@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+
+## this scripts runs everything on the bnl cluster
+import os, sys
+
+#datasetl=['BBAO','GBAO','GBAO_no6dF','LBAO','LBAO+CMBP','LBAO+CMBW','GBAO+CMBP','GBAO+CMBW',
+#         'BBAO+CMBP','BBAO+CMBW','BBAO+SN','BBAO+SN+RiessH0','SN','SN+CMBW','SN+CMBP',
+#         'BBAO+SN+CMBP','BBAO+SN+CMBW', 'GBAO+SN+cCMBP']
+
+
+## removed JordiCDM for the time being
+modell= ['LCDM','oLCDM','wCDM','owCDM','waCDM','owaCDM','PolyCDM','LCDMmasslessnu','nuLCDM'] 
+
+def wqsubmit(prefact,model,datasets):
+  # run three chains
+  for i in range(1,4):
+    comd = "Run/driver.py %s %s %s %i"%(prefact,model,datasets,i)
+    print comd
+    nm=model+"_"+prefact+"_"+datasets
+    wqcom='wq sub -r job_name:%s_%i -c "%s"'%(nm,i,comd)
+    os.system("nohup %s >%s 2>%s &"%(wqcom,'chains/logs/'+nm+'.log','chains/logs/'+nm+'.err'))
+
+if sys.argv[1]=='all':
+  lst=['hladder','pre','LCDM']
+
+for e in lst:
+    if (e=='hladder'):
+        wqsubmit('phy','PolyCDM','GBAO+SN+cCMBP')
+        wqsubmit('phy','PolyCDM','GBAO+SNx10+cCMBPx10')
+        wqsubmit('phy','PolyCDM','GBAOx10+SN+cCMBPx10')
+        wqsubmit('phy','PolyCDM','GBAOx10+SNx10+cCMBP')
+        wqsubmit('phy','PolyCDM','GBAOx10+SN+cCMBP')
+        wqsubmit('phy','PolyCDM','GBAO+SNx10+cCMBP')
+        wqsubmit('phy','PolyCDM','GBAO+SN+cCMBPx10')
+        sys.exit(0)
+    elif e=='pre':
+        wqsubmit('pre','oLCDM','GBAO')
+        wqsubmit('pre','oLCDM','LBAO')
+        wqsubmit('pre','oLCDM','BBAO')
+        wqsubmit('pre','oLCDM','GBAO+PlDa')
+        wqsubmit('pre','oLCDM','BBAO+PlDa')
+        wqsubmit('pre','oLCDM','BBAO+PlDa')
+        sys.exit(0)
+    elif e=='LCDM':
+        wqsubmit('phy','LCDM','BBAO+Planck')
+        sys.exit(0)
+
+ 
+

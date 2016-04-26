@@ -1,0 +1,149 @@
+#!/usr/bin/env python
+
+from scipy import *
+from plot_aux import *
+import pylab, sys
+
+params1 = {'backend': 'pdf',
+               'axes.labelsize': 20,
+               'text.fontsize': 18,
+               'xtick.labelsize': 20,
+               'ytick.labelsize': 20,
+               'legend.draw_frame': False,
+               'legend.fontsize': 16,
+               'lines.markersize': 6,
+               'font.size': 20,
+               'text.usetex': True}#
+pylab.rcParams.update(params1)
+
+
+#-----------
+<<<<<<< .mine
+dire = '/astro/u/anze/work/April/chains/'
+#dire = '/chains/'
+=======
+#dire = '/gpfs01/astro/workarea/jvazquez/chains/'
+dire = 'chains/'
+>>>>>>> .r156530
+
+T= plot_aux()
+
+datasetl = ['BBAO+Planck', 'SN+Planck', 'BBAO+SN+Planck']
+extra    = 'phy'
+
+
+model   = ['LCDM']
+params  = ['h','Om']
+T.Plotting_2d(dire,model, extra, datasetl, params, Nb=60)
+pylab.xlim(0.64,0.74)
+pylab.ylim(0.23,0.37)
+pylab.savefig('deplot20.pdf')
+pylab.show()
+
+
+model   = ['oLCDM']  
+params  = ['Om','Ok']
+T.Plotting_2d(dire, model, extra, datasetl, params)
+}}}pylab.ylim(-0.05,0.05)
+pylab.savefig('deplot21.pdf')
+pylab.show()
+
+
+model   = ['wCDM']  
+params  = ['Om','w']
+T.Plotting_2d(dire, model, extra, datasetl, params)
+xll,xlh=pylab.xlim()
+pylab.plot ([xll,xlh],[-1,-1],'k:')
+pylab.ylim(-1.4,-0.7)
+pylab.savefig('deplot22.pdf')
+pylab.show()
+
+
+model   = ['owCDM']  
+params  = ['w','Ok']
+T.Plotting_2d(dire, model, extra, datasetl, params)
+pylab.axis([-1.6,-0.5,-0.05,0.05])
+pylab.plot ([-1,-1],[-0.05,0.05],'k:')
+pylab.plot ([-1.6,-0.5],[0,0],'k:')
+pylab.savefig('deplot23.pdf')
+pylab.show()
+
+
+model   = ['waCDM']
+params  = ['w_z','wa']
+T.Plotting_waDE_2d(dire,model, extra, datasetl, params)
+pylab.savefig('deplot24.pdf')
+pylab.show()
+
+
+model   = ['owaCDM']
+params  = ['w_z','Ok']
+T.Plotting_waDE_2d(dire,model, extra, datasetl, params)
+pylab.savefig('deplot25.pdf')
+pylab.show()
+
+
+
+################### Second set of Plots
+
+datasetl = ['GBAO', 'LBAO', 'BBAO']
+
+model    =  ['LCDM']
+params   =  ['h','Om']
+T.Plotting_2d(dire, model, extra, datasetl, params, PL='True')
+pylab.legend(loc='upper left')
+pylab.axis([0.5,1.0,0.0,1.0])
+pylab.savefig('lcdm.pdf')
+pylab.show()
+
+
+model    =  ['oLCDM', 'LCDM']
+params   =  ['Ol']
+extra    =   'pre'
+T.Plotting_1d(dire, model, extra, datasetl, params, Ol='True')
+pylab.xlim(-0.2,1.5)
+pylab.savefig('pre0.pdf')
+pylab.show()
+
+
+model    =  ['oLCDM', 'LCDM']
+params   =  ['Pr']
+extra    =   'pre'
+T.Plotting_1d(dire, model, extra, datasetl, params)
+pylab.xlim(18,45)
+pylab.savefig('pre1.pdf')
+pylab.show()
+
+
+datasetl = ['BBAO']
+model    =  ['oLCDM']
+params   =  ['Om','Ol']
+T.Plotting_2d(dire, model, extra, datasetl, params, Ol='True')
+pylab.ylabel('$\\Omega_{\Lambda}$')
+pylab.plot([0,1],[1,0],'k:')
+pylab.savefig('pre2.pdf')
+pylab.show()
+
+
+################## H plot
+
+T.plotH(0.8,dire,'PolyCDM_phy_GBAO+SN+cPlanck','b', '$\\mbox{PolyCDM GBAO+SN}+\mathbf{r_d}$')
+T.plotH(1,dire,'PolyCDM_phy_BBAO+SN+Planck','b', 'PolyCDM BAO+SN+Planck')
+T.plotH(1.2,dire,'owaCDM_phy_BBAO+SN+Planck','b','$ow_0w_a$-CDM BAO+SN+Planck')
+
+T.plotH(1.6,'','/home/anze/work/Planck/PLA/base/planck_lowl_lowLike/base_planck_lowl_lowLike','g', '$\Lambda$CDM PLA Planck')
+T.plotH(1.8,'','/home/anze/work/Planck/PLA/base/WMAP/base_WMAP','g', '$\Lambda$CDM PLA WMAP')
+
+T.plotH(2.2,'','N: 0.738 0.024','m','Riess++')
+T.plotH(2.4,'','N: 0.743 0.021','m','Freedmann++')
+T.plotH(2.6,'','N: 0.725 0.025','m','Efstathiou')
+
+pylab.xlim(0.60,0.9)
+pylab.ylim(0.6,2.8)
+pylab.grid(axis='both')
+pylab.yticks([])
+pylab.xlabel("$h$")
+pylab.savefig('Ayaaaa-boom.pdf')
+pylab.show()
+ 
+

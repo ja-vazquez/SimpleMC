@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+
+## this scripts runs everything on the bnl cluster
+import os, sys
+
+#datasetl=['BBAO','GBAO','GBAO_no6dF','LBAO','LBAO+CMBP','LBAO+CMBW','GBAO+CMBP','GBAO+CMBW',
+#         'BBAO+CMBP','BBAO+CMBW','BBAO+SN','BBAO+SN+RiessH0','SN','SN+CMBW','SN+CMBP',
+#         'BBAO+SN+CMBP','BBAO+SN+CMBW', 'GBAO+SN+cCMBP']
+
+
+## removed JordiCDM for the time being
+modell= ['LCDM','oLCDM','wCDM','owCDM','waCDM','owaCDM','PolyCDM','LCDMmasslessnu','nuLCDM'] 
+
+def wqsubmit(prefact,model,datasets):
+  # run three chains
+  for i in range(1,4):
+    comd = "Run/driver.py %s %s %s %i"%(prefact,model,datasets,i)
+    print comd
+    nm=model+"_"+prefact+"_"+datasets
+    wqcom='wq sub -r job_name:%s_%i -c "%s"'%(nm,i,comd)
+    os.system("nohup %s >%s 2>%s &"%(wqcom,'chains/logs/'+nm+'.log','chains/logs/'+nm+'.err'))
+
+
+if __main__="main":
+  if sys.argv[1]!='all':
+          modell=sys.argv[1].split(',')
+  if sys.argv[2]!='all':
+          datasetl=sys.argv[2].split(',')
+
+<<<<<<< .mine
+if sys.argv[1]!='all':
+        prefactl=sys.argv[1].split(',')
+if sys.argv[2]!='all':
+        modell=sys.argv[2].split(',')
+if sys.argv[3]!='all':
+        datasetl=sys.argv[3].split(',')
+
+
+ 
+for model in modell:
+    for datasets in datasetl:
+        if datasets in ['BBAO','GBAO','LBAO']:
+           prefactl=['pre','phy']
+        else:
+           for prefact in prefactl:
+                wqsubmit (prefact,model,datasets)
+=======
+  for model in modell:
+      for datasets in datasetl:
+        prefactl=['phy']
+        for prefact in prefactl:
+          wqsubmit (prefact,model,datasets)
+>>>>>>> .r156586

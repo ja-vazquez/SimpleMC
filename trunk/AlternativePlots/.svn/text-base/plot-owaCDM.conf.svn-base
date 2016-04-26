@@ -1,0 +1,4 @@
+# what(H or R) filename label(for legend)
+H hz-owaCDM-BBAO+CMBP-chains_140411_155701.list owaCDM_BBAO+CMBP
+H hz-owaCDM-BBAO+SN+CMBP-chains_140411_155701.list owaCDM_BBAO+SN+CMBP
+H hz-LCDM-BBAO+SN+CMBP-chains_140411_155701.list LCDM_BBAO+SN+CMBP

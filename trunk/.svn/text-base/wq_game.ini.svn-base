@@ -1,0 +1,8 @@
+mode: bycore
+N: 100
+threads: 1
+hostfile: auto
+job_name: owCDM_game
+command: |
+     source ~/.bashrc;
+     OMP_NUM_THREADS=%threads% mpirun -hostfile %hostfile% python Run/driver_game.py phy owCDM BBAO+Planck 2000 >chains/logs/test_owCDM_BBAO_2000.log 2>chains/logs/test_owCDM_BBAO_2000.err

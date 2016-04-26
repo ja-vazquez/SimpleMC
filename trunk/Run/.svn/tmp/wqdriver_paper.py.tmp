@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+
+## this scripts runs everything on the bnl cluster
+import os, sys
+from wqdriver import wqsubmit
+
+if len(sys.argv)>1:
+  lst=sys.argv[1:]
+else:
+  lst=['S3','S5','HLadder','smoking','Early']
+
+for l in lst:
+  if l=='S3':
+    for datasets in ['GBAO','LBAO','BBAO']:
+      wqsubmit ('phy', 'LCDM',datasets)
+      wqsubmit ('pre', 'LCDM',datasets)
+      wqsubmit ('pre','oLCDM',datasets)
+      wqsubmit ('pre','oLCDM',datasets+'+PlDa')
+  elif l=='S5':
+    for model in ['LCDM','oLCDM','wCDM','owCDM','waCDM','owaCDM','LCDMmasslessnu','nuLCDM']:
+      for datasets in ['BBAO+Planck','SN+Planck','BBAO+SN+Planck']:
+        wqsubmit ('phy',model,datasets)
+  elif l=='HLadder':
+    for data in ['GBAO+SN+PlRd','GBAO+SNx10+PlRdx10','GBAOx10+SN+PlRdx10','GBAOx10+SNx10+PlRd','GBAOx10+SN+PlRd',
+                 'GBAO+SNx10+PlRd','GBAO+SN+PlRdx10']:
+      wqsubmit('phy','PolyCDM',data)
+    wqsubmit('phy','owaCDM','GBAO+SN+PlRd')
+    wqsubmit('phy','PolyCDM','GBAO+UnionSN+PlRd')
+    wqsubmit('phy','owaCDM','GBAO+UnionSN+PlRd')
+  elif l=='smoking':
+    for datasets in ['LBAO','BBAO','BBAO+Planck','BBAO+SN+Planck','Planck']:
+      for models in ['Decay','DecayFrac','WeirdCDM']:
+        wqsubmit('phy',models,datasets)
+    wqsubmit('phy','PolyCDM','BBAO+SN+Planck')
+
+    wqsubmit('phy','PolyCDM','BBAO+SN+PlRd')
+    wqsubmit('phy','TLight','BBAO+SN+PlRd')
+  elif l=='smokingW': #weird alone
+    for datasets in ['LBAO','BBAO','BBAO+Planck','BBAO+SN+Planck','Planck']:
+      for models in ['WeirdCDM']:
+        wqsubmit('phy',models,datasets)
+  elif l=='Early':
+    for model in ['EarlyDE','EarlyDE_rd','EarlyDE_w','EarlyDE_w_rd']: 
+        for datasets in ['Planck','BBAO+Planck','BBAO+SN+Planck']:
+    	    wqsubmit('phy',model, datasets) 
+
+  elif l=='Neff':
+    wqsubmit('phy','NeffLCDM','LBAO+Planck')
+    wqsubmit('phy','NeffLCDM','BBAO+Planck')
+    wqsubmit('phy','NeffLCDM','BBAO+SN+Planck')
+  else:
+    print "WTF",l
