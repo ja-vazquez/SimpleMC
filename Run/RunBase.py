@@ -1,8 +1,8 @@
 #Add paths, we want to be able to run in either root or Run/
 import sys,os
-sys.path.append("py")
-sys.path.append("../py")
-sys.path.append("models")
+#print sys.path
+sys.path=["py","../py","models"]+sys.path
+
 
 #Cosmologies
 from LCDMCosmology import *
@@ -105,7 +105,7 @@ def ParseModel(model):
     elif model=="SlowRDE":
         T=SlowRDECosmology(varyOk=False)
     elif model=="Quint":
-        T=QuintCosmology_try()
+        T=QuintCosmology()
     elif model=='wDM':
         T=wDMCosmology()
     else:
@@ -149,10 +149,10 @@ def ParseDataset(datasets):
             DR11LOWZ(),
             DR11CMASS()
             ])
-	elif name=='CMASS':
-	    L.addLikelihoods([
-	    DR11CMASS()
-	    ])	
+        elif name=='CMASS':
+            L.addLikelihoods([
+            DR11CMASS()
+            ])
         elif name=='LBAO':
             L.addLikelihoods([
             DR11LyaAuto(),
@@ -170,8 +170,8 @@ def ParseDataset(datasets):
             L.addLikelihood(SDSSMGS())
         elif name=='Planck':
             L.addLikelihood(PlanckLikelihood())
-	elif name=='Planck_15':
-	    L.addLikelihood(PlanckLikelihood_15())
+        elif name=='Planck_15':
+            L.addLikelihood(PlanckLikelihood_15())
         elif name=='WMAP':
             L.addLikelihood(WMAP9Likelihood())
         elif name=='PlRd':
@@ -194,24 +194,24 @@ def ParseDataset(datasets):
             L.addLikelihood(RiessH0())
         elif name=='6dFGS':
             L.addLikelihood(SixdFGS())
-	elif name=='ACPNS_1':
-	    L.addLikelihood(ACPNS_1())
-	elif name=='ACPNS_3':
-	    L.addLikelihood(ACPNS_3())
-	elif name=='ACPNS':
+        elif name=='ACPNS_1':       #DR12 -test
+            L.addLikelihood(ACPNS_1())
+        elif name=='ACPNS_3':
+            L.addLikelihood(ACPNS_3())
+        elif name=='ACPNS':
             L.addLikelihoods([
-	    ACPNS_1(), ACPNS_3() 
-	    ])
-        elif name=='CombBAOzb1':
-	    L.addLikelihood(CombBAOzb1())
-	elif name=='CombBAOzb2':
-	    L.addLikelihood(CombBAOzb2())
-	elif name=='CombBAOzb3':
-	    L.addLikelihood(CombBAOzb3())
-	elif name=='CombBAOzball':
-	    L.addLikelihoods([
-	    CombBAOzb1(), CombBAOzb2(), CombBAOzb3()
-	    ])
+            ACPNS_1(), ACPNS_3()
+            ])
+        elif name=='CombBAOzb1':    #Combine BAO DR12
+            L.addLikelihood(CombBAOzb1())
+        elif name=='CombBAOzb2':
+            L.addLikelihood(CombBAOzb2())
+        elif name=='CombBAOzb3':
+            L.addLikelihood(CombBAOzb3())
+        elif name=='CombBAOzball':
+            L.addLikelihoods([
+            CombBAOzb1(), CombBAOzb2(), CombBAOzb3()
+            ])
         else:
             print "Cannot parse data, unrecognizable part:", name
             sys.exit(1)

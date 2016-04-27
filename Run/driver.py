@@ -17,7 +17,7 @@ where model is one of
 
 %s 
 
-and datasets is one of 
+and datasets is one of
 
 %s
 

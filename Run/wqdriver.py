@@ -14,12 +14,13 @@ modell= ['LCDM','oLCDM','wCDM','owCDM','waCDM','owaCDM','PolyCDM','LCDMmasslessn
 def wqsubmit(prefact,model,datasets,nchains=10,nsamp=100000,chainsdir="chains"):
   # run three chains
   for i in range(1,nchains+1):
-    comd = "Run/driver.py %s %s %s %i %i %i %s"%(prefact,model,datasets,i, nsamp/100, nsamp, chainsdir)
+    comd = "Run/driver.py %s %s %s %i %i %i %s"%(prefact,model,datasets,i, min(100,nsamp/100), nsamp, chainsdir)
     print comd
     nm=model+"_"+prefact+"_"+datasets+"_"+str(i)
     wqcom='wq sub -r job_name:%s -c "%s"'%(nm,comd)
+    #os.system("nohup %s&"%(wqcom))
     os.system("nohup %s >%s 2>%s &"%(wqcom,chainsdir+'/logs/'+nm+'.log',chainsdir+'/logs/'+nm+'.err'))
-    time.sleep(0.1)
+    time.sleep(0.5)
 
 if __name__ == "__main__":
   if sys.argv[1]!='all':
