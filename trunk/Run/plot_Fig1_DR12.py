@@ -23,7 +23,7 @@ params1 = {'backend': 'pdf',
                'text.fontsize': 18,
                'xtick.labelsize': 20,
                'ytick.labelsize': 20,
-               'legend.draw_frame': False,
+#               'legend.draw_frame': False,
                'legend.fontsize': 16,
                'lines.markersize': 6,
                'font.size': 20,
@@ -54,6 +54,7 @@ zCombBAO2 = 0.51
 zCombBAO3 = 0.61
 
 rd_EHtoCAMB =153.19/149.28
+rd_fid_DR12 = 147.78
 
 zl=arange(0,4,0.01)
 
@@ -139,14 +140,15 @@ plot_errorbar(zLyaC,  10.8*(1+zLyaC),   yerr=0.4*(1+zLyaC),    color ='red', fmt
 plot_errorbar(zLyaC,  9.0*zLyaC,        yerr=0.3*zLyaC,        color ='green', fmt='-*', markersize=8, empty=False)
 
 
-plot_errorbar(zCombBAO1,  10.298,         yerr=0.138,        color ='magenta', fmt='x', markersize=8, empty=False)
-plot_errorbar(zCombBAO2,  13.406,         yerr=0.189,        color ='magenta', fmt='x', markersize=8, empty=False)
-plot_errorbar(zCombBAO3,  15.614,  	  yerr=0.250,        color ='magenta', fmt='x', markersize=8, empty=False)
+plot_errorbar(zCombBAO1,  1529./rd_fid_DR12,     yerr=24./rd_fid_DR12,        color ='magenta', fmt='x', markersize=8, empty=False)
+plot_errorbar(zCombBAO2,  2007./rd_fid_DR12,     yerr=29./rd_fid_DR12,        color ='magenta', fmt='x', markersize=8, empty=False)
+plot_errorbar(zCombBAO3,  2274./rd_fid_DR12,  	 yerr=36./rd_fid_DR12,        color ='magenta', fmt='x', markersize=8, empty=False)
 
+fact = (300000./rd_fid_DR12)
 
-plot_errorbar(zCombBAO1,  24.752*zCombBAO1,       yerr=0.641*zCombBAO1,        color ='cyan', fmt='x', markersize=8, empty=False)
-plot_errorbar(zCombBAO2,  22.244*zCombBAO2,       yerr=0.552*zCombBAO2,        color ='cyan', fmt='x', markersize=8, empty=False)
-plot_errorbar(zCombBAO3,  20.358*zCombBAO3,       yerr=0.466*zCombBAO3,        color ='cyan', fmt='x', markersize=8, empty=False)
+plot_errorbar(zCombBAO1,  fact*zCombBAO1/81.2,       yerr=fact*zCombBAO1*2.0/(81.2)**2,        color ='cyan', fmt='x', markersize=8, empty=False)
+plot_errorbar(zCombBAO2,  fact*zCombBAO2/88.3,       yerr=fact*zCombBAO2*2.1/(88.3)**2,        color ='cyan', fmt='x', markersize=8, empty=False)
+plot_errorbar(zCombBAO3,  fact*zCombBAO3/95.6,       yerr=fact*zCombBAO3*2.4/(95.6)**2,        color ='cyan', fmt='x', markersize=8, empty=False)
 
 #Axis
 ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
