@@ -38,7 +38,7 @@ else:
 if len(sys.argv)>5:
     skip=int(sys.argv[5])
 else:
-    skip=5000
+    skip=3000
 
 if len(sys.argv)>6:
     nsamp=int(sys.argv[6])

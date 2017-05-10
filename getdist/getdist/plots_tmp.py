@@ -109,7 +109,7 @@ class GetDistPlotSettings(object):
         self.plot_args = None
         self.solid_colors = ['#006FED', '#E03424', 'gray', '#009966', '#000866', '#336600', '#006633', 'm',
                              'r']
-        self.default_dash_styles = {'--': (3, 2), '-.': (4, 1, 1, 1)}
+        self.default_dash_styles = {'-.': (3, 2), '-.': (4, 1, 1, 1)}
         self.line_labels = True
         self.x_label_rotation = 0
         self.num_shades = 80
@@ -144,7 +144,7 @@ class GetDistPlotSettings(object):
         self.legend_frac_subplot_line = 0.1
         self.legend_fontsize = None
 
-        self.num_plot_contours = 2
+        self.num_plot_contours = 3
         self.solid_contour_palefactor = 0.6
         self.alpha_filled_add = 0.85
         self.alpha_factor_contour_lines = 0.5
@@ -894,21 +894,18 @@ class GetDistPlotter(object):
             if proxyIx >= 0: self.contours_added[proxyIx] = (plt.Rectangle((0, 0), 1, 1, fc=CS.tcolors[-1][0]))
             ax.contour(density.x, density.y, density.P, levels[:1], colors=CS.tcolors[-1],
                        linewidths=self.settings.lw_contour, alpha=alpha * self.settings.alpha_factor_contour_lines,
-                       **kwargs)
+		       linestyles = [args['ls']],
+		       **kwargs)
         else:
             args = self._get_line_styles(plotno, **kwargs)
-            # if color is None: color = self._get_color(plotno, **kwargs)
-            # cols = [color]
-            # if ls is None: ls = self._get_linestyle(plotno, **kwargs)
+            if color is None: color = self._get_color(plotno, **kwargs)
+            cols = [color]
+            if ls is None: ls = self._get_linestyle(plotno, **kwargs)
             linestyles = [args['ls']]
             cols = [args['color']]
             kwargs = self._get_plot_args(plotno, **kwargs)
             kwargs['alpha'] = alpha
-<<<<<<< HEAD
             CS = ax.contour(density.x, density.y, density.P, contour_levels, colors=cols, linestyles=linestyles,
-=======
-            CS = ax.contour(density.x, density.y, density.P, sorted(contour_levels), colors=cols, linestyles=linestyles,
->>>>>>> fb76cd00b4ed385b531b8f00c80dd7c143efa82d
                             linewidths=self.settings.lw_contour, **kwargs)
             dashes = args.get('dashes')
             if dashes:
@@ -1759,11 +1756,7 @@ class GetDistPlotter(object):
         :param legend_ncol: The number of columns for the legend
         :param legend_loc: The location for the legend
         :param upper_roots: set to fill the upper triangle with subplots using this list of sample root names 
-<<<<<<< HEAD
                              (TODO: this needs some work easily without a lot of tweaking)
-=======
-                             (TODO: this needs some work to easily work without a lot of tweaking)
->>>>>>> fb76cd00b4ed385b531b8f00c80dd7c143efa82d
         :param upper_kwargs: list of dict for arguments when making upper-triangle 2D plots
         :param kwargs: optional keyword arguments for :func:`~GetDistPlotter.plot_2d` or :func:`~GetDistPlotter.plot_3d` (lower triangle only)
         
@@ -1812,10 +1805,6 @@ class GetDistPlotter(object):
                     _line_args += [{'color': col}]
             return _line_args
 
-<<<<<<< HEAD
-=======
-	contour_ls = ['--']
->>>>>>> fb76cd00b4ed385b531b8f00c80dd7c143efa82d
         contour_args = self._make_contour_args(len(roots), filled=filled, contour_args=contour_args,
                                                colors=contour_colors, ls=contour_ls, lws=contour_lws)
         if line_args is None:
@@ -2084,11 +2073,7 @@ class GetDistPlotter(object):
         :return: (xmin, xmax), (ymin, ymax) bounds for the axes.
         """
 
-<<<<<<< HEAD
         kwargs = {'fixed_color':color}
-=======
-        kwargs = {'fixed_color': color}
->>>>>>> fb76cd00b4ed385b531b8f00c80dd7c143efa82d
         return self.add_3d_scatter(root, [x, y], False, alpha, extra_thin, scatter_size, ax, **kwargs)
 
     def add_3d_scatter(self, root, params, color_bar=True, alpha=1, extra_thin=1, scatter_size=None, ax=None, **kwargs):
@@ -2118,19 +2103,10 @@ class GetDistPlotter(object):
         if extra_thin > 1:
             samples = [pts[::extra_thin] for pts in samples]
         self.last_scatter = (ax or plt.gca()).scatter(samples[0], samples[1], edgecolors='none',
-<<<<<<< HEAD
                                         s=scatter_size or self.settings.scatter_size, c=fixed_color or samples[2],
                                         cmap=self.settings.colormap_scatter, alpha=alpha)
         if not ax: plt.sci(self.last_scatter)
         if color_bar and not fixed_color: self.last_colorbar = self.add_colorbar(params[2], mappable=self.last_scatter, ax=ax, **kwargs)
-=======
-                                                      s=scatter_size or self.settings.scatter_size,
-                                                      c=fixed_color or samples[2],
-                                                      cmap=self.settings.colormap_scatter, alpha=alpha)
-        if not ax: plt.sci(self.last_scatter)
-        if color_bar and not fixed_color: self.last_colorbar = self.add_colorbar(params[2], mappable=self.last_scatter,
-                                                                                 ax=ax, **kwargs)
->>>>>>> fb76cd00b4ed385b531b8f00c80dd7c143efa82d
         xbounds = [min(samples[0]), max(samples[0])]
         r = xbounds[1] - xbounds[0]
         xbounds[0] -= r / 20

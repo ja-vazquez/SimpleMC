@@ -6,7 +6,11 @@ class DensitiesError(Exception):
     pass
 
 
+<<<<<<< HEAD
 defaultContours = [0.68, 0.95]
+=======
+defaultContours = [0.68, 0.95, 0.995]
+>>>>>>> fb76cd00b4ed385b531b8f00c80dd7c143efa82d
 
 
 def getContourLevels(inbins, contours=defaultContours, missing_norm=0, half_edge=True):
