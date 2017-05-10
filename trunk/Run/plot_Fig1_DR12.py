@@ -10,6 +10,8 @@ import matplotlib.ticker
 import pylab 
 import math as N
 
+
+
 plaw=0.5
 #for division by log(1+z) use this
 #plaw=-1
@@ -33,6 +35,8 @@ pylab.rcParams.update(params1)
 
 #Planck best fit cosmology
 T=LCDMCosmology(Obh2=0.022,Om=0.31,h=0.676)
+#PLK-15
+#T=LCDMCosmology(Obh2=0.02225,Om=0.3156,h=0.6727)
 
 zLOWZ  = 0.32 
 zCMASS = 0.57
@@ -55,6 +59,7 @@ zCombBAO3 = 0.61
 
 rd_EHtoCAMB =153.19/149.28
 rd_fid_DR12 = 147.78
+rd_fid_DR7  = 151.84  
 
 zl=arange(0,4,0.01)
 
@@ -97,16 +102,19 @@ def color_legend(leg):
 legend1.draw_frame(False)
 color_legend(legend1)
 
+def ersys(x, y):
+ 	return sqrt(x**2 + y**2)
+
 
 ### Plotting -  Error bars 
-def plot_errorbar(z,val, yerr=0, color=0, fmt=0, markersize=0,label=None, empty=True):
+def plot_errorbar(z,val, yerr=0, color=0, fmt=0, markersize=0,label=None, empty=True, alpha=1):
     if empty:
         mfc='white'
         lw=1
     else:
         mfc=color
         lw=2
-    pylab.errorbar(z,val/fixer(z), yerr=yerr/fixer(z), color=color, fmt=fmt, markersize=markersize, lw=lw, capthick=lw,capsize=2+2*lw,markerfacecolor=mfc)
+    pylab.errorbar(z,val/fixer(z), yerr=yerr/fixer(z), color=color, fmt=fmt, markersize=markersize, lw=lw, capthick=lw,capsize=2+2*lw,markerfacecolor=mfc, alpha=alpha)
     if label>0:
         if (mfc=='white'):
             pylab.plot ([],[],fmt,color='black',label=label,markersize=markersize,markerfacecolor=mfc)
@@ -115,40 +123,64 @@ def plot_errorbar(z,val, yerr=0, color=0, fmt=0, markersize=0,label=None, empty=
 
 pylab.legend(loc="lower right")
 
+fmt1 = '^'
+fmt2 = 's'
+empty1= True
+empty2= False
+alpha= 1.0
 
-plot_errorbar(z6dFGS,    2.97*rd_EHtoCAMB,   yerr=rd_EHtoCAMB*0.015/0.336**2,  color ='blue', fmt='+', markersize=8, label="$\\rm{6dFGS}$")
-plot_errorbar(zMGS,      666/148.651,    yerr=25/148.651,               color ='blue', fmt='^', markersize=8, label="$\\rm{MGS}$")
-plot_errorbar(zSDSS1,    5.2493*rd_EHtoCAMB, yerr=rd_EHtoCAMB*0.0061/0.1905**2,color ='blue', fmt='p', markersize=8, label="$\\rm{SDSS-II}$")
-plot_errorbar(zSDSS2,    9.1157*rd_EHtoCAMB, yerr=rd_EHtoCAMB*0.0036/0.1097**2,color ='blue', fmt='p', markersize=8)
-plot_errorbar(zWiggleZ1, 10.917*rd_EHtoCAMB ,yerr=rd_EHtoCAMB*0.0071/0.0916**2,color ='blue', fmt='s', markersize=8, label="$\\rm{WiggleZ}$")
-plot_errorbar(zWiggleZ2, 13.774*rd_EHtoCAMB ,yerr=rd_EHtoCAMB*0.0034/0.0726**2,color ='blue', fmt='s', markersize=8)
-plot_errorbar(zWiggleZ3, 16.891*rd_EHtoCAMB ,yerr=rd_EHtoCAMB*0.0031/0.0592**2,color ='blue', fmt='s', markersize=8)
+#Errorbars from DR12 Full-shape
+fact = (300000./rd_fid_DR12)
+
+#666/148.651,    yerr=25/148.651
+plot_errorbar(z6dFGS,    2.97*rd_EHtoCAMB,   yerr=rd_EHtoCAMB*0.015/0.336**2,  color ='blue', fmt='>', markersize=6, empty=empty2, label="$\\rm{6dFGS}$", alpha=alpha)
+plot_errorbar(zMGS,      4.464,    yerr=0.168,               color ='blue', fmt='p', markersize=6, label="$\\rm{SDSS\ MGS}$", empty=empty2, alpha=alpha)
+
+plot_errorbar(zSDSS1,    5.2493*rd_EHtoCAMB, yerr=rd_EHtoCAMB*0.0061/0.1905**2,color ='blue', fmt=fmt1, markersize=6, empty=empty1, alpha=alpha)
+plot_errorbar(zSDSS2,    1348./rd_fid_DR12, yerr=26./rd_fid_DR12 ,color ='blue', fmt=fmt1, markersize=6, label="$\\rm{SDSS\ DR7}$", empty=empty1, alpha=alpha)
+
+#plot_errorbar(zSDSS2,    fact*zSDSS2/84.9, yerr=fact*zSDSS2*7.0/84.9**2  ,color ='green', fmt=fmt1, markersize=8, empty=empty1, alpha=alpha)
+#plot_errorbar(zSDSS2,    1410./rd_fid_DR12, yerr=51./rd_fid_DR12 ,color ='red', fmt=fmt1, markersize=6, empty=empty1, alpha=alpha)
+
+plot_errorbar(zWiggleZ1, 1695./rd_fid_DR12 ,yerr=82./rd_fid_DR12 ,color ='blue', fmt=fmt2, markersize=6, label="$\\rm{WiggleZ}$", empty=empty1, alpha=alpha)
+plot_errorbar(zWiggleZ2, 2194./rd_fid_DR12 ,yerr=100./rd_fid_DR12 ,color ='blue', fmt=fmt2, markersize=6, empty=empty1, alpha=alpha)
+plot_errorbar(zWiggleZ3, 2486./rd_fid_DR12 ,yerr=85./rd_fid_DR12 ,color ='blue', fmt=fmt2, markersize=6, empty=empty1, alpha=alpha)
+
 
 if eboss:
     plot_errorbar(zLOWZ,     8.467,              yerr=0.17,        color ='blue', fmt='v', markersize=8, label="$\\mathrm{LOWZ}$",empty=False)
 else:
-    plot_errorbar(zLOWZ,     8.467,              yerr=0.17,        color ='blue', fmt='v', markersize=8, label="$\\mathrm{LOWZ}$",empty=False)
+    pass	
+    #plot_errorbar(zLOWZ,     8.467,              yerr=0.17,        color ='blue', fmt='v', markersize=8, label="$\\mathrm{LOWZ}$",empty=False)
 
 
-plot_errorbar(zCMASS, 9.519*(1+zCMASS), yerr=0.134*(1+zCMASS), color ='red', fmt='d', markersize=6,label="$\\mathrm{CMASS}$", empty=False)
-plot_errorbar(zCMASS, 20.75*zCMASS,     yerr=0.73*zCMASS,      color ='green', fmt='-d', markersize=6,empty=False)
-
-plot_errorbar(zLyaA,  11.28*(1+zLyaA),  yerr=0.65*(1+ zLyaA),  color ='red', fmt='o', markersize=8,label="$\\mathrm{Ly}\\alpha\ \\rm{auto}$", empty=False)
-plot_errorbar(zLyaA,  9.18*zLyaA,       yerr=0.28*zLyaA,       color ='green', fmt='-o', markersize=8,empty=False)
-
-plot_errorbar(zLyaC,  10.8*(1+zLyaC),   yerr=0.4*(1+zLyaC),    color ='red', fmt='*', markersize=8,label="$\\mathrm{Ly}\\alpha\ \\rm{cross}$",empty=False)
-plot_errorbar(zLyaC,  9.0*zLyaC,        yerr=0.3*zLyaC,        color ='green', fmt='-*', markersize=8, empty=False)
+#plot_errorbar(zCMASS, 9.519*(1+zCMASS), yerr=0.134*(1+zCMASS), color ='red', fmt='d', markersize=6,label="$\\mathrm{CMASS}$", empty=False)
+#plot_errorbar(zCMASS, 20.75*zCMASS,     yerr=0.73*zCMASS,      color ='green', fmt='-d', markersize=6,empty=False)
 
 
-plot_errorbar(zCombBAO1,  1529./rd_fid_DR12,     yerr=24./rd_fid_DR12,        color ='magenta', fmt='x', markersize=8, empty=False)
-plot_errorbar(zCombBAO2,  2007./rd_fid_DR12,     yerr=29./rd_fid_DR12,        color ='magenta', fmt='x', markersize=8, empty=False)
-plot_errorbar(zCombBAO3,  2274./rd_fid_DR12,  	 yerr=36./rd_fid_DR12,        color ='magenta', fmt='x', markersize=8, empty=False)
 
-fact = (300000./rd_fid_DR12)
+plot_errorbar(zCombBAO1,  1512.4/rd_fid_DR12,     yerr=ersys(22.5, 11.0)/rd_fid_DR12,       
+		color ='red', fmt='d', markersize=8, empty=empty2, label="$\\rm{BOSS\ Galaxy\ DR12}$")
+plot_errorbar(zCombBAO2,  1975.2/rd_fid_DR12,     yerr=ersys(26.6, 14.1)/rd_fid_DR12,
+		color ='red', fmt='d', markersize=8, empty=empty2)
+plot_errorbar(zCombBAO3,  2306.7/rd_fid_DR12,  	 yerr=ersys(33.2, 16.7)/rd_fid_DR12, 
+		color ='red', fmt='d', markersize=8, empty=empty2)
 
-plot_errorbar(zCombBAO1,  fact*zCombBAO1/81.2,       yerr=fact*zCombBAO1*2.0/(81.2)**2,        color ='cyan', fmt='x', markersize=8, empty=False)
-plot_errorbar(zCombBAO2,  fact*zCombBAO2/88.3,       yerr=fact*zCombBAO2*2.1/(88.3)**2,        color ='cyan', fmt='x', markersize=8, empty=False)
-plot_errorbar(zCombBAO3,  fact*zCombBAO3/95.6,       yerr=fact*zCombBAO3*2.4/(95.6)**2,        color ='cyan', fmt='x', markersize=8, empty=False)
+
+plot_errorbar(zCombBAO1,  fact*zCombBAO1/81.21,       yerr=fact*zCombBAO1*ersys(2.17, 0.97)/(81.21)**2,  
+		color ='green', fmt='d', markersize=8, empty=empty2)
+plot_errorbar(zCombBAO2,  fact*zCombBAO2/90.90,       yerr=fact*zCombBAO2*ersys(2.07, 1.08)/(90.90)**2,    
+		color ='green', fmt='d', markersize=8, empty=empty2)
+plot_errorbar(zCombBAO3,  fact*zCombBAO3/98.96,       yerr=fact*zCombBAO3*ersys(2.21, 1.18)/(98.96)**2, 
+		color ='green', fmt='d', markersize=8, empty=empty2)
+
+
+plot_errorbar(zLyaA,  11.28*(1+zLyaA),  yerr=0.65*(1+ zLyaA),  color ='red', fmt='o', markersize=8,label="$\\rm{BOSS}\ \\mathrm{Ly}\\alpha\\mbox{-}\\rm{auto}\ \\rm{DR11}$", empty=empty2)
+plot_errorbar(zLyaA,  9.18*zLyaA,       yerr=0.28*zLyaA,       color ='green', fmt='-o', markersize=8,empty=empty2)
+
+plot_errorbar(zLyaC,  10.8*(1+zLyaC),   yerr=0.4*(1+zLyaC),    color ='red', fmt='*', markersize=8,label="$\\rm{BOSS}\ \\mathrm{Ly}\\alpha\\mbox{-}\\rm{cross}\ \\rm{DR11}$", empty=empty2)
+plot_errorbar(zLyaC,  9.0*zLyaC,        yerr=0.3*zLyaC,        color ='green', fmt='-*', markersize=8, empty=empty2)
+
 
 #Axis
 ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
@@ -172,7 +204,7 @@ if plaw>0:
         pylab.xlim(0.0,2.6)
         pylab.savefig("Fig1_DR12_eboss.pdf")
     else:
-        pylab.legend(loc='upper left', numpoints=1)
+        pylab.legend(loc='upper left', numpoints=1, frameon=True)
         pylab.ylim(6,30)
         pylab.xlim(0.08,3.0)
         pylab.savefig("Fig1_DR12.pdf")
@@ -194,5 +226,5 @@ else:
         pylab.savefig("Fig1_DR12_v2.pdf")
 
 
-pylab.show()
+#pylab.show()
 
