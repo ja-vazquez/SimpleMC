@@ -11,16 +11,17 @@ from Parameter import *
 
 ## Parameters are value, variation, bounds
 #0.3038, 0.02234, 0.6821
-Om_par = Parameter("Om", 0.3038, 0.1, (0.05,1.5), "\Omega_m*" )
+Om_par = Parameter("Om", 0.3038, 0.05, (0.05,1.5), "\Omega_m*" )
 Obh2_par = Parameter("Obh2", 0.02234, 0.0002, (0.02, 0.025), "\Omega_bh^2")
 h_par = Parameter("h", 0.6821, 0.05,(0.4, 1.0), "h")
 mnu_par = Parameter("mnu", 0.06, 0.1, (0,1.0), "\Sigma m_{\\nu}")
 Nnu_par = Parameter("Nnu", 3.046, 0.5, (3.046,5.046), "N_{\\rm eff}")
 
 Ok_par = Parameter("Ok",0.0, 0.1, (-1.5, 1.5), "\Omega_k")
-w_par = Parameter("w",-1.0, 0.1, (-2.0,0.0), "w_0")
-wa_par = Parameter("wa",0.0, 0.1, (-2.0,2.0), "w_a" )
-wb_par = Parameter("wb",0.0, 0.2, (-1.5,1.5),  "w_b")
+w_par = Parameter("w",   1.0, 0.1,   (-0.5, 2.0), "w_0")
+wa_par = Parameter("wa", 1.0, 0.1,  (-0.5, 2.0), "w_a" )
+wb_par = Parameter("wb", 0.7, 0.2,  (-2., 3.0), "w_b")
+wc_par = Parameter("wc", 0.7, 0.2,   (-3., 5.0), "w_c")
 
 ## this is the prefactor parameter c/rdH0
 Pr_par = Parameter("Pr",28.6,4, (5, 70), "c/(H_0r_d)")
@@ -96,4 +97,34 @@ OSti_par = Parameter("OSti", 0.0, 0.01, (0, 0.1), "O_{Stif}")
 #Cosine Parameterisation
 nk_par = Parameter("nk", 0.0, 0.1, (-1, 1), "n")
 kk_par = Parameter("kk", 1.5, 0.1, (0.01, 3.14), "k")
+
+#Quintom Cosology
+mquin_par  = Parameter("mquin", 0.5, 0.1, (0, 3), "m_{\phi}")
+mphan_par  = Parameter("mphan", 0.5, 0.1, (0, 3), "m_{\psi}")
+iniphi_par = Parameter("iniphi", 0.1, 0.1, (0, 3), "phi_0")
+
+#Anisotropic
+bd_par     = Parameter("bd", 1.0, 0.5, (0, 5), "\omega")
+Osigma_par  = Parameter("Osigma", -5., 1.0, (-15, 0), "\Omega_{\sigma}")
+
+#Fourier
+a0_par     = Parameter("a0", 1, 0.1, (-1, 2), "a0")
+a1_par     = Parameter("a1", 0, 0.1, (-1, 2), "a1")
+a2_par     = Parameter("a2", 0, 0.1, (-1, 2), "a2")
+a3_par     = Parameter("a3", 0, 0.1, (-1, 2), "a3")
+a4_par     = Parameter("a4", 0, 0.1, (-1, 2), "a4")
+
+#Horndeski
+c1_par     = Parameter("c1", -5.2, 0.05, (-0.5, 0.5), "c1")
+c2_par     = Parameter("c2", 3.1, 0.05, (-0.5, 0.5), "c2")
+c3_par     = Parameter("c3", -1.1, 0.05, (-0.5, 0.5), "c3")
+c4_par     = Parameter("c4", 1., 0.05, (-0.5, 0.5), "c4")
+
+f1_par     = Parameter("f1", 1., 0.05, (0.5, 1.5), "f1")
+f2_par     = Parameter("f2", 1., 0.05, (0.5, 1.5), "f2")
+f3_par     = Parameter("f3", 1., 0.05, (0.5, 1.5), "f3")
+f4_par     = Parameter("f4", 1., 0.05, (0.5, 1.5), "f4")
+
+
+
 
