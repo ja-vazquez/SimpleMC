@@ -115,15 +115,15 @@ a3_par     = Parameter("a3", 0, 0.1, (-1, 2), "a3")
 a4_par     = Parameter("a4", 0, 0.1, (-1, 2), "a4")
 
 #Horndeski
-c1_par     = Parameter("c1", -5.2, 0.05, (-0.5, 0.5), "c1")
-c2_par     = Parameter("c2", 3.1, 0.05, (-0.5, 0.5), "c2")
-c3_par     = Parameter("c3", -1.1, 0.05, (-0.5, 0.5), "c3")
-c4_par     = Parameter("c4", 1., 0.05, (-0.5, 0.5), "c4")
+c1_par     = Parameter("c1", 0.0, 0.15, (-2.0, 1.5), "c1")
+c2_par     = Parameter("c2", 0.0, 0.1, (-1.5, 1.5), "c2")
+c3_par     = Parameter("c3", 0.0, 0.1, (-1.0, 1.0), "c3")
+c4_par     = Parameter("c4", 0.0, 0.1, (-0.5, 0.5), "c4")
 
-f1_par     = Parameter("f1", 1., 0.05, (0.5, 1.5), "f1")
-f2_par     = Parameter("f2", 1., 0.05, (0.5, 1.5), "f2")
-f3_par     = Parameter("f3", 1., 0.05, (0.5, 1.5), "f3")
-f4_par     = Parameter("f4", 1., 0.05, (0.5, 1.5), "f4")
+f1_par     = Parameter("f1", 1., 0.1, (0.5, 1.5), "f1")
+f2_par     = Parameter("f2", 1., 0.1, (0.5, 1.5), "f2")
+f3_par     = Parameter("f3", 1., 0.1, (0.5, 1.5), "f3")
+f4_par     = Parameter("f4", 1., 0.1, (0.5, 1.5), "f4")
 
 
 
