@@ -18,13 +18,20 @@ from StepCDMCosmology import *
 from EarlyDECosmology import *
 from SlowRDECosmology import *
 from QuintCosmology_try import *
+from QuintomCosmology import *
 from wDMCosmology import *
 from OzcosCosmology import *
+from HornCosmology import *
+from HornFcoCosmology import *
+from AnisotropicCosmology import *
+from FourierCosmology import *
+from Luis import *
 
 #Like modules
 from BAOLikelihoods import *
 from SimpleCMB import *
 from CompressedSNLikelihood import *
+from CompressedHDLikelihood import *
 from HubbleParameterLikelihood import *
 
 #Composite Likelihood
@@ -72,9 +79,13 @@ def ParseModel(model):
     elif model=="owCDM":
         T=owa0CDMCosmology(varywa=False)
     elif model=="owaCDM":
-        T=owa0CDMCosmology()
+        T=Lowa0CDMCosmology()
     elif model=='FCDM':
 	T=OzcosCosmology()
+    elif model=='HornFco_c_cubic':
+        T=HornFcoCosmology(varyc=True)
+    elif model=='HornFco_f_cubic':
+        T=HornFcoCosmology(varyf=True)
     elif model=="JordiCDM":
         T=JordiCDMCosmology()
     elif model=="WeirdCDM":
@@ -105,6 +116,16 @@ def ParseModel(model):
         T=SlowRDECosmology(varyOk=False)
     elif model=="Quint":
 	T=QuintCosmology_try()
+    elif model=="Quintess":
+	T=QuintomCosmology(varymquin=True)
+    elif model=="Phantom":
+        T=QuintomCosmology(varymphan=True)
+    elif model=="Quintom":
+	T=QuintomCosmology(varymquin=True, varymphan=True, varyiniphi=True)
+    elif model=="Anisotropic":
+	T=AnisotropicCosmology()
+    elif model=="Fourier":
+	T=FourierCosmology()
     elif model=='wDM':
 	T=wDMCosmology()
     else:
@@ -191,7 +212,9 @@ def ParseDataset(datasets):
             L.addLikelihood(UnionSN())
         elif name=='RiessH0':
             L.addLikelihood(RiessH0())
-        elif name=='6dFGS':
+	elif name=='HD2':
+	    L.addLikelihood(HD())
+	elif name=='6dFGS':
             L.addLikelihood(SixdFGS())
 	elif name=='ACPNS_1':
 	    L.addLikelihood(ACPNS_1())

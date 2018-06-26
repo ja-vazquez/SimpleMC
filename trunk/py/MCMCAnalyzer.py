@@ -156,7 +156,7 @@ class MCMCAnalyzer:
 
     def ProcessAccepted(self,ppars, ploglike, ploglikes):
         self.co+=1
-        if (self.co%1000==0):
+        if (self.co%100==0): #JaV 1000
             print "Accepted samples",self.co,self.cw
         vec=[p.value for p in self.cpars]
 
@@ -171,7 +171,7 @@ class MCMCAnalyzer:
 
             self.fout.write(outstr)
             ## Flush file on regular basis
-            if (self.co%1000==0):
+            if (self.co%100==0): #JaV 1000
                 self.fout.flush()
                 
             if (self.cloglike>self.maxloglike):
