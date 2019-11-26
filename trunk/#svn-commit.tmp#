@@ -1,8 +1,0 @@
-
-
---This line, and those below, will be ignored--
-
-AM   Run/plot_Dec.py
-M    Run/RunBase.py
-M    py/ParamDefs.py
-A    py/DecayLCDMCosmology.py

@@ -1,1 +1,0 @@
-from getdist.plots import *

@@ -1,6 +1,0 @@
-# what(H or R) filename label(for legend)
-H hz-StepCDM-BBAO+CMBP-chains_step.list StepCDM_BBAO+CMBP
-H hz-StepCDM-BBAO+SN+CMBP-chains_step.list StepCDM_BBAO+SN+CMBP
-H hz-LCDM-BBAO+SN+CMBP-chains_140411_155701.list LCDM_BBAO+SN+CMBP
-R rhode-StepCDM-BBAO+CMBP-chains_step.list StepCDM_BBAO+CMBP
-R rhode-StepCDM-BBAO+SN+CMBP-chains_step.list StepCDM_BBAO+SN+CMBP
