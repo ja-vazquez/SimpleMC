@@ -26,7 +26,7 @@ class BaseLikelihood:
     def loglike(self):
         return 0.0
 
-    def theory_loglike_prior():
+    def theory_loglike_prior(self):
         return self.theory_.prior_loglike()
 
     def loglike_wprior(self):
