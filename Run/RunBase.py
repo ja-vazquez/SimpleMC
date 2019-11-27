@@ -36,8 +36,9 @@ from LikelihoodMultiplier import LikelihoodMultiplier
 from BAOLikelihoods import DR11LOWZ, DR11CMASS, DR14LyaAuto, DR14LyaCross, \
         SixdFGS, SDSSMGS, DR11LyaAuto, DR11LyaCross
 from SimpleCMB import PlanckLikelihood, WMAP9Likelihood
-from CompressedSNLikelihood import BetouleSN, UnionSN
+from CompressedSNLikelihood    import BetouleSN, UnionSN
 from HubbleParameterLikelihood import RiessH0
+from CompressedHDLikelihood    import HubbleDiagram
 
 # Analyzers
 from MCMCAnalyzer import *
@@ -235,6 +236,8 @@ def ParseDataset(datasets):
             L.addLikelihood(UnionSN())
         elif name == 'RiessH0':
             L.addLikelihood(RiessH0())
+        elif name=='HD':
+            L.addLikelihood(HubbleDiagram())
         elif name == '6dFGS':
             L.addLikelihood(SixdFGS())
         else:

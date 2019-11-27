@@ -7,7 +7,7 @@ import scipy.linalg as la
 import scipy as sp
 
 
-class CompressedSNLikelihood (BaseLikelihood):
+class CompressedSNLikelihood(BaseLikelihood):
     def __init__(self, name, values_filename, cov_filename):
         BaseLikelihood.__init__(self, name)
         print("Loading ", values_filename)
