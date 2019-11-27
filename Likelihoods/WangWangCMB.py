@@ -7,32 +7,35 @@
 # This module implements Wang+Wang CMB
 ##
 
-from BaseLikelihood import *
-from scipy import *
+import sys
+from BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
+import scipy as sp
 
 print("DEPRECATED!")
-stop()
+sys.exit(1)
 
 
 class WangWangCMB (BaseLikelihood):
     def __init__(self, name, mean, err, cor):
         BaseLikelihood.__init__(self, name)
-        self.mean = array(mean)
+        self.mean = sp.array(mean)
         # wang and wang give correlation matrix
         # and errors and presumably we need to multipy
         # them back
-        err = array(err)
-        cov = array(cor)*outer(err, err)
+        err = sp.array(err)
+        cov = sp.array(cor)*sp.outer(err, err)
         self.icov = la.inv(cov)
+
 
     def setTheory(self, theory):
         self.theory_ = theory
         self.theory_.setNoObh2prior()
 
+
     def loglike(self):
         delt = self.theory_.WangWangVec()-self.mean
-        return -dot(delt, dot(self.icov, delt))/2.0
+        return -sp.dot(delt, sp.dot(self.icov, delt))/2.0
 
 
 class PlanckLikelihood(WangWangCMB):
@@ -67,7 +70,7 @@ class PlanckLikelihood(WangWangCMB):
 
         else:
             print("Basd mtrices param")
-            stop()
+            sys.exit(1)
 
         WangWangCMB.__init__(self, "CMB_WW_"+matrices, mean, err, cov)
 
@@ -89,6 +92,6 @@ class WMAP9Likelihood(WangWangCMB):
 
         else:
             print("Basd mtrices param")
-            stop()
+            sys.exit(1)
 
         WangWangCMB.__init__(self, "CMB_WW_WMAP9", mean, err, cov)
