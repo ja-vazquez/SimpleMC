@@ -15,7 +15,7 @@ class Plotter:
 		self.weights = weights
 		self.plottername = plottername
 
-		self.parsfile = chainsdir + '/' + outputname.rstrip(".txt")+".paramnames"
+		self.parsfile = chainsdir + '/' + outputname + ".paramnames"
 
 		self.readFile()
 
@@ -99,10 +99,10 @@ class Plotter:
 		if self.samplername == 'mh':
 			npchain = np.loadtxt(self.chainsdir + '/'+self.outputname+'_1.txt')
 		else:
-			npchain = np.loadtxt(self.chainsdir + '/'+self.outputname)
+			npchain = np.loadtxt(self.chainsdir + '/'+self.outputname + '.txt')
 			self.outputname = self.outputname.rstrip(".txt")
 
-		self.samples = npchain[:,2:self.ndim+2]
+		self.samples = npchain[ : , 2:self.ndim+2]
 
 		
 
@@ -110,10 +110,13 @@ class Plotter:
 		"""
 		Displays the plots after the samples are generated.
 		"""
-		from PIL import Image
-		img = Image.open(self.chainsdir+'/'+self.outputname+".png")
-		img.show()
-
+		try:
+			from PIL import Image
+			img = Image.open(self.chainsdir+'/'+self.outputname+".png")
+			img.show()
+		except:
+			print("Figure saved.")
+			
 	def rootDirWithFile(self):
 		"""
 		Finds the path.
