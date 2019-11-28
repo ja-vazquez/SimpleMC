@@ -1,4 +1,4 @@
-from RunBase import ParseModel, ParseDataset
+from RunBase import *
 from numpy import array
 
 def iniReader(inifile):
