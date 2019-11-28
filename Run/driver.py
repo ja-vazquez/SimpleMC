@@ -1,5 +1,9 @@
 #!/usr/bin/env python
+
+
 import sys
+sys.path = ["Analizers"] + sys.path
+
 from RunBase import ParseModel, ParseDataset
 from MCMCAnalyzer import MCMCAnalyzer
 from MaxLikeAnalyzer import MaxLikeAnalyzer
@@ -68,5 +72,5 @@ if chainno > 0:
     M = MCMCAnalyzer(L, chainsdir + "/" + model + "_"+prefact + "_" +
                      datasets, skip=skip, nsamp=nsamp, temp=temp, chain_num=chainno)
 else:
-    A = MaxLikeAnalyzer(L)
+    A = MaxLikeAnalyzer(L, noErrors=False)
     T.printParameters(A.params)

@@ -1,5 +1,5 @@
 # This is a helper class that takes a likelihood
-# and just multiplies loglike with some value to simulater
+# and just multiplies loglike with some value to simulate
 # better or shittier data.
 ##
 # You have to give python a credit for how effortlessly
@@ -15,6 +15,7 @@ def LikelihoodMultiplier(LikeInstance, mult):
             # save type since we need to call parent type
             self.LikeType = LikeInstance.__class__
             self.mult = mult
+
 
         def loglike(self):
             return self.LikeType.loglike(self)*self.mult

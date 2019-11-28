@@ -3,9 +3,8 @@
 #
 
 
-from BaseLikelihood import *
-from scipy import *
-import scipy.linalg as la
+from BaseLikelihood import BaseLikelihood
+
 
 
 class HubbleParameterLikelihood (BaseLikelihood):

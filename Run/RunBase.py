@@ -4,10 +4,10 @@
 import sys
 sys.path = ["py", "../py", "Models", "Cosmo", "Likelihoods"] + sys.path
 
-#TODO -- Include model used in several papers
-#TODO -- Add Choronometers data
+#TODO -- Include models used in several papers
 #TODO -- Add Planck 15
 #TODO -- Add DR12 Galaxies
+#TODO -- Add Compress Pantheon
 
 # Cosmologies already included
 from LCDMCosmology import LCDMCosmology
@@ -26,22 +26,23 @@ from SlowRDECosmology import SlowRDECosmology
 from BinnedWCosmology import BinnedWCosmology
 from QuintCosmology import QuintCosmology
 
-
-# Likelihood modules
-from BAOLikelihoods import *
-from SimpleCMB import *
-from CompressedSNLikelihood import *
-from HubbleParameterLikelihood import *
-
 # Composite Likelihood
-from CompositeLikelihood import *
+from CompositeLikelihood import CompositeLikelihood
 
 # Likelihood Multiplier
-from LikelihoodMultiplier import *
+from LikelihoodMultiplier import LikelihoodMultiplier
+
+# Likelihood modules
+from BAOLikelihoods import DR11LOWZ, DR11CMASS, DR14LyaAuto, DR14LyaCross, \
+        SixdFGS, SDSSMGS, DR11LyaAuto, DR11LyaCross
+from SimpleCMB import PlanckLikelihood, WMAP9Likelihood
+from CompressedSNLikelihood    import BetouleSN, UnionSN
+from HubbleParameterLikelihood import RiessH0
+from CompressedHDLikelihood    import HubbleDiagram
 
 # Analyzers
-from MCMCAnalyzer import *
-from MaxLikeAnalyzer import *
+#from MCMCAnalyzer import *
+#from MaxLikeAnalyzer import *
 
 #Importance Sampling
 from CosmoMCImportanceSampler import *
@@ -179,9 +180,9 @@ def ParseDataset(datasets):
             ])
         elif name == 'GBAOx10':
             L.addLikelihoods([
-                LikelihoodMultiplier(DR11LOWZ(), 100.0),
+                LikelihoodMultiplier(DR11LOWZ(),  100.0),
                 LikelihoodMultiplier(DR11CMASS(), 100.0),
-                LikelihoodMultiplier(SixdFGS(), 100.0)
+                LikelihoodMultiplier(SixdFGS(),   100.0)
             ])
         elif name == 'GBAO_no6dF':
             L.addLikelihoods([
@@ -235,6 +236,8 @@ def ParseDataset(datasets):
             L.addLikelihood(UnionSN())
         elif name == 'RiessH0':
             L.addLikelihood(RiessH0())
+        elif name=='HD':
+            L.addLikelihood(HubbleDiagram())
         elif name == '6dFGS':
             L.addLikelihood(SixdFGS())
         else:
