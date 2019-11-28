@@ -4,10 +4,10 @@
 import sys
 sys.path = ["py", "../py", "Models", "Cosmo", "Likelihoods"] + sys.path
 
-#TODO -- Include model used in several papers
-#TODO -- Add Choronometers data
+#TODO -- Include models used in several papers
 #TODO -- Add Planck 15
 #TODO -- Add DR12 Galaxies
+#TODO -- Add Compress Pantheon
 
 # Cosmologies already included
 from LCDMCosmology import LCDMCosmology
@@ -41,8 +41,8 @@ from HubbleParameterLikelihood import RiessH0
 from CompressedHDLikelihood    import HubbleDiagram
 
 # Analyzers
-from MCMCAnalyzer import *
-from MaxLikeAnalyzer import *
+#from MCMCAnalyzer import *
+#from MaxLikeAnalyzer import *
 
 #Importance Sampling
 from CosmoMCImportanceSampler import *

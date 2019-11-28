@@ -4,46 +4,51 @@
 # second derivative matrix. It kinda works, but not very well.
 #
 
-from scipy import *
+import scipy as sp
 from scipy.optimize import minimize
 import scipy.linalg as la
-try:
-    import numdifftools as nd
-except:
-    pass
+#try:
+import numdifftools as nd
+#except:
+#    pass
 
 
 class MaxLikeAnalyzer:
     def __init__(self, like, noErrors=False):
-        self.like = like
+        self.like   = like
         self.params = like.freeParameters()
-        self.vpars = [p.value for p in self.params]
+        self.vpars  = [p.value for p in self.params]
+        self.sigma  = sp.array([p.error for p in self.params])
         print("Minimizing...", self.vpars)
         bounds = [p.bounds for p in self.params]
         print(bounds)
-        res = minimize(self.negloglike, self.vpars, bounds=bounds,
-                       method='L-BFGS-B')  # , bounds=bounds)
+        res = minimize(self.negloglike, self.vpars, bounds=bounds, method='L-BFGS-B')
         print(res)
+
         if (not noErrors):
-            hessfun = nd.Hessian(self.negloglike)
-            hess = hessfun(res.x)
+            hess    = nd.Hessian(self.negloglike, step=self.sigma)(res.x)
+            print ('Working?', '**'*20)
+            eigvl, eigvc = la.eig(hess)
+            print (hess, eigvl,)
             self.cov = la.inv(hess)
+            print ('Thought so', '**'*20)
             print(self.cov)
             # set errors:
-            for i in range(len(self.params)):
-                self.params[i].setError(sqrt(self.cov[i, i]))
+            for i, pars in enumerate(self.params):
+                pars.setError(sp.sqrt(self.cov[i, i]))
         # update with the final result
         self.negloglike(res.x)
         print("Done.")
 
+
+
     def negloglike(self, x):
-        for i in range(len(self.params)):
-            self.params[i].setValue(x[i])
+        for i, pars in enumerate(self.params):
+            pars.setValue(x[i])
         self.like.updateParams(self.params)
         loglike = self.like.loglike_wprior()
-        # print x,loglike
 
-        if (isnan(loglike)):
+        if (sp.isnan(loglike)):
             return self.lastval+10
         else:
             self.lastval = -loglike
