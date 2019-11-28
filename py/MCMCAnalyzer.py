@@ -144,8 +144,7 @@ class MCMCAnalyzer:
             mlfname = outfile+"_%i.maxlike" % (self.chain_num)
 
         if (path.isfile(cfname)):
-            print("Due to bad habits in the past, won't open existing file.", cfname)
-            sys.exit(1)
+            print("An existing file with the same name has been deleted.", cfname)
         self.fout = open(cfname, 'w')
         self.mlfout = open(mlfname, 'w')
 
