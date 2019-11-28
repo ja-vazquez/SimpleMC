@@ -86,3 +86,7 @@ B_par   = Parameter("B",   -20, 2,  (-100, 100), "B")
 
 # wDark Matter
 wDM_par = Parameter("wDM", 0.0, 0.1, (-1.0, 1.0), "w_{DM}")
+
+#Generic models
+a_par = Parameter("a", 0., 0.5, (-10., 10.), "a" )
+b_par = Parameter("b", 0., 0.5, (-10., 10.), "b")

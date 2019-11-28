@@ -26,6 +26,10 @@ from SlowRDECosmology import SlowRDECosmology
 from BinnedWCosmology import BinnedWCosmology
 from QuintCosmology import QuintCosmology
 
+#Generic model
+from GenericCosmology import GenericCosmology
+
+
 # Composite Likelihood
 from CompositeLikelihood import CompositeLikelihood
 
@@ -40,8 +44,10 @@ from CompressedSNLikelihood    import BetouleSN, UnionSN
 from HubbleParameterLikelihood import RiessH0
 from CompressedHDLikelihood    import HubbleDiagram
 
+from CompressedGenericLikelihood import StraightLine
+
 # Analyzers
-#from MCMCAnalyzer import *
+from MCMCAnalyzer import *
 #from MaxLikeAnalyzer import *
 
 #Importance Sampling
@@ -136,6 +142,8 @@ def ParseModel(model):
         T = QuintCosmology()
     elif model == 'wDM':
         T = wDMCosmology()
+    elif model == 'sline':
+        T = GenericCosmology()
     else:
         print("Cannot recognize model", model)
         sys.exit(1)
@@ -240,6 +248,8 @@ def ParseDataset(datasets):
             L.addLikelihood(HubbleDiagram())
         elif name == '6dFGS':
             L.addLikelihood(SixdFGS())
+        elif name == 'dline':
+            L.addLikelihood(StraightLine())
         else:
             print("Cannot parse data, unrecognizable part:", name)
             sys.exit(1)

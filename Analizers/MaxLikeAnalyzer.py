@@ -23,6 +23,7 @@ class MaxLikeAnalyzer:
         bounds = [p.bounds for p in self.params]
         print(bounds)
         res = minimize(self.negloglike, self.vpars, bounds=bounds, method='L-BFGS-B')
+
         print(res)
 
         if (not noErrors):
