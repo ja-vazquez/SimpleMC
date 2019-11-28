@@ -15,7 +15,8 @@ import copy
 import random
 import sys
 import os.path as path
-
+from numpy import all, empty
+from GelmanRubinDiagnostic import *
 
 class MCMCAnalyzer:
     def __init__(self, like, outfile, skip=5000, nsamp=100000, temp=1.0, cov=None, chain_num=None):
@@ -27,6 +28,9 @@ class MCMCAnalyzer:
         self.temp = float(temp)  # temperature
         self.chain_num = chain_num
         self.cpars = like.freeParameters()
+        self.dims = 0
+        self.chains = []
+        for p in self.cpars: self.dims+=1
         minvals, maxvals = [], []
         for lb, hb in [p.bounds for p in self.cpars]:
             minvals.append(lb)
@@ -145,6 +149,7 @@ class MCMCAnalyzer:
 
         if (path.isfile(cfname)):
             print("An existing file with the same name has been deleted.", cfname)
+
         self.fout = open(cfname, 'w')
         self.mlfout = open(mlfname, 'w')
 
@@ -169,6 +174,15 @@ class MCMCAnalyzer:
         self.co += 1
         if (self.co % 1000 == 0):
             print("Accepted samples", self.co, self.cw)
+            #GR
+            criteria = empty(self.dims + 1)
+            criteria.fill(0.01)
+            diagnostic = GelmanRubinDiagnostic(self.chains, self.dims).GRDRun()
+            
+            if all(diagnostic < criteria): 
+                print("Convergence achivied!!!")
+                self.done = True
+
         vec = [p.value for p in self.cpars]
 
         if (self.co > self.skip):
@@ -182,7 +196,10 @@ class MCMCAnalyzer:
             else:
                 outstr = self.formstr % tuple([wers, -self.cloglike]+vec)
 
+            rowchain = [wers, -self.cloglike] + vec                             
+            self.chains.append(rowchain)
             self.fout.write(outstr)
+
             # Flush file on regular basis
             if (self.co % 1000 == 0):
                 self.fout.flush()
