@@ -45,6 +45,7 @@ class MCMCAnalyzer:
         if (cov == None):
             # make initial cov matrix from diagonal "errors"
             errs = [0.01*p.error**2 for p in self.cpars]
+""" ----- Aqui voy, para continuar manana"""
             self.init_pcov(sp.diag(errs))
         else:
             self.init_pcov(cov)
@@ -99,7 +100,7 @@ class MCMCAnalyzer:
                 self.cw += 1 
         self.closeFiles()
 
-""" ----- Aqui voy, para continuar manana"""
+
     def GetProposal(self):
         vec = zeros(self.N)
         numreject=0
