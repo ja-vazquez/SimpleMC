@@ -7,14 +7,14 @@
 # this guy, as opposed to cosmomc, reweights the weights on the fly.
 #
 
-#from random import *
-#from scipy import *
+
 import scipy.linalg as la
+import os.path as path
+import scipy as sp
 import copy
 import random
 import sys
-import os.path as path
-import scipy as sp
+
 
 class MCMCAnalyzer:
     def __init__(self, like, outfile, skip=5000, nsamp=100000, temp=1.0, cov=None, chain_num=None):
@@ -45,12 +45,15 @@ class MCMCAnalyzer:
         if (cov == None):
             # make initial cov matrix from diagonal "errors"
             errs = [0.01*p.error**2 for p in self.cpars]
-""" ----- Aqui voy, para continuar manana"""
             self.init_pcov(sp.diag(errs))
         else:
             self.init_pcov(cov)
 
         self.RunChain()
+
+
+    def init_pcov(self, mat):
+        self.chol = la.cholesky(mat)
 
 
 
@@ -82,15 +85,15 @@ class MCMCAnalyzer:
             self.cw += numout  ## things hitting outside the prior are formally rejected samples
             self.like.updateParams(ppars)
             ploglike, ploglikes = self.getLikes()
-            if (isnan(ploglike)):
+            if (sp.isnan(ploglike)):
                 print("Something bad has happened, nan in loglike, assuming zero log")
                 ploglike = -1e50
             # print cloglike, ploglike, [p.value for p in like.freeParameters()], [p.value for p in self.cpars]
             if (ploglike > self.cloglike):
                 accept = True
             else:
-                accept = (exp((ploglike-self.cloglike)/self.temp)
-                          > uniform(0., 1.))
+                accept = (sp.exp((ploglike-self.cloglike)/self.temp)
+                          > random.uniform(0., 1.))
 
             # print [p.value for p in ppars], accept, ploglike
             # stop
@@ -99,29 +102,6 @@ class MCMCAnalyzer:
             else:
                 self.cw += 1 
         self.closeFiles()
-
-
-    def GetProposal(self):
-        vec = zeros(self.N)
-        numreject=0
-        while True:
-            ppars = copy.deepcopy(self.cpars)
-            step = self.draw_pcov()
-        # print step# [p.value for p in  step]
-            for i, p in enumerate(ppars):
-                p.value += step[i]
-                vec[i] = p.value
-
-            if all(vec > self.minvals) and all(vec < self.maxvals):
-                return ppars, numreject
-            numreject+=1
-            
-    def init_pcov(self, mat):
-        self.chol = la.cholesky(mat)
-
-    def draw_pcov(self):
-        a = array([random.gauss(0., 1,) for i in range(self.N)])
-        return dot(a, self.chol)
 
 
     def openFiles(self):
@@ -172,6 +152,28 @@ class MCMCAnalyzer:
         return cloglike, cloglikes
 
 
+    def GetProposal(self):
+        vec = sp.zeros(self.N)
+        numreject = 0
+        while True:
+            ppars = copy.deepcopy(self.cpars)
+            step  = self.draw_pcov()
+            # print step# [p.value for p in  step]
+            for i, p in enumerate(ppars):
+                p.value += step[i]
+                vec[i]   = p.value
+
+            if all(vec > self.minvals) and all(vec < self.maxvals):
+                return ppars, numreject
+            numreject += 1
+            
+
+
+    def draw_pcov(self):
+        a = sp.array([random.gauss(0., 1,) for _ in range(self.N)])
+        return sp.dot(a, self.chol)
+
+
 
     def ProcessAccepted(self, ppars, ploglike, ploglikes):
         self.co += 1
@@ -181,14 +183,14 @@ class MCMCAnalyzer:
 
         if (self.co > self.skip):
             # weight rescaled
-            wers = self.cw*exp((self.cloglike-self.logofs)
+            wers = self.cw*sp.exp((self.cloglike-self.logofs)
                                * (self.temp-1.0)/self.temp)
 
             if (self.composite):
                 outstr = self.formstr % tuple(
-                    [wers, -self.cloglike]+vec + self.cloglikes.tolist())
+                    [wers, -self.cloglike] + vec + self.cloglikes.tolist())
             else:
-                outstr = self.formstr % tuple([wers, -self.cloglike]+vec)
+                outstr = self.formstr % tuple([wers, -self.cloglike] + vec)
 
             self.fout.write(outstr)
             # Flush file on regular basis
@@ -207,26 +209,36 @@ class MCMCAnalyzer:
 
         elif (self.co < self.skip):
             self.swx += self.cw
-            v = array(vec)
-            self.meanx += v*self.cw
-            self.meanxx += outer(v, v)*self.cw
+            v = sp.array(vec)
+            self.meanx  += v*self.cw
+            self.meanxx += sp.outer(v, v)*self.cw
             if (self.cw > 30):
                 print("Still burning in, weight too large")
                 self.chol *= 0.9
                 print(self.cw)
         else:  # co==skip
-            self.meanx /= self.swx
+            self.meanx  /= self.swx
             self.meanxx /= self.swx
-            self.meanxx -= outer(self.meanx, self.meanx)
+            self.meanxx -= sp.outer(self.meanx, self.meanx)
             print("Re-initializing covariance matrix after burn-in")
             print(self.meanxx)
             for i, p in enumerate(self.cpars):
-                print(p.name, p.value, sqrt(self.meanxx[i, i]))
+                print(p.name, p.value, sp.sqrt(self.meanxx[i, i]))
 
             self.init_pcov(self.meanxx)
 
-        self.cw = 1
+        self.cw    = 1
         self.cpars = ppars
         self.cloglike = ploglike
         if self.composite:
             self.cloglikes = ploglikes
+
+
+
+
+
+
+
+
+
+

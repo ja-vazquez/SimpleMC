@@ -46,9 +46,6 @@ from CompressedHDLikelihood    import HubbleDiagram
 
 from CompressedGenericLikelihood import StraightLine
 
-# Analyzers
-from MCMCAnalyzer import *
-#from MaxLikeAnalyzer import *
 
 #Importance Sampling
 from CosmoMCImportanceSampler import *
