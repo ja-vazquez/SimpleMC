@@ -277,7 +277,7 @@ file.close()
 print("\nElapsed time: %.3f minutes = %.3f seconds"%(ttime/60,ttime))       
 
 skip = 0
-saveChainNestle(M,skip,path +'/'+ outputname + ".txt")
+saveChainNestle(M, path +'/'+ outputname + ".txt")
     
 ################################################################################
 
