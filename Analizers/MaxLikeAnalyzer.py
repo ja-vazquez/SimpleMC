@@ -12,6 +12,9 @@ import numdifftools as nd
 #except:
 #    pass
 
+#TODO -- Computing the inverse of the Hessian may not be working in several cases
+#TODO -- Fix it
+#TODO -- Add the GA for finding the maximum
 
 class MaxLikeAnalyzer:
     def __init__(self, like, noErrors=False):

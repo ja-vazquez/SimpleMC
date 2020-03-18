@@ -138,7 +138,7 @@ def ParseModel(model):
     elif model == "Quint_last":
         T = QuintCosmology()
     elif model == 'wDM':
-        T = wDMCosmology()
+        T = wCDMCosmology()
     elif model == 'sline':
         T = GenericCosmology()
     else:

@@ -1,5 +1,11 @@
 #!/usr/bin/env python
-
+#
+# This little code allows running something
+# based on command line. To be used in conjuction wiht
+# the wqdriver that subtmis to BNL queue
+#
+#TODO-- There is no model_list or data_list
+#TODO-- although drive may be deprecated
 
 import sys
 sys.path = ["Analizers"] + sys.path
@@ -8,11 +14,6 @@ from RunBase import ParseModel, ParseDataset
 from MCMCAnalyzer import MCMCAnalyzer
 from MaxLikeAnalyzer import MaxLikeAnalyzer
 
-#
-# This little code allows running something
-# based on command line. To be used in conjuction wiht
-# the wqdriver that subtmis to BNL queue
-#
 
 if (len(sys.argv) < 4):
     print("""Usage:
@@ -61,6 +62,7 @@ else:
 temp = 2.0  # temperature at which to sample, weights get readjusted on the fly
 
 print("Running ", model, prefact, datasets, skip, nsamp, temp, chainno)
+
 T = ParseModel(model)
 L = ParseDataset(datasets)
 if prefact == "pre":
