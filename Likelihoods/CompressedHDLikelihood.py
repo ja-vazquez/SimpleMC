@@ -10,9 +10,10 @@ class CompressedHDLikelihood(BaseLikelihood):
     def __init__(self,name,values_filename, cov_filename):
         BaseLikelihood.__init__(self,name)
         print("Loading ",values_filename)
-        da= sp.loadtxt(values_filename)
+        da = sp.loadtxt(values_filename)
         self.zs = da[:,0]
         self.Hs = da[:,1]
+        print (len(self.Hs))
         print("Loading ",cov_filename)
         cov = sp.loadtxt(cov_filename,skiprows=1)
         assert(len(cov) == len(self.zs))
@@ -39,5 +40,5 @@ class CompressedHDLikelihood(BaseLikelihood):
 
 class HubbleDiagram(CompressedHDLikelihood):
     def __init__(self):
-        CompressedHDLikelihood.__init__(self,"HD","data/HDiagramCompilacion-data.txt",
-                                             "data/HDiagramCompilacion-cov.txt")
+        CompressedHDLikelihood.__init__(self,"HD","data/HDiagramCompilacion-data_31.txt",
+                                             "data/HDiagramCompilacion-cov_31.txt")

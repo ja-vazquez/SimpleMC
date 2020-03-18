@@ -241,7 +241,7 @@ def ParseDataset(datasets):
             L.addLikelihood(UnionSN())
         elif name == 'RiessH0':
             L.addLikelihood(RiessH0())
-        elif name=='HD':
+        elif name == 'HD':
             L.addLikelihood(HubbleDiagram())
         elif name == '6dFGS':
             L.addLikelihood(SixdFGS())
