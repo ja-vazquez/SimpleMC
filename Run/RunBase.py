@@ -38,7 +38,7 @@ from LikelihoodMultiplier import LikelihoodMultiplier
 
 # Likelihood modules
 from BAOLikelihoods import DR11LOWZ, DR11CMASS, DR14LyaAuto, DR14LyaCross, \
-        SixdFGS, SDSSMGS, DR11LyaAuto, DR11LyaCross
+        SixdFGS, SDSSMGS, DR11LyaAuto, DR11LyaCross, eBOSS
 from SimpleCMB import PlanckLikelihood, WMAP9Likelihood
 from CompressedSNLikelihood    import BetouleSN, UnionSN
 from HubbleParameterLikelihood import RiessH0
@@ -245,6 +245,8 @@ def ParseDataset(datasets):
             L.addLikelihood(HubbleDiagram())
         elif name == '6dFGS':
             L.addLikelihood(SixdFGS())
+        elif name == 'eBOSS':
+            L.addLikelihood(eBOSS())
         elif name == 'dline':
             L.addLikelihood(StraightLine())
         else:

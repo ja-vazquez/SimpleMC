@@ -90,11 +90,19 @@ class DR14LyaCross(TabulatedBAOLikelihood):
                                         2, fidTheory, 2.34, aperp_col=1, apar_col=0, skiprows=1)
 
 
+# Data extracted from https://arxiv.org/abs/1705.06373
+class eBOSS(GaussBAODVLikelihood):
+    def __init__(self):
+        obh2 = 0.022
+        Om   = 0.31
+        h    = 0.676
+        mnu  = 0.06
+        fidTheory = LCDMCosmology(obh2, Om, h, mnu)
+        GaussBAODVLikelihood.__init__(
+            self, "eBOSS", 1.52, 3843.0, 17.0, fidTheory, maxchi2=4)
 
 
 # Data extracted from http://arxiv.org/pdf/1106.3366.pdf
-
-
 class SixdFGS(GaussBAODVLikelihood):
     def __init__(self):
         obh2 = 0.02227

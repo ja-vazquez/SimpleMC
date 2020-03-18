@@ -1,6 +1,6 @@
 #
 # This module calculates likelihood for Hubble Diagram.
-#
+# based on the CompressSN file
 
 from BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
@@ -13,7 +13,6 @@ class CompressedHDLikelihood(BaseLikelihood):
         da = sp.loadtxt(values_filename)
         self.zs = da[:,0]
         self.Hs = da[:,1]
-        print (len(self.Hs))
         print("Loading ",cov_filename)
         cov = sp.loadtxt(cov_filename,skiprows=1)
         assert(len(cov) == len(self.zs))
@@ -23,7 +22,7 @@ class CompressedHDLikelihood(BaseLikelihood):
         print("Adding marginalising constant")
         cov += 3**2
         vals, vecs = la.eig(cov)
-        vals=sorted(sp.real(vals))
+        vals = sorted(sp.real(vals))
         print("Eigenvalues of cov matrix:", vals[0:3],'...',vals[-1])
         self.icov = la.inv(cov)
 
@@ -39,6 +38,7 @@ class CompressedHDLikelihood(BaseLikelihood):
 
 
 class HubbleDiagram(CompressedHDLikelihood):
+    # data from https://arxiv.org/abs/1802.01505
     def __init__(self):
         CompressedHDLikelihood.__init__(self,"HD","data/HDiagramCompilacion-data_31.txt",
                                              "data/HDiagramCompilacion-cov_31.txt")

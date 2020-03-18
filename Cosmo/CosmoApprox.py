@@ -95,4 +95,4 @@ def rd_EH_approx(obh2, ocbh2, onuh2, Nnu):
         print("ERROR, cannot use EH approx with Nnu.")
         print("Nnu=", Nnu)
         sys.exit(1)
-    return self.CA.soundhorizon_eh(ocbh2, obh2, Nnu)
+    return soundhorizon_eh(ocbh2, obh2, Nnu)

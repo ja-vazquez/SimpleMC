@@ -35,7 +35,7 @@ class LCDMCosmology(BaseCosmology, RadiationAndNeutrinos):
         elif (self.rd_approx == "CuestaNeff"):
             self.rd_func_ = CA.rd_cuesta_Nnu_approx
         elif (self.rd_approx == "EH"):
-            self.rd_func_ = self.rd_EH_approx
+            self.rd_func_ = CA.rd_EH_approx
         else:
             print("Bad rd Approx specified")
             sys.exit(1)
