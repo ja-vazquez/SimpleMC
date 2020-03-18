@@ -34,6 +34,12 @@ class DR11CMASS(TabulatedBAOLikelihood):
                                         -2, fidTheory, 0.57)
 
 
+##BAO-only consensus results, Alam et al. 2016
+#https://arxiv.org/abs/1607.03155
+class DR12BAOConsensus():
+    pass
+
+
 class DR11LyaAuto(TabulatedBAOLikelihood):
     def __init__(self):
         # fiducial cosmology for Lya data.
@@ -100,6 +106,7 @@ class eBOSS(GaussBAODVLikelihood):
         fidTheory = LCDMCosmology(obh2, Om, h, mnu)
         GaussBAODVLikelihood.__init__(
             self, "eBOSS", 1.52, 3843.0, 17.0, fidTheory, maxchi2=4)
+
 
 
 # Data extracted from http://arxiv.org/pdf/1106.3366.pdf
