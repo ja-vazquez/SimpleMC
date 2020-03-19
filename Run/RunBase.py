@@ -38,7 +38,7 @@ from LikelihoodMultiplier import LikelihoodMultiplier
 
 # Likelihood modules
 from BAOLikelihoods import DR11LOWZ, DR11CMASS, DR14LyaAuto, DR14LyaCross, \
-        SixdFGS, SDSSMGS, DR11LyaAuto, DR11LyaCross, eBOSS
+        SixdFGS, SDSSMGS, DR11LyaAuto, DR11LyaCross, eBOSS, DR12Consensus
 from SimpleCMB import PlanckLikelihood, WMAP9Likelihood
 from CompressedSNLikelihood    import BetouleSN, UnionSN
 from HubbleParameterLikelihood import RiessH0
@@ -182,6 +182,10 @@ def ParseDataset(datasets):
                 DR11CMASS(),
                 SixdFGS(),
                 SDSSMGS()
+            ])
+        elif name == 'CBAO':
+            L.addLikelihoods([
+                DR12Consensus()
             ])
         elif name == 'GBAOx10':
             L.addLikelihoods([

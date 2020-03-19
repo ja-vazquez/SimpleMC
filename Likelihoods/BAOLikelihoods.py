@@ -5,6 +5,7 @@
 from TabulatedBAOLikelihood import TabulatedBAOLikelihood
 from TabulatedBAODVLikelihood import TabulatedBAODVLikelihood
 from GaussBAODVLikelihood import GaussBAODVLikelihood
+from ConsensusBAOLikelihood import ConsensusBAOLikelihood
 from LCDMCosmology import LCDMCosmology
 
 
@@ -33,11 +34,15 @@ class DR11CMASS(TabulatedBAOLikelihood):
         TabulatedBAOLikelihood.__init__(self, "DR11CMASS", 'data/sdss_DR11CMASS_consensus.dat',
                                         -2, fidTheory, 0.57)
 
-
-##BAO-only consensus results, Alam et al. 2016
-#https://arxiv.org/abs/1607.03155
-class DR12BAOConsensus():
-    pass
+class DR12Consensus(ConsensusBAOLikelihood):
+    def __init__(self):
+        obh2 = 0.022
+        Om   = 0.31
+        h    = 0.676
+        mnu  = 0.06
+        fidTheory = LCDMCosmology(obh2, Om, h, mnu)
+        ConsensusBAOLikelihood.__init__(self, "BAODR12", "data/sdss_DR12Consensus_bao.dat",
+                                             "data/BAO_consensus_covtot_dM_Hz.txt", fidTheory)
 
 
 class DR11LyaAuto(TabulatedBAOLikelihood):
