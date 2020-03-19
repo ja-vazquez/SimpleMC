@@ -22,9 +22,6 @@ class CompressedSNLikelihood(BaseLikelihood):
         print("Eigenvalues of cov matrix:", vals[0:3], '...', vals[-1])
         print("Adding marginalising constant")
         cov += 3**2
-        vals, vecs = la.eig(cov)
-        vals = sorted(sp.real(vals))
-        print("Eigenvalues of cov matrix:", vals[0:3], '...', vals[-1])
         self.icov = la.inv(cov)
 
 
