@@ -16,7 +16,7 @@ h_par    = Parameter("h",    0.6821,  0.05,   (0.4, 1.0),    "h")
 mnu_par  = Parameter("mnu",  0.06,    0.1,    (0, 1.0),      "\Sigma m_{\\nu}")
 Nnu_par  = Parameter("Nnu",  3.046,   0.5,    (3.046, 5.046),"N_{\\rm eff}")
 
-Ok_par = Parameter("Ok", 0.0, 0.1, (-0.5, 0.5), "\Omega_k")
+Ok_par = Parameter("Ok", 0.0, 0.01, (-0.1, 0.1), "\Omega_k")
 w_par  = Parameter("w", -1.0, 0.1, (-2.0, 0.0), "w_0")
 wa_par = Parameter("wa", 0.0, 0.1, (-2.0, 2.0), "w_a")
 

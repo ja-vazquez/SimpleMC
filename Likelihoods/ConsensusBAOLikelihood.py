@@ -47,7 +47,7 @@ class ConsensusBAOLikelihood(BaseLikelihood):
 
         ## This is the factor that we need to correct
         ## note that in principle this shouldn't matter too much, we will marginalise over this
-        tvec += 23
+        tvec += 0
         delta = tvec - self.DM_DH
         return -sp.dot(delta, sp.dot(self.icov, delta))/2.0
 

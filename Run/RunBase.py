@@ -39,7 +39,7 @@ from LikelihoodMultiplier import LikelihoodMultiplier
 # Likelihood modules
 from BAOLikelihoods import DR11LOWZ, DR11CMASS, DR14LyaAuto, DR14LyaCross, \
         SixdFGS, SDSSMGS, DR11LyaAuto, DR11LyaCross, eBOSS, DR12Consensus
-from SimpleCMB import PlanckLikelihood, WMAP9Likelihood
+from SimpleCMB import PlanckLikelihood, PlanckLikelihood_15, WMAP9Likelihood
 from CompressedSNLikelihood    import BetouleSN, UnionSN
 from HubbleParameterLikelihood import RiessH0
 from CompressedHDLikelihood    import HubbleDiagram
@@ -224,6 +224,8 @@ def ParseDataset(datasets):
             L.addLikelihood(SDSSMGS())
         elif name == 'Planck':
             L.addLikelihood(PlanckLikelihood())
+        elif name == 'Planck_15':
+            L.addLikelihood(PlanckLikelihood_15())
         elif name == 'WMAP':
             L.addLikelihood(WMAP9Likelihood())
         elif name == 'PlRd':

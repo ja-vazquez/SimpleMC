@@ -39,13 +39,25 @@ class SimpleCMB (BaseLikelihood):
 
 
 class PlanckLikelihood(SimpleCMB):
-    def __init__(self, kill_Da=False, kill_rd=False):
+    def __init__(self, kill_Da= False, kill_rd= False):
         mean = sp.array([2.24519776e-02,   1.38572404e-01,   9.43303000e+01])
         cov  = sp.array([[1.28572727e-07,  -6.03323687e-07,   1.44305285e-05],
                         [-6.03323687e-07,   7.54205794e-06,  -3.60547663e-05],
                         [1.44305285e-05,  -3.60547663e-05,   4.26414740e-03]])
         name = "SPlanck"
         SimpleCMB.__init__(self, name, mean, cov, kill_Da, kill_rd)
+
+
+
+                #Calibrated with plikHM_TTTEEE_lowTEB
+class PlanckLikelihood_15(SimpleCMB):
+    def __init__(self, kill_Da= False, kill_rd= False):
+        mean = sp.array([2.24001583e-02,   1.40200580e-01,   9.44043640e+01 ])
+        cov = sp.array([[3.02751758e-08,  -1.54495460e-07,   4.26868164e-06],
+                 [ -1.54495460e-07,   2.16079050e-06,  -1.49955437e-05 ],
+                 [ 4.26868164e-06,  -1.49955437e-05,   1.30349464e-03  ]])
+        name = "SPlanck_15"
+        SimpleCMB.__init__(self,name,mean,cov, kill_Da, kill_rd)
 
 
 
