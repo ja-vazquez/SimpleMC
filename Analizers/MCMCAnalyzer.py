@@ -7,7 +7,7 @@
 # this guy, as opposed to cosmomc, reweights the weights on the fly.
 #
 
-
+import scipy.integrate as integrate
 import scipy.linalg as la
 import os.path as path
 import scipy as sp
@@ -199,7 +199,7 @@ class MCMCAnalyzer:
 
             tmp = [wers, -self.cloglike] + vec
             if self.derived:
-                tmp += [pd.value for pd in self.AD.listDerived(self.cpars)]
+                tmp += [pd.value for pd in self.AD.listDerived(self.like)]
 
             if (self.composite):
                 outstr = self.formstr % tuple(tmp + self.cloglikes.tolist())
@@ -256,17 +256,20 @@ class MCMCAnalyzer:
 class AllDerived:
     def __init__(self):
         #self.cpars = cpars
-        self.Ol = Derivedparam('Ol', 0, '\Omega_\Lambda*')
-        self.H0 = Derivedparam('H0', 0, 'H_0*')
-        self.list = [self.Ol, self.H0]
+        self.Ol   = Derivedparam('Ol', 0, '\Omega_\Lambda*')
+        self.H0   = Derivedparam('H0', 0, 'H_0*')
+        self.Age  = Derivedparam('Age', 0, 'Age[Gyr]*')
+        self.list = [self.Ol, self.H0, self.Age]
 
 
 
-    def listDerived(self, cpars):
-        self.cpars = cpars
+    def listDerived(self, like):
+        self.like  = like
+        self.cpars = like.freeParameters()
         self.Ol.setValue(self.computeDerived('Ol'))
         self.H0.setValue(self.computeDerived('H0'))
-        return [self.Ol, self.H0]
+        self.Age.setValue(self.computeDerived('Age'))
+        return self.list
 
 
     def computeDerived(self, parname):
@@ -278,8 +281,15 @@ class AllDerived:
             for par in self.cpars:
                 if par.name == 'h':
                     return par.value*100
+        elif parname == 'Age':
+            return integrate.quad(self.compAge, 0, 10**5)[0]/3.24076E-20/(3.154E7*1.0E9)
         else:
             sys.exit('Define derived parameter', parname)
+
+
+    def compAge(self, z):
+        return 1.0/((1+z)*100.0*self.like.theory_.h*sp.sqrt(self.like.theory_.RHSquared_a(1.0/(1+z))))
+
 
 
 class Derivedparam:
