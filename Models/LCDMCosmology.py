@@ -103,10 +103,11 @@ class LCDMCosmology(BaseCosmology, RadiationAndNeutrinos):
         if (self.varyPrefactor or self.noObh2prior):
             return 0
         ## put back in if needed
+        else:
         # Cooke et al, http://arxiv.org/abs/1308.3240
         # 2.202 +/- 0.046
-        #return -(self.Obh2-0.02202)**2/(2*0.00046**2)
-        return 0
+            return -(self.Obh2-0.02202)**2/(2*0.00046**2)
+        #return 0
 
 
     # this returns the Wang+Wang variables in a vec

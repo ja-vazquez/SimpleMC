@@ -17,7 +17,8 @@ import sys
 
 
 class MCMCAnalyzer:
-    def __init__(self, like, outfile, skip=5000, nsamp=100000, temp=1.0, cov=None, chain_num=None):
+    def __init__(self, like, outfile, skip=5000, nsamp=100000, temp=1.0,
+                 cov=None, chain_num=None, derived=False):
 
         self.like      = like
         self.outfile   = outfile
@@ -27,6 +28,7 @@ class MCMCAnalyzer:
         self.chain_num = chain_num
         self.cpars     = like.freeParameters()
         self.N         = len(self.cpars)
+        self.derived   = derived == 'True'
 
         minvals, maxvals = [], []
         for lb, hb in [p.bounds for p in self.cpars]:
@@ -49,6 +51,7 @@ class MCMCAnalyzer:
         else:
             self.init_pcov(cov)
 
+        if self.derived: self.AD = AllDerived()
         self.RunChain()
 
 
@@ -110,6 +113,11 @@ class MCMCAnalyzer:
             fpar = open(outfile + ".paramnames", 'w')
             for p in self.cpars:
                 fpar.write(p.name + "\t\t\t" + p.Ltxname + "\n")
+
+            if self.derived:
+                for pd in self.AD.list:
+                    fpar.write(pd.name + "\t\t\t" + pd.Ltxname + "\n")
+
             if self.composite:
                 for name in self.sublikenames:
                     fpar.write(name + "_like \t\t\t" + name + "\n")
@@ -117,6 +125,9 @@ class MCMCAnalyzer:
             fpar.close()
 
         formstr = '%g ' + '%g '*(self.N+1)
+        if self.derived:
+            formstr += '%g '*(len(self.AD.list))
+
         if (self.composite):
             formstr += '%g '*(len(self.sublikenames)+1)
         formstr += '\n'
@@ -158,7 +169,7 @@ class MCMCAnalyzer:
         while True:
             ppars = copy.deepcopy(self.cpars)
             step  = self.draw_pcov()
-            # print step# [p.value for p in  step]
+            #print ('step #', [p.value for p in  ppars])
             for i, p in enumerate(ppars):
                 p.value += step[i]
                 vec[i]   = p.value
@@ -186,11 +197,14 @@ class MCMCAnalyzer:
             wers = self.cw*sp.exp((self.cloglike-self.logofs)
                                * (self.temp-1.0)/self.temp)
 
+            tmp = [wers, -self.cloglike] + vec
+            if self.derived:
+                tmp += [pd.value for pd in self.AD.listDerived(self.cpars)]
+
             if (self.composite):
-                outstr = self.formstr % tuple(
-                         [wers, -self.cloglike] + vec + self.cloglikes.tolist())
+                outstr = self.formstr % tuple(tmp + self.cloglikes.tolist())
             else:
-                outstr = self.formstr % tuple([wers, -self.cloglike] + vec)
+                outstr = self.formstr % tuple(tmp)
 
             self.fout.write(outstr)
             # Flush file on regular basis
@@ -238,6 +252,52 @@ class MCMCAnalyzer:
 
 
 
+
+class AllDerived:
+    def __init__(self):
+        #self.cpars = cpars
+        self.Ol = Derivedparam('Ol', 0, '\Omega_\Lambda*')
+        self.H0 = Derivedparam('H0', 0, 'H_0*')
+        self.list = [self.Ol, self.H0]
+
+
+
+    def listDerived(self, cpars):
+        self.cpars = cpars
+        self.Ol.setValue(self.computeDerived('Ol'))
+        self.H0.setValue(self.computeDerived('H0'))
+        return [self.Ol, self.H0]
+
+
+    def computeDerived(self, parname):
+        if parname == 'Ol':
+            for par in self.cpars:
+                if par.name == 'Om':
+                    return 1- par.value
+        elif parname == 'H0':
+            for par in self.cpars:
+                if par.name == 'h':
+                    return par.value*100
+        else:
+            sys.exit('Define derived parameter', parname)
+
+
+class Derivedparam:
+    def __init__(self, name, value, Ltxname=None):
+        self.name = name
+        if Ltxname:
+            self.Ltxname = Ltxname
+        else:
+            self.Ltxname = name
+        self.value = value
+
+
+    def setLatexName(self, Ltx):
+        self.Ltxname = Ltx
+
+
+    def setValue(self, val):
+        self.value = val
 
 
 

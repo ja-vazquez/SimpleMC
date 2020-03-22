@@ -19,10 +19,10 @@ class DriverMC():
         This class is the manager and wrapper between all 
         the analyzers and the perninent functions.
     """
-    def __init__(self, file):
+    def __init__(self, baseConfig):
         #nsigma is the default value for sigma in gaussian priors
         self.nsigma  = 4.
-        self.inifile = file
+        self.inifile = baseConfig
         self.iniReader()   
         self.T, self.L = self.TLinit()
         #if you like to change the bounds, you need edit ParamDefs.py file.
@@ -30,16 +30,18 @@ class DriverMC():
         self.dims, self.paramsList = self.getDims()
         #self.n_sigma = self.dims * self.nsigma
         self.outputname = self.model + "_" + self.prefact + \
-            "_" + self.datasets + "_" + self.samplername + "_" + \
-            "[" + time.strftime("%H:%M:%S") + "]_"
-#quitar el tiempo y talvez samplername
+            "_" + self.datasets + "_" + self.samplername + "_"
+            # \ + \ "[" + time.strftime("%H:%M:%S") + "]_"
+
 
         if self.prefact == "pre":
             self.T.setVaryPrefactor()
-            self.T.printFreeParameters()
+        self.T.printFreeParameters()
 
         self.result = self.executer()
-        self.postprocess()
+
+#Doesn;t work with MaxAnalizer, check it later
+        #self.postprocess()
 
     def executer(self):
         ti = time.time()
@@ -85,7 +87,8 @@ class DriverMC():
                 self.temp       = int(config['mcmc']['temp'])
                 self.chainno    = int(config['mcmc']['chainno'])
                 #self.GRcriteria = float(config['mcmc']['GRcriteria'])
-            
+                self.derived    = config['mcmc']['addderived']
+
             elif self.samplername in ['nested']:
                 print('\nUsing dynesty library')
                 self.nlivepoints   = int(config['nested']['nlivepoints'])
@@ -106,7 +109,10 @@ class DriverMC():
                     print("Using %d-sigmas for the gaussian prior.\n"%(self.nsigma))
                 else: 
                     print("Using flat priors...")
-               
+
+            elif self.samplername in ['MaxLikeAnalyzer']:
+                self.withErrors      = config['MaxLikeAnalyzer']['withErrors']
+
         else:
             print("Please use Python 3 and try again!")
             exit(1)
@@ -257,7 +263,8 @@ class DriverMC():
       
         
         M = MCMCAnalyzer(self.L, self.chainsdir + "/" + self.outputname,\
-            skip=self.skip, nsamp=self.nsamp, temp = self.temp, chain_num=self.chainno)
+                        skip=self.skip, nsamp=self.nsamp, temp = self.temp,
+                        chain_num=self.chainno, derived=self.derived)
         #,\        GRcriteria = self.GRcriteria)
 
         try:
@@ -331,11 +338,9 @@ class DriverMC():
     def MaxLikeRunner(self):
         self.outputname += 'optimization' 
         print("Using MaxLikeAnalyzer")
-        self.T.printFreeParameters()
-        res, nloglike = MaxLikeAnalyzer(self.L).result()
-        return ['MaxLikeAnalyzer', None, "\nParameters : ", res, "\nOptimal nloglike : ", nloglike ]
-
-        #self.T.printParameters(A.params)
+        A = MaxLikeAnalyzer(self.L, withErrors = self.withErrors)
+        self.T.printParameters(A.params)
+        return True
        
 
 

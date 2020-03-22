@@ -3,7 +3,7 @@
 # of neutrino energy densities.
 #
 
-
+from __future__ import print_function
 import scipy as sp
 from scipy import constants as ct
 from scipy.special import zeta
@@ -11,7 +11,6 @@ from scipy.integrate import quad
 from scipy.interpolate import interp1d
 import CosmoApprox as CA
 #from numba import autojit
-
 
 class NuIntegral:
     def __init__(self):

@@ -10,7 +10,7 @@
 from Parameter import Parameter
 
 # Parameters are value, variation, bounds
-Om_par   = Parameter("Om",   0.3038,  0.1,    (0.05, 0.5),   "\Omega_m")
+Om_par   = Parameter("Om",   0.3038,  0.05,    (0.05, 0.5),   "\Omega_m")
 Obh2_par = Parameter("Obh2", 0.02234, 0.0002, (0.02, 0.025), "\Omega_{b}h^2")
 h_par    = Parameter("h",    0.6821,  0.05,   (0.4, 1.0),    "h")
 mnu_par  = Parameter("mnu",  0.06,    0.1,    (0, 1.0),      "\Sigma m_{\\nu}")
@@ -90,3 +90,5 @@ wDM_par = Parameter("wDM", 0.0, 0.1, (-1.0, 1.0), "w_{DM}")
 #Generic models
 a_par = Parameter("a", 0., 0.5, (-10., 10.), "a" )
 b_par = Parameter("b", 0., 0.5, (-10., 10.), "b")
+
+
