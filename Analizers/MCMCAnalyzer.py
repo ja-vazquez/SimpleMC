@@ -188,7 +188,7 @@ class MCMCAnalyzer:
 
             if (self.composite):
                 outstr = self.formstr % tuple(
-                    [wers, -self.cloglike] + vec + self.cloglikes.tolist())
+                         [wers, -self.cloglike] + vec + self.cloglikes.tolist())
             else:
                 outstr = self.formstr % tuple([wers, -self.cloglike] + vec)
 

@@ -7,43 +7,33 @@
 import scipy as sp
 from scipy.optimize import minimize
 import scipy.linalg as la
-#try:
 import numdifftools as nd
-#except:
-#    pass
 
-#TODO -- Computing the inverse of the Hessian may not be working in several cases
-#TODO -- Fix it
-#TODO -- Add the GA for finding the maximum
+
 
 class MaxLikeAnalyzer:
-    def __init__(self, like, noErrors=False):
+    def __init__(self, like, withErrors=False):
         self.like   = like
         self.params = like.freeParameters()
         self.vpars  = [p.value for p in self.params]
         self.sigma  = sp.array([p.error for p in self.params])
-        print("Minimizing...", self.vpars)
         bounds = [p.bounds for p in self.params]
-        print(bounds)
-        res = minimize(self.negloglike, self.vpars, bounds=bounds, method='L-BFGS-B')
+        print("Minimizing...", self.vpars, "with bounds", bounds)
 
-        print(res)
+        self.res = minimize(self.negloglike, self.vpars, bounds=bounds, method='L-BFGS-B')
+        print(self.res, 'with noErrors =', withErrors)
 
-        if (not noErrors):
-            hess    = nd.Hessian(self.negloglike, step=self.sigma)(res.x)
-            print ('Working?', '**'*20)
+        if (withErrors == 'Yes'):
+            hess    = nd.Hessian(self.negloglike)(self.res.x)
             eigvl, eigvc = la.eig(hess)
             print (hess, eigvl,)
             self.cov = la.inv(hess)
-            print ('Thought so', '**'*20)
-            print(self.cov)
+            print('Covariance matrix \n', self.cov)
             # set errors:
             for i, pars in enumerate(self.params):
                 pars.setError(sp.sqrt(self.cov[i, i]))
         # update with the final result
-        self.negloglike(res.x)
-        print("Done.")
-
+        self.result(self.negloglike(self.res.x))
 
 
     def negloglike(self, x):
@@ -57,3 +47,9 @@ class MaxLikeAnalyzer:
         else:
             self.lastval = -loglike
             return -loglike
+
+
+    def result(self, loglike):
+        print ("------")
+        print("Done.")
+        print("Optimal loglike : ", loglike)
