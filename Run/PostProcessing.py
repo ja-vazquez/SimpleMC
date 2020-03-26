@@ -12,7 +12,7 @@ import dynesty
 
 class PostProcessing():
     def __init__(self, list_result, paramList, outputname,\
-                 olambda = True, chainsdir = 'chains', skip = 0.1):
+                 olambda = True, chainsdir = 'chains', skip = 0.1, engine = 'dynesty'):
         self.analyzername = list_result[0]
         self.result = list_result[1]
         self.paramList = paramList
@@ -21,6 +21,7 @@ class PostProcessing():
         self.list_result = list_result
         self.skip = skip
         self.olambda = olambda
+        self.engine = engine
 
         for i in range(2, len(self.list_result)):
             self.args.append(self.list_result[i])
@@ -33,25 +34,35 @@ class PostProcessing():
         """
 
         f = open(self.filename + '.txt', 'a+')
-        weights = np.exp(self.result['logwt'] - self.result['logz'][-1])
-        postsamples = dynesty.utils.resample_equal(self.result.samples, weights)
+        if self.engine == 'dynesty':
+            weights = np.exp(self.result['logwt'] - self.result['logz'][-1])
+            postsamples = dynesty.utils.resample_equal(self.result.samples, weights)
        
-        print('\n Number of posterior samples is {}'.format(postsamples.shape[0]))
+            print('\n Number of posterior samples is {}'.format(postsamples.shape[0]))
 
         
-        for i, sample in enumerate(postsamples):
-            strweights = str(weights[i])
-            strlogl = str(self.result['logl'][i])
-            strsamples = str(sample).lstrip('[').rstrip(']')
-            if self.olambda:
-                OLambda = 1 - sample[0]
-                strOLambda = ' '+str(OLambda)
-            else:
-                strOLambda = ""
-            row = strweights + ' ' + strlogl + ' ' + strsamples + strOLambda
-            nrow = " ".join( row.split() )
-            f.write(nrow+'\n')
-            
+            for i, sample in enumerate(postsamples):
+                strweights = str(weights[i])
+                strlogl = str(self.result['logl'][i])
+                strsamples = str(sample).lstrip('[').rstrip(']')
+                #if self.olambda:
+                #    OLambda = 1 - sample[0]
+                #    strOLambda = ' '+str(OLambda)
+                #else:
+                #    strOLambda = ""
+                row = strweights + ' ' + strlogl + ' ' + strsamples + strOLambda
+                nrow = " ".join( row.split() )
+                f.write(nrow+'\n')
+
+        if self.engine == 'nestle':
+            for i in range(len(self.result.samples)):
+                strweights = str(self.result.weights[i]).lstrip('[').rstrip(']')
+                strlogl=str(-1*self.result.logl[i]).lstrip('[').rstrip(']')
+                strsamples=str(self.result.samples[i]).lstrip('[').rstrip(']')
+                row = strweights+' '+strlogl+' '+strsamples
+                nrow = " ".join( row.split() )
+                f.write(nrow+'\n')
+
         f.close()
 
     def paramFiles(self, T, L):
@@ -73,9 +84,9 @@ class PostProcessing():
         fpar=open(parfile, 'w')   
         for p in cpars:
             fpar.write(p.name+"\t\t\t"+p.Ltxname+"\n")
-        if self.olambda:
-            fpar.write("OLambda\t\t\t \Omega_{\Lambda}\n")
-        fpar.close()
+        #if self.olambda:
+        #    fpar.write("OLambda\t\t\t \Omega_{\Lambda}\n")
+        #fpar.close()
 
     def writeSummary(self, time, *args):
         file = open(self.filename + "_Summary" + ".txt",'w')
@@ -125,10 +136,37 @@ class PostProcessing():
             summaryResults.append(self.paramList[i] + " : " + str(round(means[i], 4)) + \
                                      "+/-" + str(round(stddev[i], 4)))
 
-        if self.olambda:
-            summaryResults.append("OLambda : " + str(round(1 - means[0], 4)) \
-                + "+/-" + str(round(stddev[0], 4)))
+        #if self.olambda:
+        #    summaryResults.append("OLambda : " + str(round(1 - means[0], 4)) \
+        #        + "+/-" + str(round(stddev[0], 4)))
         
         #print("summaryResults", summaryResults[0])
         #mcstats.likeSummary()
         return summaryResults
+
+
+    def saveChainNestle(self):
+        """
+        This generates an output Simple(cosmo)MC style for Nestle Samplers.
+
+        Parameters:
+
+        result:     Nestle object
+        outputname: str name of the output file
+
+        """
+        if(path.isfile(outputname+'.txt')):
+            print("An existing file with the same name has been deleted.", outputname+'.txt')
+            remove(outputname+'.txt')
+
+        f = open(outputname+'.txt','a+')
+
+        for i in range(len(result.samples)):
+            strweights = str(result.weights[i]).lstrip('[').rstrip(']')
+            strlogl=str(-1*result.logl[i]).lstrip('[').rstrip(']')
+            strsamples=str(result.samples[i]).lstrip('[').rstrip(']')
+            row = strweights+' '+strlogl+' '+strsamples
+            nrow = " ".join( row.split() )
+            f.write(nrow+'\n')
+            #f.write(strweights+' '+strlogl+' '+strsamples+'\n')
+        f.close()

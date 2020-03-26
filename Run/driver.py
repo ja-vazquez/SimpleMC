@@ -7,4 +7,3 @@ fileConfig = "/Users/josevazquezgonzalez/Desktop/Codigos_SimpleMC/SimpleMC/baseC
 D = DriverMC(fileConfig)
 
 #D.plotter()
-

@@ -72,7 +72,7 @@ L.setTheory(T)
 
 if chainno > 0:
     M = MCMCAnalyzer(L, chainsdir + "/" + model + "_"+prefact + "_" +
-                     datasets, skip=skip, nsamp=nsamp, temp=temp, chain_num=chainno)
+                     datasets, skip=skip, nsamp=nsamp, temp=temp, chain_num=chainno, derived='True')
 else:
     A = MaxLikeAnalyzer(L, noErrors=False)
     T.printParameters(A.params)

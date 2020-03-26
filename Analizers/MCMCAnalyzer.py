@@ -250,7 +250,7 @@ class MCMCAnalyzer:
 
 
 
-
+###---------------------------------------###
 
 
 class AllDerived:
@@ -282,12 +282,12 @@ class AllDerived:
                 if par.name == 'h':
                     return par.value*100
         elif parname == 'Age':
-            return integrate.quad(self.compAge, 0, 10**5)[0]/3.24076E-20/(3.154E7*1.0E9)
+            return integrate.quad(self.compuAge, 0, 10**5)[0]/3.24076E-20/(3.154E7*1.0E9)
         else:
             sys.exit('Define derived parameter', parname)
 
 
-    def compAge(self, z):
+    def compuAge(self, z):
         return 1.0/((1+z)*100.0*self.like.theory_.h*sp.sqrt(self.like.theory_.RHSquared_a(1.0/(1+z))))
 
 
@@ -304,7 +304,6 @@ class Derivedparam:
 
     def setLatexName(self, Ltx):
         self.Ltxname = Ltx
-
 
     def setValue(self, val):
         self.value = val

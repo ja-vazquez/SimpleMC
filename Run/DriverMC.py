@@ -41,7 +41,7 @@ class DriverMC():
         self.result = self.executer()
 
 #Doesn;t work with MaxAnalizer, check it later
-        #self.postprocess()
+        self.postprocess()
 
     def executer(self):
         ti = time.time()
@@ -97,7 +97,9 @@ class DriverMC():
                 self.nestedType    = config['nested']['nestedType']
                 self.neuralNetwork = config['nested']['neuralNetwork']
                 self.dynamic = config['nested']['dynamic'] 
-                
+                self.nproc   = int(config['nested']['nproc'])
+                self.engine  = config['nested']['engine']
+
                 print("The number of live points is: %d"%(self.nlivepoints))
                 if self.nestedType == 'multi':
                     print('\nThe sampler used is MULTINEST. Feroz et al (2009)\n')
@@ -109,6 +111,10 @@ class DriverMC():
                     print("Using %d-sigmas for the gaussian prior.\n"%(self.nsigma))
                 else: 
                     print("Using flat priors...")
+
+                if self.neuralNetwork == 'yes':
+                    self.split      = float(config['neural']['split'])
+                    self.numNeurons = int(config['neural']['numNeurons'])
 
             elif self.samplername in ['MaxLikeAnalyzer']:
                 self.withErrors      = config['MaxLikeAnalyzer']['withErrors']
@@ -289,13 +295,17 @@ class DriverMC():
         """
         self.outputname += self.nestedType+'_nested_'+str(self.nlivepoints)
 
-        ncores = mp.cpu_count()
-        print("Number of processors: ", ncores)
-        
-        if ncores > 1: 
+        if self.nproc <= 0:
+            ncores = mp.cpu_count()
+            print("Number of processors: ", ncores)
             nprocess = ncores//2
         else:
-            nprocess = 1
+            nprocess = self.nproc
+
+        #if ncores > 1:
+        #    nprocess = ncores//2
+        #else:
+        #    nprocess = 1
         
         pool = mp.Pool(processes=nprocess)
 
@@ -309,14 +319,23 @@ class DriverMC():
             sampler.run_nested(nlive_init=self.nlivepoints, dlogz_init=0.05, nlive_batch=100,\
                             maxiter_init=10000, maxiter_batch=1000, maxbatch=10)
 
-        else:
+            M = sampler.results
+            M.summary()
+
+        elif self.engine == 'dynesty':
             sampler = dynesty.NestedSampler(self.logLike, self.priorTransform, self.dims,
                         bound=self.nestedType, sample = 'rwalk', nlive = self.nlivepoints,\
                         pool = pool, queue_size = ncores)
             sampler.run_nested(dlogz=self.accuracy)
-        M = sampler.results   
+            M = sampler.results
+            M.summary()
 
-        return ['nested', M, 'nested : ' + self.nestedType, 'dynamic : ' +\
+        elif self.engine == 'nestle':
+            import nestle
+            M = nestle.sample(self.logLike, self.priorTransform, ndim=self.dims, method=self.nestedType,
+            npoints=self.nlivepoints, dlogz=self.accuracy, callback=nestle.print_progress)
+
+        return ['nested', M, M.summary(), 'nested : ' + self.nestedType, 'dynamic : ' +\
                  self.dynamic, 'ANN : ' + self.neuralNetwork]
 
 
@@ -357,7 +376,7 @@ class DriverMC():
     def postprocess(self):
         from PostProcessing import PostProcessing 
         pp = PostProcessing(self.result, self.paramsList , self.outputname,\
-             chainsdir=self.chainsdir)        
+             chainsdir=self.chainsdir, engine = self.engine)
         
         if self.samplername == 'nested':
             pp.paramFiles(self.T, self.L)
