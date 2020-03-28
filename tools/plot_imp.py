@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+import sys
+sys.path = ["../Run", "Run"] + sys.path
+
 from scipy import *
 from cosmich import *
 from ChainIterator import *
@@ -26,19 +29,20 @@ import math as N
 # 1D-plotting is valid for only one model, and may use several parameters/datasets
 
 # -----------
-dire = 'chains_SimpleMC/'
-name_fig = 'Plot'
-datasetl = ['BBAO']
-
-# ------------------
+dire     = 'chains/'
 Plot_1D = 'True'
-model_1D = 'LCDM_phy'
-params_1D = ['h']
-NBins_1D = 40
+
+model     = 'wCDM_phy'
+datasets  = ['BBAO+JLA']
+params    = ['h', 'w']
+NBins_1D  = 40
 
 xrange = 'False'
 xmin_1, xmax_1 = 0, 3
 xmin_2, xmax_2 = 0, 5
+
+
+
 
 # -----------------------
 Plot_2D = 'False'
@@ -51,34 +55,6 @@ xmin, xmax = 0.2, 0.4
 ymin, ymax = 0.6, 0.75
 
 # ---------------------------------------------------------------------------------
-
-
-def colour(x):
-    if x == 1:
-        return 'black'
-    if x == 2:
-        return 'blue'
-    if x == 3:
-        return 'red'
-    if x == 4:
-        return 'magenta'
-    if x == 5:
-        return 'cyan'
-    if x == 6:
-        return 'orange'
-    if x == 7:
-        return 'green'
-    if x == 8:
-        return 'yellow'
-    if x > 8:
-        print("Increased colouring")
-
-
-def color_legend(leg):
-    # """Color legend texts based on color of corresponding lines"""
-    for line, txt in zip(leg.get_lines(), leg.get_texts()):
-        txt.set_color(line.get_color())
-
 
 def cosmodata(datasets):
     cosmodata = ''
@@ -109,6 +85,66 @@ def cosmodata(datasets):
     return cosmodata
 
 
+def colour(x):
+    if x == 0: return 'black'
+    if x == 1: return 'blue'
+    if x == 2: return 'red'
+    if x == 3: return 'magenta'
+    if x == 4: return 'cyan'
+    if x == 5: return 'orange'
+    if x == 6: return 'green'
+    if x == 7: return 'yellow'
+    if x > 9:print("Increased colouring")
+
+
+def color_legend(leg):
+    # """Color legend texts based on color of corresponding lines"""
+    for line, txt in zip(leg.get_lines(), leg.get_texts()):
+        txt.set_color(line.get_color())
+
+
+
+if 'True' in Plot_1D:
+
+    for i, dataset in enumerate(datasets):
+        for j, param in enumerate(params):
+            pylab.subplot(1, len(params), j+1)
+            C = cosmochain(dire + model + '_' + dataset, 'auto')
+
+            #C = ChainIterator('chains_140411_155701',
+            #                  'LCDM', 'phy', 'BBAO+CMBP')
+            #grlist = []
+            #wlist = []
+            #for i in range(0, C.N, 1000):
+            #    T = C.theory(i)
+            #    grlist.append(T.growth(10.0))
+            #    wlist.append(C.weight(i))
+
+            #grlist = array(grlist)
+            #wlist = array(wlist)
+            #mn = (grlist*wlist).sum()/wlist.sum()
+            #er = sqrt((grlist**2*wlist).sum()/wlist.sum()-mn**2)
+            #print("growth z=10/z=0 = ", mn, "+/-", er)
+
+            C.Plot1D(param)
+            #xx, yy = C.GetHisto(param, NormPeak=True, nbins=NBins_1D)
+            #pylab.plot(xx, yy, colour(i), label=model + '_' + dataset)
+
+            #if 'True' in xrange:
+            #    xmin = "xmin_"+str(b)
+            #    xmax = "xmax_"+str(b)
+            #    pylab.xlim(eval(xmin), eval(xmax))
+
+            pylab.xlabel(C.latexname(str(param)))
+            pylab.ylabel('prob.')
+
+    #leg = pylab.legend(loc='upper right')
+    #leg.draw_frame(False)
+    #color_legend(leg)
+    #pylab.savefig(name_fig+'_1D.pdf')
+    pylab.show()
+
+
 if 'True' in Plot_2D:
     a = 0
     for model in model_2D:
@@ -132,48 +168,7 @@ if 'True' in Plot_2D:
     pylab.savefig(name_fig+'_2D.pdf')
     pylab.show()
 
-
-if 'True' in Plot_1D:
-    a = 0
-    for datasets in datasetl:
-        b = 0
-        for params in params_1D:
-            b += 1
-            pylab.subplot(1, len(params_1D), b)
-            C = cosmochain(dire + model_1D+'_'+datasets, 'auto')
-
-            C = ChainIterator('chains_140411_155701',
-                              'LCDM', 'phy', 'BBAO+CMBP')
-            grlist = []
-            wlist = []
-            for i in range(0, C.N, 1000):
-                T = C.theory(i)
-                grlist.append(T.growth(10.0))
-                wlist.append(C.weight(i))
-
-            grlist = array(grlist)
-            wlist = array(wlist)
-            mn = (grlist*wlist).sum()/wlist.sum()
-            er = sqrt((grlist**2*wlist).sum()/wlist.sum()-mn**2)
-            print("growth z=10/z=0 = ", mn, "+/-", er)
-
-            a += 1
-            xx, yy = C.GetHisto(params, NormPeak=True, nbins=NBins_1D)
-            pylab.plot(xx, yy, colour(a), label=cosmodata(datasets))
-
-            if 'True' in xrange:
-                xmin = "xmin_"+str(b)
-                xmax = "xmax_"+str(b)
-                pylab.xlim(eval(xmin), eval(xmax))
-
-            pylab.xlabel(C.latexname(str(params)))
-            pylab.ylabel('prob.')
-
-    leg = pylab.legend(loc='upper right')
-    leg.draw_frame(False)
-    color_legend(leg)
-    pylab.savefig(name_fig+'_1D.pdf')
-    pylab.show()
-
 else:
     print('Nothing else to do')
+
+

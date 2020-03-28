@@ -4,6 +4,7 @@
 #
 #
 
+import sys
 from glob import *
 from scipy import *
 import pylab
@@ -15,7 +16,7 @@ import numpy as np
 def myloadtxt(fname, cols=None):
     # fixed the annoying "setting an array element with a sequence."
     # when chain still runnig.
-    da = []
+    da  = []
     bad = []
     for line in open(fname).readlines()[:-2]:
         try:
@@ -28,32 +29,34 @@ def myloadtxt(fname, cols=None):
             da.append(cline)
         else:
             bad.append(cline)
+    # chains are col0: weight, col1:Likel, rest:params
     da = np.array(da)
     if (len(bad)):
         print("BAD=", bad)
+        sys.exit(1)
     return da
 
 
 class cosmochain:
-
-    def __init__(self, root, nums='auto', skip_=None, temp=1.0, balance=True, weightfunc=None, kirkby=False):
+    def __init__(self, root, nchains='auto', skip_=None, temp=1.0, balance=True, weightfunc=None, kirkby=False):
 
         if (balance and ("PLA" in root or "neffch" in root or "Decay" in root)):
             balance = False
 
-        # get file list
-        if type(nums) == type('auto'):
-            if nums == 'auto':
-                flist = glob(root+'_?.txt')+glob(root+'_??.txt')
+        # get list of chain_files
+        if type(nchains) == type('auto'):
+            if nchains == 'auto':
+                flist = glob(root + '_?.txt') + glob(root + '_??.txt')
         else:
-            if (nums == None):
+            if (nchains == None):
                 flist = [root]
-            elif (type(nums[0]) == type(1)):
-                flist = [root+'_'+str(x)+'.txt' for x in nums]
+            elif (type(nchains[0]) == type(1)):
+                flist = [root + '_' + str(x) + '.txt' for x in nchains]
 
         if len(flist) == 0:
             print("Bad chain spec.")
             print(root+'_?.txt')
+
 
         # get parameter names
         try:
@@ -61,7 +64,7 @@ class cosmochain:
                 flist[0].replace('.txt', '.paramnames')).readlines()]
         except:
             try:
-                lines = open(root+'.paramnames').readlines()
+                lines = open(root + '.paramnames').readlines()
                 self.paramnames = [n.split()[0] for n in lines]
                 self.latexnames = [' '.join(n.split()[1:]) for n in lines]
                 self.lname = {}
@@ -70,25 +73,27 @@ class cosmochain:
             except:
                 try:
                     self.paramnames = [n.split()[0]
-                                       for n in open(root+'.params').readlines()]
+                                       for n in open(root + '.params').readlines()]
                 except:
-                    print("neither params nor paramnames")
+                    print("neither params nor paramnames included")
                     self.paramnames = []
+                    sys.exit(1)
         self.parcol = {}
         for i, n in enumerate(self.paramnames):
             print(i, n)
             self.parcol[n] = i+2
         print("Got ", len(self.paramnames), "parameters.")
+
+
         data = []
         for fname in flist:
             print("Reading", fname, "...", end=' ')
             if (kirkby):
                 skip = 3
                 print("kirkby style ", end=' ')
-                cdata = open(name).readlines()[skip:-1]
-                cdata = array([[1, 0]+list(map(float, x.split()))
+                cdata = open(fname).readlines()[skip:-1]
+                cdata = array([[1, 0] + list(map(float, x.split()))
                                for x in cdata])
-
             else:
                 da = myloadtxt(fname, cols=len(self.paramnames)+2)
                 if len(da) == 0:
@@ -99,7 +104,7 @@ class cosmochain:
                     while (da[ii, 1] > finlike):
                         ii += 1
                     # plus 10
-                    skip = ii+20
+                    skip  = ii+20
                     cdata = da[skip:-1]
                 else:
                     skip = skip_
@@ -126,7 +131,7 @@ class cosmochain:
 
         try:
             self.bestarg = self.chain[:, 1].argmin()
-            self.best = self.chain[self.bestarg]
+            self.best    = self.chain[self.bestarg]
         except:
             print("WTF?")
 
@@ -135,17 +140,23 @@ class cosmochain:
             like = like-like.min()
             self.chain[:, 0] *= exp(-(temp-1.0)*like)
 
+
+
     def latexname(self, name):
         print(self.lname[name])
-        return '$'+self.lname[name]+'$'
+        return '$'+ self.lname[name] +'$'
 
+
+    #get column of a given parameter
     def slist(self, name):
         return self.chain[:, self.parcol[name]]
+
 
     def __getitem__(self, key):
         if (type(key) == type("p")):
             key = self.parcol[key]
         return self.chain[:, key]
+
 
     def __setitem__(self, key, res):
         if (type(key) == type("p")):
@@ -159,16 +170,19 @@ class cosmochain:
                 self.parcol[key] = Nc
                 self.paramnames.append(key)
                 key = Nc
-
         self.chain[:, key] = res
+
 
     def BestSample(self):
         ii = self.chain[:, 1].argmin()
         return self.chain[ii, :]
 
+
     def Plot1D(self, p1, sty='r-', label="", N=50):
         xx, yy = self.GetHisto(p1, nbins=N)
         pylab.plot(xx, yy, sty, label="", lw=2)
+
+
 
     def Plot2D(self, p1, p2, N=60, lims=None, conts=[0.68, 0.95, 0.997], filled=True, lw=2, bp=False, blur=None, nch1=None, nch2=None, label=""):
         pl = zeros((N, N))
@@ -327,14 +341,16 @@ class cosmochain:
     def GetMarginal(self, param, val):
         return ((self.chain[:, param] > val)*self.chain[:, 0]).sum()/self.chain[:, 0].sum()
 
-    def GetHisto(self, param, nbins=50, nch=None, mnval=None, mxval=None, smooth=None, NormPeak=False, plot=None, lw=4):
+
+
+    def GetHisto(self, param, nbins=50, nch=None, mnval=None, mxval=None, \
+                       smooth=None, NormPeak=False, plot=None, lw=4):
         "Returns histogram for plotting."
         if nch != None:
             line = nch
         else:
             if (type(param) == type("st")):
                 param = self.parcol[param]
-
             line = self.chain[:, param]
 
         # print self.chain[0,:]
@@ -377,6 +393,9 @@ class cosmochain:
         if (plot != None):
             pylab.plot(xval, yval, plot, lw=lw)
         return xval, yval
+
+
+
 
     def GetLimitsOld(self, param, lims=[0.6826894920, 0.9544997360, 0.9973002039]):
         "returns median and pairs corresponding to lims"
