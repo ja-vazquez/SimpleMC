@@ -13,6 +13,8 @@ from scipy.interpolate import UnivariateSpline
 import numpy as np
 from scipy.ndimage import gaussian_filter1d
 
+
+# chains are col0: weight, col1:Likel, rest:params
 def myloadtxt(fname, cols=None):
     # fixed the annoying "setting an array element with a sequence."
     # when chain still runnig.
@@ -29,11 +31,11 @@ def myloadtxt(fname, cols=None):
             da.append(cline)
         else:
             bad.append(cline)
-    # chains are col0: weight, col1:Likel, rest:params
+
     da = np.array(da)
     if (len(bad)):
-        print("BAD=", bad)
-        sys.exit(1)
+        sys.exit("exit: BAD= format")
+
     return da
 
 
@@ -55,30 +57,24 @@ class cosmochain:
                 flist = [root + '_' + str(x) + '.txt' for x in nchains]
 
         if len(flist) == 0:
-            print("Bad chain spec.")
-            print(root+'_?.txt')
-
+            sys.exit("exit: Bad chain spec." + root +'_?.txt')
 
         # get parameter names
         try:
-            self.paramnames = [n.split()[0] for n in open(
-                flist[0].replace('.txt', '.paramnames')).readlines()]
+            lines = open(flist[0].replace('.txt', '.paramnames')).readlines()
         except:
             try:
                 lines = open(root + '.paramnames').readlines()
-                self.paramnames = [n.split()[0] for n in lines]
-                self.latexnames = [' '.join(n.split()[1:]) for n in lines]
-                self.lname = {}
-                for n, ln in zip(self.paramnames, self.latexnames):
-                    self.lname[n] = ln
             except:
                 try:
-                    self.paramnames = [n.split()[0]
-                                       for n in open(root + '.params').readlines()]
+                    lines = open(root + '.params').readlines()
                 except:
-                    print("neither params nor paramnames included")
-                    self.paramnames = []
-                    sys.exit(1)
+                    sys.exit("exit: neither params nor paramnames included")
+
+        self.paramnames = [n.split()[0] for n in lines]
+        self.latexnames = [' '.join(n.split()[1:]) for n in lines]
+        self.lname      = dict(zip(self.paramnames, self.latexnames))
+
         self.parcol = {}
         for i, n in enumerate(self.paramnames):
             print(i, n)
@@ -117,8 +113,7 @@ class cosmochain:
                     cdata[:, 0] /= cdata[:, 0].mean()
                 cdata = da[skip:-1]
 
-            data = data+list(cdata)
-
+            data += list(cdata)
         self.chain = array(data)
 
         if weightfunc != None:
@@ -128,7 +123,7 @@ class cosmochain:
 
         print(len(self.chain), len(self.chain[0]))
         del data
-        self.N = len(self.chain)
+
 
         try:
             self.bestarg = self.chain[:, 1].argmin()
@@ -144,7 +139,7 @@ class cosmochain:
 
 
     def latexname(self, name):
-        print(self.lname[name])
+        #print(self.lname[name])
         return '$'+ self.lname[name] +'$'
 
 
@@ -340,6 +335,8 @@ class cosmochain:
             lims[2], lims[3]-lims[1], lims[3]-lims[0]
         return (m, ep1, ep2, ep3, em1, em2, em3)
 
+
+
     def GetMarginal(self, param, val):
         return ((self.chain[:, param] > val)*self.chain[:, 0]).sum()/self.chain[:, 0].sum()
 
@@ -355,16 +352,11 @@ class cosmochain:
                 param = self.parcol[param]
             line = self.chain[:, param]
 
-        # print self.chain[0,:]
-
-        if mnval == None:
-            mnval = line.min()
-        if mxval == None:
-            mxval = line.max()  # (to add the last one)
-        if (mnval == mxval):
-            return None, None
+        if mnval == None:    mnval = line.min()
+        if mxval == None:    mxval = line.max()  # (to add the last one)
+        if (mnval == mxval): return None, None
         mxval *= 1.001
-        # print mnval, mxval
+
         stp = (1.0*mxval-1.0*mnval)/nbins
         tmp = list(map(int, (line-mnval)/stp))
 
@@ -373,6 +365,8 @@ class cosmochain:
         for ii in range(len(tmp)):
             if (tmp[ii] >= 0) and (tmp[ii] < nbins):
                 histo[tmp[ii]] += self.chain[ii, 0]
+
+
         xval = array([mnval+(x+0.5)*stp for x in range(nbins)])
         yval = histo/stp
         print(xval, mnval, mxval, stp)
@@ -380,11 +374,11 @@ class cosmochain:
         if smooth:
             yvalpad = array([0, 0, 0, 0]+list(yval)+[0, 0, 0, 0])
             if smooth == 1:
-                yval = (yvalpad[4:nbins+4] +
-                        yvalpad[3:nbins+3]+yvalpad[5:nbins+5])/3.0
+                yval = (yvalpad[3:nbins+3] + yvalpad[4:nbins+4] +
+                        yvalpad[5:nbins+5])/3.0
             if smooth == 2:
-                yval = (yvalpad[4:nbins+4]+yvalpad[3:nbins+3] +
-                        yvalpad[5:nbins+5]+yvalpad[2:nbins+2]+yvalpad[6:nbins+6])/5.0
+                yval = (yvalpad[2:nbins+2] + yvalpad[3:nbins+3] + yvalpad[4:nbins+4]+
+                        yvalpad[5:nbins+5]++yvalpad[6:nbins+6])/5.0
 
         if (NormPeak):
             yval /= yval.max()
@@ -392,8 +386,7 @@ class cosmochain:
             area = yval.sum()*stp
             yval /= area
 
-        if (plot != None):
-            pylab.plot(xval, yval, plot, lw=lw)
+        if (plot != None): pylab.plot(xval, yval, plot, lw=lw)
         return xval, yval*1.01
 
 
@@ -451,6 +444,7 @@ class cosmochain:
         # print mn,cov[0,0]
         # stop
         return mn, cov
+
 
     def plotAll(self, color, justlines=False, parlist=None):
         cc = 0

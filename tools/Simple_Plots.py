@@ -51,5 +51,5 @@ class Simple_Plots(cosmochain):
             leg.draw_frame(False)
             self.color_legend(leg)
         plt.tight_layout()
-        plt.savefig('Plot_1D.pdf')
+        #plt.savefig('Plot_1D.pdf')
         plt.show()

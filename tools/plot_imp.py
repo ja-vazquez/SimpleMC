@@ -2,6 +2,9 @@
 
 
 from Simple_Plots import Simple_Plots
+import sys
+
+
 
 
 dir_name   = 'chains/'
@@ -13,7 +16,6 @@ param_pair = ['h', 'w']
 S = Simple_Plots(dir_name, roots, params)
 S.label = ['BBAO+JLA', 'BBAO+Pantheon+PLK15']
 S.Plots1D()
-
 
 
 
