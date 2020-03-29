@@ -12,7 +12,7 @@ import numpy.fft as fft
 from scipy.interpolate import UnivariateSpline
 import numpy as np
 from scipy.ndimage import gaussian_filter1d
-
+from scipy.ndimage.filters import gaussian_filter
 
 # chains are col0: weight, col1:Likel, rest:params
 def myloadtxt(fname, cols=None):
@@ -181,64 +181,61 @@ class cosmochain:
 
 
 
-    def Plot2D(self, p1, p2, N=60, lims=None, conts=[0.68, 0.95, 0.997], filled=True, lw=2, bp=False, blur=None, nch1=None, nch2=None, label=""):
-        pl = zeros((N, N))
+    def Plot2D(self, param1, param2, N=60, lims=None, conts=[0.68, 0.95, 0.997], filled=True, lw=2,\
+                     pbest=False, blur=None, ncolumn1=None, ncolumn2=None, label="", solid=True):
 
-        if (nch1 == None):
-            if (type(p1) == type("p")):
-                p1 = self.parcol[p1]
-            xx = self.chain[:, p1]
+        if (ncolumn1 == None):
+            if (type(param1) == type("p")):
+                param1 = self.parcol[param1]
+            xx = self.chain[:, param1]
         else:
-            xx = nch1
+            xx = ncolumn1
 
-        if (nch2 == None):
-            if (type(p2) == type("p")):
-                p2 = self.parcol[p2]
-            yy = self.chain[:, p2]
+        if (ncolumn2 == None):
+            if (type(param2) == type("p")):
+                param2 = self.parcol[param2]
+            yy = self.chain[:, param2]
         else:
-            yy = nch2
+            yy = ncolumn2
 
         we = self.chain[:, 0]
 
         if (lims == None):
-            xmin = xx.min()
-            xmax = xx.max()
-            de = (xmax-xmin)/100
+            xmin, xmax = xx.min(), xx.max()
+            de = (xmax-xmin)/100.
             if (de == 0):
-                de = xmax/100
+                de = xmax/100.
             xmin -= de
             xmax += de
 
-            ymin = yy.min()
-            ymax = yy.max()
-            de = (ymax-ymin)/100
+            ymin, ymax = yy.min(), yy.max()
+            de = (ymax-ymin)/100.
             if (de == 0):
-                de = ymax/100
+                de = ymax/100.
             ymin -= de
             ymax += de
         else:
             xmin, xmax, ymin, ymax = lims
 
-        out = 0
+        out   = 0
+        grid  = zeros((N, N))
         for x, y, w in zip(xx, yy, we):
             i1 = int((x-xmin)/(xmax-xmin)*N)
             i2 = int((y-ymin)/(ymax-ymin)*N)
             try:
-                pl[i2, i1] += w
+                grid[i2, i1] += w
             except:
                 out += w
 
         if (out > 0):
             print("warn: out =", out/we.sum())
 
-        b = pl.flatten()
-
+        b = grid.flatten()
         b = b.tolist()
         b.sort(reverse=True)
         b = array(b)
 
         c = b*1.0
-
         c = c.cumsum()
         c /= c[-1]
 
@@ -254,52 +251,33 @@ class cosmochain:
             if (cum > conts[2]) and (l3 == 0):
                 l3 = val
 
-        print(l1, l2, l3)
+        print('contours', l1, l2, l3)
+        #grid =smline(grid)
 
-        # pl=smline2(pl)
+        limits = ( xmin, xmax, ymin, ymax)
+        lcont  = [l3, l2, l1]
+        grid   = gaussian_filter(grid, sigma= 0.9)
 
-        # pylab.imshow(pl,extent=(xmin,ymin,xmax,ymax),origin='lower',aspect='auto')
+        mcolor ={'blue':'Blues', 'red':'Reds'}
 
         if type(filled) == type('string'):
             print('lw=', lw)
-            pylab.contour(pl, [l3, l2, l1], extent=(
-                xmin, xmax, ymin, ymax), origin='lower', aspect='auto', colors=filled, linewidths=lw)
+            pylab.contour(grid, lcont, extent=limits, origin='lower', \
+                            aspect='auto', colors=filled, linewidths=lw)
             if (label != ""):
                 pylab.plot([], [], color=filled, linewidth=lw, label=label)
-        # JAV
-            if filled == "green":
-                pylab.contourf(pl, [l3, l2, l1], extent=(
-                    xmin, xmax, ymin, ymax), origin='lower', aspect='auto', cmap=pylab.get_cmap('Greens'))
-                pylab.contour(pl, [l3, l2, l1], extent=(
-                    xmin, xmax, ymin, ymax), origin='lower', aspect='auto', colors='green', lwidth=lw)
 
-        else:
-            if filled == 1:
-                pylab.contourf(pl, [l3, l2, l1], extent=(
-                    xmin, xmax, ymin, ymax), origin='lower', aspect='auto', cmap=pylab.get_cmap('cool'))
-                pylab.contour(pl, [l3, l2, l1], extent=(
-                    xmin, xmax, ymin, ymax), origin='lower', aspect='auto', colors='red', lwidth=lw)
-            elif filled == 2:
-                pylab.contourf(pl, [l3, l2, l1], extent=(
-                    xmin, xmax, ymin, ymax), origin='lower', aspect='auto', color='red', cmap=pylab.get_cmap('autumn'))
-                #pylab.imshow(pl,extent=(xmin,xmax,ymin,ymax),origin='lower', aspect='auto', cmap=pylab.get_cmap('autumn'))
-            elif filled == 0:
-                pylab.contour(pl, [l3, l2, l1], extent=(
-                    xmin, xmax, ymin, ymax), origin='lower', aspect='auto', colors='black', lwidth=lw)
-            elif filled == -1:
-                pylab.contour(pl, [l3, l2, l1], extent=(
-                    xmin, xmax, ymin, ymax), origin='lower', aspect='auto', colors='red', lwidth=lw)
-            elif filled == -2:
-                pylab.contour(pl, [l3, l2, l1], extent=(
-                    xmin, xmax, ymin, ymax), origin='lower', aspect='auto', colors='blue', lwidth=lw)
-            elif filled == -3:
-                pylab.contour(pl, [l3, l2, l1], extent=(
-                    xmin, xmax, ymin, ymax), origin='lower', aspect='auto', colors='green', lwidth=lw)
+            if solid:
+                pylab.contourf(grid, lcont + [max(b)], extent=limits, origin='lower', \
+                                aspect='auto', cmap=pylab.get_cmap(mcolor[filled]))
 
-        if (bp):
-            pylab.plot(self.best[p1], self.best[p2], 'ro')
+        if (pbest):
+            pylab.plot(self.best[param1], self.best[param2], 'ro')
 
-        return (xmin, xmax, ymin, ymax)
+        return grid, lcont+[max(b)], limits
+
+
+
 
     def GetLimits(self, param, ML=False, nch=None, limlist=[0.5-0.997/2, 0.5-0.95/2, 0.5-0.68/2, 0.5, 0.5+0.68/2, 0.5+0.95/2, 0.5+0.997/2],
                   returnlims=False):
@@ -342,23 +320,23 @@ class cosmochain:
 
 
 
-    def GetHisto(self, param, nbins=50, nch=None, mnval=None, mxval=None, \
+    def GetHisto(self, param, nbins=50, ncolumn=None, minval=None, maxval=None, \
                        smooth=None, NormPeak=False, plot=None, lw=4):
         "Returns histogram for plotting."
-        if nch != None:
-            line = nch
+        if ncolumn != None:
+            column = ncolumn
         else:
             if (type(param) == type("st")):
                 param = self.parcol[param]
-            line = self.chain[:, param]
+            column = self.chain[:, param]
 
-        if mnval == None:    mnval = line.min()
-        if mxval == None:    mxval = line.max()  # (to add the last one)
-        if (mnval == mxval): return None, None
-        mxval *= 1.001
+        if minval == None:    minval = column.min()
+        if maxval == None:    maxval = column.max()  # (to add the last one)
+        if (minval == maxval): return None, None
+        maxval *= 1.001
 
-        stp = (1.0*mxval-1.0*mnval)/nbins
-        tmp = list(map(int, (line-mnval)/stp))
+        step = (1.0*maxval-1.0*minval)/nbins
+        tmp  = list(map(int, (column - minval)/step))
 
         histo = zeros((nbins,))
 
@@ -366,10 +344,9 @@ class cosmochain:
             if (tmp[ii] >= 0) and (tmp[ii] < nbins):
                 histo[tmp[ii]] += self.chain[ii, 0]
 
-
-        xval = array([mnval+(x+0.5)*stp for x in range(nbins)])
-        yval = histo/stp
-        print(xval, mnval, mxval, stp)
+        xval = array([minval+(x+0.5)*step for x in range(nbins)])
+        yval = histo/step
+        #print(xval, minval, maxval, step)
 
         if smooth:
             yvalpad = array([0, 0, 0, 0]+list(yval)+[0, 0, 0, 0])
@@ -383,9 +360,10 @@ class cosmochain:
         if (NormPeak):
             yval /= yval.max()
         else:
-            area = yval.sum()*stp
+            area = yval.sum()*step
             yval /= area
 
+        yval = gaussian_filter1d(yval, sigma=2)
         if (plot != None): pylab.plot(xval, yval, plot, lw=lw)
         return xval, yval*1.01
 
@@ -423,6 +401,8 @@ class cosmochain:
         print(str)
 
         return mean, lowl, highl
+
+
 
     def GetCovariance(self, parlist):
         N = len(parlist)

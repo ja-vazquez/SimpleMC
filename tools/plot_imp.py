@@ -2,21 +2,19 @@
 
 
 from Simple_Plots import Simple_Plots
-import sys
-
-
 
 
 dir_name   = 'chains/'
-roots      = ['wCDM_phy_BBAO+JLA', 'wCDM_phy_BBAO+Pantheon+Planck_15']
-params     = ['h', 'w', 'Ol', 'Age']
-param_pair = ['h', 'w']
+roots      = ['wCDM_phy_BBAO+JLA'] #, 'wCDM_phy_BBAO+Pantheon+Planck_15']
+params_1D     = ['h', 'w', 'Ol', 'Age']
+params_2D = [['h', 'w'], ['Om', 'h']]
 
 
-S = Simple_Plots(dir_name, roots, params)
+S = Simple_Plots(dir_name, roots)
 S.label = ['BBAO+JLA', 'BBAO+Pantheon+PLK15']
-S.Plots1D()
 
+S.Plots1D(params_1D)
+S.Plots2D(params_2D)
 
 
 
@@ -36,45 +34,5 @@ S.Plots1D()
             #er = sqrt((grlist**2*wlist).sum()/wlist.sum()-mn**2)
             #print("growth z=10/z=0 = ", mn, "+/-", er)
 
-
-
-
-# -----------------------
-Plot_2D = 'False'
-model_2D = ['LCDM_phy']
-param_2D = ['Om', 'h']
-NBins_2D = 40
-
-xrange_2D = 'False'
-xmin, xmax = 0.2, 0.4
-ymin, ymax = 0.6, 0.75
-
-
-
-if 'FALSE':
-    a = 0
-    for model in model_2D:
-        for datasets in datasetl:
-            a += 1
-
-            C = cosmochain(dire + model+'_'+datasets)
-            C.Plot2D(param_2D[0], param_2D[1], filled=colour(
-                a), label=cosmodata(datasets), N=NBins_2D)
-
-    if 'True' in xrange_2D:
-        pylab.xlim(xmin, xmax)
-        pylab.ylim(ymin, ymax)
-
-    leg = pylab.legend()
-    leg.draw_frame(False)		# No box & colour legend
-    color_legend(leg)
-
-    pylab.xlabel(C.latexname(param_2D[0]))
-    pylab.ylabel(C.latexname(param_2D[1]))
-    pylab.savefig(name_fig+'_2D.pdf')
-    pylab.show()
-
-else:
-    print('Nothing else to do')
-
 """
+
