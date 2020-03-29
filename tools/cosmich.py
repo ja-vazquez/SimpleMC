@@ -11,7 +11,7 @@ import pylab
 import numpy.fft as fft
 from scipy.interpolate import UnivariateSpline
 import numpy as np
-
+from scipy.ndimage import gaussian_filter1d
 
 def myloadtxt(fname, cols=None):
     # fixed the annoying "setting an array element with a sequence."
@@ -38,7 +38,8 @@ def myloadtxt(fname, cols=None):
 
 
 class cosmochain:
-    def __init__(self, root, nchains='auto', skip_=None, temp=1.0, balance=True, weightfunc=None, kirkby=False):
+    def __init__(self, root, nchains='auto', skip_=None, temp=1.0, \
+                       balance=True, weightfunc=None, kirkby=False):
 
         if (balance and ("PLA" in root or "neffch" in root or "Decay" in root)):
             balance = False
@@ -181,6 +182,7 @@ class cosmochain:
     def Plot1D(self, p1, sty='r-', label="", N=50):
         xx, yy = self.GetHisto(p1, nbins=N)
         pylab.plot(xx, yy, sty, label="", lw=2)
+
 
 
 
@@ -392,7 +394,7 @@ class cosmochain:
 
         if (plot != None):
             pylab.plot(xval, yval, plot, lw=lw)
-        return xval, yval
+        return xval, yval*1.01
 
 
 
