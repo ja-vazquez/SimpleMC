@@ -6,8 +6,8 @@ from Simple_Plots import Simple_Plots
 
 dir_name   = 'chains/'
 roots      = ['wCDM_phy_BBAO+JLA'] #, 'wCDM_phy_BBAO+Pantheon+Planck_15']
-params_1D     = ['h', 'w', 'Ol', 'Age']
-params_2D = [['h', 'w'], ['Om', 'h']]
+params_1D  = ['h', 'w', 'Ol', 'Age']
+params_2D  = [['h', 'w'], ['Om', 'h']]
 
 
 S = Simple_Plots(dir_name, roots)
