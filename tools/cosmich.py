@@ -124,7 +124,6 @@ class cosmochain:
         print(len(self.chain), len(self.chain[0]))
         del data
 
-
         try:
             self.bestarg = self.chain[:, 1].argmin()
             self.best    = self.chain[self.bestarg]
@@ -174,10 +173,65 @@ class cosmochain:
         return self.chain[ii, :]
 
 
+
+    def GetMarginal(self, param, val):
+        param = self.parcol[param]
+        return ((self.chain[:, param] > val)*self.chain[:, 0]).sum()/self.chain[:, 0].sum()
+
+
+
+    def GetHisto(self, param, nbins=50, ncolumn=None, minval=None, maxval=None, \
+                       smooth=None, NormPeak=False, plot=None, lw=4):
+        "Returns histogram for plotting."
+        if ncolumn != None:
+            column = ncolumn
+        else:
+            if (type(param) == type("st")):
+                param = self.parcol[param]
+            column = self.chain[:, param]
+
+        if minval  == None:    minval = column.min()
+        if maxval  == None:    maxval = column.max()  # (to add the last one)
+        if (minval == maxval): return None, None
+        maxval *= 1.001
+
+        step = (1.0*maxval-1.0*minval)/nbins
+        tmp  = list(map(int, (column - minval)/step))
+
+        histo = zeros((nbins,))
+
+        for ii in range(len(tmp)):
+            if (tmp[ii] >= 0) and (tmp[ii] < nbins):
+                histo[tmp[ii]] += self.chain[ii, 0]
+
+        xval = array([minval+(x+0.5)*step for x in range(nbins)])
+        yval = histo/step
+        #print(xval, minval, maxval, step)
+
+        if smooth:
+            yvalpad = array([0, 0, 0, 0]+list(yval)+[0, 0, 0, 0])
+            if smooth == 1:
+                yval = (yvalpad[3:nbins+3] + yvalpad[4:nbins+4] +
+                        yvalpad[5:nbins+5])/3.0
+            if smooth == 2:
+                yval = (yvalpad[2:nbins+2] + yvalpad[3:nbins+3] + yvalpad[4:nbins+4]+
+                        yvalpad[5:nbins+5]++yvalpad[6:nbins+6])/5.0
+
+        if (NormPeak):
+            yval /= yval.max()
+        else:
+            area = yval.sum()*step
+            yval /= area
+
+        yval = gaussian_filter1d(yval, sigma=2)
+        if (plot != None): pylab.plot(xval, yval, plot, lw=lw)
+        return xval, yval*1.01
+
+
+
     def Plot1D(self, p1, sty='r-', label="", N=50):
         xx, yy = self.GetHisto(p1, nbins=N)
         pylab.plot(xx, yy, sty, label="", lw=2)
-
 
 
 
@@ -239,23 +293,22 @@ class cosmochain:
         c = c.cumsum()
         c /= c[-1]
 
-        l1 = 0
-        l2 = 0
-        l3 = 0
+        l1, l2, l3 = 0, 0, 0
 
+        print (conts, len(conts) >= 3)
         for val, cum in zip(b, c):
             if (cum > conts[0]) and (l1 == 0):
                 l1 = val
             if (cum > conts[1]) and (l2 == 0):
                 l2 = val
-            if (cum > conts[2]) and (l3 == 0):
+            if (len(conts) >= 3) and (cum > conts[2]) and (l3 == 0):
                 l3 = val
 
         print('contours', l1, l2, l3)
         #grid =smline(grid)
 
         limits = ( xmin, xmax, ymin, ymax)
-        lcont  = [l3, l2, l1]
+        lcont  = [l3, l2, l1] if (len(conts) >= 3) else [l2, l1]
         grid   = gaussian_filter(grid, sigma= 0.9)
 
         mcolor ={'blue':'Blues', 'red':'Reds'}
@@ -272,14 +325,15 @@ class cosmochain:
                                 aspect='auto', cmap=pylab.get_cmap(mcolor[filled]))
 
         if (pbest):
-            pylab.plot(self.best[param1], self.best[param2], 'ro')
+            pylab.plot(self.best[param1], self.best[param2], 'bo')
 
         return grid, lcont+[max(b)], limits
 
 
 
 
-    def GetLimits(self, param, ML=False, nch=None, limlist=[0.5-0.997/2, 0.5-0.95/2, 0.5-0.68/2, 0.5, 0.5+0.68/2, 0.5+0.95/2, 0.5+0.997/2],
+    def GetLimits(self, param, ML=False, nch=None,
+                  limlist=[0.5-0.997/2, 0.5-0.95/2, 0.5-0.68/2, 0.5, 0.5+0.68/2, 0.5+0.95/2, 0.5+0.997/2],
                   returnlims=False):
         if nch != None:
             lis = list(zip(nch, self.chain[:, 0]))
@@ -289,11 +343,11 @@ class cosmochain:
             lis = list(zip(self.chain[:, param], self.chain[:, 0]))
 
         lis.sort()
-        lis = array(lis)
+        lis  = array(lis)
         pars = array(lis[:, 0])
-        wei = array(lis[:, 1])
-        wei = wei.cumsum()
-        wei = wei/wei[-1]
+        wei  = array(lis[:, 1])
+        wei  = wei.cumsum()
+        wei  = wei/wei[-1]
         lims = []
         for lim in limlist:
             a = where(wei > lim)[0][0]
@@ -312,95 +366,6 @@ class cosmochain:
             lims[3], lims[6]-lims[3], lims[3] - \
             lims[2], lims[3]-lims[1], lims[3]-lims[0]
         return (m, ep1, ep2, ep3, em1, em2, em3)
-
-
-
-    def GetMarginal(self, param, val):
-        return ((self.chain[:, param] > val)*self.chain[:, 0]).sum()/self.chain[:, 0].sum()
-
-
-
-    def GetHisto(self, param, nbins=50, ncolumn=None, minval=None, maxval=None, \
-                       smooth=None, NormPeak=False, plot=None, lw=4):
-        "Returns histogram for plotting."
-        if ncolumn != None:
-            column = ncolumn
-        else:
-            if (type(param) == type("st")):
-                param = self.parcol[param]
-            column = self.chain[:, param]
-
-        if minval == None:    minval = column.min()
-        if maxval == None:    maxval = column.max()  # (to add the last one)
-        if (minval == maxval): return None, None
-        maxval *= 1.001
-
-        step = (1.0*maxval-1.0*minval)/nbins
-        tmp  = list(map(int, (column - minval)/step))
-
-        histo = zeros((nbins,))
-
-        for ii in range(len(tmp)):
-            if (tmp[ii] >= 0) and (tmp[ii] < nbins):
-                histo[tmp[ii]] += self.chain[ii, 0]
-
-        xval = array([minval+(x+0.5)*step for x in range(nbins)])
-        yval = histo/step
-        #print(xval, minval, maxval, step)
-
-        if smooth:
-            yvalpad = array([0, 0, 0, 0]+list(yval)+[0, 0, 0, 0])
-            if smooth == 1:
-                yval = (yvalpad[3:nbins+3] + yvalpad[4:nbins+4] +
-                        yvalpad[5:nbins+5])/3.0
-            if smooth == 2:
-                yval = (yvalpad[2:nbins+2] + yvalpad[3:nbins+3] + yvalpad[4:nbins+4]+
-                        yvalpad[5:nbins+5]++yvalpad[6:nbins+6])/5.0
-
-        if (NormPeak):
-            yval /= yval.max()
-        else:
-            area = yval.sum()*step
-            yval /= area
-
-        yval = gaussian_filter1d(yval, sigma=2)
-        if (plot != None): pylab.plot(xval, yval, plot, lw=lw)
-        return xval, yval*1.01
-
-
-
-
-    def GetLimitsOld(self, param, lims=[0.6826894920, 0.9544997360, 0.9973002039]):
-        "returns median and pairs corresponding to lims"
-        line = [(x[param+1], x[0]) for x in self.chain]
-        # print line
-        line.sort()
-        sw = self.chain[:, 0].sum()
-        lowl = [None]*len(lims)
-        highl = [None]*len(lims)
-        lowtrig = 0.5-array(lims)/2
-        hightrig = 0.5+array(lims)/2
-
-        # print sw, hightrig
-
-        sum = 0
-        mean = None
-        for qq in line:
-            sum += qq[1]
-            if (not mean) and (sum >= 0.5*sw):
-                mean = qq[0]
-            for ii in range(len(lims)):
-                if (not lowl[ii]) and (sum >= lowtrig[ii]*sw):
-                    lowl[ii] = qq[0]
-                if (not highl[ii]) and (sum >= hightrig[ii]*sw):
-                    highl[ii] = qq[0]
-        lowl -= mean
-        highl -= mean
-        str = "%2.0f^{+%2.0f+%2.0f+%2.0f}_{%2.0f%2.0f%2.0f}" % (
-            mean, highl[0], highl[1], highl[2], lowl[0], lowl[1], lowl[2])
-        print(str)
-
-        return mean, lowl, highl
 
 
 
@@ -458,6 +423,40 @@ class cosmochain:
 
                 if (ic == N-1) and (not justlines):
                     pylab.xlabel(self.paramnames[j])
+
+
+
+    def GetLimitsOld(self, param, lims=[0.6826894920, 0.9544997360, 0.9973002039]):
+        "returns median and pairs corresponding to lims"
+        line = [(x[param+1], x[0]) for x in self.chain]
+        # print line
+        line.sort()
+        sw = self.chain[:, 0].sum()
+        lowl = [None]*len(lims)
+        highl = [None]*len(lims)
+        lowtrig = 0.5-array(lims)/2
+        hightrig = 0.5+array(lims)/2
+
+        # print sw, hightrig
+
+        sum = 0
+        mean = None
+        for qq in line:
+            sum += qq[1]
+            if (not mean) and (sum >= 0.5*sw):
+                mean = qq[0]
+            for ii in range(len(lims)):
+                if (not lowl[ii]) and (sum >= lowtrig[ii]*sw):
+                    lowl[ii] = qq[0]
+                if (not highl[ii]) and (sum >= hightrig[ii]*sw):
+                    highl[ii] = qq[0]
+        lowl -= mean
+        highl -= mean
+        str = "%2.0f^{+%2.0f+%2.0f+%2.0f}_{%2.0f%2.0f%2.0f}" % (
+            mean, highl[0], highl[1], highl[2], lowl[0], lowl[1], lowl[2])
+        print(str)
+
+        return mean, lowl, highl
 
 
 def smline(x, y, mnmx):
