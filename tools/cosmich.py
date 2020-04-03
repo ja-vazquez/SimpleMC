@@ -370,25 +370,22 @@ class cosmochain:
 
 
     def GetCovariance(self, parlist):
-        N = len(parlist)
+        N   = len(parlist)
         cov = zeros((N, N))
-        mn = zeros(N)
-        sw = 0.0
+        mn  = zeros(N)
+        sw  = 0.0
         for el in self.chain:  # [:100]:
-            sw += el[0]
-            vec = array([el[i] for i in parlist])
-            mn += vec*el[0]
+            sw  += el[0]
+            vec  = array([el[self.parcol[i]] for i in parlist])
+            mn  += vec*el[0]
             cov += el[0]*array([[v1*v2 for v1 in vec] for v2 in vec])
             # print cov[0,0], vec[0],sw
-
-        mn /= sw
+        mn  /= sw
         cov /= sw
 
-        # print mn,cov[0,0]
         cov -= array([[v1*v2 for v1 in mn] for v2 in mn])
-        # print mn,cov[0,0]
-        # stop
         return mn, cov
+
 
 
     def plotAll(self, color, justlines=False, parlist=None):
@@ -412,17 +409,17 @@ class cosmochain:
 
                 pylab.subplot(N, N, cc)
                 if (ic == jc):
-                    xv, yv = self.GetHisto(i+2)
+                    xv, yv = self.GetHisto(i+2, smooth=2, NormPeak=True)
                     pylab.plot(xv, yv, '-', color=color)
                 elif (ic > jc):
                     print(i, j, 'aaa', N)
-                    self.Plot2D(j+2, i+2, filled=color)
+                    self.Plot2D(j+2, i+2, filled=color, conts=[0.68, 0.95])
                     if (jc == 0):
                         if not justlines:
-                            pylab.ylabel(self.paramnames[i])
+                            pylab.ylabel(self.latexname(self.paramnames[i]))
 
                 if (ic == N-1) and (not justlines):
-                    pylab.xlabel(self.paramnames[j])
+                    pylab.xlabel(self.latexname(self.paramnames[j]), fontsize=10)
 
 
 
