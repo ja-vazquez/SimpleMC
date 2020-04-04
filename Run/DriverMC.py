@@ -39,8 +39,6 @@ class DriverMC():
         self.T.printFreeParameters()
 
         self.result = self.executer()
-
-#Doesn;t work with MaxAnalizer, check it later
         self.postprocess()
 
     def executer(self):
@@ -301,11 +299,6 @@ class DriverMC():
             nprocess = ncores//2
         else:
             nprocess = self.nproc
-
-        #if ncores > 1:
-        #    nprocess = ncores//2
-        #else:
-        #    nprocess = 1
         
         pool = mp.Pool(processes=nprocess)
 
@@ -393,9 +386,9 @@ class DriverMC():
 
         
 
-    def plotter(self):
-        from PlotterMC import PlotterMC
-        plot = PlotterMC(self.dims, chainsdir = self.chainsdir, chainsfile = self.outputname)
+    #def plotter(self):
+    #    from PlotterMC import PlotterMC
+    #    plot = PlotterMC(self.dims, chainsdir = self.chainsdir, chainsfile = self.outputname)
 
 #############################Testing functions#################################################
     
