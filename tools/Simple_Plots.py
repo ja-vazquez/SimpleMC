@@ -1,5 +1,4 @@
 
-from scipy.ndimage import gaussian_filter1d
 from cosmich import cosmochain
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
@@ -18,11 +17,11 @@ rcParams.update({'backend': 'pdf',
 class Simple_Plots(cosmochain):
     name = 'jav'
 
-    def __init__(self, dir_name, roots):
+    def __init__(self, dir_name, roots, label=None):
         self.dir_name   = dir_name
         self.roots      = roots
 
-        self.label    = None
+        self.label    = label
         self.colors   = ['red', 'blue']
 
         self.Clist = [cosmochain(dir_name + r) for r in roots]
@@ -34,7 +33,6 @@ class Simple_Plots(cosmochain):
         for i, C in enumerate(self.Clist):
             for j, param in enumerate(params):
                 plt.subplot(1, len(params), j+1)
-
                 xx, yy = C.GetHisto(param, smooth=2, NormPeak=True)
                 plt.plot(xx, yy, label=self.label[i], color=self.colors[i])
 
@@ -66,8 +64,7 @@ class Simple_Plots(cosmochain):
 
 
 
-
-    def plotAlls(self, parlist, new_style=True):
+    def triangle(self, parlist, new_style=True):
         rcParams.update({'xtick.labelsize': 12,
                          'ytick.labelsize': 12,})
         for i, C in enumerate(self.Clist):
@@ -102,7 +99,34 @@ class Simple_Plots(cosmochain):
             txt.set_color(line.get_color())
 
 
+
     def draw_frame(self):
             leg = plt.legend(loc='upper right')
             leg.draw_frame(False)
             self.color_legend(leg)
+
+
+
+
+    def cornerPlotter(self, params, color='g', show_titles=True, fill_contours=True):
+        import corner
+        for C in self.Clist:
+            parcols = [C.parcol[p] for p in params]
+            pchains = C.chain[:, parcols]
+            lnames  = [C.latexname(l) for l in params]
+
+            figure = corner.corner(pchains, labels=lnames, \
+                               bins             = 50, \
+                               weights          =C.chain[:,0], \
+                               color            ='b', \
+                               quantiles        =[0.5], \
+                               show_titles      =True, \
+                               title_fmt        ='.4f', \
+                               smooth1d         =True, \
+                               smooth           =True, \
+                               fill_contours    =fill_contours, \
+                               plot_contours    =True, \
+                               plot_density     =True, \
+                               levels           =(0.68,0.95),\
+                               title_kwargs={"fontsize": 12})
+            figure.savefig('Plot_corner.pdf')

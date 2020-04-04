@@ -424,7 +424,7 @@ class cosmochain:
                     elif (ic > jc):
                         smt =self.Plot2D(j+2, i+2, filled=1, conts=[0.68, 0.95])
                         axs[ic, jc].contour(smt[0], smt[1], extent=smt[2], origin='lower', \
-                                    aspect='auto', colors='blue', linewidths=2)
+                                    aspect='auto', colors='blue', linewidths=1)
                         axs[ic, jc].contourf(smt[0], smt[1], extent=smt[2], origin='lower', \
                                     aspect='auto', cmap=plt.get_cmap('Blues'))
 
