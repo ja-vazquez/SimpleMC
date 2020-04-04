@@ -43,7 +43,7 @@ class Simple_Plots(cosmochain):
 
         self.draw_frame()
         plt.tight_layout()
-        #plt.savefig('Plot_1D.pdf')
+        plt.savefig('Plot_1D.pdf')
         plt.show()
 
 
@@ -61,7 +61,7 @@ class Simple_Plots(cosmochain):
 
         self.draw_frame()
         plt.tight_layout()
-        #plt.savefig('Plot_2D.pdf')
+        plt.savefig('Plot_2D.pdf')
         plt.show()
 
 
@@ -72,7 +72,7 @@ class Simple_Plots(cosmochain):
                          'ytick.labelsize': 12,})
         for i, C in enumerate(self.Clist):
             C.plotAll(color='blue', parlist=parlist, new_style=new_style)
-            #plt.savefig('Plot_triangle.pdf')
+            plt.savefig('Plot_triangle.pdf')
             plt.show()
 
 
