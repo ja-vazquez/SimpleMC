@@ -8,8 +8,8 @@ from matplotlib import rcParams
 rcParams.update({'backend': 'pdf',
                'axes.labelsize': 15,
                'text.fontsize': 15,
-               'xtick.labelsize': 10,
-               'ytick.labelsize': 10,
+               'xtick.labelsize': 15,
+               'ytick.labelsize': 15,
                'legend.fontsize': 10,
                'lines.markersize': 6,
                'font.size': 20,
@@ -65,13 +65,17 @@ class Simple_Plots(cosmochain):
         plt.show()
 
 
-    def plotAlls(self, parlist=None):
-        plt.figure(figsize=(4*len(parlist), 3*len(parlist)))
+
+
+    def plotAlls(self, parlist, new_style=True):
+        rcParams.update({'xtick.labelsize': 12,
+                         'ytick.labelsize': 12,})
         for i, C in enumerate(self.Clist):
-            C.plotAll(color='blue', parlist=parlist)
-            rcParams.update({'xtick.labelsize': 12,
-                             'ytick.labelsize': 12,})
+            C.plotAll(color='blue', parlist=parlist, new_style=new_style)
+            #plt.savefig('Plot_triangle.pdf')
             plt.show()
+
+
 
 
     def Show_limits(self, params):

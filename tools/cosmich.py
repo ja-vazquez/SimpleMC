@@ -5,14 +5,13 @@
 #
 
 import sys
-from glob import *
-from scipy import *
-import pylab
+import matplotlib.pyplot as plt
+import scipy as sp
+from glob import glob
 import numpy.fft as fft
-from scipy.interpolate import UnivariateSpline
-import numpy as np
 from scipy.ndimage import gaussian_filter1d
 from scipy.ndimage.filters import gaussian_filter
+
 
 # chains are col0: weight, col1:Likel, rest:params
 def myloadtxt(fname, cols=None):
@@ -32,11 +31,11 @@ def myloadtxt(fname, cols=None):
         else:
             bad.append(cline)
 
-    da = np.array(da)
+    da = sp.array(da)
     if (len(bad)):
         sys.exit("exit: BAD= format")
-
     return da
+
 
 
 class cosmochain:
@@ -89,7 +88,7 @@ class cosmochain:
                 skip = 3
                 print("kirkby style ", end=' ')
                 cdata = open(fname).readlines()[skip:-1]
-                cdata = array([[1, 0] + list(map(float, x.split()))
+                cdata = sp.array([[1, 0] + list(map(float, x.split()))
                                for x in cdata])
             else:
                 da = myloadtxt(fname, cols=len(self.paramnames)+2)
@@ -114,7 +113,7 @@ class cosmochain:
                 cdata = da[skip:-1]
 
             data += list(cdata)
-        self.chain = array(data)
+        self.chain = sp.array(data)
 
         if weightfunc != None:
             print("Reweighting")
@@ -137,9 +136,11 @@ class cosmochain:
 
 
 
+
     def latexname(self, name):
         #print(self.lname[name])
         return '$'+ self.lname[name] +'$'
+
 
 
     #get column of a given parameter
@@ -147,10 +148,12 @@ class cosmochain:
         return self.chain[:, self.parcol[name]]
 
 
+
     def __getitem__(self, key):
         if (type(key) == type("p")):
             key = self.parcol[key]
         return self.chain[:, key]
+
 
 
     def __setitem__(self, key, res):
@@ -160,12 +163,14 @@ class cosmochain:
             else:
                 # need to add a column
                 N = len(self.chain)
-                self.chain = concatenate((self.chain, zeros((N, 1))), 1)
+                self.chain = sp.concatenate((self.chain, sp.zeros((N, 1))), 1)
                 Nc = len(self.chain[0])-1
                 self.parcol[key] = Nc
                 self.paramnames.append(key)
                 key = Nc
         self.chain[:, key] = res
+
+
 
 
     def BestSample(self):
@@ -198,18 +203,18 @@ class cosmochain:
         step = (1.0*maxval-1.0*minval)/nbins
         tmp  = list(map(int, (column - minval)/step))
 
-        histo = zeros((nbins,))
+        histo = sp.zeros((nbins,))
 
         for ii in range(len(tmp)):
             if (tmp[ii] >= 0) and (tmp[ii] < nbins):
                 histo[tmp[ii]] += self.chain[ii, 0]
 
-        xval = array([minval+(x+0.5)*step for x in range(nbins)])
+        xval = sp.array([minval+(x+0.5)*step for x in range(nbins)])
         yval = histo/step
         #print(xval, minval, maxval, step)
 
         if smooth:
-            yvalpad = array([0, 0, 0, 0]+list(yval)+[0, 0, 0, 0])
+            yvalpad = sp.array([0, 0, 0, 0]+list(yval)+[0, 0, 0, 0])
             if smooth == 1:
                 yval = (yvalpad[3:nbins+3] + yvalpad[4:nbins+4] +
                         yvalpad[5:nbins+5])/3.0
@@ -224,14 +229,14 @@ class cosmochain:
             yval /= area
 
         yval = gaussian_filter1d(yval, sigma=2)
-        if (plot != None): pylab.plot(xval, yval, plot, lw=lw)
+        if (plot != None): plt.plot(xval, yval, plot, lw=lw)
         return xval, yval*1.01
 
 
 
     def Plot1D(self, p1, sty='r-', label="", N=50):
         xx, yy = self.GetHisto(p1, nbins=N)
-        pylab.plot(xx, yy, sty, label="", lw=2)
+        plt.plot(xx, yy, sty, label="", lw=2)
 
 
 
@@ -272,7 +277,7 @@ class cosmochain:
             xmin, xmax, ymin, ymax = lims
 
         out   = 0
-        grid  = zeros((N, N))
+        grid  = sp.zeros((N, N))
         for x, y, w in zip(xx, yy, we):
             i1 = int((x-xmin)/(xmax-xmin)*N)
             i2 = int((y-ymin)/(ymax-ymin)*N)
@@ -287,7 +292,7 @@ class cosmochain:
         b = grid.flatten()
         b = b.tolist()
         b.sort(reverse=True)
-        b = array(b)
+        b = sp.array(b)
 
         c = b*1.0
         c = c.cumsum()
@@ -315,17 +320,17 @@ class cosmochain:
 
         if type(filled) == type('string'):
             print('lw=', lw)
-            pylab.contour(grid, lcont, extent=limits, origin='lower', \
+            plt.contour(grid, lcont, extent=limits, origin='lower', \
                             aspect='auto', colors=filled, linewidths=lw)
             if (label != ""):
-                pylab.plot([], [], color=filled, linewidth=lw, label=label)
+                plt.plot([], [], color=filled, linewidth=lw, label=label)
 
             if solid:
-                pylab.contourf(grid, lcont + [max(b)], extent=limits, origin='lower', \
-                                aspect='auto', cmap=pylab.get_cmap(mcolor[filled]))
+                plt.contourf(grid, lcont + [max(b)], extent=limits, origin='lower', \
+                                aspect='auto', cmap=plt.get_cmap(mcolor[filled]))
 
         if (pbest):
-            pylab.plot(self.best[param1], self.best[param2], 'bo')
+            plt.plot(self.best[param1], self.best[param2], 'bo')
 
         return grid, lcont+[max(b)], limits
 
@@ -343,14 +348,14 @@ class cosmochain:
             lis = list(zip(self.chain[:, param], self.chain[:, 0]))
 
         lis.sort()
-        lis  = array(lis)
-        pars = array(lis[:, 0])
-        wei  = array(lis[:, 1])
+        lis  = sp.array(lis)
+        pars = sp.array(lis[:, 0])
+        wei  = sp.array(lis[:, 1])
         wei  = wei.cumsum()
         wei  = wei/wei[-1]
         lims = []
         for lim in limlist:
-            a = where(wei > lim)[0][0]
+            a = sp.where(wei > lim)[0][0]
             lims.append(pars[a])
         if (ML):
             print("Central moved:", lims[3], end=' ')
@@ -371,24 +376,24 @@ class cosmochain:
 
     def GetCovariance(self, parlist):
         N   = len(parlist)
-        cov = zeros((N, N))
-        mn  = zeros(N)
+        cov = sp.zeros((N, N))
+        mn  = sp.zeros(N)
         sw  = 0.0
         for el in self.chain:  # [:100]:
             sw  += el[0]
-            vec  = array([el[self.parcol[i]] for i in parlist])
+            vec  = sp.array([el[self.parcol[i]] for i in parlist])
             mn  += vec*el[0]
-            cov += el[0]*array([[v1*v2 for v1 in vec] for v2 in vec])
+            cov += el[0]*sp.array([[v1*v2 for v1 in vec] for v2 in vec])
             # print cov[0,0], vec[0],sw
         mn  /= sw
         cov /= sw
 
-        cov -= array([[v1*v2 for v1 in mn] for v2 in mn])
+        cov -= sp.array([[v1*v2 for v1 in mn] for v2 in mn])
         return mn, cov
 
 
 
-    def plotAll(self, color, justlines=False, parlist=None):
+    def plotAll(self, color, justlines=False, parlist=None, new_style=False):
         cc = 0
         if not parlist:
             N = len(self.paramnames)
@@ -399,27 +404,59 @@ class cosmochain:
                 if type(el) == type('string'):
                     parlist[i] = self.parcol[el]-2
 
-        for ic, i in enumerate(parlist):
-            for jc, j in enumerate(parlist):
-                cc += 1
-                if (ic < jc):
-                    continue
-                if (i < 0) or (j < 0):
-                    continue
 
-                pylab.subplot(N, N, cc)
-                if (ic == jc):
-                    xv, yv = self.GetHisto(i+2, smooth=2, NormPeak=True)
-                    pylab.plot(xv, yv, '-', color=color)
-                elif (ic > jc):
-                    print(i, j, 'aaa', N)
-                    self.Plot2D(j+2, i+2, filled=color, conts=[0.68, 0.95])
-                    if (jc == 0):
+        if new_style:
+            fig, axs = plt.subplots(N, N, sharex='col',
+                                    gridspec_kw={'hspace': 0, 'wspace': 0}, figsize=(12,10))
+            for ic, i in enumerate(parlist):
+                for jc, j in enumerate(parlist):
+                    cc += 1
+                    if (ic < jc):
+                        axs[ic, jc].axis('off')
+                        continue
+                    if (i < 0) or (j < 0):
+                        continue
+
+                    if jc>0: axs[ic, jc].tick_params(labelleft=False)
+                    if (ic == jc):
+                        xv, yv = self.GetHisto(i+2, smooth=2, NormPeak=True)
+                        axs[ic,jc].plot(xv, yv, '-', color=color)
+                    elif (ic > jc):
+                        smt =self.Plot2D(j+2, i+2, filled=1, conts=[0.68, 0.95])
+                        axs[ic, jc].contour(smt[0], smt[1], extent=smt[2], origin='lower', \
+                                    aspect='auto', colors='blue', linewidths=2)
+                        axs[ic, jc].contourf(smt[0], smt[1], extent=smt[2], origin='lower', \
+                                    aspect='auto', cmap=plt.get_cmap('Blues'))
+
+                    if (jc == 0 and ic >0):
                         if not justlines:
-                            pylab.ylabel(self.latexname(self.paramnames[i]))
+                            axs[ic, jc].set_ylabel(self.latexname(self.paramnames[i]))
 
-                if (ic == N-1) and (not justlines):
-                    pylab.xlabel(self.latexname(self.paramnames[j]), fontsize=10)
+                    if (ic == N-1) and (not justlines):
+                        axs[ic, jc].set_xlabel(self.latexname(self.paramnames[j]), fontsize=10)
+        else:
+            for ic, i in enumerate(parlist):
+                for jc, j in enumerate(parlist):
+                    cc += 1
+                    if (ic < jc):
+                        continue
+                    if (i < 0) or (j < 0):
+                        continue
+
+                    plt.subplot(N, N, cc)
+                    if (ic == jc):
+                        xv, yv = self.GetHisto(i+2, smooth=2, NormPeak=True)
+                        plt.plot(xv, yv, '-', color=color)
+                    elif (ic > jc):
+                        print(i, j, 'aaa', N)
+                        self.Plot2D(j+2, i+2, filled=color, conts=[0.68, 0.95])
+                        if (jc == 0):
+                            if not justlines:
+                                plt.ylabel(self.latexname(self.paramnames[i]))
+
+                    if (ic == N-1) and (not justlines):
+                        plt.xlabel(self.latexname(self.paramnames[j]), fontsize=10)
+
 
 
 
@@ -431,8 +468,8 @@ class cosmochain:
         sw = self.chain[:, 0].sum()
         lowl = [None]*len(lims)
         highl = [None]*len(lims)
-        lowtrig = 0.5-array(lims)/2
-        hightrig = 0.5+array(lims)/2
+        lowtrig = 0.5- sp.array(lims)/2
+        hightrig = 0.5+ sp.array(lims)/2
 
         # print sw, hightrig
 
@@ -456,27 +493,28 @@ class cosmochain:
         return mean, lowl, highl
 
 
-def smline(x, y, mnmx):
 
+
+def smline(x, y, mnmx):
     # first lets.pad
-    y = log(y+1e-30)
+    y = sp.log(y+1e-30)
     N = len(y)
-    y = array([y[0]]*N+list(y)+[y[-1]]*N)
+    y = sp.array([y[0]]*N+list(y)+[y[-1]]*N)
     rft = fft.rfft(y)
     Nx = len(rft)
-    k = linspace(0, 1, Nx)
-    rft *= exp(-k*k/(2*0.2**2))
+    k = sp.linspace(0, 1, Nx)
+    rft *= sp.exp(-k*k/(2*0.2**2))
     y = fft.irfft(rft)
     y = y[N:2*N]
-    y = exp(y)
+    y = sp.exp(y)
     return x, y
 
 
 def smline2(pic):
     Nx = len(pic[0])
     Ny = len(pic)
-    picp = zeros((3*Nx, 3*Ny))
-    picp[Nx:2*Nx, Ny:2*Ny] = log(pic+1e-10)
+    picp = sp.zeros((3*Nx, 3*Ny))
+    picp[Nx:2*Nx, Ny:2*Ny] = sp.log(pic+1e-10)
     rft = fft.rfft2(picp)
     Nxf = len(rft[0])
     Nyf = len(rft)
@@ -487,9 +525,9 @@ def smline2(pic):
         for j in range(Nyf):
             kx = i*1.0/(Nxf)
             ky = j*1.0/(Nyf)
-            k = sqrt(kx*kx+ky*ky)
-            rft[j, i] *= exp(-k*k/(0.1*3.0**2))
+            k = sp.sqrt(kx*kx+ky*ky)
+            rft[j, i] *= sp.exp(-k*k/(0.1*3.0**2))
     print(rft.sum())
     picp = fft.irfft2(rft)
-    pic = exp(picp[Nx:2*Nx, Ny:2*Ny])
+    pic = sp.exp(picp[Nx:2*Nx, Ny:2*Ny])
     return pic

@@ -13,9 +13,11 @@ params_2D  = [['h', 'w'], ['Om', 'h']]
 S = Simple_Plots(dir_name, roots)
 S.label = ['BBAO+JLA', 'BBAO+Pantheon+PLK15']
 
+S.Show_limits(params_1D)
+S.Covariance(params_1D)
 S.Plots1D(params_1D)
 S.Plots2D(params_2D)
-
+S.plotAlls(params_1D)
 
 
 """
