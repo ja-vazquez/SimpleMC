@@ -2,7 +2,7 @@ import sys
 sys.path = ["Analizers", "Cosmo", "pybambi", "py"] + sys.path
 
 from MaxLikeAnalyzer import MaxLikeAnalyzer
-from MCMCAnalyzer_test import MCMCAnalyzer
+from MCMCAnalyzer import MCMCAnalyzer
 from Parameter import Parameter
 from RunBase import ParseModel, ParseDataset
 from scipy.special import ndtri
