@@ -104,8 +104,8 @@ class LCDMCosmology(BaseCosmology, RadiationAndNeutrinos):
             return 0
         ## put back in if needed
         else:
-        # Cooke et al, http://arxiv.org/abs/1308.3240
-        # 2.202 +/- 0.046
+            #'Cooke et al, http://arxiv.org/abs/1308.3240,
+            # 2.202 +/- 0.046'
             return -(self.Obh2-0.02202)**2/(2*0.00046**2)
         #return 0
 

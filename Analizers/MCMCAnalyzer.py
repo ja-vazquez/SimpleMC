@@ -15,6 +15,17 @@ import copy
 import random
 import sys
 
+import mpi4py
+from mpi4py import MPI
+
+comm = MPI.COMM_WORLD
+name = MPI.Get_processor_name()
+
+
+
+print ("Hello, World! "
+       "I am process %d of %d on %s" %
+       (comm.rank, comm.size, name))
 
 class MCMCAnalyzer:
     def __init__(self, like, outfile, skip=5000, nsamp=100000, temp=1.0,
@@ -25,7 +36,7 @@ class MCMCAnalyzer:
         self.nsamp     = nsamp
         self.skip      = skip
         self.temp      = float(temp)  # temperature
-        self.chain_num = chain_num
+        self.chain_num = comm.rank+1 #chain_num
         self.cpars     = like.freeParameters()
         self.N         = len(self.cpars)
         self.derived   = derived == 'True'
@@ -52,6 +63,7 @@ class MCMCAnalyzer:
             self.init_pcov(cov)
 
         if self.derived: self.AD = AllDerived()
+
         self.RunChain()
 
 
@@ -62,7 +74,7 @@ class MCMCAnalyzer:
 
     def RunChain(self):
         self.openFiles()
-        self.cloglike, self.cloglikes = self. getLikes()
+        self.cloglike, self.cloglikes = self.getLikes()
         # set up logofs based on the first log like which should be
         # the same for all chains. Better than nothing.
         # self.logofs=self.cloglike
@@ -80,9 +92,16 @@ class MCMCAnalyzer:
         # max loglike
         self.maxloglike = -1e30
         # are we done
-        self.done = False
+        self.done   = False
+        #converge
+        self.percen = 0.3
+        self.cblocks= 500
+        self.GRcondition = 0.01
+
+
         print("Starting chain...")
 
+        steps = 0
         while not (self.done):
             ppars, numout = self.GetProposal()
             self.cw += numout  ## things hitting outside the prior are formally rejected samples
@@ -103,8 +122,65 @@ class MCMCAnalyzer:
             if (accept):
                 self.ProcessAccepted(ppars, ploglike, ploglikes)
             else:
-                self.cw += 1 
-        self.closeFiles()
+                self.cw += 1
+
+            steps+= 1
+            if (steps % self.cblocks == 0):
+                with open(self.outfile + "_%i.txt" % (comm.rank+1), 'r') as f:
+                    lines = f.read().splitlines()
+                    self.csteps = int(steps*self.percen)
+                    last_line   = lines[-self.csteps:]
+                chains = comm.gather(last_line, root=0)
+
+                if comm.rank ==0:
+                    lpars = []
+                    for i, chain in enumerate(chains):
+                        tmp = []
+                        for line in chain:
+                            lp = line.split(' ')[2:2+self.N]
+                            tmp.append(list(map(lambda x: float(x), lp)))
+                        lpars.append(tmp)
+                    gr = self.GRDRun(lpars)
+                    print (gr, gr< self.GRcondition, sp.all(gr< self.GRcondition))
+                    if (sp.all(gr< self.GRcondition)):
+                        condition = 1
+                        self.closeFiles()
+                    else:
+                        condition = 0
+                else:
+                        condition = None
+
+                recvmsg = comm.bcast(condition, root=0)
+                if recvmsg ==1:
+                    print ('**'*20)
+                    sys.exit('-- Gelman-Rubin achived -- ')
+
+
+
+
+
+
+    def GRDRun(self, chains):
+        """This is a implementation of the Gelman Rubin diagnostic"""
+        mean_chain = []
+        var_chain  = []
+        for chain in chains:
+            mean_chain.append(sp.mean(chain, axis=0))
+            var_chain.append(sp.var(chain, axis=0))
+
+        M = sp.mean(mean_chain, axis=0)
+        W = sp.mean(var_chain,  axis=0)
+
+        B= sum([(b-M)**2 for b in mean_chain])
+        B = self.csteps/(len(chains)- 1.)*B
+        R = (1. - 1./self.csteps)*W +  B/self.csteps
+
+        result = sp.array(sp.absolute(1- sp.sqrt(R/W)))
+        print ('Gelman-Rubin Diagnostic:', result)
+        return result
+
+
+
 
 
     def openFiles(self):

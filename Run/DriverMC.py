@@ -2,7 +2,7 @@ import sys
 sys.path = ["Analizers", "Cosmo", "pybambi", "py"] + sys.path
 
 from MaxLikeAnalyzer import MaxLikeAnalyzer
-from MCMCAnalyzer import MCMCAnalyzer
+from MCMCAnalyzer_test import MCMCAnalyzer
 from Parameter import Parameter
 from RunBase import ParseModel, ParseDataset
 from scipy.special import ndtri
@@ -30,7 +30,7 @@ class DriverMC():
         self.dims, self.paramsList = self.getDims()
         #self.n_sigma = self.dims * self.nsigma
         self.outputname = self.model + "_" + self.prefact + \
-            "_" + self.datasets + "_" + self.samplername + "_"
+            "_" + self.datasets + "_" + self.samplername
             # \ + \ "[" + time.strftime("%H:%M:%S") + "]_"
 
 
@@ -258,13 +258,11 @@ class DriverMC():
     def MCMCRunner(self):
         """
             This method calls MCMCAnalyzer.
-
             Returns [MCMCAnalyzer object, time, evidence via MCEvidence (if it is possible)]
 
         """
-        weights = None
-        self.outputname += str(self.nsamp)
-      
+        #weights = None
+        #self.outputname += str(self.nsamp)
         
         M = MCMCAnalyzer(self.L, self.chainsdir + "/" + self.outputname,\
                         skip=self.skip, nsamp=self.nsamp, temp = self.temp,
