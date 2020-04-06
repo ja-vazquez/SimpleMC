@@ -15,7 +15,6 @@ import copy
 import random
 import sys
 
-import mpi4py
 from mpi4py import MPI
 
 comm = MPI.COMM_WORLD
@@ -94,14 +93,14 @@ class MCMCAnalyzer:
         # are we done
         self.done   = False
         #converge
-        self.percen = 0.3
-        self.cblocks= 500
+        self.lpars   = []
+        self.percen  = 0.4
+        self.checkgr = 500
         self.GRcondition = 0.01
-
 
         print("Starting chain...")
 
-        steps = 0
+
         while not (self.done):
             ppars, numout = self.GetProposal()
             self.cw += numout  ## things hitting outside the prior are formally rejected samples
@@ -124,24 +123,12 @@ class MCMCAnalyzer:
             else:
                 self.cw += 1
 
-            steps+= 1
-            if (steps % self.cblocks == 0):
-                with open(self.outfile + "_%i.txt" % (comm.rank+1), 'r') as f:
-                    lines = f.read().splitlines()
-                    self.csteps = int(steps*self.percen)
-                    last_line   = lines[-self.csteps:]
-                chains = comm.gather(last_line, root=0)
 
+            if (self.co % self.checkgr == 0):
+                chains = comm.gather(self.lpars, root=0)
                 if comm.rank ==0:
-                    lpars = []
-                    for i, chain in enumerate(chains):
-                        tmp = []
-                        for line in chain:
-                            lp = line.split(' ')[2:2+self.N]
-                            tmp.append(list(map(lambda x: float(x), lp)))
-                        lpars.append(tmp)
-                    gr = self.GRDRun(lpars)
-                    print (gr, gr< self.GRcondition, sp.all(gr< self.GRcondition))
+                    gr = self.GRDRun(chains)
+                    print('Gelman-Rubin R-1:', gr)
                     if (sp.all(gr< self.GRcondition)):
                         condition = 1
                         self.closeFiles()
@@ -149,13 +136,9 @@ class MCMCAnalyzer:
                         condition = 0
                 else:
                         condition = None
-
                 recvmsg = comm.bcast(condition, root=0)
                 if recvmsg ==1:
-                    print ('**'*20)
-                    sys.exit('-- Gelman-Rubin achived -- ')
-
-
+                    sys.exit('---- Gelman-Rubin achived ---- ')
 
 
 
@@ -164,21 +147,30 @@ class MCMCAnalyzer:
         """This is a implementation of the Gelman Rubin diagnostic"""
         mean_chain = []
         var_chain  = []
-        for chain in chains:
-            mean_chain.append(sp.mean(chain, axis=0))
-            var_chain.append(sp.var(chain, axis=0))
+
+        clen = [len(chain) for chain in chains]
+        if len(set(clen)) == 1:
+            lchain = clen[0]
+        else:
+            #print('take same # steps', clen)
+            lchain = min(clen)
+
+        try:
+            for chain in chains:
+                mean_chain.append(sp.mean(chain[-lchain:], axis=0))
+                var_chain.append(sp.var(chain[-lchain:], axis=0))
+        except:
+            return 1
 
         M = sp.mean(mean_chain, axis=0)
         W = sp.mean(var_chain,  axis=0)
 
         B= sum([(b-M)**2 for b in mean_chain])
-        B = self.csteps/(len(chains)- 1.)*B
-        R = (1. - 1./self.csteps)*W +  B/self.csteps
+        B = lchain/(len(chains)- 1.)*B
+        R = (1. - 1./clen[0])*W +  B/lchain
 
         result = sp.array(sp.absolute(1- sp.sqrt(R/W)))
-        print ('Gelman-Rubin Diagnostic:', result)
         return result
-
 
 
 
@@ -267,6 +259,12 @@ class MCMCAnalyzer:
         if (self.co % 100 == 0): #JAV 1000
             print("Accepted samples", self.co, self.cw)
         vec = [p.value for p in self.cpars]
+
+        #for convergence
+        self.lpars.append(vec)
+        if self.co % 10 ==0:
+            del self.lpars[:int((1-self.percen)*10)]
+
 
         if (self.co > self.skip):
             # weight rescaled
