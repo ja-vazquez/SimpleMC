@@ -95,7 +95,7 @@ class MCMCAnalyzer:
         #converge
         self.lpars   = []
         self.percen  = 0.4
-        self.checkgr = 500
+        self.checkgr = 300
         self.GRcondition = 0.01
 
         print("Starting chain...")
@@ -148,12 +148,16 @@ class MCMCAnalyzer:
         mean_chain = []
         var_chain  = []
 
-        clen = [len(chain) for chain in chains]
-        if len(set(clen)) == 1:
-            lchain = clen[0]
+        if len(chains) == 1:
+            lchain = len(chains[0])//2
+            chains = [chains[0][:lchain], chains[0][lchain:]]
         else:
-            #print('take same # steps', clen)
-            lchain = min(clen)
+            clen = [len(chain) for chain in chains]
+            if len(set(clen)) == 1:
+                lchain = clen[0]
+            else:
+                #print('take same # steps', clen)
+                lchain = min(clen)
 
         try:
             for chain in chains:
@@ -167,7 +171,7 @@ class MCMCAnalyzer:
 
         B= sum([(b-M)**2 for b in mean_chain])
         B = lchain/(len(chains)- 1.)*B
-        R = (1. - 1./clen[0])*W +  B/lchain
+        R = (1. - 1./lchain)*W +  B/lchain
 
         result = sp.array(sp.absolute(1- sp.sqrt(R/W)))
         return result
