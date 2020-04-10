@@ -1,27 +1,33 @@
 #!/usr/bin/env python
 import sys
-from Simple_Plots import Simple_Plots
+from Simple_plots import Simple_plots
 import matplotlib.pyplot as plt
-
+import numpy as np
 
 dir_name   = 'chains/'
-roots      = ['wCDM_phy_BBAO+JLA'] #, 'wCDM_phy_BBAO+Pantheon+Planck_15']
+roots      = ['wCDM_phy_BBAO+HD+JLA_mcmc'] #, 'wCDM_phy_BBAO+Pantheon+Planck_15']
 params_1D  = ['h', 'w', 'Ol', 'Age']
 params_2D  = [['h', 'w'], ['Om', 'h']]
 labels     = ['BBAO+JLA'] #, 'BBAO+Pantheon+PLK15']
 
 
-plotter = 'corner'
-#[Simple_plots, getdist, corner]
+plotter = 'fgivenx'
+#Simple_plots, getdist, corner, fgivenx
 
 
+#1D, 2D and triangular posterior distributions
 if plotter == 'Simple_plots':
-    S = Simple_Plots(dir_name, roots, labels)
+    S = Simple_plots(dir_name, roots, labels)
     #S.Show_limits(params_1D)
     #S.Covariance(params_1D)
     #S.Plots1D(params_1D)
     #S.Plots2D(params_2D)
     S.triangle(params_1D)
+
+
+elif plotter == 'corner':
+    S = Simple_plots(dir_name, roots)
+    S.cornerPlotter(params_1D)
 
 
 elif plotter == 'getdist':
@@ -37,8 +43,14 @@ elif plotter == 'getdist':
     plt.show()
 
 
-elif plotter == 'corner':
-    S = Simple_Plots(dir_name, roots)
-    S.cornerPlotter(params_1D)
 
+elif plotter == 'fgivenx':
+    S = Simple_plots(dir_name, roots[0])
 
+    z = np.linspace(0,4,100)
+    def func(z,theta1):
+        Omega_m, h = theta1
+        Hz=100*h*(Omega_m*(1+z)**3 + (1-Omega_m))**0.5
+        return Hz
+
+    S.fgivenx(['Om', 'h'], z, func, labels=['z','H(z)'])

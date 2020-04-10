@@ -2,7 +2,7 @@
 from cosmich import cosmochain
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
-
+import numpy as np
 
 rcParams.update({'backend': 'pdf',
                'axes.labelsize': 15,
@@ -14,7 +14,7 @@ rcParams.update({'backend': 'pdf',
                'font.size': 20,
                'text.usetex': True})
 
-class Simple_Plots(cosmochain):
+class Simple_plots(cosmochain):
     name = 'jav'
 
     def __init__(self, dir_name, roots, label=None):
@@ -24,7 +24,10 @@ class Simple_Plots(cosmochain):
         self.label    = label
         self.colors   = ['red', 'blue']
 
-        self.Clist = [cosmochain(dir_name + r) for r in roots]
+        if (type(roots) == type("ch")):
+            self.Clist = cosmochain(dir_name + roots)
+        elif len(roots)>0:
+            self.Clist = [cosmochain(dir_name + r) for r in roots]
 
 
 
@@ -130,3 +133,25 @@ class Simple_Plots(cosmochain):
                                levels           =(0.68,0.95),\
                                title_kwargs={"fontsize": 12})
             figure.savefig('Plot_corner.pdf')
+
+
+
+    def fgivenx(self, params, z, func, labels=None):
+        from fgivenx import plot_contours
+
+        plist = [self.Clist.slist(p) for p in params]
+
+        cbar1 = plot_contours(func, z, list(zip(*plist)), weights=self.Clist.chain[:, 0],
+                              contour_line_levels=[1,2], linewidths = 0.8, colors=plt.get_cmap('Greens'))
+        cbar1 = plt.colorbar(cbar1,ticks=[0,1,2])
+        cbar1.set_ticklabels(['','$1\sigma$','$2\sigma$'])
+
+        plt.grid()
+        if labels:
+            plt.ylabel(r'$%s$'%labels[1])
+            plt.xlabel(r'$%s$'%labels[0])
+        plt.savefig('fgivenx.pdf')
+        plt.tight_layout()
+        plt.show()
+
+
