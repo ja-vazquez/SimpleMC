@@ -92,3 +92,7 @@ a_par = Parameter("a", 0., 0.5, (-10., 10.), "a" )
 b_par = Parameter("b", 0., 0.5, (-10., 10.), "b")
 
 
+#Compress data
+zbin_par = [Parameter("zbin%d"%i, 1.2*i,  0.1, (0.+i, 10.+i), "zbin%d"%i) for i in range(1, 10)]
+
+

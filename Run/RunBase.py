@@ -28,7 +28,7 @@ from QuintCosmology import QuintCosmology
 
 #Generic model
 from GenericCosmology import GenericCosmology
-
+from GenericPantheon import GenericPantheon
 
 # Composite Likelihood
 from CompositeLikelihood import CompositeLikelihood
@@ -45,7 +45,8 @@ from PantheonSNLikelihood      import PantheonSNLikelihood
 from HubbleParameterLikelihood import RiessH0
 from CompressedHDLikelihood    import HubbleDiagram
 
-from CompressedGenericLikelihood import StraightLine
+from GenericLikelihood import StraightLine
+from GenericPantheonSNLikelihood import GenericPantheonSNLikelihood
 
 
 #Importance Sampling
@@ -142,6 +143,8 @@ def ParseModel(model):
         T = wCDMCosmology()
     elif model == 'sline':
         T = GenericCosmology()
+    elif model == 'GPantheon':
+        T = GenericPantheon()
     else:
         print("Cannot recognize model", model)
         sys.exit(1)
@@ -258,6 +261,8 @@ def ParseDataset(datasets):
             L.addLikelihood(eBOSS())
         elif name == 'dline':
             L.addLikelihood(StraightLine())
+        elif name == 'CPantheon':
+            L.addLikelihood(GenericPantheonSNLikelihood())
         else:
             print("Cannot parse data, unrecognizable part:", name)
             sys.exit(1)
