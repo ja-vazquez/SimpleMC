@@ -5,13 +5,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 dir_name   = 'chains/'
-roots      = ['wCDM_phy_BBAO+HD+JLA_mcmc'] #, 'wCDM_phy_BBAO+Pantheon+Planck_15']
-params_1D  = ['h', 'w', 'Ol', 'Age']
-params_2D  = [['h', 'w'], ['Om', 'h']]
-labels     = ['BBAO+JLA'] #, 'BBAO+Pantheon+PLK15']
+#roots      = ['wCDM_phy_BBAO+HD+JLA_mcmc']
+#params_1D  = ['h', 'w', 'Ol', 'Age']
+#params_2D  = [['h', 'w'], ['Om', 'h']]
+#labels     = ['BBAO+JLA']
 
 
-plotter = 'fgivenx'
+roots = ['GPantheon_phy_CPantheon_mcmc']
+params_1D = ['zbin%d'%i for i in range(20)]
+labels     = ['Compress_Pantheon']
+
+
+
+plotter = 'Simple_plots'
 #Simple_plots, getdist, corner, fgivenx
 
 
@@ -20,9 +26,9 @@ if plotter == 'Simple_plots':
     S = Simple_plots(dir_name, roots, labels)
     #S.Show_limits(params_1D)
     #S.Covariance(params_1D)
-    #S.Plots1D(params_1D)
+    S.Plots1D(params_1D)
     #S.Plots2D(params_2D)
-    S.triangle(params_1D)
+    #S.triangle(params_1D)
 
 
 elif plotter == 'corner':

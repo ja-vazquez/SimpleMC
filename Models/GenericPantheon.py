@@ -4,7 +4,7 @@ from ParamDefs import *
 import sys
 import numpy as np
 sys.path = ["../Cosmo"] + sys.path
-
+import matplotlib.pyplot as plt
 
 class BaseGenericPModel:
     def __init__(self):
@@ -47,6 +47,10 @@ class GenericPantheon(BaseGenericPModel):
         self.index = dict((j,i) for i,j in enumerate(names))
 
         self.zvals = np.logspace(np.log10(0.01),np.log10(2.261), len(self.parvals)+1)
+
+        da=[x.split() for x in open('data/pantheon_lcparam_full_long_zhel.txt').readlines()[1:]]
+        self.zcmb = np.array([float(line[1]) for line in da])
+        self.mag = np.array([float(line[4]) for line in da])
         BaseGenericPModel.__init__(self)
 
 
@@ -63,6 +67,10 @@ class GenericPantheon(BaseGenericPModel):
         for p in pars:
             i = self.index[p.name]
             self.zs[i] = p.value
+
+        #plt.plot(self.zcmb, self.mag, 'ro')
+        #plt.plot(self.zcmb, [self.genericPModel(z)+13.9 for z in self.zcmb], 'bo')
+        #plt.show()
         return True
 
 
