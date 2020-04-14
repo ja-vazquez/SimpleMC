@@ -32,10 +32,10 @@ class Simple_plots(cosmochain):
 
 
     def Plots1D(self, params, **kwargs):
-        plt.figure(figsize=(5*len(params), 4))
+        plt.figure(figsize=(4*(len(params)//4+1.5), 3*(len(params)//4+1)))
         for i, C in enumerate(self.Clist):
             for j, param in enumerate(params):
-                plt.subplot(1, len(params), j+1)
+                plt.subplot(len(params)//4+1, 3, j+1)
                 xx, yy = C.GetHisto(param, smooth=2, NormPeak=True)
                 plt.plot(xx, yy, label=self.label[i], color=self.colors[i])
 
@@ -44,7 +44,7 @@ class Simple_plots(cosmochain):
 
         self.draw_frame()
         plt.tight_layout()
-        plt.savefig('Plot_1D.pdf')
+        #plt.savefig('Plot_1D.pdf')
         plt.show()
 
 
