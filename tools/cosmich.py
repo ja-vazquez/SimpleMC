@@ -120,7 +120,7 @@ class cosmochain:
             for i, line in enumerate(self.chain):
                 self.chain[i, 0] = weightfunc(line)
 
-        print(len(self.chain), len(self.chain[0]))
+        #print(len(self.chain), len(self.chain[0]))
         del data
 
         try:
