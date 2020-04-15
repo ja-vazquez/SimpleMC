@@ -40,7 +40,7 @@ from LikelihoodMultiplier import LikelihoodMultiplier
 from BAOLikelihoods import DR11LOWZ, DR11CMASS, DR14LyaAuto, DR14LyaCross, \
         SixdFGS, SDSSMGS, DR11LyaAuto, DR11LyaCross, eBOSS, DR12Consensus
 from SimpleCMB import PlanckLikelihood, PlanckLikelihood_15, WMAP9Likelihood
-from CompressedSNLikelihood    import BetouleSN, UnionSN
+from CompressedSNLikelihood    import BetouleSN, UnionSN, BinnedPantheon
 from PantheonSNLikelihood      import PantheonSNLikelihood
 from HubbleParameterLikelihood import RiessH0
 from CompressedHDLikelihood    import HubbleDiagram
@@ -261,8 +261,10 @@ def ParseDataset(datasets):
             L.addLikelihood(eBOSS())
         elif name == 'dline':
             L.addLikelihood(StraightLine())
-        elif name == 'CPantheon':
+        elif name == 'CPantheon_15':
             L.addLikelihood(GenericPantheonSNLikelihood())
+        elif name == 'BPantheon_15':
+            L.addLikelihood(BinnedPantheon())
         else:
             print("Cannot parse data, unrecognizable part:", name)
             sys.exit(1)

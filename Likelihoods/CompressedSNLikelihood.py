@@ -45,3 +45,9 @@ class UnionSN(CompressedSNLikelihood):
     def __init__(self):
         CompressedSNLikelihood.__init__(self, "UnionSNV2", "data/binned-sne-union21-v2.txt",
                                         "data/binned-covariance-sne-union21-v2.txt")
+
+
+class BinnedPantheon(CompressedSNLikelihood):
+    def __init__(self):
+        CompressedSNLikelihood.__init__(self, "BinnedPantheon", "data/binned_pantheon_15.txt",
+                                        "data/binned_cov_pantheon_15.txt")
