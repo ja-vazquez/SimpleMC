@@ -1,0 +1,388 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Introduction &mdash; SuperMC latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="Welcome to SuperMC’s documentation! (BETA version // not ready yet )" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> SuperMC
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#general-flow">General flow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#samplers">Samplers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sampler-comparison">Sampler comparison</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data.html"><strong>Data</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotters.html"><strong>Plotters</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="API.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SuperMC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Introduction</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/intro.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>This code runs both in Python 2x and 3x. However, we highly recommend Python 3x.</p>
+<p>You need the following scientific modules:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo pip install numpy matplotlib scipy dynesty
+</pre></div>
+</div>
+<p>In addition, MCEvidence is necessary to estimate the bayesian evidence in the Metropolis-Hastings sampler:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install git+https://github.com/yabebalFantaye/MCEvidence
+</pre></div>
+</div>
+<p>For use Artificial Neural Networks with multinest and ellipsoidal sampling (as in pyBAMBI), you need to install:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install tensorflow keras
+</pre></div>
+</div>
+<p>If you want to use the full options to plot:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install corner getdist
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All in one copy-paste line:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install numpy matplotlib scipy nestle tensorflow keras corner getdist git+https://github.com/yabebalFantaye/MCEvidence
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>In this section we show a basic use of SuperMC.</p>
+<ol class="arabic simple">
+<li><p>First you need to create an <em>ini file</em> as follows:</p></li>
+</ol>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  [custom]
+  chainsdir = chains
+  model = LCDM
+  prefact = py
+  datasets = SN+Planck
+  ;sampler can be {mcmc, nested, emcee}
+  ;or analyzers {MaxLike, genetic}
+  sampler = mcmc
+
+  [mcmc]
+  nsamp = 5000
+  skip = 0
+  chainno = 1
+  GRcriteria = 0.05
+  temp = 2
+
+  ;it is recommended around nlivepoints=50*ndim
+  [nested]
+  ;dynamic and neuralNetwork can be yes/no
+  dynamic = no
+  neuralNetwork = no
+  ;type: {&#39;none&#39;,&#39;single&#39;,&#39;multi&#39;, &#39;balls&#39;, &#39;cubes&#39;}
+  nestedType = cubes
+  nlivepoints = 1024
+  accuracy = 0.5
+  ;u for flat(uniform) or g for gaussian prior
+  priortype = u
+
+
+  ;data options: HD, BBAO, GBAO, GBAO_no6dF, CMASS, LBAO, LaBAO, LxBAO, MGS, Planck, WMAP, PlRd, WRd, PlDa, PlRdx10, CMBW, SN, SNx10, UnionSN, RiessH0, 6dFGS, generic
+
+  ;model options: LCDM, LCDMasslessnu, nuLCDM, NeffLCDM, noradLCDM, nuoLCDM, nuwLCDM, oLCDM, wCDM, waCDM, owCDM, owaCDM, JordiCDM, WeirdCDM, TLight, StepCDM, Spline, PolyCDM, fPolyCDM, Decay, Decay01, Decay05, EarlyDE, EarlyDE_rd_DE, SlowRDE, nled, generic
+
+  ;sampler options: mh, snest, mnest, bambi, sbambi, emcee, MaxLike
+  ;mcmc -&gt; metropolis-hastings
+  ;none -&gt; Prior mass without bounds
+  ;single -&gt; Ellipsoidal nested sampling
+  ;multi -&gt; multinest
+  ;balls -&gt;  balls centered on each live point
+  ;cube -&gt; cubes centered on each live point
+  ;MaxLikeAnalyzer -&gt; Maximum Likelihood Analyzer
+;genetic -&gt; simple genetic algorithm for optimization
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Considerations:</p>
+<ul>
+<li><p><em>prefact</em> and <em>nsamp</em> are only for Metropolis-Hastings.</p></li>
+<li><p><em>nlivepoints</em> and <em>accuracy</em> are only for nested sampling.</p></li>
+<li><p><em>sampler</em> options are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>mcmc : Metropolis-Hastings.</p></li>
+<li><p>nested : Nested Sampling</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><em>sampler</em> can be one <em>optimizer</em> of the following:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>MaxLikeAnalyzer : from scipy.optimize.minimize</p></li>
+<li><p>genetic : a Simple Genetic Algorithm</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><em>skip</em> is burnin.</p></li>
+<li><p>For <em>priortype</em> u is uniform prior and g gaussian prior. At this time, only nested sampling accept both of them.</p></li>
+<li><p><em>chainsdir</em> is the directory where the chains in a text file and the plots will be saved.</p></li>
+</ul>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Then in <em>driver.py</em>, please put the path of the <em>ini file</em>:</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DriverMC</span> <span class="kn">import</span> <span class="n">DriverMC</span>
+
+<span class="n">fileConfig</span> <span class="o">=</span> <span class="s2">&quot;/home/isidro/SuperMC_/baseConfig.ini&quot;</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">DriverMC</span><span class="p">(</span><span class="n">fileConfig</span><span class="p">)</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>For last, you can run in the <em>SuperMC</em> directory:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python3 Run/driver.py
+</pre></div>
+</div>
+<p>You can see your outputs in the <em>chains</em> directory.</p>
+<ul class="simple">
+<li><p>See the <a class="reference external" href="plotters.html">plots</a> .</p></li>
+</ul>
+</div>
+<div class="section" id="general-flow">
+<h2>General flow<a class="headerlink" href="#general-flow" title="Permalink to this headline">¶</a></h2>
+<div class="figure align-default">
+<img alt="_images/SuperMCDiagram.png" src="_images/SuperMCDiagram.png" />
+</div>
+</div>
+<div class="section" id="samplers">
+<h2>Samplers<a class="headerlink" href="#samplers" title="Permalink to this headline">¶</a></h2>
+<p>SuperMC contains the nest samplers:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Metropolis-Hastings.</dt><dd><p>It is implemented in the <strong>MCMCAnalyzer class</strong>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Ellipsoidal Nested Sampling.</dt><dd><p><a class="reference external" href="https://iopscience.iop.org/article/10.1086/501068/metal">Mukherjee, P., Parkinson, D., &amp; Liddle, A. R. (2006). A nested sampling algorithm for cosmological model selection. The Astrophysical Journal Letters, 638(2), L51.</a>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>MULTINEST</dt><dd><p><a class="reference external" href="https://academic.oup.com/mnras/article/398/4/1601/981502">Feroz, F., Hobson, M. P., &amp; Bridges, M. (2009). MultiNest: an efficient and robust Bayesian inference tool for cosmology and particle physics. Monthly Notices of the Royal Astronomical Society, 398(4), 1601-1614.</a>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>BAMBI = MULTINEST + Artificial Neural Networks.</dt><dd><p><a class="reference external" href="https://academic.oup.com/mnras/article/421/1/169/989639">Graff, P., Feroz, F., Hobson, M. P., &amp; Lasenby, A. (2012). BAMBI: blind accelerated multimodal Bayesian inference. Monthly Notices of the Royal Astronomical Society, 421(1), 169-180.</a>.</p>
+</dd>
+</dl>
+</li>
+<li><p>Ellipsoidal Nested Sampling with Artificial Neural Networks</p></li>
+</ul>
+</div></blockquote>
+<p>Also, for a previous quickly test, SuperMC have <strong>MaxAnalyzer</strong> that analyze the most probably values of the parameters.</p>
+</div>
+<div class="section" id="sampler-comparison">
+<h2>Sampler comparison<a class="headerlink" href="#sampler-comparison" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To verify the consistency of the parameter estimation among the different samplers available, we have made the following graph.</p>
+</div>
+<div class="figure align-default" id="id1">
+<img alt="_images/samplersTriangle.png" src="_images/samplersTriangle.png" />
+<p class="caption"><span class="caption-text">We estimates the posteriors of the parameters of the owaCDM model (dark energy with timedependent equation-of-state in a model of unknown curvature) using Supernovae type Ia, Cosmic Chronometers (Hubble Distance) and BAO .</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="examples.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to SuperMC’s documentation! (BETA version // not ready yet )" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, A Slosar, JA Vazquez, I Gomez-Vargas
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

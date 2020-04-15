@@ -1,0 +1,818 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>API &mdash; SuperMC latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Plotters" href="plotters.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> SuperMC
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data.html"><strong>Data</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotters.html"><strong>Plotters</strong></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#run-modules"><strong>Run modules</strong></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#drivermc">DriverMC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Run.PostProcessing">PostProcessing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#runbase">RunBase</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Run.wqdriver">wqdriver</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#analizers">Analizers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mcmcanalyzer">MCMCAnalyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cosmomcimportancesampler">CosmoMCImportanceSampler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-py.GelmanRubinDiagnostic">GelmanRubinDiagnostic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-py.PlotterMC">PlotterMC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Analizers.MaxLikeAnalyzer">MaxLikeAnalyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Analizers.Individuo">Individuo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#poblacion">Poblacion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#geneticmedel">GeneticMedel</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#models"><strong>Models</strong></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#basecosmology-class">BaseCosmology class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#models-lcdmcosmology">Models.LCDMCosmology</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#likelihoods"><strong>Likelihoods</strong></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-Likelihoods.BaseLikelihood">Likelihoods.BaseLikelihood</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compositelikelihood">CompositeLikelihood</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Likelihoods.LikelihoodMultiplier">LikelihoodMultiplier</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#examples">Examples:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compressedsnlikelihood">CompressedSNLikelihood</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compressedgenericlikelihood">CompressedGenericLikelihood</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#others-modules-with-likelihoods">Others modules with Likelihoods</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#cosmo-modules"><strong>Cosmo modules</strong></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#basecosmology">BaseCosmology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Cosmo.CosmoApprox">CosmoApprox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Cosmo.Parameter">Parameter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#paramdefs">ParamDefs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#pybambi-modules"><strong>pybambi modules</strong></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-pybambi.bambi">bambi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-pybambi.base">base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-pybambi.pybambimanager">pybambimanager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-pybambi.kerasnet">kerasnet</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SuperMC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>API</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/API.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="api">
+<h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<p>This page details the methods and classes provided by the <cite>SuperMC</cite>.</p>
+<div class="section" id="run-modules">
+<h2><strong>Run modules</strong><a class="headerlink" href="#run-modules" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="drivermc">
+<h3>DriverMC<a class="headerlink" href="#drivermc" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="Run.DriverMC">
+<em class="property">class </em><code class="sig-prename descclassname">Run.</code><code class="sig-name descname">DriverMC</code><a class="headerlink" href="#Run.DriverMC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-Run.PostProcessing">
+<span id="postprocessing"></span><h3>PostProcessing<a class="headerlink" href="#module-Run.PostProcessing" title="Permalink to this headline">¶</a></h3>
+<p>This module processes the samples from a nested sampler and prints, saves chains in a text file
+and creates a param file.</p>
+<dl class="class">
+<dt id="Run.PostProcessing.PostProcessing">
+<em class="property">class </em><code class="sig-prename descclassname">Run.PostProcessing.</code><code class="sig-name descname">PostProcessing</code><span class="sig-paren">(</span><em class="sig-param">list_result</em>, <em class="sig-param">paramList</em>, <em class="sig-param">outputname</em>, <em class="sig-param">olambda=True</em>, <em class="sig-param">chainsdir='chains'</em>, <em class="sig-param">skip=0.1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Run/PostProcessing.html#PostProcessing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Run.PostProcessing.PostProcessing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="Run.PostProcessing.PostProcessing.getdistAnalyzer">
+<code class="sig-name descname">getdistAnalyzer</code><span class="sig-paren">(</span><em class="sig-param">cov=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Run/PostProcessing.html#PostProcessing.getdistAnalyzer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Run.PostProcessing.PostProcessing.getdistAnalyzer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Run.PostProcessing.PostProcessing.paramFiles">
+<code class="sig-name descname">paramFiles</code><span class="sig-paren">(</span><em class="sig-param">T</em>, <em class="sig-param">L</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Run/PostProcessing.html#PostProcessing.paramFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Run.PostProcessing.PostProcessing.paramFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method writes the .paramnames file with theirs LaTeX names.</p>
+<p>Parameters:</p>
+<p>T:          T is an instance of ParseModel(model)
+L:          L is an instance of ParseDataset(datasets)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Run.PostProcessing.PostProcessing.saveNestedChain">
+<code class="sig-name descname">saveNestedChain</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Run/PostProcessing.html#PostProcessing.saveNestedChain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Run.PostProcessing.PostProcessing.saveNestedChain" title="Permalink to this definition">¶</a></dt>
+<dd><p>This generates an output Simple(cosmo)MC style for dynesty Samplers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Run.PostProcessing.PostProcessing.writeSummary">
+<code class="sig-name descname">writeSummary</code><span class="sig-paren">(</span><em class="sig-param">time</em>, <em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Run/PostProcessing.html#PostProcessing.writeSummary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Run.PostProcessing.PostProcessing.writeSummary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="runbase">
+<h3>RunBase<a class="headerlink" href="#runbase" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="Run.PostProcessing.Run.RunBase">
+<em class="property">class </em><code class="sig-prename descclassname">Run.</code><code class="sig-name descname">RunBase</code><a class="headerlink" href="#Run.PostProcessing.Run.RunBase" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-Run.wqdriver">
+<span id="wqdriver"></span><h3>wqdriver<a class="headerlink" href="#module-Run.wqdriver" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="Run.wqdriver.wqsubmit">
+<code class="sig-prename descclassname">Run.wqdriver.</code><code class="sig-name descname">wqsubmit</code><span class="sig-paren">(</span><em class="sig-param">prefact</em>, <em class="sig-param">model</em>, <em class="sig-param">datasets</em>, <em class="sig-param">nchains=10</em>, <em class="sig-param">nsamp=100000</em>, <em class="sig-param">chainsdir='chains'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Run/wqdriver.html#wqsubmit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Run.wqdriver.wqsubmit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="analizers">
+<h2>Analizers<a class="headerlink" href="#analizers" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="mcmcanalyzer">
+<h3>MCMCAnalyzer<a class="headerlink" href="#mcmcanalyzer" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="cosmomcimportancesampler">
+<h3>CosmoMCImportanceSampler<a class="headerlink" href="#cosmomcimportancesampler" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="module-py.GelmanRubinDiagnostic">
+<span id="gelmanrubindiagnostic"></span><h3>GelmanRubinDiagnostic<a class="headerlink" href="#module-py.GelmanRubinDiagnostic" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="py.GelmanRubinDiagnostic.GelmanRubinDiagnostic">
+<em class="property">class </em><code class="sig-prename descclassname">py.GelmanRubinDiagnostic.</code><code class="sig-name descname">GelmanRubinDiagnostic</code><span class="sig-paren">(</span><em class="sig-param">df=None</em>, <em class="sig-param">freeParams=None</em>, <em class="sig-param">chainslist=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py/GelmanRubinDiagnostic.html#GelmanRubinDiagnostic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py.GelmanRubinDiagnostic.GelmanRubinDiagnostic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Gelman Rubin Diagnostics class.</p>
+<p>counter is the current number of stpes in the MCMC method.</p>
+<dl class="method">
+<dt id="py.GelmanRubinDiagnostic.GelmanRubinDiagnostic.GRDRun">
+<code class="sig-name descname">GRDRun</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/py/GelmanRubinDiagnostic.html#GelmanRubinDiagnostic.GRDRun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py.GelmanRubinDiagnostic.GelmanRubinDiagnostic.GRDRun" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a implementation of the Gelman Rubin diagnostic</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-py.PlotterMC">
+<span id="plottermc"></span><h3>PlotterMC<a class="headerlink" href="#module-py.PlotterMC" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="py.PlotterMC.PlotterMC">
+<em class="property">class </em><code class="sig-prename descclassname">py.PlotterMC.</code><code class="sig-name descname">PlotterMC</code><span class="sig-paren">(</span><em class="sig-param">ndim</em>, <em class="sig-param">samples=None</em>, <em class="sig-param">plottername='getdist'</em>, <em class="sig-param">chainsfile=None</em>, <em class="sig-param">chainsdir=None</em>, <em class="sig-param">truths=None</em>, <em class="sig-param">weights=None</em>, <em class="sig-param">show=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py/PlotterMC.html#PlotterMC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py.PlotterMC.PlotterMC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class make plots with getdist or corner.</p>
+<dl class="method">
+<dt id="py.PlotterMC.PlotterMC.cornerPlotter">
+<code class="sig-name descname">cornerPlotter</code><span class="sig-paren">(</span><em class="sig-param">color='g'</em>, <em class="sig-param">show_titles=True</em>, <em class="sig-param">fill_contours=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py/PlotterMC.html#PlotterMC.cornerPlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py.PlotterMC.PlotterMC.cornerPlotter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Corner method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="py.PlotterMC.PlotterMC.cosmichPlotter">
+<code class="sig-name descname">cosmichPlotter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/py/PlotterMC.html#PlotterMC.cosmichPlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py.PlotterMC.PlotterMC.cosmichPlotter" title="Permalink to this definition">¶</a></dt>
+<dd><p>cosmich plotter method</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="py.PlotterMC.PlotterMC.getdistPlotter">
+<code class="sig-name descname">getdistPlotter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/py/PlotterMC.html#PlotterMC.getdistPlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py.PlotterMC.PlotterMC.getdistPlotter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getdist method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="py.PlotterMC.PlotterMC.readFile">
+<code class="sig-name descname">readFile</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/py/PlotterMC.html#PlotterMC.readFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py.PlotterMC.PlotterMC.readFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method reads the samples and the .param file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="py.PlotterMC.PlotterMC.rootDirWithFile">
+<code class="sig-name descname">rootDirWithFile</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/py/PlotterMC.html#PlotterMC.rootDirWithFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py.PlotterMC.PlotterMC.rootDirWithFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the path.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="py.PlotterMC.PlotterMC.showFig">
+<code class="sig-name descname">showFig</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/py/PlotterMC.html#PlotterMC.showFig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py.PlotterMC.PlotterMC.showFig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Displays the plots after the samples are generated.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Analizers.MaxLikeAnalyzer">
+<span id="maxlikeanalyzer"></span><h3>MaxLikeAnalyzer<a class="headerlink" href="#module-Analizers.MaxLikeAnalyzer" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="Analizers.MaxLikeAnalyzer.MaxLikeAnalyzer">
+<em class="property">class </em><code class="sig-prename descclassname">Analizers.MaxLikeAnalyzer.</code><code class="sig-name descname">MaxLikeAnalyzer</code><span class="sig-paren">(</span><em class="sig-param">like</em>, <em class="sig-param">noErrors=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Analizers/MaxLikeAnalyzer.html#MaxLikeAnalyzer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Analizers.MaxLikeAnalyzer.MaxLikeAnalyzer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="Analizers.MaxLikeAnalyzer.MaxLikeAnalyzer.negloglike">
+<code class="sig-name descname">negloglike</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Analizers/MaxLikeAnalyzer.html#MaxLikeAnalyzer.negloglike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Analizers.MaxLikeAnalyzer.MaxLikeAnalyzer.negloglike" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Analizers.MaxLikeAnalyzer.MaxLikeAnalyzer.result">
+<code class="sig-name descname">result</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Analizers/MaxLikeAnalyzer.html#MaxLikeAnalyzer.result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Analizers.MaxLikeAnalyzer.MaxLikeAnalyzer.result" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Analizers.Individuo">
+<span id="individuo"></span><h3>Individuo<a class="headerlink" href="#module-Analizers.Individuo" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="Analizers.Individuo.Individuo">
+<em class="property">class </em><code class="sig-prename descclassname">Analizers.Individuo.</code><code class="sig-name descname">Individuo</code><span class="sig-paren">(</span><em class="sig-param">n_variables</em>, <em class="sig-param">limites_inf=None</em>, <em class="sig-param">limites_sup=None</em>, <em class="sig-param">verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Analizers/Individuo.html#Individuo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Analizers.Individuo.Individuo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="Analizers.Individuo.Individuo.calcular_fitness">
+<code class="sig-name descname">calcular_fitness</code><span class="sig-paren">(</span><em class="sig-param">funcion_objetivo</em>, <em class="sig-param">optimizacion</em>, <em class="sig-param">verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Analizers/Individuo.html#Individuo.calcular_fitness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Analizers.Individuo.Individuo.calcular_fitness" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Analizers.Individuo.Individuo.mutar">
+<code class="sig-name descname">mutar</code><span class="sig-paren">(</span><em class="sig-param">prob_mut=0.01</em>, <em class="sig-param">distribucion='uniforme'</em>, <em class="sig-param">media_distribucion=1</em>, <em class="sig-param">sd_distribucion=1</em>, <em class="sig-param">min_distribucion=-1</em>, <em class="sig-param">max_distribucion=1</em>, <em class="sig-param">verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Analizers/Individuo.html#Individuo.mutar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Analizers.Individuo.Individuo.mutar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="poblacion">
+<h3>Poblacion<a class="headerlink" href="#poblacion" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="geneticmedel">
+<h3>GeneticMedel<a class="headerlink" href="#geneticmedel" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="models">
+<h2><strong>Models</strong><a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="basecosmology-class">
+<h3>BaseCosmology class<a class="headerlink" href="#basecosmology-class" title="Permalink to this headline">¶</a></h3>
+<p>This class is the general structure of the models. It have the following methods:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Base Cosmology class doesn’t know about your parameterization of the equation of state or densities or anything. However, it does know about Hubble’s constant at z=0 OR the prefactor c/(H0*rd) which should be fit for in the case of “rd agnostic” fits. That is why you should let it declare those parameterd based on its settings However, to get the angular diameter distance you need to pass it its Curvature parameter (Omega k basically), so you need to update it.</p>
+</div>
+</div>
+<div class="section" id="models-lcdmcosmology">
+<h3>Models.LCDMCosmology<a class="headerlink" href="#models-lcdmcosmology" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="Analizers.Individuo.Models.LCDMCosmology">
+<em class="property">class </em><code class="sig-prename descclassname">Models.</code><code class="sig-name descname">LCDMCosmology</code><a class="headerlink" href="#Analizers.Individuo.Models.LCDMCosmology" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="Analizers.Individuo.LCDMCosmology.setNoObh2prior">
+<code class="sig-prename descclassname">LCDMCosmology.</code><code class="sig-name descname">setNoObh2prior</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Analizers.Individuo.LCDMCosmology.setNoObh2prior" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is LCDM cosmology. It is used as a base class for most other cosmologies, mostly because it treats Neutrinos and Radiation hassle.</p>
+</div>
+</div>
+</div>
+<div class="section" id="likelihoods">
+<h2><strong>Likelihoods</strong><a class="headerlink" href="#likelihoods" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p><strong>BaseLikelihood</strong> is the basic structure of the likelihoods objects.</p></li>
+<li><p><strong>CompositeLikelihood</strong> and <strong>LikelihoodMultiplier</strong> allow to create more complex probabilities from the combination of two or more.</p></li>
+</ul>
+</div>
+<div class="section" id="module-Likelihoods.BaseLikelihood">
+<span id="likelihoods-baselikelihood"></span><h3>Likelihoods.BaseLikelihood<a class="headerlink" href="#module-Likelihoods.BaseLikelihood" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="Likelihoods.BaseLikelihood.BaseLikelihood">
+<em class="property">class </em><code class="sig-prename descclassname">Likelihoods.BaseLikelihood.</code><code class="sig-name descname">BaseLikelihood</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Likelihoods/BaseLikelihood.html#BaseLikelihood"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Likelihoods.BaseLikelihood.BaseLikelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is the base likelihood object. Base for all other likelihoods.</p>
+<dl class="method">
+<dt id="Likelihoods.BaseLikelihood.BaseLikelihood.freeParameters">
+<code class="sig-name descname">freeParameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Likelihoods/BaseLikelihood.html#BaseLikelihood.freeParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Likelihoods.BaseLikelihood.BaseLikelihood.freeParameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Likelihoods.BaseLikelihood.BaseLikelihood.loglike">
+<code class="sig-name descname">loglike</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Likelihoods/BaseLikelihood.html#BaseLikelihood.loglike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Likelihoods.BaseLikelihood.BaseLikelihood.loglike" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Likelihoods.BaseLikelihood.BaseLikelihood.loglike_wprior">
+<code class="sig-name descname">loglike_wprior</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Likelihoods/BaseLikelihood.html#BaseLikelihood.loglike_wprior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Likelihoods.BaseLikelihood.BaseLikelihood.loglike_wprior" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Likelihoods.BaseLikelihood.BaseLikelihood.name">
+<code class="sig-name descname">name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Likelihoods/BaseLikelihood.html#BaseLikelihood.name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Likelihoods.BaseLikelihood.BaseLikelihood.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Likelihoods.BaseLikelihood.BaseLikelihood.setTheory">
+<code class="sig-name descname">setTheory</code><span class="sig-paren">(</span><em class="sig-param">theory</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Likelihoods/BaseLikelihood.html#BaseLikelihood.setTheory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Likelihoods.BaseLikelihood.BaseLikelihood.setTheory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Likelihoods.BaseLikelihood.BaseLikelihood.theory">
+<code class="sig-name descname">theory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Likelihoods/BaseLikelihood.html#BaseLikelihood.theory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Likelihoods.BaseLikelihood.BaseLikelihood.theory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Likelihoods.BaseLikelihood.BaseLikelihood.theory_loglike_prior">
+<code class="sig-name descname">theory_loglike_prior</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Likelihoods/BaseLikelihood.html#BaseLikelihood.theory_loglike_prior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Likelihoods.BaseLikelihood.BaseLikelihood.theory_loglike_prior" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Likelihoods.BaseLikelihood.BaseLikelihood.updateParams">
+<code class="sig-name descname">updateParams</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Likelihoods/BaseLikelihood.html#BaseLikelihood.updateParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Likelihoods.BaseLikelihood.BaseLikelihood.updateParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="compositelikelihood">
+<h3>CompositeLikelihood<a class="headerlink" href="#compositelikelihood" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="module-Likelihoods.LikelihoodMultiplier">
+<span id="likelihoodmultiplier"></span><h3>LikelihoodMultiplier<a class="headerlink" href="#module-Likelihoods.LikelihoodMultiplier" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="Likelihoods.LikelihoodMultiplier.LikelihoodMultiplier">
+<code class="sig-prename descclassname">Likelihoods.LikelihoodMultiplier.</code><code class="sig-name descname">LikelihoodMultiplier</code><span class="sig-paren">(</span><em class="sig-param">LikeInstance</em>, <em class="sig-param">mult</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Likelihoods/LikelihoodMultiplier.html#LikelihoodMultiplier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Likelihoods.LikelihoodMultiplier.LikelihoodMultiplier" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a helper class that takes a likelihood
+and just multiplies loglike with some value to simulate
+better or shittier data.</p>
+<p>You have to give python a credit for how effortlessly
+one can hack classes!!</p>
+</dd></dl>
+
+</div>
+<div class="section" id="examples">
+<h3>Examples:<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="compressedsnlikelihood">
+<h3>CompressedSNLikelihood<a class="headerlink" href="#compressedsnlikelihood" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="compressedgenericlikelihood">
+<h3>CompressedGenericLikelihood<a class="headerlink" href="#compressedgenericlikelihood" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="others-modules-with-likelihoods">
+<h3>Others modules with Likelihoods<a class="headerlink" href="#others-modules-with-likelihoods" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>BAOLikelihoods</p></li>
+<li><p>GaussBAODVLikelihood</p></li>
+<li><p>TabulatedBAOLikelihood</p></li>
+<li><p>TabulatedBAODVLikelihood</p></li>
+<li><p>HubbleParameterLikelihood</p></li>
+<li><p>SimpleCMB</p></li>
+<li><p>WangWangCMB</p></li>
+<li><p>CompressedHDLikelihood</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="cosmo-modules">
+<h2><strong>Cosmo modules</strong><a class="headerlink" href="#cosmo-modules" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="basecosmology">
+<h3>BaseCosmology<a class="headerlink" href="#basecosmology" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="module-Cosmo.CosmoApprox">
+<span id="cosmoapprox"></span><h3>CosmoApprox<a class="headerlink" href="#module-Cosmo.CosmoApprox" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="Cosmo.CosmoApprox.rd_EH_approx">
+<code class="sig-prename descclassname">Cosmo.CosmoApprox.</code><code class="sig-name descname">rd_EH_approx</code><span class="sig-paren">(</span><em class="sig-param">obh2</em>, <em class="sig-param">ocbh2</em>, <em class="sig-param">onuh2</em>, <em class="sig-param">Nnu</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Cosmo/CosmoApprox.html#rd_EH_approx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Cosmo.CosmoApprox.rd_EH_approx" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="Cosmo.CosmoApprox.rd_anderson_approx">
+<code class="sig-prename descclassname">Cosmo.CosmoApprox.</code><code class="sig-name descname">rd_anderson_approx</code><span class="sig-paren">(</span><em class="sig-param">obh2</em>, <em class="sig-param">ocbh2</em>, <em class="sig-param">onuh2</em>, <em class="sig-param">Nnu</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Cosmo/CosmoApprox.html#rd_anderson_approx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Cosmo.CosmoApprox.rd_anderson_approx" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="Cosmo.CosmoApprox.rd_cuesta_Nnu_approx">
+<code class="sig-prename descclassname">Cosmo.CosmoApprox.</code><code class="sig-name descname">rd_cuesta_Nnu_approx</code><span class="sig-paren">(</span><em class="sig-param">obh2</em>, <em class="sig-param">ocbh2</em>, <em class="sig-param">onuh2</em>, <em class="sig-param">Nnu</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Cosmo/CosmoApprox.html#rd_cuesta_Nnu_approx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Cosmo.CosmoApprox.rd_cuesta_Nnu_approx" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="Cosmo.CosmoApprox.rd_cuesta_approx">
+<code class="sig-prename descclassname">Cosmo.CosmoApprox.</code><code class="sig-name descname">rd_cuesta_approx</code><span class="sig-paren">(</span><em class="sig-param">obh2</em>, <em class="sig-param">ocbh2</em>, <em class="sig-param">onuh2</em>, <em class="sig-param">Nnu</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Cosmo/CosmoApprox.html#rd_cuesta_approx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Cosmo.CosmoApprox.rd_cuesta_approx" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="Cosmo.CosmoApprox.soundhorizon_eh">
+<code class="sig-prename descclassname">Cosmo.CosmoApprox.</code><code class="sig-name descname">soundhorizon_eh</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">wm</em>, <em class="sig-param">wb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Cosmo/CosmoApprox.html#soundhorizon_eh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Cosmo.CosmoApprox.soundhorizon_eh" title="Permalink to this definition">¶</a></dt>
+<dd><p>soundhorizon_eh(self,wm,wb):
+A fit to the sound horizon, in Mpc, from Eistenstein &amp; Hu (1998;
+ApJ, 496, 605), Eqs. 2-6.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Cosmo.CosmoApprox.soundhorizon_star">
+<code class="sig-prename descclassname">Cosmo.CosmoApprox.</code><code class="sig-name descname">soundhorizon_star</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">wm</em>, <em class="sig-param">wb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Cosmo/CosmoApprox.html#soundhorizon_star"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Cosmo.CosmoApprox.soundhorizon_star" title="Permalink to this definition">¶</a></dt>
+<dd><p>soundhorizon_star(self,wm,wb):
+A fit to the sound horizon, in Mpc, from Eistenstein &amp; Hu (1998;
+ApJ, 496, 605), Eqs. 2-6, except using z_lastscattering not zdrag.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Cosmo.CosmoApprox.z_drag">
+<code class="sig-prename descclassname">Cosmo.CosmoApprox.</code><code class="sig-name descname">z_drag</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">wm</em>, <em class="sig-param">wb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Cosmo/CosmoApprox.html#z_drag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Cosmo.CosmoApprox.z_drag" title="Permalink to this definition">¶</a></dt>
+<dd><p>z_drag(self,wm,wb):
+Returns z_drag.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Cosmo.CosmoApprox.z_lastscattering">
+<code class="sig-prename descclassname">Cosmo.CosmoApprox.</code><code class="sig-name descname">z_lastscattering</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">wm</em>, <em class="sig-param">wb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Cosmo/CosmoApprox.html#z_lastscattering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Cosmo.CosmoApprox.z_lastscattering" title="Permalink to this definition">¶</a></dt>
+<dd><p>z_lastscattering(self,wm,wb):
+Returns z_LS from Hu &amp; White, DampingTail paper.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-Cosmo.Parameter">
+<span id="parameter"></span><h3>Parameter<a class="headerlink" href="#module-Cosmo.Parameter" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="Cosmo.Parameter.Parameter">
+<em class="property">class </em><code class="sig-prename descclassname">Cosmo.Parameter.</code><code class="sig-name descname">Parameter</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">value</em>, <em class="sig-param">err=0.0</em>, <em class="sig-param">bounds=None</em>, <em class="sig-param">Ltxname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Cosmo/Parameter.html#Parameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Cosmo.Parameter.Parameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="Cosmo.Parameter.Parameter.sameParam">
+<code class="sig-name descname">sameParam</code><span class="sig-paren">(</span><em class="sig-param">param2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Cosmo/Parameter.html#Parameter.sameParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Cosmo.Parameter.Parameter.sameParam" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Cosmo.Parameter.Parameter.setBounds">
+<code class="sig-name descname">setBounds</code><span class="sig-paren">(</span><em class="sig-param">low</em>, <em class="sig-param">high</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Cosmo/Parameter.html#Parameter.setBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Cosmo.Parameter.Parameter.setBounds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Cosmo.Parameter.Parameter.setError">
+<code class="sig-name descname">setError</code><span class="sig-paren">(</span><em class="sig-param">err</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Cosmo/Parameter.html#Parameter.setError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Cosmo.Parameter.Parameter.setError" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Cosmo.Parameter.Parameter.setLatexName">
+<code class="sig-name descname">setLatexName</code><span class="sig-paren">(</span><em class="sig-param">Ltx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Cosmo/Parameter.html#Parameter.setLatexName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Cosmo.Parameter.Parameter.setLatexName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Cosmo.Parameter.Parameter.setValue">
+<code class="sig-name descname">setValue</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Cosmo/Parameter.html#Parameter.setValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Cosmo.Parameter.Parameter.setValue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="paramdefs">
+<h3>ParamDefs<a class="headerlink" href="#paramdefs" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="pybambi-modules">
+<h2><strong>pybambi modules</strong><a class="headerlink" href="#pybambi-modules" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-pybambi.bambi">
+<span id="bambi"></span><h3>bambi<a class="headerlink" href="#module-pybambi.bambi" title="Permalink to this headline">¶</a></h3>
+<p>Driving routine for pyBAMBI.</p>
+<p>Author: Will Handley (<a class="reference external" href="mailto:wh260&#37;&#52;&#48;cam&#46;ac&#46;uk">wh260<span>&#64;</span>cam<span>&#46;</span>ac<span>&#46;</span>uk</a>)
+Date: November 2018</p>
+<dl class="function">
+<dt id="pybambi.bambi.run_pyBAMBI">
+<code class="sig-prename descclassname">pybambi.bambi.</code><code class="sig-name descname">run_pyBAMBI</code><span class="sig-paren">(</span><em class="sig-param">loglikelihood</em>, <em class="sig-param">prior</em>, <em class="sig-param">nDims</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybambi/bambi.html#run_pyBAMBI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybambi.bambi.run_pyBAMBI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run pyBAMBI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sampler</strong> (<em>str</em>) – Choice of sampler. Options: <cite>[‘mnest’, ‘snest’]</cite>.
+Default <cite>‘multinest’</cite>.</p></li>
+<li><p><strong>nlive</strong> (<em>int</em>) – Number of live points.
+Default <cite>nDims*25</cite></p></li>
+<li><p><strong>root</strong> (<em>str</em>) – root of filename.
+Default <cite>‘chains/&lt;nested_sampler&gt;’</cite></p></li>
+<li><p><strong>num_repeats</strong> (<em>int</em>) – number of repeats for polychord.
+Default <cite>nDims*5</cite></p></li>
+<li><p><strong>eff</strong> (<em>float</em>) – efficiency for multinest.
+Default <cite>0.5**nDims</cite></p></li>
+<li><p><strong>learner</strong> (<em>object</em>) – information indicating what learning algorithm to use for approximating
+the likelihood. Can be the string <cite>‘keras’</cite>, or a <cite>keras.models.Model</cite>
+Default <cite>‘keras’</cite></p></li>
+<li><p><strong>ntrain</strong> (<em>int</em>) – Number of training points to use
+Default <cite>nlive</cite></p></li>
+<li><p><strong>proxy_tolerance</strong> (<em>float</em>) – Required accuracy of proxy.
+Default <cite>0.01</cite></p></li>
+<li><p><strong>ns_output</strong> (<em>int</em>) – Nested sampling output level.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pybambi.base">
+<span id="base"></span><h3>base<a class="headerlink" href="#module-pybambi.base" title="Permalink to this headline">¶</a></h3>
+<p>Base predictor class.</p>
+<p>Author: Will Handley (<a class="reference external" href="mailto:wh260&#37;&#52;&#48;cam&#46;ac&#46;uk">wh260<span>&#64;</span>cam<span>&#46;</span>ac<span>&#46;</span>uk</a>)
+Date: November 2018</p>
+<dl class="class">
+<dt id="pybambi.base.Predictor">
+<em class="property">class </em><code class="sig-prename descclassname">pybambi.base.</code><code class="sig-name descname">Predictor</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">logL</em>, <em class="sig-param">split=0.8</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybambi/base.html#Predictor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybambi.base.Predictor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base predictor class.</p>
+<p>This takes in a training set params -&gt; logL, and aims to construct a
+mapping between them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> – <cite>numpy.array</cite> of physical parameters to train on
+shape (ntrain, ndims)</p></li>
+<li><p><strong>logL</strong> – <cite>numpy.array</cite> of loglikelihoods to learn
+shape (ntrain,)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="pybambi.base.Predictor.uncertainty">
+<code class="sig-name descname">uncertainty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybambi/base.html#Predictor.uncertainty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybambi.base.Predictor.uncertainty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uncertainty value for the trained model.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pybambi.base.Predictor.valid">
+<code class="sig-name descname">valid</code><span class="sig-paren">(</span><em class="sig-param">loglikelihood</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybambi/base.html#Predictor.valid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybambi.base.Predictor.valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check validity of proxy.</p>
+<p>Checks to see if the supplied log likelihood value is within the
+current range of likelihoods, including the uncertainty</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>loglikelihood</strong> – Value of the log likelihood that needs checking</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pybambi.pybambimanager">
+<span id="pybambimanager"></span><h3>pybambimanager<a class="headerlink" href="#module-pybambi.pybambimanager" title="Permalink to this headline">¶</a></h3>
+<p>BAMBI management object.</p>
+<p>Author: Pat Scott (<a class="reference external" href="mailto:p&#46;scott&#37;&#52;&#48;imperial&#46;ac&#46;uk">p<span>&#46;</span>scott<span>&#64;</span>imperial<span>&#46;</span>ac<span>&#46;</span>uk</a>)
+Date: Feb 2019</p>
+<dl class="class">
+<dt id="pybambi.pybambimanager.BambiManager">
+<em class="property">class </em><code class="sig-prename descclassname">pybambi.pybambimanager.</code><code class="sig-name descname">BambiManager</code><span class="sig-paren">(</span><em class="sig-param">loglikelihood</em>, <em class="sig-param">learner</em>, <em class="sig-param">proxy_tolerance</em>, <em class="sig-param">failure_tolerance</em>, <em class="sig-param">ntrain</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybambi/pybambimanager.html#BambiManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybambi.pybambimanager.BambiManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Does all the talking for BAMBI.</p>
+<p>Takes a new set of training data from the dumper and trains (or retrains) a
+neural net, and assesses whether or not it can be used for a given
+parameter combination.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ntrain</strong> (<em>int</em>) – Number of training points to use</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="pybambi.pybambimanager.BambiManager.dumper">
+<code class="sig-name descname">dumper</code><span class="sig-paren">(</span><em class="sig-param">live_params</em>, <em class="sig-param">live_loglks</em>, <em class="sig-param">dead_params</em>, <em class="sig-param">dead_loglks</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybambi/pybambimanager.html#BambiManager.dumper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybambi.pybambimanager.BambiManager.dumper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Respond to signal from nested sampler.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pybambi.pybambimanager.BambiManager.loglikelihood">
+<code class="sig-name descname">loglikelihood</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybambi/pybambimanager.html#BambiManager.loglikelihood"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybambi.pybambimanager.BambiManager.loglikelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bambi Proxy wrapper for original loglikelihood.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pybambi.pybambimanager.BambiManager.make_learner">
+<code class="sig-name descname">make_learner</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">loglikes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybambi/pybambimanager.html#BambiManager.make_learner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybambi.pybambimanager.BambiManager.make_learner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a Predictor.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pybambi.pybambimanager.BambiManager.train_new_learner">
+<code class="sig-name descname">train_new_learner</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">loglikes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybambi/pybambimanager.html#BambiManager.train_new_learner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybambi.pybambimanager.BambiManager.train_new_learner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train a new Predictor.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pybambi.kerasnet">
+<span id="kerasnet"></span><h3>kerasnet<a class="headerlink" href="#module-pybambi.kerasnet" title="Permalink to this headline">¶</a></h3>
+<p>Keras neural net predictor.</p>
+<p>This implements a Keras Sequential model (a deep MLP)</p>
+<p>Author: Martin White (<a class="reference external" href="mailto:martin&#46;white&#37;&#52;&#48;adelaide&#46;edu&#46;au">martin<span>&#46;</span>white<span>&#64;</span>adelaide<span>&#46;</span>edu<span>&#46;</span>au</a>)
+Date: December 2018</p>
+<dl class="class">
+<dt id="pybambi.kerasnet.KerasNetInterpolation">
+<em class="property">class </em><code class="sig-prename descclassname">pybambi.kerasnet.</code><code class="sig-name descname">KerasNetInterpolation</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">logL</em>, <em class="sig-param">split=0.8</em>, <em class="sig-param">model=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybambi/kerasnet.html#KerasNetInterpolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybambi.kerasnet.KerasNetInterpolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">base.Predictor</span></code></p>
+<p>Keras neural net interpolation.</p>
+<p>Returns the loglikelihood from a Keras neural net-based interpolator</p>
+<p>Trains a basic 3-layer neural network with 200 neurons per layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> – <cite>numpy.array of</cite> physical parameters to train on
+shape (ntrain, ndims)</p></li>
+<li><p><strong>logL</strong> – <cite>numpy.array</cite> of loglikelihoods to learn
+shape (ntrain,)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="pybambi.kerasnet.KerasNetInterpolation.uncertainty">
+<code class="sig-name descname">uncertainty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybambi/kerasnet.html#KerasNetInterpolation.uncertainty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybambi.kerasnet.KerasNetInterpolation.uncertainty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uncertainty value for the trained keras model.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="plotters.html" class="btn btn-neutral float-left" title="Plotters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, A Slosar, JA Vazquez, I Gomez-Vargas
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
