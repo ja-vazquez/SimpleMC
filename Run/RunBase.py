@@ -24,6 +24,7 @@ from StepCDMCosmology import StepCDMCosmology
 from EarlyDECosmology import EarlyDECosmology
 from SlowRDECosmology import SlowRDECosmology
 from BinnedWCosmology import BinnedWCosmology
+from SureshCosmology import SureshCosmology
 from PhiCDMCosmology import PhiCDMCosmology
 
 #Generic model
@@ -139,6 +140,8 @@ def ParseModel(model):
         T = BinnedWCosmology()
     elif model == "PhiCDM":
         T = PhiCDMCosmology()
+    elif model == "Suresh":
+        T = SureshCosmology()
     elif model == 'wDM':
         T = wCDMCosmology()
     elif model == 'sline':
@@ -189,7 +192,9 @@ def ParseDataset(datasets):
             ])
         elif name == 'CBAO':
             L.addLikelihoods([
-                DR12Consensus()
+                DR12Consensus(),
+                SixdFGS(),
+                SDSSMGS()
             ])
         elif name == 'GBAOx10':
             L.addLikelihoods([
