@@ -24,7 +24,7 @@ from StepCDMCosmology import StepCDMCosmology
 from EarlyDECosmology import EarlyDECosmology
 from SlowRDECosmology import SlowRDECosmology
 from BinnedWCosmology import BinnedWCosmology
-from QuintCosmology import QuintCosmology
+from PhiCDMCosmology import PhiCDMCosmology
 
 #Generic model
 from GenericCosmology import GenericCosmology
@@ -137,8 +137,8 @@ def ParseModel(model):
         T = SlowRDECosmology(varyOk=False)
     elif model == "Binned":
         T = BinnedWCosmology()
-    elif model == "Quint_last":
-        T = QuintCosmology()
+    elif model == "PhiCDM":
+        T = PhiCDMCosmology()
     elif model == 'wDM':
         T = wCDMCosmology()
     elif model == 'sline':
