@@ -21,7 +21,7 @@ class SureshCosmology(LCDMCosmology):
 
         self.a_in  = 5e-5
         self.ndots = 2000
-        self.zvals = np.linspace(0, 5, 300)
+        self.zvals = np.linspace(0, 10, 300)
 
 
         LCDMCosmology.__init__(self, mnu=0)
