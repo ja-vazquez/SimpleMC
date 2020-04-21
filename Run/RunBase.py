@@ -178,8 +178,8 @@ def ParseDataset(datasets):
             L.addLikelihoods([
                 DR11LOWZ(),
                 DR11CMASS(),
-                DR14LyaAuto(),
-                DR14LyaCross(),
+                DR11LyaAuto(),
+                DR11LyaCross(),
                 SixdFGS(),
                 SDSSMGS()
             ])
@@ -193,8 +193,11 @@ def ParseDataset(datasets):
         elif name == 'CBAO':
             L.addLikelihoods([
                 DR12Consensus(),
+                DR14LyaAuto(),
+                DR14LyaCross(),
                 SixdFGS(),
-                SDSSMGS()
+                SDSSMGS(),
+                eBOSS()
             ])
         elif name == 'GBAOx10':
             L.addLikelihoods([
@@ -231,6 +234,10 @@ def ParseDataset(datasets):
             ])
         elif name == "MGS":
             L.addLikelihood(SDSSMGS())
+        elif name == '6dFGS':
+            L.addLikelihood(SixdFGS())
+        elif name == 'eBOSS':
+            L.addLikelihood(eBOSS())
         elif name == 'Planck':
             L.addLikelihood(PlanckLikelihood())
         elif name == 'Planck_15':
@@ -250,6 +257,8 @@ def ParseDataset(datasets):
             L.addLikelihood(WMAP9Likelihood())
         elif name == 'Pantheon':
             L.addLikelihood(PantheonSNLikelihood())
+        elif name == 'BPantheon_15':
+            L.addLikelihood(BinnedPantheon())
         elif name == 'JLA':
             L.addLikelihood(BetouleSN())
         elif name == 'JLAx10':
@@ -260,16 +269,10 @@ def ParseDataset(datasets):
             L.addLikelihood(RiessH0())
         elif name == 'HD':
             L.addLikelihood(HubbleDiagram())
-        elif name == '6dFGS':
-            L.addLikelihood(SixdFGS())
-        elif name == 'eBOSS':
-            L.addLikelihood(eBOSS())
         elif name == 'dline':
             L.addLikelihood(StraightLine())
         elif name == 'CPantheon_15':
             L.addLikelihood(GenericPantheonSNLikelihood())
-        elif name == 'BPantheon_15':
-            L.addLikelihood(BinnedPantheon())
         else:
             print("Cannot parse data, unrecognizable part:", name)
             sys.exit(1)
