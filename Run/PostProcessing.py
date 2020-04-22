@@ -54,7 +54,7 @@ class PostProcessing():
                 nrow = " ".join( row.split() )
                 f.write(nrow+'\n')
 
-        if self.engine == 'nestle':
+        elif self.engine == 'nestle':
             for i in range(len(self.result.samples)):
                 strweights = str(self.result.weights[i]).lstrip('[').rstrip(']')
                 strlogl=str(-1*self.result.logl[i]).lstrip('[').rstrip(']')
@@ -143,30 +143,3 @@ class PostProcessing():
         #print("summaryResults", summaryResults[0])
         #mcstats.likeSummary()
         return summaryResults
-
-
-    def saveChainNestle(self):
-        """
-        This generates an output Simple(cosmo)MC style for Nestle Samplers.
-
-        Parameters:
-
-        result:     Nestle object
-        outputname: str name of the output file
-
-        """
-        if(path.isfile(outputname+'.txt')):
-            print("An existing file with the same name has been deleted.", outputname+'.txt')
-            remove(outputname+'.txt')
-
-        f = open(outputname+'.txt','a+')
-
-        for i in range(len(result.samples)):
-            strweights = str(result.weights[i]).lstrip('[').rstrip(']')
-            strlogl=str(-1*result.logl[i]).lstrip('[').rstrip(']')
-            strsamples=str(result.samples[i]).lstrip('[').rstrip(']')
-            row = strweights+' '+strlogl+' '+strsamples
-            nrow = " ".join( row.split() )
-            f.write(nrow+'\n')
-            #f.write(strweights+' '+strlogl+' '+strsamples+'\n')
-        f.close()
