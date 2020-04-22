@@ -36,7 +36,7 @@ class PostProcessing():
         f = open(self.filename + '.txt', 'a+')
         if self.engine == 'dynesty':
             weights = np.exp(self.result['logwt'] - self.result['logz'][-1])
-            postsamples = dynesty.utils.resample_equal(self.result.samples, weights)
+            postsamples = self.result.samples
        
             print('\n Number of posterior samples is {}'.format(postsamples.shape[0]))
 
