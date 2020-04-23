@@ -8,7 +8,7 @@ from RunBase import ParseModel, ParseDataset
 from scipy.special import ndtri
 #from SimpleGenetic import SimpleGenetic
 
-import dynesty
+#import dynesty
 #import emcee
 import multiprocessing as mp
 import numpy as np
@@ -289,23 +289,34 @@ class DriverMC():
             -- MULTINEST
             bound : {'none', 'single', 'multi', 'balls', 'cubes'},
         """
-        self.outputname += self.nestedType+'_nested_'+str(self.nlivepoints)
+        self.outputname += '_'+self.engine+'_'+self.nestedType
 
         if self.nproc <= 0:
             ncores = mp.cpu_count()
-            print("Number of processors: ", ncores)
+            print("--"*10 )
+            print("Using %d Processors: "%ncores)
+            print("--"*10 )
             nprocess = ncores//2
         else:
             nprocess = self.nproc
         
         pool = mp.Pool(processes=nprocess)
 
+        showfiles = True
+        if self.engine == 'dynesty':
+            if showfiles == False:
+                from dynesty import dynesty
+            else:
+                # Check it later
+                sys.path =  ['dynesty', '/dynesty'] + sys.path
+                from dynesty import dynesty
+
+
         if self.dynamic == 'yes':
             print("Using dynamic nested sampling...")
 
             sampler = dynesty.DynamicNestedSampler(self.logLike, self.priorTransform, \
-                self.dims, bound = self.nestedType,\
-                        pool = pool, queue_size = nprocess)
+                      self.dims, bound = self.nestedType, pool = pool, queue_size = nprocess)
             
             sampler.run_nested(nlive_init=self.nlivepoints, dlogz_init=0.05, nlive_batch=100,\
                             maxiter_init=10000, maxiter_batch=1000, maxbatch=10)
@@ -325,7 +336,12 @@ class DriverMC():
             import nestle
             M = nestle.sample(self.logLike, self.priorTransform, ndim=self.dims, method=self.nestedType,
             npoints=self.nlivepoints, dlogz=self.accuracy, callback=nestle.print_progress)
-
+            #M.summary()
+            print('\n'+'--'*10)
+            print('logz=%2.2f +/- %2.2f \n'%(M.logz, M.logzerr))
+        else:
+            print('wrong selection')
+            sys.exit(1)
         return ['nested', M, M.summary(), 'nested : ' + self.nestedType, 'dynamic : ' +\
                  self.dynamic, 'ANN : ' + self.neuralNetwork]
 
