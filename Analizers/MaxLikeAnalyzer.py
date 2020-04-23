@@ -7,8 +7,11 @@
 import scipy as sp
 from scipy.optimize import minimize
 import scipy.linalg as la
-import numdifftools as nd
 
+try:
+    import numdifftools as nd
+except:
+    sys.exit('install numdifftools')
 
 
 class MaxLikeAnalyzer:

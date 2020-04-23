@@ -76,7 +76,7 @@ class MCMCAnalyzer:
         self.cloglike, self.cloglikes = self.getLikes()
         # set up logofs based on the first log like which should be
         # the same for all chains. Better than nothing.
-        # self.logofs=self.cloglike
+        #self.logofs=self.cloglike
         # Actually, above doesn't seem to work very well.
         # Instead, use zero, as our likelihoods never became very large
         self.logofs = 0
@@ -95,7 +95,7 @@ class MCMCAnalyzer:
         #converge
         self.lpars   = []
         self.percen  = 0.4
-        self.checkgr = 300
+        self.checkgr = 500
         self.GRcondition = 0.01
 
         print("Starting chain...")
@@ -124,7 +124,7 @@ class MCMCAnalyzer:
                 self.cw += 1
 
 
-            if (self.co % self.checkgr == 0):
+            if (self.co >0 and self.co % self.checkgr == 0):
                 chains = comm.gather(self.lpars, root=0)
                 if comm.rank ==0:
                     gr = self.GRDRun(chains)
