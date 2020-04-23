@@ -6,10 +6,13 @@ from MCMCAnalyzer import MCMCAnalyzer
 from Parameter import Parameter
 from RunBase import ParseModel, ParseDataset
 from scipy.special import ndtri
-#from SimpleGenetic import SimpleGenetic
+from PostProcessing import PostProcessing 
+from scipy.special import ndtri
+from SimpleGenetic import SimpleGenetic
+from PostProcessing import PostProcessing 
 
 import dynesty
-#import emcee
+import emcee
 import multiprocessing as mp
 import numpy as np
 import time
@@ -114,6 +117,11 @@ class DriverMC():
                     self.split      = float(config['neural']['split'])
                     self.numNeurons = int(config['neural']['numNeurons'])
 
+            elif self.samplername in ['emcee']:
+                self.ensambles = int(config['emcee']['ensambles'])
+                self.samples = int(config['emcee']['samples'])
+                self.burnin = int(config['emcee']['burnin'])
+
             elif self.samplername in ['MaxLikeAnalyzer']:
                 self.withErrors      = config['MaxLikeAnalyzer']['withErrors']
 
@@ -137,8 +145,6 @@ class DriverMC():
         bounds = self.SetPriors()[3]
         means  = np.array(self.SetPriors()[1])
         return bounds, means
-
-
 
     def SetPriors(self):
         """
@@ -342,7 +348,35 @@ class DriverMC():
         return ['bambi', M, 'nested : ' + self.nestedType, 'dynamic : ' +\
                  self.dynamic, 'ANN : ' + self.neuralNetwork]
 
+    def emceeRunner(self):
+        Nens = self.ensambles   # number of ensemble points
 
+        ini = []
+
+        for bound in self.bounds:
+            ini.append(np.random.uniform(bound[0], bound[1], Nens))
+
+        inisamples = np.array(ini).T # initial samples
+
+        Nburnin = self.burnin   # number of burn-in samples
+        Nsamples = self.samples  # number of final posterior samples
+
+        # set up the sampler
+        sampler = emcee.EnsembleSampler(Nens, self.dims, self.logPosterior)
+
+        # pass the initial samples and total number of samples required
+        sampler.run_mcmc(inisamples, Nsamples+Nburnin, progress=True)
+
+        # extract the samples (removing the burn-in)
+        postsamples = sampler.chain[:, Nburnin:, :].reshape((-1, self.dims))
+
+        print(postsamples)
+
+        print('Number of posterior samples is {}'.format(postsamples.shape[0]))
+        import corner
+        fig = corner.corner(postsamples)
+        fig.savefig('emcee.png')
+        return ['emcee', sampler, 'ensambles : ' + str(self.ensambles)]
 ###################################Optimizers##############################################
 
     def MaxLikeRunner(self):
@@ -365,13 +399,14 @@ class DriverMC():
 
 ###############################Post-processing############################################
     def postprocess(self):
-        from PostProcessing import PostProcessing 
-        pp = PostProcessing(self.result, self.paramsList , self.outputname,\
-             chainsdir=self.chainsdir, engine = self.engine)
-        
         if self.samplername == 'nested':
+            pp = PostProcessing(self.result, self.paramsList , self.outputname,\
+             chainsdir=self.chainsdir, engine = self.engine)
             pp.paramFiles(self.T, self.L)
             pp.saveNestedChain()
+        else:
+            pp = PostProcessing(self.result, self.paramsList , self.outputname,\
+             chainsdir=self.chainsdir)
 
 
 #Do it later -- plots and stats analis
@@ -389,21 +424,8 @@ class DriverMC():
     #    plot = PlotterMC(self.dims, chainsdir = self.chainsdir, chainsfile = self.outputname)
 
 #############################Testing functions#################################################
+
     
-    def logposterior(self, theta):
-        lp = self.priorTransform(theta)
-        if not np.isfinite(lp).any():
-            return -np.inf
-
-        return lp + self.logLike(theta)
-
-    def emceeRunner(self):
-        #pos = soln.x + 1e-4 * np.random.randn(32, 3)
-        nwalkers = 100
-        ndim = self.dims
-        p0 = np.random.rand(nwalkers, ndim)
-        sampler = emcee.EnsembleSampler(nwalkers, ndim, self.logposterior)
-        sampler.run_mcmc(p0, 5000) 
 
 
     def logLike2(self, *v):
@@ -425,3 +447,52 @@ class DriverMC():
             loglike = self.L.loglike_wprior()
         print("loglike", loglike)
         return loglike
+
+############# for emcee
+    def logPosterior(self, theta):
+        """
+        The natural logarithm of the joint posterior.
+        
+        Args:
+            theta (tuple): a sample containing individual parameter values
+            data (list): the set of data/observations
+            sigma (float): the standard deviation of the data points
+            x (list): the abscissa values at which the data/model is defined
+        """
+    
+        lp = self.logPrior(theta) # get the prior
+        
+        # if the prior is not finite return a probability of zero (log probability of -inf)
+        if not np.isfinite(lp):
+            return -np.inf
+        
+        # return the likeihood times the prior (log likelihood plus the log prior)
+        return lp + self.logLike(theta)
+
+    def logPrior(self, theta):
+        """
+        The natural logarithm of the prior probability.
+        
+        Args:
+            theta (tuple): a sample containing individual parameter values
+        
+        Note:
+            We can ignore the normalisations of the prior here.
+            Uniform prior on all the parameters.
+        """ 
+     
+        # set prior to 1 (log prior to 0) if in the range and zero (-inf) outside the range 
+        
+        for i, bound in enumerate(self.bounds):
+            if bound[0] < theta[i] < bound[1]:
+                flag = True
+            else:
+                flag = False
+                break
+        
+        if flag == True:
+            return 0.0
+        else:
+            return -np.inf
+
+
