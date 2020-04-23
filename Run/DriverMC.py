@@ -16,6 +16,7 @@ import emcee
 import multiprocessing as mp
 import numpy as np
 import time
+import corner
 
 class DriverMC():
     """
@@ -117,7 +118,7 @@ class DriverMC():
                     self.split      = float(config['neural']['split'])
                     self.numNeurons = int(config['neural']['numNeurons'])
 
-            elif self.samplername in ['emcee']:
+            elif self.samplername == 'emcee':
                 self.ensambles = int(config['emcee']['ensambles'])
                 self.samples = int(config['emcee']['samples'])
                 self.burnin = int(config['emcee']['burnin'])
@@ -349,6 +350,8 @@ class DriverMC():
                  self.dynamic, 'ANN : ' + self.neuralNetwork]
 
     def emceeRunner(self):
+        self.outputname += '_ensambles_'+str(self.ensambles)
+
         Nens = self.ensambles   # number of ensemble points
 
         ini = []
@@ -370,10 +373,9 @@ class DriverMC():
         # extract the samples (removing the burn-in)
         postsamples = sampler.chain[:, Nburnin:, :].reshape((-1, self.dims))
 
-        print(postsamples)
-
+        
         print('Number of posterior samples is {}'.format(postsamples.shape[0]))
-        import corner
+        
         fig = corner.corner(postsamples)
         fig.savefig('emcee.png')
         return ['emcee', sampler, 'ensambles : ' + str(self.ensambles)]
@@ -389,9 +391,9 @@ class DriverMC():
 
 
     def geneticRunner(self):
-        self.outputname += 'optimization' 
-        print("Usinge Simple Genetic Algorithm")
-        M = SimpleGenetic(self.logLike2, self.dims, self.bounds)
+        self.outputname += 'optimization_genetic' 
+        print("Using Simple Genetic Algorithm")
+        M = SimpleGenetic(self.logLikeGenetic, self.dims, self.bounds)
         
         return ['genetic', M ]
 
@@ -404,9 +406,16 @@ class DriverMC():
              chainsdir=self.chainsdir, engine = self.engine)
             pp.paramFiles(self.T, self.L)
             pp.saveNestedChain()
+        elif self.samplername == 'emcee':
+            pp = PostProcessing(self.result, self.paramsList , self.outputname,\
+             chainsdir=self.chainsdir, skip = self.burnin)
+            pp.paramFiles(self.T, self.L)
+            pp.saveEmceeSamples()
         else:
             pp = PostProcessing(self.result, self.paramsList , self.outputname,\
              chainsdir=self.chainsdir)
+            pp.paramFiles(self.T, self.L)
+            pp.saveEmceeSamples() 
 
 
 #Do it later -- plots and stats analis
@@ -422,13 +431,9 @@ class DriverMC():
     #def plotter(self):
     #    from PlotterMC import PlotterMC
     #    plot = PlotterMC(self.dims, chainsdir = self.chainsdir, chainsfile = self.outputname)
-
-#############################Testing functions#################################################
-
-    
-
-
-    def logLike2(self, *v):
+   
+# ###########for genetic
+    def logLikeGenetic(self, *v):
         values = []
         print("Entrando al logLike2")
         for i, element in enumerate(v):

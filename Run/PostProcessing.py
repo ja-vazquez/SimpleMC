@@ -9,7 +9,6 @@ from os import remove
 import numpy as np
 import dynesty
 
-
 class PostProcessing():
     def __init__(self, list_result, paramList, outputname,\
                  olambda = True, chainsdir = 'chains', skip = 0.1, engine = 'dynesty'):
@@ -64,6 +63,23 @@ class PostProcessing():
                 f.write(nrow+'\n')
 
         f.close()
+
+    #AJUSTAR!
+    def saveEmceeSamples(self):
+        dims = len(self.paramList)
+        postsamples = self.result.chain[:, self.skip:, :].reshape((-1, dims))
+        # for i, row in enumerate(postsamples):
+        #     strsamples = str(row).lstrip('[').rstrip(']')
+        tau = self.result.get_autocorr_time()
+        burnin = int(2 * np.max(tau))
+        thin = int(0.5 * np.min(tau))
+        samples = self.result.get_chain(discard=burnin, flat=True, thin=thin)
+        log_prob_samples = self.result.get_log_prob(discard=burnin, flat=True, thin=thin)
+        log_prior_samples = self.result.get_blobs(discard=burnin, flat=True, thin=thin)
+        all_samples = np.concatenate((samples, log_prob_samples[:, None],
+                      log_prior_samples[:, None]), axis=1)
+        for i in all_samples:
+            print(i)
 
     def paramFiles(self, T, L):
         """
