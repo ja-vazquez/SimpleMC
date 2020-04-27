@@ -306,6 +306,9 @@ class DriverMC():
             print("Using %d Processors: "%ncores)
             print("--"*10 )
             nprocess = ncores//2
+        elif self.nproc == 1:
+            nprocess = None
+            pool = None
         else:
             nprocess = self.nproc
         
@@ -344,7 +347,8 @@ class DriverMC():
         elif self.engine == 'nestle':
             import nestle
             M = nestle.sample(self.logLike, self.priorTransform, ndim=self.dims, method=self.nestedType,
-            npoints=self.nlivepoints, dlogz=self.accuracy, callback=nestle.print_progress)
+            npoints=self.nlivepoints, dlogz=self.accuracy, callback=nestle.print_progress,
+            pool = pool, queue_size = nprocess)
             #M.summary()
             print('\n'+'--'*10)
             print('logz=%2.2f +/- %2.2f \n'%(M.logz, M.logzerr))
