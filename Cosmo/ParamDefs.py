@@ -92,3 +92,15 @@ a_par = Parameter("a", 0., 0.5, (-10., 10.), "a" )
 b_par = Parameter("b", 0., 0.5, (-10., 10.), "b")
 
 
+#Compress data
+#plus the first bin that is fix
+Nbins = 15
+step  = (13-1.3)/(Nbins-1)
+zbin_par = [Parameter("zbin%d"%i, 1.3+step*i, 0.3, (step*i, 3+step*i), "zbin%d"%i) for i in range(Nbins)]
+
+
+#Quintess Cosmology
+mphi_par   = Parameter("mphi", 0.2, 0.1, (-5, 1), "m_{\phi}")
+
+#PhiSuresh
+alpha_par  = Parameter("alpha", 0.08, 0.05, (0.001, 1.5), "\\alpha")

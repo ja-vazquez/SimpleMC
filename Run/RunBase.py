@@ -24,11 +24,12 @@ from StepCDMCosmology import StepCDMCosmology
 from EarlyDECosmology import EarlyDECosmology
 from SlowRDECosmology import SlowRDECosmology
 from BinnedWCosmology import BinnedWCosmology
-from QuintCosmology import QuintCosmology
+from SureshCosmology import SureshCosmology
+from PhiCDMCosmology import PhiCDMCosmology
 
 #Generic model
 from GenericCosmology import GenericCosmology
-
+from GenericPantheon import GenericPantheon
 
 # Composite Likelihood
 from CompositeLikelihood import CompositeLikelihood
@@ -40,12 +41,13 @@ from LikelihoodMultiplier import LikelihoodMultiplier
 from BAOLikelihoods import DR11LOWZ, DR11CMASS, DR14LyaAuto, DR14LyaCross, \
         SixdFGS, SDSSMGS, DR11LyaAuto, DR11LyaCross, eBOSS, DR12Consensus
 from SimpleCMB import PlanckLikelihood, PlanckLikelihood_15, WMAP9Likelihood
-from CompressedSNLikelihood    import BetouleSN, UnionSN
+from CompressedSNLikelihood    import BetouleSN, UnionSN, BinnedPantheon
 from PantheonSNLikelihood      import PantheonSNLikelihood
 from HubbleParameterLikelihood import RiessH0
 from CompressedHDLikelihood    import HubbleDiagram
 
-from CompressedGenericLikelihood import StraightLine
+from GenericLikelihood import StraightLine
+from GenericPantheonSNLikelihood import GenericPantheonSNLikelihood
 
 
 #Importance Sampling
@@ -136,12 +138,16 @@ def ParseModel(model):
         T = SlowRDECosmology(varyOk=False)
     elif model == "Binned":
         T = BinnedWCosmology()
-    elif model == "Quint_last":
-        T = QuintCosmology()
+    elif model == "PhiCDM":
+        T = PhiCDMCosmology()
+    elif model == "Suresh":
+        T = SureshCosmology()
     elif model == 'wDM':
         T = wCDMCosmology()
     elif model == 'sline':
         T = GenericCosmology()
+    elif model == 'GPantheon':
+        T = GenericPantheon()
     else:
         print("Cannot recognize model", model)
         sys.exit(1)
@@ -172,8 +178,8 @@ def ParseDataset(datasets):
             L.addLikelihoods([
                 DR11LOWZ(),
                 DR11CMASS(),
-                DR14LyaAuto(),
-                DR14LyaCross(),
+                DR11LyaAuto(),
+                DR11LyaCross(),
                 SixdFGS(),
                 SDSSMGS()
             ])
@@ -186,7 +192,12 @@ def ParseDataset(datasets):
             ])
         elif name == 'CBAO':
             L.addLikelihoods([
-                DR12Consensus()
+                DR12Consensus(),
+                DR14LyaAuto(),
+                DR14LyaCross(),
+                SixdFGS(),
+                SDSSMGS(),
+                eBOSS()
             ])
         elif name == 'GBAOx10':
             L.addLikelihoods([
@@ -223,6 +234,10 @@ def ParseDataset(datasets):
             ])
         elif name == "MGS":
             L.addLikelihood(SDSSMGS())
+        elif name == '6dFGS':
+            L.addLikelihood(SixdFGS())
+        elif name == 'eBOSS':
+            L.addLikelihood(eBOSS())
         elif name == 'Planck':
             L.addLikelihood(PlanckLikelihood())
         elif name == 'Planck_15':
@@ -242,9 +257,11 @@ def ParseDataset(datasets):
             L.addLikelihood(WMAP9Likelihood())
         elif name == 'Pantheon':
             L.addLikelihood(PantheonSNLikelihood())
-        elif name == 'JLA':
+        elif name == 'BPantheon_15':
+            L.addLikelihood(BinnedPantheon())
+        elif name == 'SN':
             L.addLikelihood(BetouleSN())
-        elif name == 'JLAx10':
+        elif name == 'SNx10':
             L.addLikelihood(LikelihoodMultiplier(BetouleSN(), 100.0))
         elif name == 'UnionSN':
             L.addLikelihood(UnionSN())
@@ -252,12 +269,10 @@ def ParseDataset(datasets):
             L.addLikelihood(RiessH0())
         elif name == 'HD':
             L.addLikelihood(HubbleDiagram())
-        elif name == '6dFGS':
-            L.addLikelihood(SixdFGS())
-        elif name == 'eBOSS':
-            L.addLikelihood(eBOSS())
         elif name == 'dline':
             L.addLikelihood(StraightLine())
+        elif name == 'CPantheon_15':
+            L.addLikelihood(GenericPantheonSNLikelihood())
         else:
             print("Cannot parse data, unrecognizable part:", name)
             sys.exit(1)

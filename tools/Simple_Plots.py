@@ -22,7 +22,7 @@ class Simple_plots(cosmochain):
         self.roots      = roots
 
         self.label    = label
-        self.colors   = ['red', 'blue']
+        self.colors   = ['red', 'blue', 'green', 'orange']
 
         if (type(roots) == type("ch")):
             self.Clist = cosmochain(dir_name + roots)
@@ -32,10 +32,10 @@ class Simple_plots(cosmochain):
 
 
     def Plots1D(self, params, **kwargs):
-        plt.figure(figsize=(5*len(params), 4))
+        plt.figure(figsize=(15, 3*(len(params)//4+1)))
         for i, C in enumerate(self.Clist):
             for j, param in enumerate(params):
-                plt.subplot(1, len(params), j+1)
+                plt.subplot((len(params)-1)//4+1, 4, j+1)
                 xx, yy = C.GetHisto(param, smooth=2, NormPeak=True)
                 plt.plot(xx, yy, label=self.label[i], color=self.colors[i])
 
@@ -45,7 +45,7 @@ class Simple_plots(cosmochain):
         self.draw_frame()
         plt.tight_layout()
         plt.savefig('Plot_1D.pdf')
-        plt.show()
+        #plt.show()
 
 
 
@@ -63,7 +63,7 @@ class Simple_plots(cosmochain):
         self.draw_frame()
         plt.tight_layout()
         plt.savefig('Plot_2D.pdf')
-        plt.show()
+        #plt.show()
 
 
 
@@ -73,7 +73,7 @@ class Simple_plots(cosmochain):
         for i, C in enumerate(self.Clist):
             C.plotAll(color='blue', parlist=parlist, new_style=new_style)
             plt.savefig('Plot_triangle.pdf')
-            plt.show()
+            #plt.show()
 
 
 

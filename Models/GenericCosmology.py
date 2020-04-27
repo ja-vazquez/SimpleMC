@@ -54,7 +54,6 @@ class GenericCosmology(BaseGenericModel):
 
 
     def updateParams(self, pars):
-        #BaseGenericModel.updateParams(self,pars)
         for p in pars:
             if p.name == "a":
                 self.a = p.value
