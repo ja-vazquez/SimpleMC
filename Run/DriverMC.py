@@ -11,13 +11,9 @@ from scipy.special import ndtri
 from SimpleGenetic import SimpleGenetic
 from PostProcessing import PostProcessing 
 
-<<<<<<< HEAD
 import dynesty
 import emcee
-=======
-#import dynesty
-#import emcee
->>>>>>> 33667434ec3900d2c4380db33a366dd782e1a47b
+
 import multiprocessing as mp
 import numpy as np
 import time
@@ -124,6 +120,7 @@ class DriverMC():
                     self.numNeurons = int(config['neural']['numNeurons'])
 
             elif self.samplername == 'emcee':
+
                 self.ensambles = int(config['emcee']['ensambles'])
                 self.samples = int(config['emcee']['samples'])
                 self.burnin = int(config['emcee']['burnin'])
@@ -427,6 +424,7 @@ class DriverMC():
              chainsdir=self.chainsdir, engine = self.engine)
             pp.paramFiles(self.T, self.L)
             pp.saveNestedChain()
+
         elif self.samplername == 'emcee':
             pp = PostProcessing(self.result, self.paramsList , self.outputname,\
              chainsdir=self.chainsdir, skip = self.burnin)
@@ -437,8 +435,7 @@ class DriverMC():
              chainsdir=self.chainsdir)
             pp.paramFiles(self.T, self.L)
             pp.saveEmceeSamples() 
-
-
+    
 #Do it later -- plots and stats analis
 
         #if self.samplername in ['mcmc', 'nested']:
@@ -452,7 +449,7 @@ class DriverMC():
     #def plotter(self):
     #    from PlotterMC import PlotterMC
     #    plot = PlotterMC(self.dims, chainsdir = self.chainsdir, chainsfile = self.outputname)
-   
+
 # ###########for genetic
     def logLikeGenetic(self, *v):
         values = []
