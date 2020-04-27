@@ -35,13 +35,9 @@ class PostProcessing():
         f = open(self.filename + '_1.txt', 'w+')
         if self.engine == 'dynesty':
             weights = np.exp(self.result['logwt'] - self.result['logz'][-1])
-<<<<<<< HEAD
+
             postsamples = self.result.samples
        
-=======
-            postsamples = dynesty.utils.resample_equal(self.result.samples, weights)
-            #postsamples =self.result.samples
->>>>>>> 33667434ec3900d2c4380db33a366dd782e1a47b
             print('\n Number of posterior samples is {}'.format(postsamples.shape[0]))
 
         
@@ -165,37 +161,5 @@ class PostProcessing():
         
         #print("summaryResults", summaryResults[0])
         #mcstats.likeSummary()
-<<<<<<< HEAD
+
         return summaryResults
-=======
-        return summaryResults
-
-
-    def saveChainNestle(self):
-        """
-        This generates an output Simple(cosmo)MC style for Nestle Samplers.
-
-        Parameters:
-
-        result:     Nestle object
-        outputname: str name of the output file
-
-        """
-        if(path.isfile(outputname+'.txt')):
-            print("There's a file with the same name.", outputname+'.txt')
-            #outputname+= '_tmp'
-            #remove(outputname+'.txt')
-            #sys.exit(1)
-
-        f = open(outputname+'_1.txt','a+')
-
-        for i in range(len(result.samples)):
-            strweights = str(result.weights[i]).lstrip('[').rstrip(']')
-            strlogl=str(-1*result.logl[i]).lstrip('[').rstrip(']')
-            strsamples=str(result.samples[i]).lstrip('[').rstrip(']')
-            row = strweights+' '+strlogl+' '+strsamples
-            nrow = " ".join( row.split() )
-            f.write(nrow+'\n')
-            #f.write(strweights+' '+strlogl+' '+strsamples+'\n')
-        f.close()
->>>>>>> 33667434ec3900d2c4380db33a366dd782e1a47b
