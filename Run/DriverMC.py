@@ -347,7 +347,7 @@ class DriverMC():
             pool.close()
         except:
             pass
-               
+
         return ['nested', M, M.summary(), 'nested : ' + self.nestedType, 'dynamic : ' +\
                  self.dynamic, 'ANN : ' + self.neuralNetwork]
 
@@ -408,14 +408,12 @@ class DriverMC():
         return True
        
 
-
     def geneticRunner(self):
         self.outputname += 'optimization_genetic' 
         print("Using Simple Genetic Algorithm")
         M = SimpleGenetic(self.logLikeGenetic, self.dims, self.bounds)
         
         return ['genetic', M ]
-
 
 
 ###############################Post-processing############################################
@@ -518,6 +516,7 @@ class DriverMC():
             return 0.0
         else:
             return -np.inf
+# ### pool from multiprocessing 
 
     def mppool(self):
         if self.nproc <= 0:
@@ -529,11 +528,13 @@ class DriverMC():
             print("Using  {} processors of {}.".format(nprocess, ncores))
         elif self.nproc == 1:
             print("Using 1 processor.".format(ncores))
+            print("--"*10 )
             nprocess = None
             pool = None
         else:
             nprocess = self.nproc
             print("Using {} processors.".format(nprocess))
+            print("--"*10 )
             
         pool = mp.Pool(processes=nprocess)
 
