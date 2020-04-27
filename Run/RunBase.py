@@ -259,9 +259,9 @@ def ParseDataset(datasets):
             L.addLikelihood(PantheonSNLikelihood())
         elif name == 'BPantheon_15':
             L.addLikelihood(BinnedPantheon())
-        elif name == 'JLA':
+        elif name == 'SN':
             L.addLikelihood(BetouleSN())
-        elif name == 'JLAx10':
+        elif name == 'SNx10':
             L.addLikelihood(LikelihoodMultiplier(BetouleSN(), 100.0))
         elif name == 'UnionSN':
             L.addLikelihood(UnionSN())

@@ -33,11 +33,11 @@ class PostProcessing():
 
         """
 
-        f = open(self.filename + '.txt', 'a+')
+        f = open(self.filename + '_1.txt', 'w+')
         if self.engine == 'dynesty':
             weights = np.exp(self.result['logwt'] - self.result['logz'][-1])
             postsamples = dynesty.utils.resample_equal(self.result.samples, weights)
-       
+            #postsamples =self.result.samples
             print('\n Number of posterior samples is {}'.format(postsamples.shape[0]))
 
         
@@ -50,7 +50,7 @@ class PostProcessing():
                 #    strOLambda = ' '+str(OLambda)
                 #else:
                 #    strOLambda = ""
-                row = strweights + ' ' + strlogl + ' ' + strsamples + strOLambda
+                row = strweights + ' ' + strlogl + ' ' + strsamples #+ strOLambda
                 nrow = " ".join( row.split() )
                 f.write(nrow+'\n')
 
@@ -156,10 +156,12 @@ class PostProcessing():
 
         """
         if(path.isfile(outputname+'.txt')):
-            print("An existing file with the same name has been deleted.", outputname+'.txt')
-            remove(outputname+'.txt')
+            print("There's a file with the same name.", outputname+'.txt')
+            #outputname+= '_tmp'
+            #remove(outputname+'.txt')
+            #sys.exit(1)
 
-        f = open(outputname+'.txt','a+')
+        f = open(outputname+'_1.txt','a+')
 
         for i in range(len(result.samples)):
             strweights = str(result.weights[i]).lstrip('[').rstrip(']')
