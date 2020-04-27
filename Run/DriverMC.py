@@ -343,6 +343,11 @@ class DriverMC():
         else:
             print('wrong selection')
             sys.exit(1)
+        try:
+            pool.close()
+        except:
+            pass
+               
         return ['nested', M, M.summary(), 'nested : ' + self.nestedType, 'dynamic : ' +\
                  self.dynamic, 'ANN : ' + self.neuralNetwork]
 
@@ -386,7 +391,10 @@ class DriverMC():
 
         
         print('Number of posterior samples is {}'.format(postsamples.shape[0]))
-        
+        try:
+            pool.close()
+        except:
+            pass 
         fig = corner.corner(postsamples)
         fig.savefig('emcee.png')
         return ['emcee', sampler, 'ensambles : ' + str(self.ensambles)]
