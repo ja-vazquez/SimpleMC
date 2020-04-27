@@ -124,6 +124,7 @@ class DriverMC():
                 self.ensambles = int(config['emcee']['ensambles'])
                 self.samples = int(config['emcee']['samples'])
                 self.burnin = int(config['emcee']['burnin'])
+                self.nproc   = int(config['emcee']['nproc'])
 
             elif self.samplername in ['MaxLikeAnalyzer']:
                 self.withErrors      = config['MaxLikeAnalyzer']['withErrors']
@@ -299,20 +300,7 @@ class DriverMC():
             bound : {'none', 'single', 'multi', 'balls', 'cubes'},
         """
         self.outputname += '_'+self.engine+'_'+self.nestedType
-
-        if self.nproc <= 0:
-            ncores = mp.cpu_count()
-            print("--"*10 )
-            print("Using %d Processors: "%ncores)
-            print("--"*10 )
-            nprocess = ncores//2
-        elif self.nproc == 1:
-            nprocess = None
-            pool = None
-        else:
-            nprocess = self.nproc
-        
-        pool = mp.Pool(processes=nprocess)
+        pool, nprocess = self.mppool()
 
         showfiles = True
         if self.engine == 'dynesty':
@@ -373,6 +361,7 @@ class DriverMC():
 
     def emceeRunner(self):
         self.outputname += '_ensambles_'+str(self.ensambles)
+        pool, _ = self.mppool()
 
         Nens = self.ensambles   # number of ensemble points
 
@@ -387,7 +376,7 @@ class DriverMC():
         Nsamples = self.samples  # number of final posterior samples
 
         # set up the sampler
-        sampler = emcee.EnsembleSampler(Nens, self.dims, self.logPosterior)
+        sampler = emcee.EnsembleSampler(Nens, self.dims, self.logPosterior, pool = pool)
 
         # pass the initial samples and total number of samples required
         sampler.run_mcmc(inisamples, Nsamples+Nburnin, progress=True)
@@ -522,4 +511,22 @@ class DriverMC():
         else:
             return -np.inf
 
+    def mppool(self):
+        if self.nproc <= 0:
+            ncores = mp.cpu_count()
+            print("--"*10 )
+            print("Using  {} Processors.".format(ncores))
+            print("--"*10 )
+            nprocess = ncores//2
+            print("Using  {} processors of {}.".format(nprocess, ncores))
+        elif self.nproc == 1:
+            print("Using 1 processor.".format(ncores))
+            nprocess = None
+            pool = None
+        else:
+            nprocess = self.nproc
+            print("Using {} processors.".format(nprocess))
+            
+        pool = mp.Pool(processes=nprocess)
 
+        return pool, nprocess
