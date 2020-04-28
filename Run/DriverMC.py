@@ -325,7 +325,7 @@ class DriverMC():
         elif self.engine == 'dynesty':
             sampler = dynesty.NestedSampler(self.logLike, self.priorTransform, self.dims,
                         bound=self.nestedType, sample = 'rwalk', nlive = self.nlivepoints,\
-                        pool = pool, queue_size = ncores)
+                        pool = pool, queue_size = nprocess)
             sampler.run_nested(dlogz=self.accuracy)
             M = sampler.results
             M.summary()
@@ -527,12 +527,11 @@ class DriverMC():
         if self.nproc <= 0:
             ncores = mp.cpu_count()
             print("--"*10 )
-            print("Using  {} Processors.".format(ncores))
-            print("--"*10 )
             nprocess = ncores//2
             print("Using  {} processors of {}.".format(nprocess, ncores))
+            pool = mp.Pool(processes=nprocess)
         elif self.nproc == 1:
-            print("Using 1 processor.".format(ncores))
+            print("Using 1 processor.")
             print("--"*10 )
             nprocess = None
             pool = None
@@ -540,7 +539,6 @@ class DriverMC():
             nprocess = self.nproc
             print("Using {} processors.".format(nprocess))
             print("--"*10 )
-            
-        pool = mp.Pool(processes=nprocess)
+            pool = mp.Pool(processes=nprocess)
 
         return pool, nprocess
