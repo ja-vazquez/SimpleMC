@@ -1,76 +1,64 @@
-from datetime import datetime
-from Individual import Individual
 from Population import Population
 
-import copy
-import matplotlib
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import random
-import random
-import seaborn as sb
-import time
-import warnings
 
-class SimpleGenetic():
-    def __init__(self, funcion_objetivo, n_variables, limites, n_individuos = 50,\
-                verbose = False, optimizacion = "maximizar",\
-                n_generaciones = 250, metodo_seleccion = "tournament", elitismo = 0.01,\
-                prob_mut = 0.1, distribucion = "uniforme", media_distribucion = 1,\
-                sd_distribucion = 1, min_distribucion = -1, max_distribucion = 1,\
-                parada_temprana = False, rondas_parada = 5, tolerancia_parada = 0.1):
+class SimpleGenetic:
+    def __init__(self, target_function, n_variables, limits, n_individuals=50,
+                verbose=False, optimization="maximize",
+                n_generations=250, method_selection="tournament", elitism=0.01,
+                prob_mut=0.1, distribution="uniform", media_distribution=1,
+                sd_distribution=1, min_distribution=-1, max_distribution=1,
+                stopping_early=False, rounds_stopping=5, tolerance_stopping=0.1):
 
-        self.funcion_objetivo = funcion_objetivo
-        #Estos limites son una lista donde cada entrada son los limites de un param
-        limites = limites
+        self.target_function = target_function
+        # These limits are a list where every input is the limit of a param
+        limits = limits
 
-        self.limites_inf = []
-        self.limites_sup = []
+        self.limits_inf = []
+        self.limits_sup = []
 
-        for limite in limites:
-            self.limites_inf.append(limite[0])
-            self.limites_sup.append(limite[1])
+        for limit in limits:
+            self.limits_inf.append(limit[0])
+            self.limits_sup.append(limit[1])
 
-        self.n_individuos = n_individuos
+        self.n_individuals = n_individuals
         self.n_variables = n_variables
         
-        self.distribucion = distribucion
-        self.elitismo = elitismo
-        self.max_distribucion   = max_distribucion
-        self.media_distribucion = media_distribucion
-        self.metodo_seleccion = metodo_seleccion
-        self.min_distribucion = min_distribucion
-        self.n_generaciones = n_generaciones
-        self.optimizacion = optimizacion
-        self.parada_temprana = parada_temprana
+        self.distribution = distribution
+        self.elitism = elitism
+        self.max_distribution = max_distribution
+        self.media_distribution = media_distribution
+        self.method_selection = method_selection
+        self.min_distribution = min_distribution
+        self.n_generations = n_generations
+        self.optimization = optimization
+        self.stopping_early = stopping_early
         self.prob_mut = prob_mut
-        self.rondas_parada = rondas_parada
-        self.sd_distribucion = sd_distribucion
-        self.tolerancia_parada  = tolerancia_parada
+        self.rounds_stopping = rounds_stopping
+        self.sd_distribution = sd_distribution
+        self.tolerance_stopping  = tolerance_stopping
         self.verbose = verbose
 
-        self.optimizar()
+        self.optimize()
 
-    def optimizar(self):
-        poblacion = Population(n_individuos = self.n_individuos,\
-                n_variables = self.n_variables,\
-                limites_inf = self.limites_inf,\
-                limites_sup = self.limites_sup,\
-                verbose = self.verbose)
-    
-        o = poblacion.optimizar(funcion_objetivo = self.funcion_objetivo,\
-                            optimizacion = self.optimizacion,\
-                            n_generaciones = self.n_generaciones,\
-                            metodo_seleccion = self.metodo_seleccion,\
-                            elitismo = self.elitismo,\
-                            prob_mut = self.prob_mut,\
-                            distribucion = self.distribucion,\
-                            media_distribucion = self.media_distribucion,\
-                            sd_distribucion = self.sd_distribucion ,\
-                            min_distribucion = self.min_distribucion,\
-                            max_distribucion = self.max_distribucion,\
-                            parada_temprana = self.parada_temprana,\
-                            rondas_parada = self.rondas_parada,\
-                            verbose = self.verbose)
+    def optimize(self):
+        population = Population(n_individuals=self.n_individuals,
+                n_variables=self.n_variables,
+                limits_inf=self.limits_inf,
+                limits_sup=self.limits_sup,
+                verbose=self.verbose)
+
+        o = population.optimize(target_function=self.target_function,
+                            optimization=self.optimization,
+                            n_generations=self.n_generations,
+                            method_selection=self.method_selection,
+                            elitism=self.elitism,
+                            prob_mut=self.prob_mut,
+                            distribution=self.distribution,
+                            media_distribution=self.media_distribution,
+                            sd_distribution=self.sd_distribution,
+                            min_distribution=self.min_distribution,
+                            max_distribution=self.max_distribution,
+                            stopping_early=self.stopping_early,
+                            rounds_stopping=self.rounds_stopping,
+                            verbose=self.verbose)
         return o

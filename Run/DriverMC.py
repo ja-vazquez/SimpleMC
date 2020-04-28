@@ -6,8 +6,6 @@ from MCMCAnalyzer import MCMCAnalyzer
 from Parameter import Parameter
 from RunBase import ParseModel, ParseDataset
 from scipy.special import ndtri
-from PostProcessing import PostProcessing 
-from scipy.special import ndtri
 from SimpleGenetic import SimpleGenetic
 from PostProcessing import PostProcessing 
 
@@ -409,28 +407,31 @@ class DriverMC():
        
 
     def geneticRunner(self):
-        self.outputname += 'optimization_genetic' 
+        self.outputname += 'optimization_genetic'
+        self.fgenetic = open(self.chainsdir+'/'+self.outputname + '.txt', 'w+')
         print("Using Simple Genetic Algorithm")
         M = SimpleGenetic(self.logLikeGenetic, self.dims, self.bounds)
-        
-        return ['genetic', M ]
+        self.fgenetic.close()
+        return ['genetic', M]
 
 
 ###############################Post-processing############################################
     def postprocess(self):
         if self.samplername == 'nested':
             pp = PostProcessing(self.result, self.paramsList , self.outputname,\
-             chainsdir=self.chainsdir, engine = self.engine)
+             chainsdir=self.chainsdir, engine=self.engine)
             pp.paramFiles(self.T, self.L)
             pp.saveNestedChain()
 
         elif self.samplername == 'emcee':
-            pp = PostProcessing(self.result, self.paramsList , self.outputname,\
-             chainsdir=self.chainsdir, skip = self.burnin)
+            pp = PostProcessing(self.result, self.paramsList, self.outputname,\
+             chainsdir=self.chainsdir, skip=self.burnin)
             pp.paramFiles(self.T, self.L)
             pp.saveEmceeSamples()
+        elif self.samplername == 'genetic' or self.samplername == MaxLikeAnalyzer:
+            pass
         else:
-            pp = PostProcessing(self.result, self.paramsList , self.outputname,\
+            pp = PostProcessing(self.result, self.paramsList, self.outputname,\
              chainsdir=self.chainsdir)
             pp.paramFiles(self.T, self.L)
             pp.saveEmceeSamples() 
@@ -452,13 +453,14 @@ class DriverMC():
 # ###########for genetic
     def logLikeGenetic(self, *v):
         values = []
-        print("Entrando al logLike2")
+        print("-"*10)
+        print("Parameters:")
         for i, element in enumerate(v):
-            print("Entrando al for del loglike", i)
             values.append(element)
-            print("element", element)
-        print("saliendo for loglike")
-        #values = np.array(values)
+            print("{}".format(element),  end=' ')
+        # values = np.array(values)
+        strvalues = str(values).lstrip('[').rstrip(']')
+        strvalues = strvalues.replace(',', '')
         listPars = self.instantiatePars(values)
         self.T.updateParams(listPars)
         self.L.setTheory(self.T)
@@ -467,7 +469,10 @@ class DriverMC():
             loglike=cloglikes.sum()
         else:
             loglike = self.L.loglike_wprior()
-        print("loglike", loglike)
+        print("\nloglike: {}".format(loglike))
+        print("-" * 10)
+        row = str(loglike) + " " + strvalues
+        self.fgenetic.write(row + "\n")
         return loglike
 
 ############# for emcee

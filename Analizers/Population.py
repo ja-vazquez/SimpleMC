@@ -1,244 +1,206 @@
 from Individual import Individual
-
 import numpy as np
-import random
-import warnings
-import random
 import copy
 import pandas as pd
 import time
-import matplotlib
-import matplotlib.pyplot as plt
 from datetime import datetime
-import seaborn as sb
+
 
 class Population:
-    def __init__(self, n_individuos, n_variables, limites_inf=None,
-                 limites_sup=None, verbose=False):
+    def __init__(self, n_individuals, n_variables, limits_inf=None,
+                 limits_sup=None, verbose=False):
 
-        self.n_individuos = n_individuos
+        self.n_individuals = n_individuals
         self.n_variables = n_variables
-        self.limites_inf = limites_inf
-        self.limites_sup = limites_sup
-        self.individuos = []
-        self.optimizado = False
-        self.iter_optimizacion = None
-        self.mejor_individuo = None
-        self.mejor_fitness = None
-        self.mejor_valor_funcion = None
-        self.mejor_valor_variables = None
-        self.historico_individuos = []
-        self.historico_mejor_valor_variables = []
-        self.historico_mejor_fitness = []
-        self.historico_mejor_valor_funcion = []
+        self.limits_inf = limits_inf
+        self.limits_sup = limits_sup
+        self.individuals = []
+        self.optimized = False
+        self.iter_optimization = None
+        self.best_individual = None
+        self.best_fitness = None
+        self.best_function_value = None
+        self.best_value_variables = None
+        self.historical_individuals = []
+        self.historical_best_value_variables = []
+        self.historical_best_fitness = []
+        self.historical_best_function_value = []
         self.diferencia_abs = []
-        self.resultados_df = None
-        self.fitness_optimo = None
-        self.valor_variables_optimo = None
-        self.valor_funcion_optimo = None
+        self.results_df = None
+        self.fitness_optimal = None
+        self.value_variables_optimal = None
+        self.function_value_optimal = None
 
-        if self.limites_inf is not None \
-        and not isinstance(self.limites_inf,np.ndarray):
-            self.limites_inf = np.array(self.limites_inf)
+        if self.limits_inf is not None \
+        and not isinstance(self.limits_inf,np.ndarray):
+            self.limits_inf = np.array(self.limits_inf)
 
-        if self.limites_sup is not None \
-        and not isinstance(self.limites_sup,np.ndarray):
-            self.limites_sup = np.array(self.limites_sup)
+        if self.limits_sup is not None and not isinstance(self.limits_sup,np.ndarray):
+            self.limits_sup = np.array(self.limits_sup)
 
-        for i in np.arange(n_individuos):
-            individuo_i = Individual(
+        for i in np.arange(n_individuals):
+            individual_i = Individual(
                             n_variables = self.n_variables,
-                            limites_inf = self.limites_inf,
-                            limites_sup = self.limites_sup,
+                            limits_inf = self.limits_inf,
+                            limits_sup = self.limits_sup,
                             verbose     = verbose)
-            self.individuos.append(individuo_i)
+            self.individuals.append(individual_i)
 
         if verbose:
             print("----------------")
-            print("Poblacion creada")
+            print("Population created")
             print("----------------")
-            print("Numero de individuos: " + str(self.n_individuos))
-            print("Limites inferiores de cada variable: " \
-                  + np.array2string(self.limites_inf))
-            print("Limites superiores de cada variable: " \
-                  + np.array2string(self.limites_sup))
-            print("")
+            print("Number of individuals: {}".format(self.n_individuals))
+            print("lower limits: {}".format(np.array2string(self.limits_inf)))
+            print("Upper limits: {}".format(np.array2string(self.limits_sup)))
 
     def __repr__(self):
         """
-        Informacion que se muestra cuando se imprime un objeto poblacion.
-
+        Info for print population object
         """
+        text = ("============================ \n  Population \n",
+                 "============================ \n Num of individuals: ",
+                 "{} \n lower limits: {}",
+                 "\n upper limits: {} \n Optimizated: {}",
+                 "\n Iterations of optimization (generations): {} ",
+                 "\n \n Information of best individual: {} \n",
+                 " ----------------------------",
+                 "\n Variables values {} \n",
+                 "Fitness: {} \n \n results after optimization: \n",
+                 " -------------------------- \n",
+                 "value optimal de variables: {} \n",
+                 "value optimal function target: {} \n Optimal fitness : {} ").format(
+                    self.n_individuals, self.limits_inf, self.limits_sup, self.optimized, self.iter_optimization, self.best_value_variables, self.best_fitness, self.value_variables_optimal,
+                    self.function_value_optimal, self.fitness_optimal)
 
-        texto = "============================" \
-                + "\n" \
-                + "         Poblacion" \
-                + "\n" \
-                + "============================" \
-                + "\n" \
-                + "Numero de individuos: " + str(self.n_individuos) \
-                + "\n" \
-                + "Limites inferiores de cada variable: " + str(self.limites_inf) \
-                + "\n" \
-                + "Limites superiores de cada variable: " + str(self.limites_sup) \
-                + "\n" \
-                + "Optimizado: " + str(self.optimizado) \
-                + "\n" \
-                + "Iteraciones optimizacion (generaciones): " \
-                     + str(self.iter_optimizacion) \
-                + "\n" \
-                + "\n" \
-                + "Informacion del mejor individuo:" \
-                + "\n" \
-                + "----------------------------" \
-                + "\n" \
-                + "Valor variables: " + str(self.mejor_valor_variables) \
-                + "\n" \
-                + "Fitness: " + str(self.mejor_fitness) \
-                + "\n" \
-                + "\n" \
-                + "Resultados tras optimizar:" \
-                + "\n" \
-                + "--------------------------" \
-                + "\n" \
-                + "Valor optimo de variables: " + str(self.valor_variables_optimo) \
-                + "\n" \
-                + "Valor optimo funcion objetivo: " + str(self.valor_funcion_optimo) \
-                + "\n" \
-                + "Fitness optimo: " + str(self.fitness_optimo)
-                
-                
-        return(texto)
+        return(text)
 
-    def mostrar_individuos(self, n=None):
+    def show_individuals(self, n=None):
         if n is None:
-            n = self.n_individuos
-        elif n > self.n_individuos:
-            n = self.n_individuos
+            n = self.n_individuals
+        elif n > self.n_individuals:
+            n = self.n_individuals
 
         for i in np.arange(n):
-            print(self.individuos[i])
+            print(self.individuals[i])
         return(None)
 
-    def evaluar_poblacion(self, funcion_objetivo, optimizacion, verbose=False):
-        for i in np.arange(self.n_individuos):
-            self.individuos[i].calcular_fitness(
-                funcion_objetivo = funcion_objetivo,
-                optimizacion     = optimizacion,
+    def evaluar_population(self, target_function, optimization, verbose=False):
+        for i in np.arange(self.n_individuals):
+            self.individuals[i].calculate_fitness(
+                target_function = target_function,
+                optimization     = optimization,
                 verbose          = verbose
             )
 
-        self.mejor_individuo = copy.deepcopy(self.individuos[0])
-        for i in np.arange(self.n_individuos):
-            if self.individuos[i].fitness > self.mejor_individuo.fitness:
-                self.mejor_individuo = copy.deepcopy(self.individuos[i])
+        self.best_individual = copy.deepcopy(self.individuals[0])
+        for i in np.arange(self.n_individuals):
+            if self.individuals[i].fitness > self.best_individual.fitness:
+                self.best_individual = copy.deepcopy(self.individuals[i])
 
-        self.mejor_fitness = self.mejor_individuo.fitness
-        self.mejor_valor_variables = self.mejor_individuo.valor_variables
-        self.mejor_valor_funcion = self.mejor_individuo.valor_funcion
+        self.best_fitness = self.best_individual.fitness
+        self.best_value_variables = self.best_individual.value_variables
+        self.best_function_value = self.best_individual.function_value
         
         if verbose:
             print("------------------")
-            print("Poblacion evaluada")
+            print("population evaluated")
             print("------------------")
-            print("Mejor fitness encontrado : " + str(self.mejor_fitness))
-            print("Valor de la funcion objetivo: " \
-                + str(self.mejor_valor_funcion))
-            print("Mejor valor de variables encontrado : "
-                + str(self.mejor_valor_variables))
-            print("")
+            print("best fitness: " + str(self.best_fitness))
+            print("value of the function target: {}".format(self.best_function_value))
+            print("best value de variables encontrado: {}".format(self.best_value_variables))
 
-    def cruzar_individuos(self, parental_1, parental_2, verbose=False):
+    def cross_individuals(self, parental_1, parental_2, verbose=False):
 
-        if parental_1 not in np.arange(self.n_individuos):
+        if parental_1 not in np.arange(self.n_individuals):
             raise Exception(
-                "El el indice del parental_1 debe de ser un valor entre 0 y " +
-                "el numero de individuos de la poblacion."
+                "index of parental_1 should be between 0 and " 
+                "the number of individuals of the population."
                 )
-        if parental_2 not in np.arange(self.n_individuos):
+        if parental_2 not in np.arange(self.n_individuals):
             raise Exception(
-                "El el indice del parental_2 debe de ser un valor entre 0 y " +
-                "el numero de individuos de la poblacion."
+                "index of parental_2 should be between 0 and " 
+                "the number of individuals of the population."
                 )
 
-        parental_1 = self.individuos[parental_1]
-        parental_2 = self.individuos[parental_2]
+        parental_1 = self.individuals[parental_1]
+        parental_2 = self.individuals[parental_2]
         
-        descendencia = copy.deepcopy(parental_1)
-        descendencia.valor_variables = np.repeat(None, descendencia.n_variables)
-        descendencia.fitness = None
+        offspring = copy.deepcopy(parental_1)
+        offspring.value_variables = np.repeat(None, offspring.n_variables)
+        offspring.fitness = None
 
-        herencia_parent_1 = np.random.choice(
-                                a       = [True, False],
-                                size    = descendencia.n_variables,
-                                p       = [0.5, 0.5],
-                                replace = True
+        inheritance_parent_1 = np.random.choice(
+                                a=[True, False],
+                                size=offspring.n_variables,
+                                p=[0.5, 0.5],
+                                replace=True
                             )
-        herencia_parent_2 = np.logical_not(herencia_parent_1)
+        inheritance_parent_2 = np.logical_not(inheritance_parent_1)
 
-        descendencia.valor_variables[herencia_parent_1] \
-            = parental_1.valor_variables[herencia_parent_1]
+        offspring.value_variables[inheritance_parent_1] \
+            = parental_1.value_variables[inheritance_parent_1]
 
-        descendencia.valor_variables[herencia_parent_2] \
-            = parental_2.valor_variables[herencia_parent_2]
+        offspring.value_variables[inheritance_parent_2] \
+            = parental_2.value_variables[inheritance_parent_2]
         
 
-        descendencia = copy.deepcopy(descendencia)
+        offspring = copy.deepcopy(offspring)
 
         if verbose:
             print("---------------")
-            print("Cruce realizado: descendencia creada")
+            print("Offspring created")
             print("---------------")
-            print("Valor variables: " + str(descendencia.valor_variables))
-            print("")
-        return(descendencia)
-    
-    def seleccionar_individuo(self, n, return_indices=True,
-                              metodo_seleccion="tournament", verbose=False):
+            print("value variables: {}".format(offspring.value_variables))
 
-        if metodo_seleccion not in ["ruleta", "rank", "tournament"]:
+        return(offspring)
+    
+    def selectionar_individual(self, n, return_indexs=True,
+                              method_selection="tournament", verbose=False):
+
+        if method_selection not in ["ruleta", "rank", "tournament"]:
             raise Exception(
-                "El metodo de seleccion debe de ser ruleta, rank o tournament"
+                "Selection method should be ruleta, rank o tournament"
                 )
 
-        array_fitness = np.repeat(None, self.n_individuos)
-        for i in np.arange(self.n_individuos):
-            array_fitness[i] = copy.copy(self.individuos[i].fitness)
+        array_fitness = np.repeat(None, self.n_individuals)
+        for i in np.arange(self.n_individuals):
+            array_fitness[i] = copy.copy(self.individuals[i].fitness)
         
-        if metodo_seleccion == "ruleta":
-            probabilidad_seleccion = array_fitness / np.sum(array_fitness)
-            ind_seleccionado = np.random.choice(
-                                    a       = np.arange(self.n_individuos),
+        if method_selection == "ruleta":
+            probabilidad_selection = array_fitness / np.sum(array_fitness)
+            ind_selectionado = np.random.choice(
+                                    a       = np.arange(self.n_individuals),
                                     size    = n,
-                                    p       = list(probabilidad_seleccion),
+                                    p       = list(probabilidad_selection),
                                     replace = True
                                )
-        elif metodo_seleccion == "rank":
+        elif method_selection == "rank":
             order = np.flip(np.argsort(a=array_fitness) + 1)
             ranks = np.argsort(order) + 1
-            probabilidad_seleccion = 1 / ranks
-            probabilidad_seleccion = probabilidad_seleccion / np.sum(probabilidad_seleccion)
-            ind_seleccionado = np.random.choice(
-                                a       = np.arange(self.n_individuos),
+            probabilidad_selection = 1 / ranks
+            probabilidad_selection = probabilidad_selection / np.sum(probabilidad_selection)
+            ind_selectionado = np.random.choice(
+                                a       = np.arange(self.n_individuals),
                                 size    = n,
-                                p       = list(probabilidad_seleccion),
+                                p       = list(probabilidad_selection),
                                 replace = True
                             )
-        elif metodo_seleccion == "tournament":
-            ind_seleccionado = np.repeat(None,n)
+        elif method_selection == "tournament":
+            ind_selectionado = np.repeat(None,n)
             for i in np.arange(n):
-                # Se seleccionan aleatoriamente dos parejas de individuos.
+                # Se selectionan aleatoriamente dos parejas de individuals.
                 candidatos_a = np.random.choice(
-                                a       = np.arange(self.n_individuos),
+                                a       = np.arange(self.n_individuals),
                                 size    = 2,
                                 replace = False
                             )
                 candidatos_b = np.random.choice(
-                                a       = np.arange(self.n_individuos),
+                                a       = np.arange(self.n_individuals),
                                 size    = 2,
                                 replace = False
                             )
-                # De cada pareja se selecciona el de mayor fitness.
+                # De cada pareja se selectiona el de mayor fitness.
                 if array_fitness[candidatos_a[0]] > array_fitness[candidatos_a[1]]:
                     ganador_a = candidatos_a[0]
                 else:
@@ -255,182 +217,177 @@ class Population:
                 else:
                     ind_final = ganador_b
                 
-                ind_seleccionado[i] = ind_final
+                ind_selectionado[i] = ind_final
 
         if verbose:
             print("---------------")
-            print("Individuo seleccionado")
+            print("individual selected")
             print("---------------")
-            print("Metodo seleccion: " + metodo_seleccion)
-            print("")
+            print("method selection: {}".format(method_selection))
 
-        if(return_indices):
-            return(ind_seleccionado)
+
+        if(return_indexs):
+            return(ind_selectionado)
         else:
             if n == 1:
-                return(copy.deepcopy(self.individuos[int(ind_seleccionado)]))
+                return(copy.deepcopy(self.individuals[int(ind_selectionado)]))
             if n > 1:
                 return(
-                    [copy.deepcopy(self.individuos[i]) for i in ind_seleccionado]
+                    [copy.deepcopy(self.individuals[i]) for i in ind_selectionado]
                 )
             
-    def crear_nueva_generecion(self, metodo_seleccion="tournament",
-                               elitismo=0.1, prob_mut=0.01,
-                               distribucion="uniforme",
-                               media_distribucion=1, sd_distribucion=1,
-                               min_distribucion=-1, max_distribucion=1,
-                               verbose=False, verbose_seleccion=False,
-                               verbose_cruce=False, verbose_mutacion=False):
+    def crear_new_generecion(self, method_selection="tournament",
+                               elitism=0.1, prob_mut=0.01,
+                               distribution="uniform",
+                               media_distribution=1, sd_distribution=1,
+                               min_distribution=-1, max_distribution=1,
+                               verbose=False, verbose_selection=False,
+                               verbose_cruce=False, verbose_mutation=False):
 
-        nuevos_individuos = []
+        news_individuals = []
 
-        if elitismo > 0:
-            n_elitismo = int(np.ceil(self.n_individuos*elitismo))
-            array_fitness = np.repeat(None, self.n_individuos)
-            for i in np.arange(self.n_individuos):
-                array_fitness[i] = copy.copy(self.individuos[i].fitness)
+        if elitism > 0:
+            n_elitism = int(np.ceil(self.n_individuals*elitism))
+            array_fitness = np.repeat(None, self.n_individuals)
+            for i in np.arange(self.n_individuals):
+                array_fitness[i] = copy.copy(self.individuals[i].fitness)
             rank = np.flip(np.argsort(array_fitness))
-            elite = [copy.deepcopy(self.individuos[i]) for i in rank[:n_elitismo]]
-            nuevos_individuos = nuevos_individuos + elite
+            elite = [copy.deepcopy(self.individuals[i]) for i in rank[:n_elitism]]
+            news_individuals = news_individuals + elite
         else:
-            n_elitismo = 0
+            n_elitism = 0
             
-        for i in np.arange(self.n_individuos-n_elitismo):
-            # Seleccionar parentales
-            indice_parentales = self.seleccionar_individuo(
+        for i in np.arange(self.n_individuals-n_elitism):
+            # selectionar parentales
+            index_parentales = self.selectionar_individual(
                                     n                = 2,
-                                    return_indices   = True,
-                                    metodo_seleccion = metodo_seleccion,
-                                    verbose          = verbose_seleccion
+                                    return_indexs   = True,
+                                    method_selection = method_selection,
+                                    verbose          = verbose_selection
                                  )
             
-            descendencia = self.cruzar_individuos(
-                            parental_1 = indice_parentales[0],
-                            parental_2 = indice_parentales[1],
-                            verbose    = verbose_cruce
+            offspring = self.cross_individuals(
+                            parental_1=index_parentales[0],
+                            parental_2=index_parentales[1],
+                            verbose=verbose_cruce
                            )
             
-            descendencia.mutar(
-                prob_mut         = prob_mut,
-                distribucion     = distribucion,
-                min_distribucion = min_distribucion,
-                max_distribucion = max_distribucion,
-                verbose          = verbose_mutacion
+            offspring.mutate(
+                prob_mut=prob_mut,
+                distribution=distribution,
+                min_distribution=min_distribution,
+                max_distribution=max_distribution,
+                verbose=verbose_mutation
             )
 
-            nuevos_individuos = nuevos_individuos + [descendencia]
+            news_individuals = news_individuals + [offspring]
 
-        self.individuos = copy.deepcopy(nuevos_individuos)
-        self.mejor_individuo = None
-        self.mejor_fitness = None
-        self.mejor_valor_variables = None
-        self.mejor_valor_funcion = None
+        self.individuals = copy.deepcopy(news_individuals)
+        self.best_individual = None
+        self.best_fitness = None
+        self.best_value_variables = None
+        self.best_function_value = None
         
         if verbose:
             print("-----------------------")
-            print("Nueva generacion creada")
+            print("new generation created")
             print("-----------------------")
-            print("Metodo seleccion: " + metodo_seleccion)
-            print("Elitismo: " + str(elitismo))
-            print("Numero individuos elite: " + str(n_elitismo))
-            print("Numero de nuevos individuos: "\
-                + str(self.n_individuos-n_elitismo))
-            print("")
+            print("method selection: {}".format(method_selection))
+            print("elitism: {}".format(elitism))
+            print("Number elite individuals: {}".format(n_elitism))
+            print("Number of new individuals: {}".format(self.n_individuals-n_elitism))
 
-    def optimizar(self, funcion_objetivo, optimizacion, n_generaciones = 50,
-                  metodo_seleccion="tournament", elitismo=0.1, prob_mut=0.01,
-                  distribucion="uniforme", media_distribucion=1,
-                  sd_distribucion=1, min_distribucion=-1, max_distribucion=1,
-                  parada_temprana=False, rondas_parada=None,
-                  tolerancia_parada=None,verbose=False,
-                  verbose_nueva_generacion=False,
-                  verbose_seleccion=False, verbose_cruce=False,
-                  verbose_mutacion=False, verbose_evaluacion=False):
+    def optimize(self, target_function, optimization, n_generations = 50,
+                  method_selection="tournament", elitism=0.1, prob_mut=0.01,
+                  distribution="uniform", media_distribution=1,
+                  sd_distribution=1, min_distribution=-1, max_distribution=1,
+                  stopping_early=False, rounds_stopping=None,
+                  tolerance_stopping=None,verbose=False,
+                  verbose_new_generation=False,
+                  verbose_selection=False, verbose_cruce=False,
+                  verbose_mutation=False, verbose_evaluacion=False):
 
 
-        if parada_temprana and (rondas_parada is None or tolerancia_parada is None):
-            raise Exception("Para activar la parada temprana es necesario indicar un valor de rondas_parada y de tolerancia_parada.")
+        if stopping_early and (rounds_stopping is None or tolerance_stopping is None):
+            raise Exception("To activate Stopping early it is necessary to indicate a",
+                            "value of rounds_stopping and tolerance_stopping.")
 
         start = time.time()
 
-        for i in np.arange(n_generaciones):
+        for i in np.arange(n_generations):
             if verbose:
                 print("-------------")
-                print("Generacion: " + str(i))
+                print("generation: {}".format(i))
                 print("-------------")
             
-            self.evaluar_poblacion(
-                funcion_objetivo = funcion_objetivo,
-                optimizacion     = optimizacion,
-                verbose          = verbose_evaluacion
+            self.evaluar_population(
+                target_function=target_function,
+                optimization=optimization,
+                verbose=verbose_evaluacion
                 )
 
-            self.historico_individuos.append(copy.deepcopy(self.individuos))
-            self.historico_mejor_fitness.append(copy.deepcopy(self.mejor_fitness))
-            self.historico_mejor_valor_variables.append(
-                                    copy.deepcopy(self.mejor_valor_variables)
+            self.historical_individuals.append(copy.deepcopy(self.individuals))
+            self.historical_best_fitness.append(copy.deepcopy(self.best_fitness))
+            self.historical_best_value_variables.append(
+                                    copy.deepcopy(self.best_value_variables)
                                 )
-            self.historico_mejor_valor_funcion.append(
-                                    copy.deepcopy(self.mejor_valor_funcion)
+            self.historical_best_function_value.append(
+                                    copy.deepcopy(self.best_function_value)
                                 )
 
             if i == 0:
                 self.diferencia_abs.append(None)
             else:
-                diferencia = abs(self.historico_mejor_fitness[i] \
-                                 - self.historico_mejor_fitness[i-1])
+                diferencia = abs(self.historical_best_fitness[i] \
+                                 - self.historical_best_fitness[i-1])
                 self.diferencia_abs.append(diferencia)
 
-            if parada_temprana and i > rondas_parada:
-                ultimos_n = np.array(self.diferencia_abs[-(rondas_parada): ])
-                if all(ultimos_n < tolerancia_parada):
-                    print("Algoritmo detenido en la generacion " 
-                          + str(i) \
-                          + " por falta cambio absoluto minimo de " \
-                          + str(tolerancia_parada) \
-                          + " durante " \
-                          + str(rondas_parada) \
-                          + " generaciones consecutivas.")
+            if stopping_early and i > rounds_stopping:
+                ultimos_n = np.array(self.diferencia_abs[-(rounds_stopping):])
+                if all(ultimos_n < tolerance_stopping):
+                    print("Algorithm stopped in the {} generation"
+                          "for lack of absolute minimum change of {}"
+                          "while {} consecutive generations".format(i, tolerance_stopping,
+                                                                    rounds_stopping))
+
                     break
                    
-            self.crear_nueva_generecion(
-                metodo_seleccion   = metodo_seleccion,
-                elitismo           = elitismo,
-                prob_mut           = prob_mut,
-                distribucion       = distribucion,
-                verbose            = verbose_nueva_generacion,
-                verbose_seleccion  = verbose_seleccion,
-                verbose_cruce      = verbose_cruce,
-                verbose_mutacion   = verbose_mutacion
+            self.crear_new_generecion(
+                method_selection=method_selection,
+                elitism=elitism,
+                prob_mut=prob_mut,
+                distribution=distribution,
+                verbose=verbose_new_generation,
+                verbose_selection=verbose_selection,
+                verbose_cruce=verbose_cruce,
+                verbose_mutation=verbose_mutation
                 )
 
         end = time.time()
-        self.optimizado = True
-        self.iter_optimizacion = i
+        self.optimized = True
+        self.iter_optimization = i
         
-        indice_valor_optimo  = np.argmax(np.array(self.historico_mejor_fitness))
-        self.fitness_optimo  = self.historico_mejor_fitness[indice_valor_optimo]
-        self.valor_funcion_optimo = self\
-                                    .historico_mejor_valor_funcion[indice_valor_optimo]
-        self.valor_variables_optimo = self\
-                                      .historico_mejor_valor_variables[indice_valor_optimo]
+        index_value_optimal  = np.argmax(np.array(self.historical_best_fitness))
+        self.fitness_optimal  = self.historical_best_fitness[index_value_optimal]
+        self.function_value_optimal = self\
+                                    .historical_best_function_value[index_value_optimal]
+        self.value_variables_optimal = self\
+                                      .historical_best_value_variables[index_value_optimal]
         
-        self.resultados_df = pd.DataFrame(
+        self.results_df = pd.DataFrame(
             {
-            "mejor_fitness"        : self.historico_mejor_fitness,
-            "mejor_valor_funcion"  : self.historico_mejor_fitness,
-            "mejor_valor_variables": self.historico_mejor_valor_variables,
+            "best_fitness"        : self.historical_best_fitness,
+            "best_function_value"  : self.historical_best_fitness,
+            "best_value_variables": self.historical_best_value_variables,
             "diferencia_abs"       : self.diferencia_abs
             }
         )
-        self.resultados_df["generacion"] = self.resultados_df.index
+        self.results_df["generation"] = self.results_df.index
         
         print("-------------------------------------------")
-        print("Optimizacion finalizada " \
-              + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        print("End of optimization {} ".format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
         print("-------------------------------------------")
-        print("Duracion optimizacion: " + str(end - start))
-        print("Numero de generaciones: " + str(self.iter_optimizacion))
-        print("Valor optimo de las variables: " + str(self.valor_variables_optimo))
-        print("Valor funcion objetivo: " + str(self.valor_funcion_optimo))
-        print("")
+        print("optimization duration: {}".format(end - start))
+        print("Number of generations: {}".format(self.iter_optimization))
+        print("Optimal value of variables: {}".format(self.value_variables_optimal))
+        print("Target function value: {}".format(self.function_value_optimal))

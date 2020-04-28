@@ -1,188 +1,158 @@
-from datetime import datetime
-import copy
-import matplotlib
-import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import random
-import random
-import seaborn as sb
-import time
 import warnings
 
+
 class Individual:
-    def __init__(self, n_variables, limites_inf=None, limites_sup=None,
+    def __init__(self, n_variables, limits_inf=None, limits_sup=None,
                  verbose=False):
         self.n_variables = n_variables
-        self.limites_inf = limites_inf
-        self.limites_sup = limites_sup
-        self.valor_variables = np.repeat(None, n_variables)
+        self.limits_inf = limits_inf
+        self.limits_sup = limits_sup
+        self.value_variables = np.repeat(None, n_variables)
         self.fitness = None
-        self.valor_funcion = None
-        
-        if self.limites_inf is not None \
-        and not isinstance(self.limites_inf, np.ndarray):
-            self.limites_inf = np.array(self.limites_inf)
+        self.function_value = None
 
-        if self.limites_sup is not None \
-        and not isinstance(self.limites_sup,np.ndarray):
-            self.limites_sup = np.array(self.limites_sup)
-        
-        if self.limites_inf is not None \
-        and len(self.limites_inf) != self.n_variables:
+        if self.limits_inf is not None and not isinstance(self.limits_inf, np.ndarray):
+            self.limits_inf = np.array(self.limits_inf)
+
+        if self.limits_sup is not None \
+                and not isinstance(self.limits_sup, np.ndarray):
+            self.limits_sup = np.array(self.limits_sup)
+
+        if self.limits_inf is not None and len(self.limits_inf) != self.n_variables:
             raise Exception(
-                "limites_inf debe tener un valor por cada variable. " +
-                "Si para alguna variable no se quiere limite, emplear None. " +
-                "Ejemplo: limites_inf = [10, None, 5]"
-                )
-        elif self.limites_sup is not None \
-        and len(self.limites_sup) != self.n_variables:
+                "limits_inf must have a value for each variable." +
+                "If you do not want to limit any variable, use None." +
+                "Ex: limits_inf = [10, None, 5]"
+            )
+        elif self.limits_sup is not None \
+                and len(self.limits_sup) != self.n_variables:
             raise Exception(
-                "limites_sup debe tener un valor por cada variable. " +
-                "Si para alguna variable no se quiere limite, emplear None. " +
-                "Ejemplo: limites_sup = [10, None, 5]"
-                )
-        elif (self.limites_inf is None) or (self.limites_sup is None):
+                "limits_sup must have a value for each variable." +
+                "If you do not want to limit any variable, use None." +
+                "Ex: limits_inf = [10, None, 5]"
+            )
+        elif (self.limits_inf is None) or (self.limits_sup is None):
             warnings.warn(
-                "Es altamente recomendable indicar los limites dentro de los " + 
-                "cuales debe buscarse la solucion de cada variable. " + 
-                "Por defecto se emplea [-10^3, 10^3]."
-                )
-        elif any(np.concatenate((self.limites_inf, self.limites_sup)) == None):
+                "It is highly recommended to indicate" +
+                " the limits within which the solution of each variable." +
+                "By default: [-10^3, 10^3]."
+            )
+        elif any(np.concatenate((self.limits_inf, self.limits_sup)) == None):
             warnings.warn(
-                "Los limites empleados por defecto cuando no se han definido " +
-                "son: [-10^3, 10^3]."
+                "By default the limits are: [-10^3, 10^3]."
             )
 
-        if self.limites_inf is None:
-            self.limites_inf = np.repeat(-10**3, self.n_variables)
+        if self.limits_inf is None:
+            self.limits_inf = np.repeat(-10 ** 3, self.n_variables)
 
-        if self.limites_sup is None:
-             self.limites_sup = np.repeat(+10**3, self.n_variables)
-            
-        if self.limites_inf is not None:
-            self.limites_inf[self.limites_inf == None] = -10**3
-           
-        if self.limites_sup is not None:
-            self.limites_sup[self.limites_sup == None] = +10**3
-        
+        if self.limits_sup is None:
+            self.limits_sup = np.repeat(+10 ** 3, self.n_variables)
+
+        if self.limits_inf is not None:
+            self.limits_inf[self.limits_inf == None] = -10 ** 3
+
+        if self.limits_sup is not None:
+            self.limits_sup[self.limits_sup == None] = +10 ** 3
+
         for i in np.arange(self.n_variables):
-            print("GENETIC: Intentando generar valores dentro frontera")
-            self.valor_variables[i] = random.uniform(
-                                        self.limites_inf[i],
-                                        self.limites_sup[i]
-                                      )
-            print("type valor_variables", type(self.valor_variables ))
-        #IGV
-        #self.valor_variables = tuple(self.valor_variables)
-
+            self.value_variables[i] = random.uniform(
+                self.limits_inf[i],
+                self.limits_sup[i]
+            )
+            print("type value_variables {}".format(self.value_variables))
+        # IGV
+        # self.value_variables = tuple(self.value_variables)
         if verbose:
-            print("Nuevo individuo creado")
+            print("New individal created")
             print("----------------------")
-            print("Valor variables: " + str(self.valor_variables))
-            print("Valor funcion objetivo: " + str(self.valor_funcion))
-            print("Fitness: " + str(self.fitness))
-            print("limites inferiores de cada variable: " \
-                  + str(self.limites_inf))
-            print("limites superiores de cada variable: " \
-                  + str(self.limites_sup))
-            print("")
+            print("Variables values: {}".format(self.value_variables))
+            print("Target function value: {}".format(self.function_value))
+            print("Fitness: {}".format(self.fitness))
+            print("Lower bounds: {}".format(self.limits_inf))
+            print("Upper limits for each variable: {}".format(self.limits_sup))
 
     def __repr__(self):
         """
-        Informacion que se muestra cuando se imprime un objeto individuo.
-
+        Info for print individual object.
         """
+        text = ("Individual \n --------- \n  Variables values:"
+                 "{} \n Target function value: {} \n Fitness:"
+                 "{} \n lower limits for each variable: {}"
+                 "upper bounds for each variable:  {} \n").format(
+                 self.value_variables, self.function_value,
+                 self.fitness, self.limits_inf, self.limits_sup)
 
-        texto = "Individuo" \
-                + "\n" \
-                + "---------" \
-                + "\n" \
-                + "Valor variables: " + str(self.valor_variables) \
-                + "\n" \
-                + "Valor funcion objetivo: " + str(self.valor_funcion) \
-                + "\n" \
-                + "Fitness: " + str(self.fitness) \
-                + "\n" \
-                + "limites inferiores de cada variable: " \
-                + str(self.limites_inf) \
-                + "\n" \
-                + "limites superiores de cada variable: " \
-                + str(self.limites_sup) \
-                + "\n"
+        return(text)
 
-        return(texto)
-
-    def calcular_fitness(self, funcion_objetivo, optimizacion, verbose = False):
-        if not optimizacion in ["maximizar", "minimizar"]:
+    def calculate_fitness(self, target_function, optimization, verbose=False):
+        if not optimization in ["maximize", "minimize"]:
             raise Exception(
-                "El argumento optimizacion debe ser: 'maximizar' o 'minimizar'"
-                )
+                "Arg should be: 'maximize' or 'minimize'"
+            )
 
-        self.valor_funcion = funcion_objetivo(*self.valor_variables)
-        if optimizacion == "maximizar":
-            self.fitness = self.valor_funcion
-        elif optimizacion == "minimizar":
-            self.fitness = -self.valor_funcion
+        self.function_value = target_function(*self.value_variables)
+        if optimization == "maximize":
+            self.fitness = self.function_value
+        elif optimization == "minimize":
+            self.fitness = -self.function_value
 
         if verbose:
-            print("El individuo ha sido evaluado")
+            print("The individual has been evaluated")
             print("-----------------------------")
-            print("Valor funcion objetivo: " + str(self.valor_funcion))
-            print("Fitness: " + str(self.fitness))
+            print("Value target function: {}".format(self.function_value))
+            print("Fitness: {}".format(self.fitness))
             print("")
 
-    def mutar(self, prob_mut=0.01, distribucion="uniforme", media_distribucion=1,
-              sd_distribucion=1, min_distribucion=-1, max_distribucion=1,
+    def mutate(self, prob_mut=0.01, distribution="uniform", media_distribution=1,
+              sd_distribution=1, min_distribution=-1, max_distribution=1,
               verbose=False):
-        if not distribucion in ["normal", "uniforme", "aleatoria"]:
+        if not distribution in ["normal", "uniform", "random"]:
             raise Exception(
-                "El argumento distribucion debe ser: 'normal', 'uniforme' o " \
-                + "'aleatoria'"
-                )
+                "Arg should be: 'normal', 'uniform' or 'random'"
+            )
 
-        posiciones_mutadas = np.random.uniform(
-                                low=0,
-                                high=1,
-                                size=self.n_variables
-                             )
-        posiciones_mutadas = posiciones_mutadas < prob_mut
+        pos_mutated = np.random.uniform(
+            low=0,
+            high=1,
+            size=self.n_variables
+        )
+        pos_mutated = pos_mutated < prob_mut
 
-        if distribucion in ["normal", "uniforme"]:
-            if distribucion == "normal":
+        if distribution in ["normal", "uniform"]:
+            if distribution == "normal":
                 factor_mut = np.random.normal(
-                                loc   = media_distribucion,
-                                scale = sd_distribucion,
-                                size  = np.sum(posiciones_mutadas)
-                             )
-            if distribucion == "uniforme":
+                    loc=media_distribution,
+                    scale=sd_distribution,
+                    size=np.sum(pos_mutated)
+                )
+            if distribution == "uniform":
                 factor_mut = np.random.uniform(
-                                low  = min_distribucion,
-                                high = max_distribucion,
-                                size = np.sum(posiciones_mutadas)
-                             )
-            self.valor_variables[posiciones_mutadas] = \
-                self.valor_variables[posiciones_mutadas] + factor_mut
+                    low=min_distribution,
+                    high=max_distribution,
+                    size=np.sum(pos_mutated)
+                )
+            self.value_variables[pos_mutated] = \
+                self.value_variables[pos_mutated] + factor_mut
 
-            for i in np.flatnonzero(posiciones_mutadas):
-                if self.valor_variables[i] < self.limites_inf[i]:
-                    self.valor_variables[i] = self.limites_inf[i]
-                if self.valor_variables[i] > self.limites_sup[i]:
-                    self.valor_variables[i] = self.limites_sup[i]
+            for i in np.flatnonzero(pos_mutated):
+                if self.value_variables[i] < self.limits_inf[i]:
+                    self.value_variables[i] = self.limits_inf[i]
+                if self.value_variables[i] > self.limits_sup[i]:
+                    self.value_variables[i] = self.limits_sup[i]
 
-        if distribucion == "aleatoria":
-            for i in np.flatnonzero(posiciones_mutadas):
-                self.valor_variables[i] = random.uniform(
-                                            self.limites_inf[i],
-                                            self.limites_sup[i]
-                                          )
+        if distribution == "random":
+            for i in np.flatnonzero(pos_mutated):
+                self.value_variables[i] = random.uniform(
+                    self.limits_inf[i],
+                    self.limits_sup[i]
+                )
 
         self.fitness = None
-        self.valor_funcion = None
+        self.function_value = None
 
         if verbose:
-            print("El individuo ha sido mutado")
-            print("---------------------------")
-            print("Total mutaciones: " + str(np.sum(posiciones_mutadas)))
-            print("Valor variables: " + str(self.valor_variables))
-            print("")
+            print("Individual has been mutated")
+            print("Total mutuations: {}".format(np.sum(pos_mutated)))
+            print("Values of variables: {}".format(self.value_variables))
