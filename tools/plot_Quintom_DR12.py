@@ -4,31 +4,45 @@
 #http://arxiv.org/pdf/1108.2635v1.pdf
 #and MGS paper
 
-from RunBase import *
+import sys
+sys.path = ["Models"] + sys.path
+
+from QuintomCosmology import QuintomCosmology
+from LCDMCosmology import LCDMCosmology
+from ParamDefs import *
 import matplotlib.pyplot as plt
 import matplotlib.ticker
-import pylab 
+import pylab
 import math as N
 import numpy as np
 import matplotlib as mpl
 from matplotlib import cm
 
+
+beta  = 0
+
 #fname = 'Quintessence'
 #fname = 'Phantom'
 #fname = 'Quintmphi'
+#mphan = 1.2
 #fname = 'Quintmphan'
-#fname = 'Quintomcophi'
-#fname = 'Quintomcophan'
-#fname = 'Quintomcobeta'
-fname  = 'Quintomdelta'
-mphi  = 1.5
-mphan = 0.6
-beta  = 6.15
-delta = 1.0
+#mphi  = 1.2
+#fname = 'Quintomcopphi'
+#mphan = 1.2
+#beta  = 4.0
+#fname = 'Quintomcopphan'
+#mphi  = 1.2
+#beta  = 6.0
+fname = 'Quintomcopbeta'
+mphi  = 1.2
+mphan = 0.1
+
+
+
+
 
 addlabel  = False
 addlegend = False
-
 
 plaw=0.5
 eboss=False
@@ -70,7 +84,7 @@ rd_EHtoCAMB =153.19/149.28
 rd_fid_DR12 = 147.78
 rd_fid_DR7  = 151.84  
 
-zl=arange(0, 5, 0.05)
+zl=np.arange(0, 3, 0.05)
 
 fmt1 = 'o'
 fmt2 = 'o'
@@ -110,7 +124,7 @@ def plot_errorbar(z,val, yerr=0, color=0, fmt=0, markersize=0,label=None, empty=
                 ax.plot ([],[],fmt,color='black',label=label,markersize=markersize)
 
 def ersys(x, y):
-    return sqrt(x**2 + y**2)
+    return np.sqrt(x**2 + y**2)
 
 
 def color_legend(leg):
@@ -123,10 +137,10 @@ def color_legend(leg):
 
 
 #Planck best fit cosmology
-T2=LCDMCosmology()
-x1=[67.4*np.sqrt(T2.RHSquared_a(1./(1+z)))     for z in zl]
-x2=[T2.HIOverrd(z)*z/fixer(z) for z in zl]
-x3=[T2.DaOverrd(z)/fixer(z)   for z in zl]
+#T2=LCDMCosmology()
+#x1=[67.4*np.sqrt(T2.RHSquared_a(1./(1+z)))     for z in zl]
+#x2=[T2.HIOverrd(z)*z/fixer(z) for z in zl]
+#x3=[T2.DaOverrd(z)/fixer(z)   for z in zl]
 #PLK-15
 #T=LCDMCosmology(Obh2=0.02225,Om=0.3156,h=0.6727)
 
@@ -135,10 +149,9 @@ if fname == 'Quintessence': T = QuintomCosmology(varymquin=True)
 if fname == 'Phantom':      T = QuintomCosmology(varymphan=True)
 if fname == 'Quintmphi':  T = QuintomCosmology(varymquin=True, varymphan=True)
 if fname == 'Quintmphan': T = QuintomCosmology(varymquin=False, varymphan=True)
-if fname == 'Quintomcophi': T = QuintomCosmology(varymquin=True, varybeta=True)
-if fname == 'Quintomcophan': T = QuintomCosmology(varymphan=True, varybeta=True)
-if fname == 'Quintomcobeta': T = QuintomCosmology(varymquin=True, varymphan=True, varybeta=True)
-if fname == 'Quintomdelta': T =  QuintomCosmology(varymquin=True, varymphan=True, varydelta=True, varybeta=True)
+if fname == 'Quintomcopphi': T = QuintomCosmology(varymquin=True, varybeta=True)
+if fname == 'Quintomcopphan': T = QuintomCosmology(varymphan=True, varybeta=True)
+if fname == 'Quintomcopbeta': T = QuintomCosmology(varymquin=True, varymphan=True, varybeta=True)
 
 hh = []
 ww = []
@@ -147,11 +160,13 @@ dh = []
 zz = []
 PP = []
 
-
-min, max = (0.5, 1.5)
-#min, max = (0.66, 0.7)
+if fname == 'Quintomcopbeta':
+    min, max = (4., 8.)
+else:
+    min, max = (0.1, 2.5)
 if beta < 0:  min, max = (-4, -1.)
-steps    = 5
+
+steps    = 2
 step     = (max-min)/steps
 
 mymap    = mpl.colors.LinearSegmentedColormap.from_list('mycolors',['red','green'])
@@ -162,7 +177,7 @@ CS3      = plt.contourf(Z, levels, cmap=mymap)
 mquin_ = mquin_par
 mphan_ = mphan_par
 beta_  = beta_par
-delta_ = delta_par
+
 for i in np.arange(min, max, step):
     if fname == 'Quintessence':
         mquin_.setValue(i)
@@ -186,40 +201,33 @@ for i in np.arange(min, max, step):
         T.updateParams([mquin_, mphan_])
         name = 'Quintom, $m_{\phi}$=%0.1f'%mphi
         mlabel = '$m_\psi$'
-    if fname == 'Quintomcophi':
+    if fname == 'Quintomcopphi':
         mquin_.setValue(i)
         mphan_.setValue(mphan)
         beta_.setValue(beta)
         T.updateParams([mquin_, mphan_, beta_])
         name = 'Quintom, $m_{\psi}$=%0.1f, $\\beta=%0.1f$'%(mphan, beta)
         mlabel = '$m_\phi$'
-    if fname == 'Quintomcophan':
+    if fname == 'Quintomcopphan':
         mquin_.setValue(mphi)
         mphan_.setValue(i)
         beta_.setValue(beta)
         T.updateParams([mquin_, mphan_, beta_])
         name = 'Quintom, $m_{\phi}$=%0.1f, $\\beta=%0.1f$'%(mphi, beta)
         mlabel = '$m_\psi$'
-    if fname == 'Quintomcobeta':
+    if fname == 'Quintomcopbeta':
         mquin_.setValue(mphi)
         mphan_.setValue(mphan)
         beta_.setValue(i)
         T.updateParams([mquin_, mphan_, beta_])
         name = 'Quintom, $m_{\phi}$=%0.1f, $m_{\psi}$=%0.1f'%(mphi, mphan)
         mlabel = '$\\beta$'
-    if fname == 'Quintomdelta':
-        mquin_.setValue(mphi)
-        mphan_.setValue(mphan)
-        beta_.setValue(beta)
-        delta_.setValue(i)
-        T.updateParams([mquin_, mphan_, delta_, beta_])
-        name = 'Quintom, $m_{\phi}$=%0.1f, $m_{\psi}$=%0.1f, $\\beta$=%0.1f'%(mphi, mphan, beta)
-        mlabel = '$\delta$'
 
     y1=[T.w_de(1./(1+z))         for z in zl]
     y2=[T.Hubble_a(1./(1+z))     for z in zl]
     y3=[T.HIOverrd(z)*z/fixer(z) for z in zl]
     y4=[T.DaOverrd(z)/fixer(z)   for z in zl]
+
 
     ww.append(y1)
     hh.append(y2)
@@ -229,17 +237,17 @@ for i in np.arange(min, max, step):
     zz.append(zl)
 
 
-fig, (ax1, ax2, ax3, ax4)  = plt.subplots(4, sharex=True, gridspec_kw={'hspace': 0}, figsize=(6,10))
+fig, (ax1, ax2, ax3, ax4)  = plt.subplots(4, sharex=True, gridspec_kw={'hspace': 0}, figsize=(7,10))
 
 
 
-fig.suptitle(name, fontsize=17,  y=0.91)
+fig.suptitle(name, fontsize=17,  y=0.95)
 
 for x,w,z in zip(zz, ww, PP):
         g    = (float(z)-min)/(max-min)
         b, r = 0, 1-g
         l1, = ax1.plot(x, w , color=(r,g,b)) #, linestyle='-.')
-if (fname == 'Quintessence') or (fname =='Quintomcophi'): ax1.set_ylabel('$w(z)$', fontsize=20)
+if (fname == 'Quintessence') or (fname =='Quintomcopphi'): ax1.set_ylabel('$w(z)$', fontsize=20)
 ax1.axhline(y=-1, color='k', linestyle='--')
 if beta <0 : ax1.set_ylim(-3, 0.)
 
@@ -248,18 +256,18 @@ for x,w,z in zip(zz, hh, PP):
         g    = (float(z)-min)/(max-min)
         b, r = 0, 1-g
         l2, = ax2.plot(x, w , color=(r,g,b)) #, linestyle='-.')
-ax2.plot(zl, x1 , color='k', linestyle='--')
+#ax2.plot(zl, x1 , color='k', linestyle='--')
 dataHz = np.loadtxt('data/Hz_all.dat')
 redshifts, obs, errors = [dataHz[:,i] for i in [0,1,2]]
 ax2.errorbar(redshifts, obs, errors, xerr=None,
                  color='blue', marker='o', ls='None',
                 elinewidth =2, capsize=3, capthick = 1, alpha=1, markersize=4)
 #ax2.legend(loc='lower right', frameon=False)
-if (fname == 'Quintessence') or (fname =='Quintomcophi'): ax2.set_ylabel('$H(z)$', fontsize=20)
+if (fname == 'Quintessence') or (fname =='Quintomcopphi'): ax2.set_ylabel('$H(z)$', fontsize=20)
 
 
 cbaxes = fig.add_axes([0.91, 0.1, 0.02, 0.78])
-cbar = pylab.colorbar(CS3, cax=cbaxes, fraction=0.046, pad=0.04)
+cbar = pylab.colorbar(CS3, cax=cbaxes) #,  pad=0.04) #fraction=0.046, pad=0.04)
 cbar.set_label(mlabel, rotation=0, fontsize=18, labelpad=-10)
 cbar.ax.tick_params(labelsize=12)
 
@@ -268,8 +276,8 @@ for x,w,z in zip(zz, dh, PP):
         g    = (float(z)-min)/(max-min)
         b, r = 0, 1-g
         l3, = ax3.plot(x, w , color=(r,g,b)) #, linestyle='-.')
-if (fname == 'Quintessence') or (fname == 'Quintomcophi'): ax3.set_ylabel("${\\rm zD_H(z)}/r_d\\sqrt{z}$")
-ax3.plot(zl, x2 , color='k', linestyle='--')
+if (fname == 'Quintessence') or (fname == 'Quintomcopphi'): ax3.set_ylabel("${\\rm zD_H(z)}/r_d\\sqrt{z}$")
+#ax3.plot(zl, x2 , color='k', linestyle='--')
 
 
 #ax4.set_xscale('log')
@@ -278,8 +286,8 @@ for x,w,z in zip(zz, da, PP):
         b, r = 0, 1-g
         l4, = ax4.plot(x, w , color=(r,g,b)) #, linestyle='-.')
 ax4.set_xlim(0.05, 3)
-if (fname == 'Quintessence') or (fname == 'Quintomcophi'): ax4.set_ylabel("${\\rm D_M(z)}/r_d\\sqrt{z}$")
-ax4.plot(zl, x3, color='k', linestyle='--')
+if (fname == 'Quintessence') or (fname == 'Quintomcopphi'): ax4.set_ylabel("${\\rm D_M(z)}/r_d\\sqrt{z}$")
+#ax4.plot(zl, x3, color='k', linestyle='--')
 
 if addlegend:
     if plaw>0:
@@ -395,6 +403,6 @@ else:
 """
 
 
-pylab.savefig("Fig1_"+fname+".pdf", bbox_inches='tight')
-#pylab.show()
+#pylab.savefig("Fig1_"+fname+".pdf", bbox_inches='tight')
+pylab.show()
 
