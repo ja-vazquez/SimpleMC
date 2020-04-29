@@ -1,6 +1,6 @@
 import sys
-sys.path = ["Analizers", "Cosmo", "pybambi", "py"] + sys.path
-
+sys.path = ["Analizers", "Cosmo", "pybambi", "py", "dynesty"] + sys.path
+import os.path
 from MaxLikeAnalyzer import MaxLikeAnalyzer
 from MCMCAnalyzer import MCMCAnalyzer
 from Parameter import Parameter
@@ -9,7 +9,7 @@ from scipy.special import ndtri
 from SimpleGenetic import SimpleGenetic
 from PostProcessing import PostProcessing 
 
-import dynesty
+# import dynesty
 import emcee
 
 import multiprocessing as mp
@@ -35,7 +35,7 @@ class DriverMC():
         self.outputname = self.model + "_" + self.prefact + \
             "_" + self.datasets + "_" + self.samplername
             # \ + \ "[" + time.strftime("%H:%M:%S") + "]_"
-
+        self.outputpath = self.chainsdir + "/" + self.outputname
 
         if self.prefact == "pre":
             self.T.setVaryPrefactor()
@@ -272,7 +272,7 @@ class DriverMC():
         #weights = None
         #self.outputname += str(self.nsamp)
         
-        M = MCMCAnalyzer(self.L, self.chainsdir + "/" + self.outputname,\
+        M = MCMCAnalyzer(self.L, self.outputpath,\
                         skip=self.skip, nsamp=self.nsamp, temp = self.temp,
                         chain_num=self.chainno, derived=self.derived)
         #,\        GRcriteria = self.GRcriteria)
@@ -280,7 +280,7 @@ class DriverMC():
         try:
             from MCEvidence import MCEvidence 
             print("Aproximating bayesian evidence with MCEvidence (arXiv:1704.03472)\n")
-            MLE = MCEvidence(self.chainsdir + "/" + self.outputname + ".txt" ).evidence()
+            MLE = MCEvidence(self.outputpath + ".txt" ).evidence()
             return ['mcmc', M, "Evidence with MCEvidence : " + str(MLE) + "\n"]
 
         except:
@@ -297,7 +297,7 @@ class DriverMC():
             -- MULTINEST
             bound : {'none', 'single', 'multi', 'balls', 'cubes'},
         """
-        self.outputname += '_'+self.engine+'_'+self.nestedType
+        self.outputpath += '_'+self.engine+'_'+self.nestedType
         pool, nprocess = self.mppool()
 
         showfiles = True
@@ -306,7 +306,7 @@ class DriverMC():
                 from dynesty import dynesty
             else:
                 # Check it later
-                sys.path =  ['dynesty', '/dynesty'] + sys.path
+                sys.path = ['dynesty', '../dynesty'] + sys.path
                 from dynesty import dynesty
 
 
@@ -314,19 +314,20 @@ class DriverMC():
             print("Using dynamic nested sampling...")
 
             sampler = dynesty.DynamicNestedSampler(self.logLike, self.priorTransform, \
-                      self.dims, bound = self.nestedType, pool = pool, queue_size = nprocess)
+                      self.dims, bound=self.nestedType, pool=pool, queue_size=nprocess)
             
             sampler.run_nested(nlive_init=self.nlivepoints, dlogz_init=0.05, nlive_batch=100,\
-                            maxiter_init=10000, maxiter_batch=1000, maxbatch=10)
+                            maxiter_init=10000, maxiter_batch=1000, maxbatch=10,
+                            outputname=self.outputpath)
 
             M = sampler.results
             M.summary()
 
         elif self.engine == 'dynesty':
-            sampler = dynesty.NestedSampler(self.logLike, self.priorTransform, self.dims,
-                        bound=self.nestedType, sample = 'rwalk', nlive = self.nlivepoints,\
+            sampler = dynesty.NestedSampler(self.logLike, self.priorTransform, self.dims,\
+                        bound=self.nestedType, sample = 'unif', nlive = self.nlivepoints,\
                         pool = pool, queue_size = nprocess)
-            sampler.run_nested(dlogz=self.accuracy)
+            sampler.run_nested(dlogz=self.accuracy, outputname=self.outputpath)
             M = sampler.results
             M.summary()
 
@@ -352,7 +353,7 @@ class DriverMC():
 
     def BambiRunner(self):
         from bambi import run_pyBAMBI
-        self.outputname += self.nestedType + '_nested+ANN_'+str(self.nlivepoints)
+        self.outputpath += self.nestedType + '_nested+ANN_'+str(self.nlivepoints)
 
         
         M = run_pyBAMBI(self.logLike, self.priorTransform, self.dims,\
@@ -363,7 +364,7 @@ class DriverMC():
                  self.dynamic, 'ANN : ' + self.neuralNetwork]
 
     def emceeRunner(self):
-        self.outputname += '_ensambles_'+str(self.ensambles)
+        self.outputpath += '_ensambles_'+str(self.ensambles)
         pool, _ = self.mppool()
 
         Nens = self.ensambles   # number of ensemble points
@@ -399,7 +400,7 @@ class DriverMC():
 ###################################Optimizers##############################################
 
     def MaxLikeRunner(self):
-        self.outputname += 'optimization' 
+        self.outputpath += 'optimization' 
         print("Using MaxLikeAnalyzer")
         A = MaxLikeAnalyzer(self.L, withErrors = self.withErrors)
         self.T.printParameters(A.params)
@@ -407,8 +408,13 @@ class DriverMC():
        
 
     def geneticRunner(self):
-        self.outputname += 'optimization_genetic'
-        self.fgenetic = open(self.chainsdir+'/'+self.outputname + '.txt', 'w+')
+        self.outputpath += 'optimization_genetic'
+        if os.path.isfile(self.outputpath + '.txt'):
+            print("Output file exists! Please choose another"
+                  " name or move the existing file.")
+            sys.exit(1)
+        else:
+            self.fgenetic = open(self.outputpath + '.txt', 'a+')
         print("Using Simple Genetic Algorithm")
         M = SimpleGenetic(self.logLikeGenetic, self.dims, self.bounds)
         self.fgenetic.close()
