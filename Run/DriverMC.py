@@ -424,21 +424,20 @@ class DriverMC():
 ###############################Post-processing############################################
     def postprocess(self):
         if self.samplername == 'nested':
-            pp = PostProcessing(self.result, self.paramsList , self.outputname,\
-             chainsdir=self.chainsdir, engine=self.engine)
+            pp = PostProcessing(self.result, self.paramsList , self.outputpath,
+                engine=self.engine)
             pp.paramFiles(self.T, self.L)
             pp.saveNestedChain()
 
         elif self.samplername == 'emcee':
-            pp = PostProcessing(self.result, self.paramsList, self.outputname,\
-             chainsdir=self.chainsdir, skip=self.burnin)
+            pp = PostProcessing(self.result, self.paramsList, self.outputpath, 
+                skip=self.burnin)
             pp.paramFiles(self.T, self.L)
             pp.saveEmceeSamples()
         elif self.samplername == 'genetic' or self.samplername == MaxLikeAnalyzer:
             pass
         else:
-            pp = PostProcessing(self.result, self.paramsList, self.outputname,\
-             chainsdir=self.chainsdir)
+            pp = PostProcessing(self.result, self.paramsList, self.outputpath)
             pp.paramFiles(self.T, self.L)
             pp.saveEmceeSamples() 
     

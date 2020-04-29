@@ -7,15 +7,15 @@ sys.path=["pybambi" , "../pybambi"]+sys.path
 import os.path as path
 from os import remove
 import numpy as np
-import dynesty
+# import dynesty
 
 class PostProcessing():
-    def __init__(self, list_result, paramList, outputname,\
-                 olambda = True, chainsdir = 'chains', skip = 0.1, engine = 'dynesty'):
+    def __init__(self, list_result, paramList, filename,\
+                 olambda = True, skip = 0.1, engine = 'dynesty'):
         self.analyzername = list_result[0]
         self.result = list_result[1]
         self.paramList = paramList
-        self.filename = chainsdir + '/' + outputname
+        self.filename = filename
         self.args = []
         self.list_result = list_result
         self.skip = skip
@@ -31,8 +31,12 @@ class PostProcessing():
         This generates an output Simple(cosmo)MC style for dynesty Samplers.
 
         """
-
-        f = open(self.filename + '_1.txt', 'w+')
+        if path.isfile(self.filename + '_1.txt'):
+            print("Output file exists! Please choose another"
+                  " name or move the existing file.")
+            sys.exit(1)
+        else:
+            f = open(self.filename + '_1.txt', 'w+')
         if self.engine == 'dynesty':
             weights = np.exp(self.result['logwt'] - self.result['logz'][-1])
 
@@ -60,7 +64,7 @@ class PostProcessing():
                 strlogl=str(-1*self.result.logl[i]).lstrip('[').rstrip(']')
                 strsamples=str(self.result.samples[i]).lstrip('[').rstrip(']')
                 row = strweights+' '+strlogl+' '+strsamples
-                nrow = " ".join( row.split() )
+                nrow = " ".join(row.split())
                 f.write(nrow+'\n')
 
         f.close()
