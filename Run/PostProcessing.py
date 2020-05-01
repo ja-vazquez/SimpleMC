@@ -7,16 +7,15 @@ sys.path=["pybambi" , "../pybambi"]+sys.path
 import os.path as path
 from os import remove
 import numpy as np
-import dynesty
-
+# import dynesty
 
 class PostProcessing():
-    def __init__(self, list_result, paramList, outputname,\
-                 olambda = True, chainsdir = 'chains', skip = 0.1, engine = 'dynesty'):
+    def __init__(self, list_result, paramList, filename,\
+                 olambda = True, skip = 0.1, engine = 'dynesty'):
         self.analyzername = list_result[0]
         self.result = list_result[1]
         self.paramList = paramList
-        self.filename = chainsdir + '/' + outputname
+        self.filename = filename
         self.args = []
         self.list_result = list_result
         self.skip = skip
@@ -32,12 +31,17 @@ class PostProcessing():
         This generates an output Simple(cosmo)MC style for dynesty Samplers.
 
         """
-
-        f = open(self.filename + '_1.txt', 'w+')
+        if path.isfile(self.filename + '_1.txt'):
+            print("Output file exists! Please choose another"
+                  " name or move the existing file.")
+            sys.exit(1)
+        else:
+            f = open(self.filename + '_1.txt', 'w+')
         if self.engine == 'dynesty':
             weights = np.exp(self.result['logwt'] - self.result['logz'][-1])
-            postsamples = dynesty.utils.resample_equal(self.result.samples, weights)
-            #postsamples =self.result.samples
+
+            postsamples = self.result.samples
+       
             print('\n Number of posterior samples is {}'.format(postsamples.shape[0]))
 
         
@@ -54,17 +58,36 @@ class PostProcessing():
                 nrow = " ".join( row.split() )
                 f.write(nrow+'\n')
 
-        if self.engine == 'nestle':
+        elif self.engine == 'nestle':
             for i in range(len(self.result.samples)):
                 strweights = str(self.result.weights[i]).lstrip('[').rstrip(']')
                 strlogl=str(-1*self.result.logl[i]).lstrip('[').rstrip(']')
                 strsamples=str(self.result.samples[i]).lstrip('[').rstrip(']')
                 row = strweights+' '+strlogl+' '+strsamples
-                nrow = " ".join( row.split() )
+                nrow = " ".join(row.split())
                 f.write(nrow+'\n')
 
         f.close()
 
+    #AJUSTAR!
+    def saveEmceeSamples(self):
+        dims = len(self.paramList)
+        postsamples = self.result.chain[:, self.skip:, :].reshape((-1, dims))
+        f = open(self.filename + '.txt', 'a+')
+        for i, row in enumerate(postsamples):
+            strsamples = str(row).lstrip('[').rstrip(']')
+            f.write(strsamples+'\n')
+        # tau = self.result.get_autocorr_time()
+        # burnin = int(2 * np.max(tau))
+        # thin = int(0.5 * np.min(tau))
+        # samples = self.result.get_chain(discard=burnin, flat=True, thin=thin)
+        # log_prob_samples = self.result.get_log_prob(discard=burnin, flat=True, thin=thin)
+        # log_prior_samples = self.result.get_blobs(discard=burnin, flat=True, thin=thin)
+        # all_samples = np.concatenate((samples, log_prob_samples[:, None],
+        #               log_prior_samples[:, None]), axis=1)
+        # for i in all_samples:
+        #     print(i)
+        f.close()
     def paramFiles(self, T, L):
         """
         This method writes the .paramnames file with theirs LaTeX names.
@@ -142,33 +165,5 @@ class PostProcessing():
         
         #print("summaryResults", summaryResults[0])
         #mcstats.likeSummary()
+
         return summaryResults
-
-
-    def saveChainNestle(self):
-        """
-        This generates an output Simple(cosmo)MC style for Nestle Samplers.
-
-        Parameters:
-
-        result:     Nestle object
-        outputname: str name of the output file
-
-        """
-        if(path.isfile(outputname+'.txt')):
-            print("There's a file with the same name.", outputname+'.txt')
-            #outputname+= '_tmp'
-            #remove(outputname+'.txt')
-            #sys.exit(1)
-
-        f = open(outputname+'_1.txt','a+')
-
-        for i in range(len(result.samples)):
-            strweights = str(result.weights[i]).lstrip('[').rstrip(']')
-            strlogl=str(-1*result.logl[i]).lstrip('[').rstrip(']')
-            strsamples=str(result.samples[i]).lstrip('[').rstrip(']')
-            row = strweights+' '+strlogl+' '+strsamples
-            nrow = " ".join( row.split() )
-            f.write(nrow+'\n')
-            #f.write(strweights+' '+strlogl+' '+strsamples+'\n')
-        f.close()

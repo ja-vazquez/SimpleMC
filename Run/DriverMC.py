@@ -1,18 +1,21 @@
 import sys
-sys.path = ["Analizers", "Cosmo", "pybambi", "py"] + sys.path
-
+sys.path = ["Analizers", "Cosmo", "pybambi", "py", "dynesty"] + sys.path
+import os.path
 from MaxLikeAnalyzer import MaxLikeAnalyzer
 from MCMCAnalyzer import MCMCAnalyzer
 from Parameter import Parameter
 from RunBase import ParseModel, ParseDataset
 from scipy.special import ndtri
-#from SimpleGenetic import SimpleGenetic
+from SimpleGenetic import SimpleGenetic
+from PostProcessing import PostProcessing 
 
-#import dynesty
-#import emcee
+# import dynesty
+import emcee
+
 import multiprocessing as mp
 import numpy as np
 import time
+import corner
 
 class DriverMC():
     """
@@ -32,7 +35,7 @@ class DriverMC():
         self.outputname = self.model + "_" + self.prefact + \
             "_" + self.datasets + "_" + self.samplername
             # \ + \ "[" + time.strftime("%H:%M:%S") + "]_"
-
+        self.outputpath = self.chainsdir + "/" + self.outputname
 
         if self.prefact == "pre":
             self.T.setVaryPrefactor()
@@ -114,6 +117,13 @@ class DriverMC():
                     self.split      = float(config['neural']['split'])
                     self.numNeurons = int(config['neural']['numNeurons'])
 
+            elif self.samplername == 'emcee':
+
+                self.ensambles = int(config['emcee']['ensambles'])
+                self.samples = int(config['emcee']['samples'])
+                self.burnin = int(config['emcee']['burnin'])
+                self.nproc   = int(config['emcee']['nproc'])
+
             elif self.samplername in ['MaxLikeAnalyzer']:
                 self.withErrors      = config['MaxLikeAnalyzer']['withErrors']
 
@@ -137,8 +147,6 @@ class DriverMC():
         bounds = self.SetPriors()[3]
         means  = np.array(self.SetPriors()[1])
         return bounds, means
-
-
 
     def SetPriors(self):
         """
@@ -264,7 +272,7 @@ class DriverMC():
         #weights = None
         #self.outputname += str(self.nsamp)
         
-        M = MCMCAnalyzer(self.L, self.chainsdir + "/" + self.outputname,\
+        M = MCMCAnalyzer(self.L, self.outputpath,\
                         skip=self.skip, nsamp=self.nsamp, temp = self.temp,
                         chain_num=self.chainno, derived=self.derived)
         #,\        GRcriteria = self.GRcriteria)
@@ -272,7 +280,7 @@ class DriverMC():
         try:
             from MCEvidence import MCEvidence 
             print("Aproximating bayesian evidence with MCEvidence (arXiv:1704.03472)\n")
-            MLE = MCEvidence(self.chainsdir + "/" + self.outputname + ".txt" ).evidence()
+            MLE = MCEvidence(self.outputpath + ".txt" ).evidence()
             return ['mcmc', M, "Evidence with MCEvidence : " + str(MLE) + "\n"]
 
         except:
@@ -289,18 +297,8 @@ class DriverMC():
             -- MULTINEST
             bound : {'none', 'single', 'multi', 'balls', 'cubes'},
         """
-        self.outputname += '_'+self.engine+'_'+self.nestedType
-
-        if self.nproc <= 0:
-            ncores = mp.cpu_count()
-            print("--"*10 )
-            print("Using %d Processors: "%ncores)
-            print("--"*10 )
-            nprocess = ncores//2
-        else:
-            nprocess = self.nproc
-        
-        pool = mp.Pool(processes=nprocess)
+        self.outputpath += '_'+self.engine+'_'+self.nestedType
+        pool, nprocess = self.mppool()
 
         showfiles = True
         if self.engine == 'dynesty':
@@ -308,7 +306,7 @@ class DriverMC():
                 from dynesty import dynesty
             else:
                 # Check it later
-                sys.path =  ['dynesty', '/dynesty'] + sys.path
+                sys.path = ['dynesty', '../dynesty'] + sys.path
                 from dynesty import dynesty
 
 
@@ -316,39 +314,46 @@ class DriverMC():
             print("Using dynamic nested sampling...")
 
             sampler = dynesty.DynamicNestedSampler(self.logLike, self.priorTransform, \
-                      self.dims, bound = self.nestedType, pool = pool, queue_size = nprocess)
+                      self.dims, bound=self.nestedType, pool=pool, queue_size=nprocess)
             
             sampler.run_nested(nlive_init=self.nlivepoints, dlogz_init=0.05, nlive_batch=100,\
-                            maxiter_init=10000, maxiter_batch=1000, maxbatch=10)
+                            maxiter_init=10000, maxiter_batch=1000, maxbatch=10,
+                            outputname=self.outputpath)
 
             M = sampler.results
             M.summary()
 
         elif self.engine == 'dynesty':
-            sampler = dynesty.NestedSampler(self.logLike, self.priorTransform, self.dims,
-                        bound=self.nestedType, sample = 'rwalk', nlive = self.nlivepoints,\
-                        pool = pool, queue_size = ncores)
-            sampler.run_nested(dlogz=self.accuracy)
+            sampler = dynesty.NestedSampler(self.logLike, self.priorTransform, self.dims,\
+                        bound=self.nestedType, sample = 'unif', nlive = self.nlivepoints,\
+                        pool = pool, queue_size = nprocess)
+            sampler.run_nested(dlogz=self.accuracy, outputname=self.outputpath)
             M = sampler.results
             M.summary()
 
         elif self.engine == 'nestle':
             import nestle
             M = nestle.sample(self.logLike, self.priorTransform, ndim=self.dims, method=self.nestedType,
-            npoints=self.nlivepoints, dlogz=self.accuracy, callback=nestle.print_progress)
+            npoints=self.nlivepoints, dlogz=self.accuracy, callback=nestle.print_progress,
+            pool = pool, queue_size = nprocess)
             #M.summary()
             print('\n'+'--'*10)
             print('logz=%2.2f +/- %2.2f \n'%(M.logz, M.logzerr))
         else:
             print('wrong selection')
             sys.exit(1)
+        try:
+            pool.close()
+        except:
+            pass
+
         return ['nested', M, M.summary(), 'nested : ' + self.nestedType, 'dynamic : ' +\
                  self.dynamic, 'ANN : ' + self.neuralNetwork]
 
 
     def BambiRunner(self):
         from bambi import run_pyBAMBI
-        self.outputname += self.nestedType + '_nested+ANN_'+str(self.nlivepoints)
+        self.outputpath += self.nestedType + '_nested+ANN_'+str(self.nlivepoints)
 
         
         M = run_pyBAMBI(self.logLike, self.priorTransform, self.dims,\
@@ -358,38 +363,84 @@ class DriverMC():
         return ['bambi', M, 'nested : ' + self.nestedType, 'dynamic : ' +\
                  self.dynamic, 'ANN : ' + self.neuralNetwork]
 
+    def emceeRunner(self):
+        self.outputpath += '_ensambles_'+str(self.ensambles)
+        pool, _ = self.mppool()
 
+        Nens = self.ensambles   # number of ensemble points
+
+        ini = []
+
+        for bound in self.bounds:
+            ini.append(np.random.uniform(bound[0], bound[1], Nens))
+
+        inisamples = np.array(ini).T # initial samples
+
+        Nburnin = self.burnin   # number of burn-in samples
+        Nsamples = self.samples  # number of final posterior samples
+
+        # set up the sampler
+        sampler = emcee.EnsembleSampler(Nens, self.dims, self.logPosterior, pool = pool)
+
+        # pass the initial samples and total number of samples required
+        sampler.run_mcmc(inisamples, Nsamples+Nburnin, progress=True)
+
+        # extract the samples (removing the burn-in)
+        postsamples = sampler.chain[:, Nburnin:, :].reshape((-1, self.dims))
+
+        
+        print('Number of posterior samples is {}'.format(postsamples.shape[0]))
+        try:
+            pool.close()
+        except:
+            pass 
+        fig = corner.corner(postsamples)
+        fig.savefig('emcee.png')
+        return ['emcee', sampler, 'ensambles : ' + str(self.ensambles)]
 ###################################Optimizers##############################################
 
     def MaxLikeRunner(self):
-        self.outputname += 'optimization' 
+        self.outputpath += 'optimization' 
         print("Using MaxLikeAnalyzer")
         A = MaxLikeAnalyzer(self.L, withErrors = self.withErrors)
         self.T.printParameters(A.params)
         return True
        
 
-
     def geneticRunner(self):
-        self.outputname += 'optimization' 
-        print("Usinge Simple Genetic Algorithm")
-        M = SimpleGenetic(self.logLike2, self.dims, self.bounds)
-        
-        return ['genetic', M ]
-
+        self.outputpath += 'optimization_genetic'
+        if os.path.isfile(self.outputpath + '.txt'):
+            print("Output file exists! Please choose another"
+                  " name or move the existing file.")
+            sys.exit(1)
+        else:
+            self.fgenetic = open(self.outputpath + '.txt', 'a+')
+        print("Using Simple Genetic Algorithm")
+        M = SimpleGenetic(self.logLikeGenetic, self.dims, self.bounds)
+        self.fgenetic.close()
+        return ['genetic', M]
 
 
 ###############################Post-processing############################################
     def postprocess(self):
-        from PostProcessing import PostProcessing 
-        pp = PostProcessing(self.result, self.paramsList , self.outputname,\
-             chainsdir=self.chainsdir, engine = self.engine)
-        
         if self.samplername == 'nested':
+            pp = PostProcessing(self.result, self.paramsList , self.outputpath,
+                engine=self.engine)
             pp.paramFiles(self.T, self.L)
             pp.saveNestedChain()
 
-
+        elif self.samplername == 'emcee':
+            pp = PostProcessing(self.result, self.paramsList, self.outputpath, 
+                skip=self.burnin)
+            pp.paramFiles(self.T, self.L)
+            pp.saveEmceeSamples()
+        elif self.samplername == 'genetic' or self.samplername == MaxLikeAnalyzer:
+            pass
+        else:
+            pp = PostProcessing(self.result, self.paramsList, self.outputpath)
+            pp.paramFiles(self.T, self.L)
+            pp.saveEmceeSamples() 
+    
 #Do it later -- plots and stats analis
 
         #if self.samplername in ['mcmc', 'nested']:
@@ -404,33 +455,17 @@ class DriverMC():
     #    from PlotterMC import PlotterMC
     #    plot = PlotterMC(self.dims, chainsdir = self.chainsdir, chainsfile = self.outputname)
 
-#############################Testing functions#################################################
-    
-    def logposterior(self, theta):
-        lp = self.priorTransform(theta)
-        if not np.isfinite(lp).any():
-            return -np.inf
-
-        return lp + self.logLike(theta)
-
-    def emceeRunner(self):
-        #pos = soln.x + 1e-4 * np.random.randn(32, 3)
-        nwalkers = 100
-        ndim = self.dims
-        p0 = np.random.rand(nwalkers, ndim)
-        sampler = emcee.EnsembleSampler(nwalkers, ndim, self.logposterior)
-        sampler.run_mcmc(p0, 5000) 
-
-
-    def logLike2(self, *v):
+# ###########for genetic
+    def logLikeGenetic(self, *v):
         values = []
-        print("Entrando al logLike2")
+        print("-"*10)
+        print("Parameters:")
         for i, element in enumerate(v):
-            print("Entrando al for del loglike", i)
             values.append(element)
-            print("element", element)
-        print("saliendo for loglike")
-        #values = np.array(values)
+            print("{}".format(element),  end=' ')
+        # values = np.array(values)
+        strvalues = str(values).lstrip('[').rstrip(']')
+        strvalues = strvalues.replace(',', '')
         listPars = self.instantiatePars(values)
         self.T.updateParams(listPars)
         self.L.setTheory(self.T)
@@ -439,5 +474,76 @@ class DriverMC():
             loglike=cloglikes.sum()
         else:
             loglike = self.L.loglike_wprior()
-        print("loglike", loglike)
+        print("\nloglike: {}".format(loglike))
+        print("-" * 10)
+        row = str(loglike) + " " + strvalues
+        self.fgenetic.write(row + "\n")
         return loglike
+
+############# for emcee
+    def logPosterior(self, theta):
+        """
+        The natural logarithm of the joint posterior.
+        
+        Args:
+            theta (tuple): a sample containing individual parameter values
+            data (list): the set of data/observations
+            sigma (float): the standard deviation of the data points
+            x (list): the abscissa values at which the data/model is defined
+        """
+    
+        lp = self.logPrior(theta) # get the prior
+        
+        # if the prior is not finite return a probability of zero (log probability of -inf)
+        if not np.isfinite(lp):
+            return -np.inf
+        
+        # return the likeihood times the prior (log likelihood plus the log prior)
+        return lp + self.logLike(theta)
+
+    def logPrior(self, theta):
+        """
+        The natural logarithm of the prior probability.
+        
+        Args:
+            theta (tuple): a sample containing individual parameter values
+        
+        Note:
+            We can ignore the normalisations of the prior here.
+            Uniform prior on all the parameters.
+        """ 
+     
+        # set prior to 1 (log prior to 0) if in the range and zero (-inf) outside the range 
+        
+        for i, bound in enumerate(self.bounds):
+            if bound[0] < theta[i] < bound[1]:
+                flag = True
+            else:
+                flag = False
+                break
+        
+        if flag == True:
+            return 0.0
+        else:
+            return -np.inf
+# ### pool from multiprocessing 
+
+    def mppool(self):
+        if self.nproc <= 0:
+            ncores = mp.cpu_count()
+            print("--"*10 )
+            nprocess = ncores//2
+            print("Using  {} processors of {}.".format(nprocess, ncores))
+            pool = mp.Pool(processes=nprocess)
+        elif self.nproc == 1:
+            print("Using 1 processor.")
+            print("--"*10 )
+            nprocess = None
+            pool = None
+        else:
+            nprocess = self.nproc
+            print("Using {} processors.".format(nprocess))
+            print("--"*10 )
+            pool = mp.Pool(processes=nprocess)
+
+        return pool, nprocess
