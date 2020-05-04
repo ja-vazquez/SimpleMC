@@ -14,7 +14,8 @@ import scipy as sp
 from scipy import constants
 import scipy.integrate as intg
 
-from ParamDefs import h_par, Pr_par
+
+from ParamDefs import h_par, Pr_par, s8_par
 
 
 class BaseCosmology:
@@ -26,6 +27,8 @@ class BaseCosmology:
         self.rd      = 149.50
         self.h       = h
         self.prefact = Pr_par.value
+        self.s8      = s8_par.value
+        self.varys8  = False
         self.varyPrefactor = False
         BaseCosmology.updateParams(self, [])
 
@@ -51,6 +54,10 @@ class BaseCosmology:
         else:
             return self.c_/(self.rd*self.h*100)
 
+    def setVarys8(self, T=True):
+        self.varys8= T
+
+
 
     def freeParameters(self):
         if (self.varyPrefactor):
@@ -59,6 +66,9 @@ class BaseCosmology:
         else:
             h_par.setValue(self.h)
             l = [h_par]
+        if (self.varys8):
+            s8_par.setValue(self.s8)
+            l.append(s8_par)
         return l
 
 
@@ -83,6 +93,8 @@ class BaseCosmology:
                 # say neutrinos, so let's keep it sane
                 #
                 # self.h=p.value*self.rd*100/self.c_
+            elif p.name == 's8':
+                self.s8 = p.value
         return True
 
 
@@ -158,7 +170,7 @@ class BaseCosmology:
 
 
     def growth(self, z):
-        # Equation 7.80 from Doddie
+        # Equation 7.77 from Doddie
         af = 1/(1.+z)
         r = intg.quad(self.GrowthIntegrand_a, 1e-7, af)
         gr = sp.sqrt(self.RHSquared_a(af))*r[0]  # assume precision is ok
@@ -166,3 +178,4 @@ class BaseCosmology:
         if hasattr(self, "Om"):
             gr *= 5/2.*self.Om
         return gr
+
