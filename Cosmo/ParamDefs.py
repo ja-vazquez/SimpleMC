@@ -20,7 +20,7 @@ Ok_par = Parameter("Ok", 0.0, 0.01, (-0.1, 0.1), "\Omega_k")
 w_par  = Parameter("w", -1.0, 0.1, (-2.0, 0.0), "w_0")
 wa_par = Parameter("wa", 0.0, 0.1, (-2.0, 2.0), "w_a")
 
-s8_par    = Parameter("s8", 0.8, 0.05, (0.4, 1.2), "s8")
+s8_par    = Parameter("s8", 0.8, 0.01, (0.6, 1.0), "s8")
 
 # this is the prefactor parameter c/rdH0
 Pr_par = Parameter("Pr", 28.6, 4, (5, 70), "c/(H_0r_d)")

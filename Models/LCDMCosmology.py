@@ -100,7 +100,7 @@ class LCDMCosmology(BaseCosmology, RadiationAndNeutrinos):
 
 
     def fs8(self, z):
-        return self.s8*(1+z)*derivative(self.growth, z, dx=1e-6)/self.growth(0)
+        return -self.s8*(1+z)*derivative(self.growth, z, dx=1e-6)/self.growth(0)
 
 
 
