@@ -337,7 +337,8 @@ class AllDerived:
         self.Ol   = Derivedparam('Ol', 0, '\Omega_\Lambda*')
         self.H0   = Derivedparam('H0', 0, 'H_0*')
         self.Age  = Derivedparam('Age', 0, 'Age[Gyr]*')
-        self.list = [self.Ol, self.H0, self.Age]
+        self.Orc  = Derivedparam('Orc', 0, '\Omega_{rc}*')
+        self.list = [self.Ol, self.H0, self.Age, self.Orc]
 
 
 
@@ -347,6 +348,7 @@ class AllDerived:
         self.Ol.setValue(self.computeDerived('Ol'))
         self.H0.setValue(self.computeDerived('H0'))
         self.Age.setValue(self.computeDerived('Age'))
+        self.Orc.setValue(self.computeDerived('Orc'))
         return self.list
 
 
@@ -355,6 +357,10 @@ class AllDerived:
             for par in self.cpars:
                 if par.name == 'Om':
                     return 1- par.value
+        if parname == 'Orc':
+            for par in self.cpars:
+                if par.name == 'Om':
+                    return (1- par.value)**2/4.
         elif parname == 'H0':
             for par in self.cpars:
                 if par.name == 'h':

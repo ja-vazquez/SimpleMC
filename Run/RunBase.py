@@ -27,6 +27,8 @@ from BinnedWCosmology import BinnedWCosmology
 from SureshCosmology import SureshCosmology
 from PhiCDMCosmology import PhiCDMCosmology
 
+from DGPCDMCosmology import DGPCDMCosmology
+
 #Generic model
 from GenericCosmology import GenericCosmology
 from GenericPantheon import GenericPantheon
@@ -45,6 +47,7 @@ from CompressedSNLikelihood    import BetouleSN, UnionSN, BinnedPantheon
 from PantheonSNLikelihood      import PantheonSNLikelihood
 from HubbleParameterLikelihood import RiessH0
 from CompressedHDLikelihood    import HubbleDiagram
+from Compressedfs8Likelihood import fs8Diagram
 
 from GenericLikelihood import StraightLine
 from GenericPantheonSNLikelihood import GenericPantheonSNLikelihood
@@ -148,6 +151,8 @@ def ParseModel(model):
         T = GenericCosmology()
     elif model == 'GPantheon':
         T = GenericPantheon()
+    elif model == 'DGP':
+        T = DGPCDMCosmology()
     else:
         print("Cannot recognize model", model)
         sys.exit(1)
@@ -269,6 +274,8 @@ def ParseDataset(datasets):
             L.addLikelihood(RiessH0())
         elif name == 'HD':
             L.addLikelihood(HubbleDiagram())
+        elif name == 'fs8':
+            L.addLikelihood(fs8Diagram())
         elif name == 'dline':
             L.addLikelihood(StraightLine())
         elif name == 'CPantheon_15':

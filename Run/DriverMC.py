@@ -10,12 +10,12 @@ from SimpleGenetic import SimpleGenetic
 from PostProcessing import PostProcessing 
 
 # import dynesty
-import emcee
+#import emcee
 
 import multiprocessing as mp
 import numpy as np
-import time
-import corner
+#import time
+#import corner
 
 class DriverMC():
     """
@@ -37,15 +37,11 @@ class DriverMC():
             # \ + \ "[" + time.strftime("%H:%M:%S") + "]_"
         self.outputpath = self.chainsdir + "/" + self.outputname
 
-        if self.prefact == "pre":
-            self.T.setVaryPrefactor()
-        self.T.printFreeParameters()
-
         self.result = self.executer()
         self.postprocess()
 
     def executer(self):
-        ti = time.time()
+        #ti = time.time()
         if self.samplername == 'mcmc':
             s = self.MCMCRunner()
         elif self.samplername == 'nested' and self.neuralNetwork == 'no':
@@ -60,7 +56,7 @@ class DriverMC():
             s = self.geneticRunner()
         else:
             sys.exit("Sampler/Analyzer name invalid")
-        self.ttime = time.time()- ti
+        #self.ttime = time.time()- ti
         #print("\n Time elapsed : {} seconds = {} minutes".format(self.ttime, self.ttime/60.))
         return s
 
@@ -78,6 +74,7 @@ class DriverMC():
             self.chainsdir   = config['custom']['chainsdir']
             self.model       = config['custom']['model']
             self.prefact     = config['custom']['prefact']
+            self.varys8      = config['custom']['varys8']
             self.datasets    = config['custom']['datasets']
             self.samplername = config['custom']['sampler']
             
@@ -137,7 +134,13 @@ class DriverMC():
         Returns T evaluated at the model, and L in at the datasets.
         """
         T = ParseModel(self.model)
-        L = ParseDataset(self.datasets)        
+        L = ParseDataset(self.datasets)
+        if self.prefact == "pre":
+            T.setVaryPrefactor()
+        if self.varys8  == "True":
+            T.setVarys8()
+        T.printFreeParameters()
+
         L.setTheory(T)
         return T, L
 
