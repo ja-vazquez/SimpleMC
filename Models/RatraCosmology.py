@@ -103,7 +103,8 @@ class SureshCosmology(LCDMCosmology):
     def start(self):
         if self.fixVcap:
             V1cap = ((self.alpha+6)/(self.alpha+2))*(0.5*self.alpha*(self.alpha+2))**(0.5*self.alpha)
-            V1cap /= 1.42  #kappa factor w units
+            #kappa factor with units
+            V1cap /= 1.42
         else:
             #Initial Guess
             V1cap = 1.8
