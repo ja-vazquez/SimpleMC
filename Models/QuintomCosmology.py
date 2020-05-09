@@ -1,5 +1,9 @@
 ## This is CDM cosmology with w, wa and Ok
 
+#This code produces the same results (as in SingleFieldCosmology)
+#por positive power-law, otherwise hasn't been tested
+
+#TODO Clean up the code.
 
 #import math as N
 import numpy as np
@@ -8,6 +12,7 @@ from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 from LCDMCosmology import LCDMCosmology
 from ParamDefs import mquin_par, mphan_par, beta_par, iniphi_par
+from scipy.optimize import newton
 
 class QuintomCosmology(LCDMCosmology):
     def __init__(self, varymquin=False, varymphan=False, varyiniphi=False, varybeta=False):
@@ -34,11 +39,11 @@ class QuintomCosmology(LCDMCosmology):
         self.zvals = np.linspace(0, 3, 100)
 
         self.cte   = 3.0*self.h**2
-        self.n     = 2
+        self.n     = 2.
         self.m     = 2
         self.chatty= True
 
-        self.qp = -1
+        self.qp = 1
 
         self.updateParams([])
 
@@ -86,11 +91,13 @@ class QuintomCosmology(LCDMCosmology):
     def Vtotal(self, x, y, select):
         """Cuadratic potential and its derivatives wrt phi or psi"""
         if select == 0:
-            Vtotal = (0.5*self.mquin**2)*x**(-2)  +  (0.5*self.mphan**2)*y**(-2) + self.beta*(x*y)**2
+            #Vtotal = 0.5*(self.mquin*x)**2  +  0.5*(self.mphan*y)**2 + self.beta*(x*y)**2
+             Vtotal = 0.5*self.mquin**2*x**self.n
         elif select == 'phi':
-            Vtotal = (0.5*self.mquin**2)*(-2*x**(-3)) + 2.*self.beta*x*y**2
+            #Vtotal = x*self.mquin**2 + 2*x*self.beta*y**2
+            Vtotal = self.n*self.mquin**2*x**(self.n - 1)
         elif select == 'psi':
-            Vtotal = (0.5*self.mphan**2)*(-2*y**(-3)) + 2.*self.beta*y*x**2
+            Vtotal = y*self.mphan**2 + 2*y*self.beta*x**2
         return Vtotal
 
 
@@ -158,6 +165,28 @@ class QuintomCosmology(LCDMCosmology):
         tol = (1- self.Ocb- self.Omrad) - Ode
         return sol, tol, Ode
 
+    def calc_Ode2(self, mid):
+        "Select Quintess, Phantom or Quintom"
+        #if (self.varymquin)   and (self.mphan == 0) and (self.beta ==0): quin0, phan0 = mid, 0
+        #elif (self.varymphan) and (self.mquin == 0) and (self.beta ==0): quin0, phan0 = 0, mid
+        #else : quin0, phan0 = mid, mid*self.iniphi
+            #Still figuring out initial conditions for two fields
+        quin0 = mid
+        phan0 = mid
+        sol = self.solver(quin0 , 0.0, phan0, 0.0).T
+
+        quin, dotq, phan, dotp = sol
+        rho =  self.rhode(sol)[-1]
+        Ode = rho*(self.h/self.hubble(0.0, [quin[-1], dotq[-1], phan[-1], dotp[-1]]))**2
+        tol = (1- self.Ocb- self.Omrad) - Ode
+        return tol
+
+
+    def rfunc(self, phi0):
+        #returns lambda that's solution
+        tol  = self.calc_Ode2(phi0) #self.solver(Ophi0).T
+        return tol
+
 
     def bisection(self):
         "Search for intial condition of phi such that \O_DE today is 0.7"
@@ -185,9 +214,15 @@ class QuintomCosmology(LCDMCosmology):
 
 
     def search_ini(self):
-        mid, sol = self.bisection()
+        try:
+            mid = newton(self.rfunc, 2)
+            print('mid', mid)
+            sol, _,_ = self.calc_Ode(mid)
+        except:
+            mid = 0
+        #mid, sol = self.bisection()
         if (mid == 0):
-            if self.chatty: print('mass=', self.mquin, self.mphan, 'sol not found with', self.mid)
+            if self.chatty: print('mass=', self.mquin, self.mphan, 'sol not found with', mid)
             self.hub_SF   = interp1d(self.lna, self.hubble(self.lna, SF=False))
             self.w_eos    = interp1d(self.lna, -1*np.ones(len(self.lna)))
             #self.hub_SF_z = self.logatoz(self.lna, np.ones(len(self.lna)))
