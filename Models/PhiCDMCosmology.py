@@ -4,33 +4,35 @@ import numpy as np
 from LCDMCosmology import *
 from scipy.interpolate import interp1d
 from scipy.integrate import odeint
-from ParamDefs import mphi_par
+from ParamDefs import ilam_par
+from scipy.optimize import newton
 
-
-class PhiCDMCosmology(LCDMCosmology):
-    def __init__(self, varymphi = True):
+class PhiCosmology(LCDMCosmology):
+    def __init__(self):
         ## two parameters: Om and h
 
         """Is better to start the chains at masses equal one, othewise
         may take much longer"""
-
-        self.varymphi  = varymphi
-
         LCDMCosmology.__init__(self, mnu=0)
-        self.lna   = np.linspace(-13, 0, 200)
-        self.z     = np.exp(-self.lna) - 1.
-        self.zvals = np.linspace(0, 3, 100)
 
-        self.mphi  = 1.94
-        self.alpha = 0.2
-        self.cte   = 3.0*self.h**2
+        self.qp     = 1.
+        self.n      = 2.
+        self.ilam   = ilam_par.value
+
+        self.lna   = np.linspace(-5, 0, 500)
+        self.z     = np.exp(-self.lna) - 1.
+        self.zvals = np.linspace(0, 5, 200)
+
+
+        self.ini_gamma = 1.0e-4
+        self.ini_hub   = 100*self.h*self.Ocb**0.5*np.exp(-1.5*self.lna[0])
 
         self.updateParams([])
 
     ## my free parameters. We add Ok on top of LCDM ones (we inherit LCDM)
     def freeParameters(self):
         l=LCDMCosmology.freeParameters(self)
-        if (self.varymphi)  : l.append(mphi_par)
+        #if (self.varymphi)  : l.append(mphi_par)
         return l
 
 
@@ -39,10 +41,10 @@ class PhiCDMCosmology(LCDMCosmology):
         if not ok:
             return False
         for p in pars:
-            if p.name  == "mphi":
-                self.mphi= p.value
+            if p.name  == "ilam":
+                self.ilam= p.value
 
-        self.search_ini()
+        self.set_ini()
 
         """
         dataHz = np.loadtxt('data/Hz_all.dat')
@@ -59,8 +61,78 @@ class PhiCDMCosmology(LCDMCosmology):
         return True
 
 
+    def MG(self, lam):
+        return (self.n - 1)/self.n*lam**2
+
+
+    def RHS(self, x_vec, lna):
+        gamma, Ophi, lam, hub = x_vec
+
+        Mgamma= self.MG(lam)
+
+        gamma_prime = (2 - self.qp*gamma)*(-3*gamma + lam*np.sqrt(3*gamma*Ophi))
+        Ophi_prime  = 3*Ophi*((1-self.qp*gamma)*(1-Ophi))
+        lam_prime   = -np.sqrt(3)*lam**2*(Mgamma -1)*np.sqrt(gamma*Ophi)
+        hub_prime   = -1.5*hub*(1 + (self.qp*gamma-1)*Ophi)
+        return [gamma_prime, Ophi_prime, lam_prime, hub_prime]
+
+
+
+    def solver(self, ini_Ophi):
+        ini_lam  = self.ilam
+        y0       = [self.ini_gamma, 10**(-ini_Ophi), ini_lam, self.ini_hub]
+        y_result = odeint(self.RHS, y0, self.lna, h0=1E-10)
+        return y_result
+
+
+    def logatoz(self, func):
+        #change functions from lna to z
+        tmp     = interp1d(self.lna, func)
+        functmp = tmp(self.lna)
+        return  np.interp(self.zvals, self.z[::-1], functmp[::-1])
+
+
+    def rfunc(self, ini_Ophi0):
+        #returns lambda that's solution
+        sol  = self.solver(ini_Ophi0).T
+        return (1-self.Om) - sol[1][-1]
+
+
+    def set_ini(self):
+        Ophi0 = newton(self.rfunc, 6)
+        x_vec = self.solver(Ophi0).T
+        self.hub_SF   = interp1d(self.lna, x_vec[3])
+        #self.hub_SF_z = self.logatoz(x_vec[3])
+        self.w_eos    = interp1d(self.lna, x_vec[0])
+
+
+
+    def hubble(self, a):
+        Ode = 1.0-self.Om
+        return self.Ocb/a**3 + self.Omrad/a**4 + Ode
+
+
+    ## this is relative hsquared as a function of a
+    ## i.e. H(z)^2/H(z=0)^2
+    def RHSquared_a(self,a):
+        lna = np.log(a)
+        #if (lna < self.lna[0]):
+        hubble = (self.hub_SF(lna)/100./self.h)**2.
+        #else:
+        #    hubble = self.hubble(a)
+        return hubble
+
+
+
+    def w_de(self, a):
+        lna = np.log(a)
+        return self.qp*self.w_eos(lna)-1
+
+
+
+    """
     def Vtotal(self, x, select):
-        """Cuadratic potential and its derivatives wrt phi or psi"""
+        #Cuadratic potential and its derivatives wrt phi or psi
         if select == 0:
             Vtotal = 0.5*(x*self.mphi)**2
         elif select == 'phi':
@@ -116,7 +188,7 @@ class PhiCDMCosmology(LCDMCosmology):
 
 
     def calc_Ode(self, mid):
-        """Select Quintess, Phantom or Quintom"""
+        #Select Quintess, Phantom or Quintom
         sol = self.solver(mid, 0.0).T
         quin, dotq = sol
         rho = self.rhode(sol)[-1]
@@ -127,7 +199,7 @@ class PhiCDMCosmology(LCDMCosmology):
 
 
     def bisection(self):
-        """Search for intial condition of phi such that \O_DE today is 0.7"""
+        #Search for intial condition of phi such that \O_DE today is 0.7
         lowphi, highphi = -10, 10 #200
         Ttol            = 1E-5 #2
         mid = (lowphi + highphi)/2.0
@@ -196,4 +268,4 @@ class PhiCDMCosmology(LCDMCosmology):
     #def RHSquared_z(self, z):
     #    hubble = (self.hub_SF_z(z)/self.h)**2.
     #    return hubble
-
+    """

@@ -111,3 +111,6 @@ mquin_par  = Parameter("mquin", 1.2, 0.1, (0, 4), "m_{\phi}")
 mphan_par  = Parameter("mphan", 0.7 , 0.1, (0, 2), "m_{\psi}")
 beta_par   = Parameter("beta",  1.0, 0.5, (0, 20), "\\beta")
 iniphi_par = Parameter("iniphi", 1.0, 0.1, (0, 2), "phi_0")
+
+#Phi Cosmology
+ilam_par   = Parameter("ilam", 1.0, 0.05, (0.1, 1.2), "\\lambda_i")
