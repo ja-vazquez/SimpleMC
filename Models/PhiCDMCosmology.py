@@ -8,20 +8,23 @@ from ParamDefs import plam_par, palp_par, pbeta_par
 from scipy.optimize import newton
 
 class PhiCosmology(LCDMCosmology):
-    def __init__(self):
+    def __init__(self, qp=1, poten='pow', varyilam=False, varybeta=False, varyalpha=False):
         ## two parameters: Om and h
 
         """Is better to start the chains at masses equal one, othewise
         may take much longer"""
         LCDMCosmology.__init__(self, mnu=0)
 
-        self.qp     = 1.     #Quin = 1, Phan = -1
-        self.type   = 'pow'  #Pow-law = pow, Exp = exp
+        self.qp       = qp     #Quin = 1, Phan = -1
+        self.poten    = poten  #Pow-law = pow, Exp = exp
 
-        self.alpha  = palp_par.value
-        self.beta   = pbeta_par.value
+        self.varyilam = varyilam
+        self.vaybeta  = varybeta
+        self.varyalpha= varyalpha
 
         self.phi0   = 1.
+        self.alpha  = palp_par.value
+        self.beta   = pbeta_par.value
         self.ilam   = plam_par.value
 
         self.lna   = np.linspace(-5, 0, 500)
@@ -37,7 +40,9 @@ class PhiCosmology(LCDMCosmology):
     ## my free parameters. We add Ok on top of LCDM ones (we inherit LCDM)
     def freeParameters(self):
         l=LCDMCosmology.freeParameters(self)
-        #if (self.varymphi)  : l.append(mphi_par)
+        if (self.varyilam)  : l.append(plam_par)
+        if (self.varybeta)  : l.append(pbeta_par)
+        if (self.varyalpha) : l.append(palp_par)
         return l
 
 
@@ -70,9 +75,9 @@ class PhiCosmology(LCDMCosmology):
 
 
     def MG(self, lam):
-        if self.type == 'pow' or self.type == 'pow2':
+        if self.poten == 'pow' or self.poten == 'pow2':
             return (self.alpha-1)/self.alpha*lam**2
-        elif self.type == 'exp' or self.type == 'exp2':
+        elif self.poten == 'exp' or self.poten == 'exp2':
             if self.alpha == 1:
                 return 1
             else:
@@ -94,19 +99,19 @@ class PhiCosmology(LCDMCosmology):
 
 
     def solver(self, ini_Ophi):
-        if self.type == 'pow':
+        if self.varyilam:
+            ini_lam  =  self.ilam
+        else:
             #in general  = alpha/phi_i -- sample over phi_i
-            ini_lam  =  np.abs(self.alpha/self.phi0)
-        elif self.type == 'pow2':
-            ini_lam  =  self.ilam
-        elif self.type == 'exp':
+            if self.poten == 'pow':
+                ini_lam  =  np.abs(self.alpha/self.phi0)
             #in general = beta*alpha*phi^(alpha-1)
-            if self.alpha == 1:
-                ini_lam = self.beta
-            else:
-                ini_lam  = self.beta*self.alpha*self.phi0**(self.alpha-1)
-        elif self.type == 'exp2':
-            ini_lam  =  self.ilam
+            elif self.poten == 'exp':
+                if self.alpha == 1:
+                    ini_lam = self.beta
+                else:
+                    ini_lam  = self.beta*self.alpha*self.phi0**(self.alpha-1)
+
 
         y0       = [self.ini_gamma, 10**(-ini_Ophi), ini_lam, self.ini_hub]
         y_result = odeint(self.RHS, y0, self.lna, h0=1E-10)
