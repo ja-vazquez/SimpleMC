@@ -4,7 +4,7 @@ import numpy as np
 from LCDMCosmology import *
 from scipy.interpolate import interp1d
 from scipy.integrate import odeint
-from ParamDefs import ilam_par
+from ParamDefs import plam_par, palp_par, pbeta_par
 from scipy.optimize import newton
 
 class PhiCosmology(LCDMCosmology):
@@ -15,11 +15,14 @@ class PhiCosmology(LCDMCosmology):
         may take much longer"""
         LCDMCosmology.__init__(self, mnu=0)
 
-        self.qp     = 1.    #Quin = 1, Phan = -1
-        self.pw     = True  #Pow-law = True, Exp = False
+        self.qp     = 1.     #Quin = 1, Phan = -1
+        self.type   = 'pow'  #Pow-law = pow, Exp = exp
 
-        self.n      = 2.
-        self.ilam   = ilam_par.value
+        self.alpha  = palp_par.value
+        self.beta   = pbeta_par.value
+
+        self.phi0   = 1.
+        self.ilam   = plam_par.value
 
         self.lna   = np.linspace(-5, 0, 500)
         self.z     = np.exp(-self.lna) - 1.
@@ -43,9 +46,12 @@ class PhiCosmology(LCDMCosmology):
         if not ok:
             return False
         for p in pars:
-            if p.name  == "ilam":
+            if p.name  == "plam":
                 self.ilam= p.value
-
+            if p.name  == "palp":
+                self.alpha= p.value
+            if p.name  == "pbeta":
+                self.beta= p.value
         self.set_ini()
 
         """
@@ -64,12 +70,14 @@ class PhiCosmology(LCDMCosmology):
 
 
     def MG(self, lam):
-        if self.pw:
-            return (self.n - 1)/self.n*lam**2
-
-        #print((self.n - 1)/(self.ilam*self.n)/(lam/(self.ilam*self.n))**(self.n/(self.n-1)))
-        #tmp = (lam)**(self.n/(self.n-1))
-        #return 1 + tmp # (self.n - 1)/(tmp*self.n)/(lam/(tmp*self.n))**(self.n/(self.n-1))
+        if self.type == 'pow' or self.type == 'pow2':
+            return (self.alpha-1)/self.alpha*lam**2
+        elif self.type == 'exp' or self.type == 'exp2':
+            if self.alpha == 1:
+                return 1
+            else:
+                fac = (self.alpha-1)/(self.beta*self.alpha)
+                return 1 + np.abs(fac*(lam/(self.beta*self.alpha))**(-self.alpha/(self.alpha-1)))
 
 
     def RHS(self, x_vec, lna):
@@ -86,7 +94,20 @@ class PhiCosmology(LCDMCosmology):
 
 
     def solver(self, ini_Ophi):
-        ini_lam  = self.ilam
+        if self.type == 'pow':
+            #in general  = alpha/phi_i -- sample over phi_i
+            ini_lam  =  np.abs(self.alpha/self.phi0)
+        elif self.type == 'pow2':
+            ini_lam  =  self.ilam
+        elif self.type == 'exp':
+            #in general = beta*alpha*phi^(alpha-1)
+            if self.alpha == 1:
+                ini_lam = self.beta
+            else:
+                ini_lam  = self.beta*self.alpha*self.phi0**(self.alpha-1)
+        elif self.type == 'exp2':
+            ini_lam  =  self.ilam
+
         y0       = [self.ini_gamma, 10**(-ini_Ophi), ini_lam, self.ini_hub]
         y_result = odeint(self.RHS, y0, self.lna, h0=1E-10)
         return y_result
