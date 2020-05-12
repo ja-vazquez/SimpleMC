@@ -24,8 +24,7 @@ from StepCDMCosmology import StepCDMCosmology
 from EarlyDECosmology import EarlyDECosmology
 from SlowRDECosmology import SlowRDECosmology
 from BinnedWCosmology import BinnedWCosmology
-from SureshCosmology import SureshCosmology
-from PhiCDMCosmology import PhiCDMCosmology
+from PhiCDMCosmology import PhiCosmology
 
 from DGPCDMCosmology import DGPCDMCosmology
 
@@ -141,10 +140,6 @@ def ParseModel(model):
         T = SlowRDECosmology(varyOk=False)
     elif model == "Binned":
         T = BinnedWCosmology()
-    elif model == "PhiCDM":
-        T = PhiCDMCosmology()
-    elif model == "Suresh":
-        T = SureshCosmology()
     elif model == 'wDM':
         T = wCDMCosmology()
     elif model == 'sline':
@@ -153,6 +148,8 @@ def ParseModel(model):
         T = GenericPantheon()
     elif model == 'DGP':
         T = DGPCDMCosmology()
+    elif model == "PhiCDM":
+        T = PhiCosmology(varyalpha=True)
     else:
         print("Cannot recognize model", model)
         sys.exit(1)
