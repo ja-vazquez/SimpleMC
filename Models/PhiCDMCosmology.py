@@ -15,7 +15,9 @@ class PhiCosmology(LCDMCosmology):
         may take much longer"""
         LCDMCosmology.__init__(self, mnu=0)
 
-        self.qp     = 1.
+        self.qp     = 1.    #Quin = 1, Phan = -1
+        self.pw     = True  #Pow-law = True, Exp = False
+
         self.n      = 2.
         self.ilam   = ilam_par.value
 
@@ -62,7 +64,12 @@ class PhiCosmology(LCDMCosmology):
 
 
     def MG(self, lam):
-        return (self.n - 1)/self.n*lam**2
+        if self.pw:
+            return (self.n - 1)/self.n*lam**2
+
+        #print((self.n - 1)/(self.ilam*self.n)/(lam/(self.ilam*self.n))**(self.n/(self.n-1)))
+        #tmp = (lam)**(self.n/(self.n-1))
+        #return 1 + tmp # (self.n - 1)/(tmp*self.n)/(lam/(tmp*self.n))**(self.n/(self.n-1))
 
 
     def RHS(self, x_vec, lna):
