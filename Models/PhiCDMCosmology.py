@@ -4,43 +4,44 @@ import numpy as np
 from LCDMCosmology import *
 from scipy.interpolate import interp1d
 from scipy.integrate import odeint
-from ParamDefs import plam_par, palp_par, pbeta_par
+from ParamDefs import plam_par, palp_par, pbeta_par, quipha_par
 from scipy.optimize import newton
 
 class PhiCosmology(LCDMCosmology):
-    def __init__(self, qp=1, poten='pow', varyalpha=False, varybeta=False, varyilam=False):
+    def __init__(self, poten='pow', varyalpha=False, varybeta=False,\
+                 varyilam=False, varyquipha=False):
         """Is better to start the chains at masses equal one, othewise
         may take much longer"""
-        LCDMCosmology.__init__(self, mnu=0)
 
-        self.qp       = qp     #Quin = 1, Phan = -1
+
         self.poten    = poten  #Pow-law = pow, Exp = exp
 
-        self.varyilam = varyilam
-        self.varybeta = varybeta
-        self.varyalpha= varyalpha
+        self.varyilam   = varyilam
+        self.varybeta   = varybeta
+        self.varyalpha  = varyalpha
+        self.varyquipha = varyquipha
 
-        self.phi0   = 1.0
         self.alpha  = palp_par.value
         self.beta   = pbeta_par.value
         self.ilam   = plam_par.value
+        self.qp     = quipha_par.value     #1=Quintes, -1=Panthom
 
-        self.lna   = np.linspace(-5, 0, 300)
+        self.lna   = np.linspace(-5, 0, 400)
         self.z     = np.exp(-self.lna) - 1.
         self.zvals = np.linspace(0, 5, 200)
 
-
         self.ini_gamma = 1.0e-4
-        #self.ini_hub   = 100*self.h*self.Ocb**0.5*np.exp(-1.5*self.lna[0])
 
+        LCDMCosmology.__init__(self, mnu=0)
         self.updateParams([])
 
     ## my free parameters. We add Ok on top of LCDM ones (we inherit LCDM)
     def freeParameters(self):
         l=LCDMCosmology.freeParameters(self)
-        if (self.varyilam)  : l.append(plam_par)
-        if (self.varybeta)  : l.append(pbeta_par)
-        if (self.varyalpha) : l.append(palp_par)
+        if (self.varyilam)   : l.append(plam_par)
+        if (self.varybeta)   : l.append(pbeta_par)
+        if (self.varyalpha)  : l.append(palp_par)
+        if (self.varyquipha) : l.append(quipha_par)
         return l
 
 
@@ -55,8 +56,10 @@ class PhiCosmology(LCDMCosmology):
                 self.alpha= p.value
             if p.name  == "pbeta":
                 self.beta= p.value
-        self.do = 1
+            if p.name  == "quipha":
+                self.qp= p.value
         self.set_ini()
+
 
         """ Testing
         import matplotlib.pyplot as plt
@@ -83,7 +86,7 @@ class PhiCosmology(LCDMCosmology):
                 return 1
             else:
                 fac = (self.alpha-1)/(self.beta*self.alpha)
-                return 1 + np.abs(fac*(lam/(self.beta*self.alpha))**(-self.alpha/(self.alpha-1)))
+                return 1 + fac*(lam/np.abs(self.beta*self.alpha))**(-self.alpha/(self.alpha-1))
 
 
     def RHS(self, x_vec, lna):
@@ -104,19 +107,19 @@ class PhiCosmology(LCDMCosmology):
 
 
     def solver(self, ini_Ophi):
+        phi0 = self.ilam
         if self.varyilam:
-            ini_lam  =  self.ilam
+            ini_lam  =  self.alpha/phi0
         else:
-            #in general  = alpha/phi_i -- sample over phi_i
             if self.poten == 'pow':
-                ini_lam  =  np.abs(self.alpha/self.phi0)
-            #in general = beta*alpha*phi^(alpha-1)
+                ini_lam  =  self.alpha/phi0
             elif self.poten == 'exp':
                 if self.alpha == 1:
                     ini_lam = self.beta
                 else:
-                    ini_lam  = self.beta*self.alpha*self.phi0**(self.alpha-1)
+                    ini_lam  = self.beta*self.alpha*phi0**(self.alpha-1)
 
+        ini_lam  = np.abs(ini_lam)
         ini_hub  = 100*self.h*self.Ocb**0.5*np.exp(-1.5*self.lna[0])
         y0       = [self.ini_gamma, 10**(-ini_Ophi), ini_lam, ini_hub]
         y_result = odeint(self.RHS, y0, self.lna, h0=1E-10)
@@ -140,13 +143,17 @@ class PhiCosmology(LCDMCosmology):
         try:
             Ophi0 = newton(self.rfunc, 6)
             x_vec = self.solver(Ophi0).T
+            self.do = 1
             self.hub_SF   = interp1d(self.lna, x_vec[3])
             #self.hub_SF_z = self.logatoz(x_vec[3])
             #self.w_eos    = interp1d(self.lna, x_vec[0])
         except RuntimeError:
-            #print(self.alpha)
-            if np.abs(self.alpha) < 0.05: self.do = 0
-            else: self.do = sys.out('something wrong happen')
+            if np.abs(self.alpha) < 0.02: self.do = 0
+            else:
+                print('troubles', self.alpha, self.beta, self.ilam)
+                self.do = 2
+
+
 
 
 
@@ -166,6 +173,8 @@ class PhiCosmology(LCDMCosmology):
                 hubble = (self.hub_SF(lna)/100./self.h)**2.
             else:
                 hubble = self.hubble(a)
+        else:
+            return 1.
         return hubble
 
 
