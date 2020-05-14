@@ -49,7 +49,7 @@ class LCDMCosmology(BaseCosmology, RadiationAndNeutrinos):
 
 
     def setNoObh2prior(self, val=True):
-        print("Disabling obh2 prior.")
+        #print("Disabling obh2 prior.")
         self.noObh2prior = val
 
 
