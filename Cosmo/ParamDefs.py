@@ -113,7 +113,7 @@ beta_par   = Parameter("beta",  1.0, 0.5, (0, 20), "\\beta")
 iniphi_par = Parameter("iniphi", 1.0, 0.1, (0, 2), "phi_0")
 
 #Phi Cosmology
-palp_par   = Parameter("palp",   1.0, 0.1, (-3, 3.), "\\alpha")
-plam_par   = Parameter("plam",   1.5, 0.1, (0.5, 1.5), "\\lambda_i")
-pbeta_par  = Parameter("pbeta",  1.0, 0.05, (0.01, 1.9), "\\beta")
-quipha_par= Parameter("quipha", 1.0, 0.5, (-1.5, 1.5), "quipha")
+phialp_par   = Parameter("phialp",   1.0, 0.1, (-3, 3.), "\\alpha")
+philam_par   = Parameter("philam",   1.5, 0.1, (0.5, 1.5), "\\lambda_i")
+phibeta_par  = Parameter("phibeta",  1.0, 0.05, (0.01, 1.9), "\\beta")
+epsilon_par= Parameter("epsilon", 1.0, 0.5, (-1.5, 1.5), "\epsilon")
