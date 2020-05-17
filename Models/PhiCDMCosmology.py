@@ -4,27 +4,27 @@ import numpy as np
 from LCDMCosmology import *
 from scipy.interpolate import interp1d
 from scipy.integrate import odeint
-from ParamDefs import plam_par, palp_par, pbeta_par, quipha_par
+from ParamDefs import phialp_par, philam_par, phibeta_par, epsilon_par
 from scipy.optimize import newton
 
 class PhiCosmology(LCDMCosmology):
     def __init__(self, poten='pow', varyalpha=False, varybeta=False,\
-                 varyilam=False, varyquipha=False):
+                 varyilam=False, varyepsilon=False):
         """Is better to start the chains at masses equal one, othewise
         may take much longer"""
 
 
         self.poten    = poten  #Pow-law = pow, Exp = exp
 
-        self.varyilam   = varyilam
-        self.varybeta   = varybeta
-        self.varyalpha  = varyalpha
-        self.varyquipha = varyquipha
+        self.varyilam    = varyilam
+        self.varybeta    = varybeta
+        self.varyalpha   = varyalpha
+        self.varyepsilon = varyepsilon
 
-        self.alpha  = palp_par.value
-        self.beta   = pbeta_par.value
-        self.ilam   = plam_par.value
-        self.qp     = quipha_par.value     #1=Quintes, -1=Panthom
+        self.alpha  = phialp_par.value
+        self.beta   = phibeta_par.value
+        self.ilam   = philam_par.value
+        self.eps    = epsilon_par.value     #1=Quintes, -1=Panthom
 
         self.lna   = np.linspace(-5, 0, 400)
         self.z     = np.exp(-self.lna) - 1.
@@ -38,10 +38,10 @@ class PhiCosmology(LCDMCosmology):
     ## my free parameters. We add Ok on top of LCDM ones (we inherit LCDM)
     def freeParameters(self):
         l=LCDMCosmology.freeParameters(self)
-        if (self.varyilam)   : l.append(plam_par)
-        if (self.varybeta)   : l.append(pbeta_par)
-        if (self.varyalpha)  : l.append(palp_par)
-        if (self.varyquipha) : l.append(quipha_par)
+        if (self.varyilam)   : l.append(philam_par)
+        if (self.varybeta)   : l.append(phibeta_par)
+        if (self.varyalpha)  : l.append(phialp_par)
+        if (self.varyquipha) : l.append(epsilon_par)
         return l
 
 
@@ -50,14 +50,14 @@ class PhiCosmology(LCDMCosmology):
         if not ok:
             return False
         for p in pars:
-            if p.name  == "plam":
+            if p.name  == "philam":
                 self.ilam= p.value
-            if p.name  == "palp":
+            if p.name  == "phialp":
                 self.alpha= p.value
-            if p.name  == "pbeta":
+            if p.name  == "phibeta":
                 self.beta= p.value
-            if p.name  == "quipha":
-                self.qp= p.value
+            if p.name  == "epsilon":
+                self.eps = p.value
         self.set_ini()
 
 
@@ -94,9 +94,9 @@ class PhiCosmology(LCDMCosmology):
 
         Mgamma= self.MG(lam)
 
-        gamma_prime = (2 - self.qp*gamma)*(-3*gamma + lam*np.sqrt(3*gamma*Ophi))
-        Ophi_prime  = 3*Ophi*((1-self.qp*gamma)*(1-Ophi))
-        hub_prime   = -1.5*hub*(1 + (self.qp*gamma-1)*Ophi)
+        gamma_prime = (2 - self.eps*gamma)*(-3*gamma + lam*np.sqrt(3*gamma*Ophi))
+        Ophi_prime  = 3*Ophi*((1-self.eps*gamma)*(1-Ophi))
+        hub_prime   = -1.5*hub*(1 + (self.eps*gamma-1)*Ophi)
         if self.alpha ==0 or self.beta ==0:
             lam_prime =0
         else:
@@ -155,8 +155,6 @@ class PhiCosmology(LCDMCosmology):
 
 
 
-
-
     def hubble(self, a):
         Ode = 1.0-self.Om
         return self.Ocb/a**3 + self.Omrad/a**4 + Ode
@@ -180,5 +178,5 @@ class PhiCosmology(LCDMCosmology):
 
     def w_de(self, a):
         lna = np.log(a)
-        return self.qp*self.w_eos(lna)-1
+        return self.eps*self.w_eos(lna)-1
 
