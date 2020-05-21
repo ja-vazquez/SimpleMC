@@ -6,7 +6,7 @@ from MCMCAnalyzer import MCMCAnalyzer
 from Parameter import Parameter
 from RunBase import ParseModel, ParseDataset
 from scipy.special import ndtri
-from SimpleGenetic import SimpleGenetic
+#from SimpleGenetic import SimpleGenetic
 from PostProcessing import PostProcessing 
 
 # import dynesty
@@ -444,13 +444,11 @@ class DriverMC():
             pp.paramFiles(self.T, self.L)
             pp.saveEmceeSamples() 
     
-#Do it later -- plots and stats analis
-
-        #if self.samplername in ['mcmc', 'nested']:
-        #    stats = pp.getdistAnalyzer(cov = True)
-        #    pp.writeSummary(self.ttime, stats)
-        #else:
-        #    pp.writeSummary(self.ttime)
+        if self.samplername in ['mcmc', 'nested']:
+            stats = pp.getdistAnalyzer(cov = True)
+            pp.writeSummary(self.ttime, stats)
+        else:
+            pp.writeSummary(self.ttime)
 
         
 
