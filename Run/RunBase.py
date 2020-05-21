@@ -25,6 +25,7 @@ from EarlyDECosmology import EarlyDECosmology
 from SlowRDECosmology import SlowRDECosmology
 from BinnedWCosmology import BinnedWCosmology
 from PhiCDMCosmology import PhiCosmology
+from STCDMCosmology import STCDMCosmology
 
 from DGPCDMCosmology import DGPCDMCosmology
 
@@ -148,18 +149,20 @@ def ParseModel(model):
         T = GenericPantheon()
     elif model == 'DGP':
         T = DGPCDMCosmology()
-    elif model == "Phi_qpow":
-        T = PhiCosmology(varyalpha=True)
+    elif model == "Phi_qexp":
+        T = PhiCosmology(poten='exp', varyilam=True)
     elif model == "Phi_ppow":
-        T = PhiCosmology(qp=-1, varyalpha=True)
+        T = PhiCosmology(varyalpha=True)
     elif model == "Phi_epsilon_pow":
         T = PhiCosmology(varyalpha=True, varyquipha=True)
-    elif model == "Phi_qexp":
+    elif model == "Phi_otroexp":
         T = PhiCosmology(poten='exp', varybeta=True)
-    elif model == "Phi_pexp":
-        T = PhiCosmology(qp=-1, poten='exp', varybeta=True)
-    elif model == "Phi_qexp_beta":
+    elif model == "Phi_otrexp":
+        T = PhiCosmology(poten='exp', varybeta=True)
+    elif model == "Phi_otrexp_beta":
         T = PhiCosmology(poten='exp', varyalpha=True, varybeta=True)
+    elif model == 'ST':
+        T = STCDMCosmology()
     else:
         print("Cannot recognize model", model)
         sys.exit(1)
