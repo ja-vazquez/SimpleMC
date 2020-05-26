@@ -149,22 +149,22 @@ def ParseModel(model):
         T = GenericPantheon()
     elif model == 'DGP':
         T = DGPCDMCosmology()
-    elif model == "Phi_qexp":
-        T = PhiCosmology(mu=0, alpha=1, varybeta=True, eps=1)
-    elif model == "Phi_qpow":
-        T = PhiCosmology(beta=0, varymu=True, varyilam=True, eps=1)
-    elif model == "Phi_qexp_pow2":
-        T = PhiCosmology(mu=0, alpha=2, varybeta=True, varyilam=True, eps=1)
-    elif model == "Phi_qpow_exp":
-        T = PhiCosmology(alpha=1, varybeta=True, varymu=True, varyilam=True, eps=1)
-    elif model == "Phi_qexp_pow_a":
-        T = PhiCosmology(mu=0, varybeta=True, varyalpha=True, varyilam=True, eps=1)
-    elif model == "Phi_qcosh":
-        T = PhiCosmology(beta=0, mu=-1, varyalpha=True, varyilam=True, eps=1)
-    elif model == "Phi_qcosh_1":
-        T = PhiCosmology(beta=-1, mu=-1, varyalpha=True, varyilam=True, eps=1)
-    elif model == "Phi_qcos_1":
-        T = PhiCosmology(beta=1, mu=-1, varyalpha=True, varyilam=True, eps=1)
+    elif model == "Phi_exp":
+        T = PhiCosmology(mu=0, alpha=1, varybeta=True)
+    elif model == "Phi_pow":
+        T = PhiCosmology(beta=0, varymu=True, varyilam=True)
+    elif model == "Phi_exp_pow2":
+        T = PhiCosmology(mu=0, alpha=2, varybeta=True, varyilam=True)
+    elif model == "Phi_pow_exp":
+        T = PhiCosmology(alpha=1, varybeta=True, varymu=True, varyilam=True)
+    elif model == "Phi_exp_pow_a":
+        T = PhiCosmology(mu=0, varybeta=True, varyalpha=True, varyilam=True)
+    elif model == "Phi_cosh":
+        T = PhiCosmology(beta=0, mu=-1, varyalpha=True, varyilam=True)
+    elif model == "Phi_cosh_1":
+        T = PhiCosmology(beta=-1, mu=-1, varyalpha=True, varyilam=True)
+    elif model == "Phi_cos_1":
+        T = PhiCosmology(beta=1, mu=-1, varyalpha=True, varyilam=True)
     elif model == 'ST':
         T = STCDMCosmology()
     else:

@@ -115,11 +115,15 @@ alpha_par  = Parameter("alpha", 0.01, 0.005, (0.001, 0.05), "\\alpha")
 mquin_par  = Parameter("mquin", 1.2, 0.1, (0, 4), "m_{\phi}")
 mphan_par  = Parameter("mphan", 0.7 , 0.1, (0, 2), "m_{\psi}")
 beta2_par  = Parameter("beta",  1.0, 0.5, (0, 20), "\\beta")
-iniphi_par = Parameter("iniphi", 1.0, 0.1, (0, 2), "phi_0")
+iniphi_par = Parameter("iniphi", 1.0, 0.1, (0, 2), "\phi_0")
 
 #Phi Cosmology
 phialp_par  = Parameter("phialp",   1.0, 0.1, (-15, 15.), "\\alpha")
 philam_par  = Parameter("philam",   0.5, 0.01, (0.01, 3.0), "\\lambda_i")
-phibeta_par = Parameter("phibeta",  0.0, 0.05, (0.01, 1.5), "\\beta")
+phibeta_par = Parameter("phibeta",  0.0, 0.05, (-3.0, 3.0), "\\beta")
 phimu_par   = Parameter("phimu",    1.0, 0.05, (-5.0, 5.0), "\\mu")
 epsilon_par = Parameter("epsilon",  -1.0, 0.5, (-1.5, 1.5), "\epsilon")
+
+#QDGP
+Oq_par = Parameter("Oq",  0.7, 0.05, (0.5, 1.0), "\Omega_q")
+wq_par = Parameter("wq",  -0.9, 0.05, (-1.0, -0.5), "w_q")

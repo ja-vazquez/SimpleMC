@@ -74,8 +74,6 @@ class PhiCosmology(LCDMCosmology):
                 self.setCurvature(self.Ok)
                 if (abs(self.Ok) > 1.0):
                     return False
-
-        self.ini_gamma = 1.0e-4*self.eps
         self.set_ini()
 
 
@@ -157,8 +155,7 @@ class PhiCosmology(LCDMCosmology):
                 ini_lam = -self.alpha*np.arctan(0.5*self.alpha*self.ilam)
             else: sys.exit('wrong potential')
         else:
-            ini_lam=self.ilam
-            """
+            #ini_lam=self.ilam
             if self.beta==0:                        #pow
                 ini_lam= self.mu*self.ilam
             else:
@@ -175,14 +172,14 @@ class PhiCosmology(LCDMCosmology):
                     if self.alpha == 1:
                         ini_lam= self.mu*self.ilam + self.beta
 
-            ini_lam = np.abs(ini_lam)
-            """
+        #we'll use the sign of lambda to describe either quint or phant
+        self.eps = np.sign(ini_lam)*1.
+        self.ini_gamma = 1.0e-4*self.eps
+        ini_lam = np.abs(ini_lam)
 
-
-        ini_hub = 100*self.h*self.Ocb**0.5*np.exp(-1.5*self.lna[0])
-        ini_Ok  = self.Ok*np.exp(-2*self.lna[0])/(self.Ocb**0.5*np.exp(-1.5*self.lna[0]))**2
+        ini_hub = 100*self.h*self.Om**0.5*np.exp(-1.5*self.lna[0])
+        ini_Ok  = self.Ok*np.exp(-2*self.lna[0])/(self.Om**0.5*np.exp(-1.5*self.lna[0]))**2
         y0      = [self.ini_gamma, 10**(-ini_Ophi), ini_lam, ini_Ok, ini_hub]
-        #if self.varyOk: y0.append(ini_Ok)
         y_result = odeint(self.RHS, y0, self.lna, h0=1E-5)
         return y_result
 
@@ -197,7 +194,7 @@ class PhiCosmology(LCDMCosmology):
     def rfunc(self, ini_Ophi0):
         #returns lambda that's solution
         sol  = self.solver(ini_Ophi0).T
-        return (1-self.Om) - sol[1][-1]
+        return (1.0-self.Om-self.Ok) - sol[1][-1]
 
 
     def set_ini(self):
@@ -209,7 +206,9 @@ class PhiCosmology(LCDMCosmology):
             #self.hub_SF_z = self.logatoz(x_vec[3])
             self.w_eos    = interp1d(self.lna, x_vec[0])
         except RuntimeError:
-            if np.abs(self.alpha) < 0.02: self.do = 0
+            if np.abs(self.ilam) < 0.02 or np.abs(self.mu) < 0.02:
+                self.do = 0
+                self.w_eos    = interp1d(self.lna, np.zeros(len(self.lna)))
             else:
                 self.w_eos    = interp1d(self.lna, np.zeros(len(self.lna)))
                 print('troubles', 'a=',self.alpha, 'b=',self.beta, 'l=', self.ilam, 'm=', self.mu)
@@ -220,6 +219,7 @@ class PhiCosmology(LCDMCosmology):
     def hubble(self, a):
         #NuContrib = self.NuDensity.rho(a)/self.h**2
         return (self.Ocb/a**3 + self.Ok/a**2 + self.Omrad/a**4 + (1.0-self.Om-self.Ok))
+
 
 
     ## this is relative hsquared as a function of a
