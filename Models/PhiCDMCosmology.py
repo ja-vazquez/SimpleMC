@@ -5,13 +5,13 @@ from LCDMCosmology import *
 from scipy.interpolate import interp1d
 from scipy.integrate import odeint
 from ParamDefs import phialp_par, philam_par, phimu_par, \
-                      phibeta_par, epsilon_par, Ok_par, mu_par
+                      phibeta_par, Ophi0_par, Ok_par, mu_par
 from scipy.optimize import newton
 
 class PhiCosmology(LCDMCosmology):
     def __init__(self, varyalpha=False, varybeta=False, varyilam=False,\
-                       varyepsilon=False, varymu=False, varyOk=False,
-                       alpha=1, beta=1, mu=1, eps=1, ilam=1):
+                       varyOphi0=False, varymu=False, varyOk=False,
+                       alpha=1, beta=1, mu=1, ilam=1, Ophi0=7):
         """Is better to start the chains at masses equal one, othewise
         may take much longer"""
 
@@ -21,18 +21,17 @@ class PhiCosmology(LCDMCosmology):
         self.varyilam    = varyilam
         self.varybeta    = varybeta
         self.varyalpha   = varyalpha
-        self.varyepsilon = varyepsilon
+        self.varyOphi0   = varyOphi0
 
         #print('-'*10, 'very sensitive to initial conditions')
         #print('-'*10, 'hence we expect plenty of warning')
 
         self.Ok     = Ok_par.value
-        self.eps    = eps   #1=Quintes, -1=Panthom
+        self.Ophi0  = Ophi0   #1=Quintes, -1=Panthom
         self.alpha  = alpha
         self.beta   = beta
         self.mu     = mu
         self.ilam   = ilam
-
 
         self.lna   = np.linspace(-6, 0, 500)
         self.z     = np.exp(-self.lna) - 1.
@@ -49,7 +48,7 @@ class PhiCosmology(LCDMCosmology):
         if (self.varyilam)    : l.append(philam_par)
         if (self.varybeta)    : l.append(phibeta_par)
         if (self.varyalpha)   : l.append(phialp_par)
-        if (self.varyepsilon) : l.append(epsilon_par)
+        if (self.varyOphi0)   : l.append(Ophi0_par)
 
         return l
 
@@ -67,8 +66,8 @@ class PhiCosmology(LCDMCosmology):
                 self.beta = p.value
             elif p.name  == "phimu":
                 self.mu   = p.value
-            elif p.name  == "epsilon":
-                self.eps  = p.value
+            elif p.name  == "Ophi0":
+                self.Ophi0 = p.value
             elif p.name  == "Ok":
                 self.Ok   = p.value
                 self.setCurvature(self.Ok)
@@ -117,7 +116,8 @@ class PhiCosmology(LCDMCosmology):
                         fac = (self.alpha-1)/(self.beta*self.alpha)
                         return 1 + fac*(lam/np.abs(self.beta*self.alpha))**(-self.alpha/(self.alpha-1))
                 elif self.mu==2 and self.alpha==2:   #pow2_exp_pow2
-                    pass
+                    fac= lam*np.sqrt(lam**2-16*self.beta)
+                    return 1 + (4*self.beta/lam**2)*(-16*self.beta-lam**2+fac)/(-16*self.beta-2*lam**2+2*fac)
                 else:       #pow_exp
                     if self.alpha ==1:
                         if self.mu ==0: return  1
@@ -167,7 +167,7 @@ class PhiCosmology(LCDMCosmology):
                     else:                           #'exp_pow_a'
                         ini_lam= self.alpha*self.beta*self.ilam#**(self.alpha-1)
                 elif self.mu==2 and self.alpha==2:   #pow2_exp_pow2
-                        pass
+                        ini_lam= self.ilam #2*(self.ilam + self.beta/self.ilam)
                 else:                               #pow_exp
                     if self.alpha == 1:
                         ini_lam= self.mu*self.ilam + self.beta
@@ -200,8 +200,9 @@ class PhiCosmology(LCDMCosmology):
 
     def set_ini(self):
         try:
-            Ophi0 = newton(self.rfunc, 8)
+            Ophi0 = self.Ophi0 #newton(self.rfunc, 8)
             x_vec = self.solver(Ophi0).T
+
             self.do = 1
             self.hub_SF   = interp1d(self.lna, x_vec[4])
             #self.hub_SF_z = self.logatoz(x_vec[3])

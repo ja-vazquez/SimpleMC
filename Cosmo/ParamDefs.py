@@ -22,7 +22,7 @@ mnu_par  = Parameter("mnu",  0.06,    0.1,    (0, 1.0),      "\Sigma m_{\\nu}")
 Nnu_par  = Parameter("Nnu",  3.046,   0.5,    (3.046, 5.046),"N_{\\rm eff}")
 
 Ok_par = Parameter("Ok", 0.0, 0.01, (-0.1, 0.1), "\Omega_k")
-w_par  = Parameter("w", -1.0, 0.1, (-2.0, 0.0), "w_0")
+w_par  = Parameter("w", -1., 0.1, (-2.0, 0.0), "w_0")
 wa_par = Parameter("wa", 0.0, 0.1, (-2.0, 2.0), "w_a")
 
 s8_par    = Parameter("s8", 0.8, 0.01, (0.6, 1.0), "s8")
@@ -118,11 +118,11 @@ beta2_par  = Parameter("beta",  1.0, 0.5, (0, 20), "\\beta")
 iniphi_par = Parameter("iniphi", 1.0, 0.1, (0, 2), "\phi_0")
 
 #Phi Cosmology
-phialp_par  = Parameter("phialp",   1.0, 0.1, (-15, 15.), "\\alpha")
+phialp_par  = Parameter("phialp",   1.0, 0.1,  (-3, 3.), "\\alpha")
 philam_par  = Parameter("philam",   0.5, 0.01, (0.01, 3.0), "\\lambda_i")
 phibeta_par = Parameter("phibeta",  0.0, 0.05, (-3.0, 3.0), "\\beta")
 phimu_par   = Parameter("phimu",    1.0, 0.05, (-5.0, 5.0), "\\mu")
-epsilon_par = Parameter("epsilon",  -1.0, 0.5, (-1.5, 1.5), "\epsilon")
+Ophi0_par   = Parameter("Ophi0",    7.5, 0.5, (7.0, 8.0), "\epsilon")
 
 #QDGP
 Oq_par = Parameter("Oq",  0.7, 0.05, (0.5, 1.0), "\Omega_q")
