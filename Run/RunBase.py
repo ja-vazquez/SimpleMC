@@ -149,8 +149,8 @@ def ParseModel(model):
         T = GenericPantheon()
     elif model == 'DGP':
         T = DGPCDMCosmology()
-    elif model == "Phi_exp":
-        T = PhiCosmology(mu=0, alpha=1, varybeta=True)
+    elif model == "Phi_exp_p0":
+        T = PhiCosmology(mu=0, alpha=1, varybeta=True, varyOphi0=True)
     elif model == "Phi_pow":
         T = PhiCosmology(beta=0, varymu=True, varyilam=True)
     elif model == "Phi_exp_pow2":
@@ -159,6 +159,8 @@ def ParseModel(model):
         T = PhiCosmology(alpha=1, varybeta=True, varymu=True, varyilam=True)
     elif model == "Phi_exp_pow_a":
         T = PhiCosmology(mu=0, varybeta=True, varyalpha=True, varyilam=True)
+    elif model == "Phi_pow2_exp_pow2":
+        T = PhiCosmology(mu=2, alpha=2, varybeta=True, varyilam=True)
     elif model == "Phi_cosh":
         T = PhiCosmology(beta=0, mu=-1, varyalpha=True, varyilam=True)
     elif model == "Phi_cosh_1":
