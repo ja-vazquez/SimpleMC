@@ -173,6 +173,7 @@ class PhiCosmology(LCDMCosmology):
                         ini_lam= self.mu*self.ilam + self.beta
 
         #we'll use the sign of lambda to describe either quint or phant
+        ini_lam = -ini_lam
         self.eps = np.sign(ini_lam)*1.
         self.ini_gamma = 1.0e-4*self.eps
         ini_lam = np.abs(ini_lam)
