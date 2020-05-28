@@ -5,13 +5,13 @@ from LCDMCosmology import *
 from scipy.interpolate import interp1d
 from scipy.integrate import odeint
 from ParamDefs import phialp_par, philam_par, phimu_par, \
-                      phibeta_par, Ophi0_par, Ok_par, mu_par
+                      phibeta_par, Ok_par
 from scipy.optimize import newton
 
 class PhiCosmology(LCDMCosmology):
     def __init__(self, varyalpha=False, varybeta=False, varyilam=False,\
                        varymu=False, varyOk=False,
-                       alpha=1, beta=1, mu=1, ilam=1):
+                       alpha=1, beta=1, mu=1, ilam=1, eps=1):
         """Is better to start the chains at masses equal one, othewise
         may take much longer"""
 
@@ -23,16 +23,14 @@ class PhiCosmology(LCDMCosmology):
         self.varybeta    = varybeta
         self.varyalpha   = varyalpha
 
-        #print('-'*10, 'very sensitive to initial conditions')
-        #print('-'*10, 'hence we expect plenty of warning')
-
         self.Ok     = Ok_par.value
         self.alpha  = alpha
         self.beta   = beta
         self.mu     = mu
         self.ilam   = ilam
+        self.eps    = eps
 
-        self.lna   = np.linspace(-5, 0, 500)
+        self.lna   = np.linspace(-6, 0, 500)
         self.z     = np.exp(-self.lna) - 1.
         self.zvals = np.linspace(0, 5, 200)
 
@@ -151,7 +149,8 @@ class PhiCosmology(LCDMCosmology):
                 ini_lam = -self.alpha*np.arctan(0.5*self.alpha*self.ilam)
             else: sys.exit('wrong potential')
         else:
-            #ini_lam=self.ilam
+            ini_lam=self.ilam
+            """
             if self.beta==0:                        #pow
                 ini_lam= self.mu*self.ilam
             else:
@@ -167,6 +166,7 @@ class PhiCosmology(LCDMCosmology):
                 else:                               #pow_exp
                     if self.alpha == 1:
                         ini_lam= self.mu*self.ilam + self.beta
+            """
 
         #we'll use the sign of lambda to describe either quint or phant
         ini_lam = -ini_lam
@@ -198,7 +198,6 @@ class PhiCosmology(LCDMCosmology):
         try:
             Ophi0 = newton(self.rfunc, 8)
             x_vec = self.solver(Ophi0).T
-
             self.do = 1
             self.hub_SF   = interp1d(self.lna, x_vec[4])
             #self.hub_SF_z = self.logatoz(x_vec[3])

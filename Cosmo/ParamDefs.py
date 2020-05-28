@@ -119,9 +119,9 @@ iniphi_par = Parameter("iniphi", 1.0, 0.1, (0, 2), "\phi_0")
 
 #Phi Cosmology
 phialp_par  = Parameter("phialp",   1.0, 0.1,  (-3, 3.), "\\alpha")
-philam_par  = Parameter("philam",   0.5, 0.01, (0.01, 3.0), "\\lambda_i")
+philam_par  = Parameter("philam",   0.5, 0.01, (-2.0, 2.0), "\\lambda_i")
 phibeta_par = Parameter("phibeta",  0.0, 0.05, (-3.0, 3.0), "\\beta")
-phimu_par   = Parameter("phimu",    1.0, 0.05, (-5.0, 5.0), "\\mu")
+phimu_par   = Parameter("phimu",    1.0, 0.05, (-4.0, 4.0), "\\mu")
 
 #QDGP
 Oq_par = Parameter("Oq",  0.7, 0.05, (0.5, 1.0), "\Omega_q")
