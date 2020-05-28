@@ -150,7 +150,7 @@ def ParseModel(model):
     elif model == 'DGP':
         T = DGPCDMCosmology()
     elif model == "Phi_exp_p0":
-        T = PhiCosmology(mu=0, alpha=1, varybeta=True, varyOphi0=True)
+        T = PhiCosmology(mu=0, alpha=1, varybeta=True)
     elif model == "Phi_pow":
         T = PhiCosmology(beta=0, varymu=True, varyilam=True)
     elif model == "Phi_exp_pow2":

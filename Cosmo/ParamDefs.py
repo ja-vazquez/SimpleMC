@@ -122,7 +122,6 @@ phialp_par  = Parameter("phialp",   1.0, 0.1,  (-3, 3.), "\\alpha")
 philam_par  = Parameter("philam",   0.5, 0.01, (0.01, 3.0), "\\lambda_i")
 phibeta_par = Parameter("phibeta",  0.0, 0.05, (-3.0, 3.0), "\\beta")
 phimu_par   = Parameter("phimu",    1.0, 0.05, (-5.0, 5.0), "\\mu")
-Ophi0_par   = Parameter("Ophi0",    7.5, 0.5, (5.0, 10.0), "\epsilon")
 
 #QDGP
 Oq_par = Parameter("Oq",  0.7, 0.05, (0.5, 1.0), "\Omega_q")

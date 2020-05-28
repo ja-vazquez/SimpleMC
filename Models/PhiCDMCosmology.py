@@ -10,30 +10,29 @@ from scipy.optimize import newton
 
 class PhiCosmology(LCDMCosmology):
     def __init__(self, varyalpha=False, varybeta=False, varyilam=False,\
-                       varyOphi0=False, varymu=False, varyOk=False,
-                       alpha=1, beta=1, mu=1, ilam=1, Ophi0=7):
+                       varymu=False, varyOk=False,
+                       alpha=1, beta=1, mu=1, ilam=1):
         """Is better to start the chains at masses equal one, othewise
         may take much longer"""
 
+         #eps => 1=Quintes, -1=Panthom
 
         self.varyOk      = varyOk
         self.varymu      = varymu
         self.varyilam    = varyilam
         self.varybeta    = varybeta
         self.varyalpha   = varyalpha
-        self.varyOphi0   = varyOphi0
 
         #print('-'*10, 'very sensitive to initial conditions')
         #print('-'*10, 'hence we expect plenty of warning')
 
         self.Ok     = Ok_par.value
-        self.Ophi0  = Ophi0   #1=Quintes, -1=Panthom
         self.alpha  = alpha
         self.beta   = beta
         self.mu     = mu
         self.ilam   = ilam
 
-        self.lna   = np.linspace(-6, 0, 500)
+        self.lna   = np.linspace(-5, 0, 500)
         self.z     = np.exp(-self.lna) - 1.
         self.zvals = np.linspace(0, 5, 200)
 
@@ -48,7 +47,6 @@ class PhiCosmology(LCDMCosmology):
         if (self.varyilam)    : l.append(philam_par)
         if (self.varybeta)    : l.append(phibeta_par)
         if (self.varyalpha)   : l.append(phialp_par)
-        if (self.varyOphi0)   : l.append(Ophi0_par)
 
         return l
 
@@ -66,8 +64,6 @@ class PhiCosmology(LCDMCosmology):
                 self.beta = p.value
             elif p.name  == "phimu":
                 self.mu   = p.value
-            elif p.name  == "Ophi0":
-                self.Ophi0 = p.value
             elif p.name  == "Ok":
                 self.Ok   = p.value
                 self.setCurvature(self.Ok)
@@ -200,7 +196,7 @@ class PhiCosmology(LCDMCosmology):
 
     def set_ini(self):
         try:
-            Ophi0 = self.Ophi0 #newton(self.rfunc, 8)
+            Ophi0 = newton(self.rfunc, 8)
             x_vec = self.solver(Ophi0).T
 
             self.do = 1
