@@ -11,7 +11,7 @@ from scipy.optimize import newton
 class PhiCosmology(LCDMCosmology):
     def __init__(self, varyalpha=False, varybeta=False, varyilam=False,\
                        varymu=False, varyOk=False,
-                       alpha=1, beta=1, mu=1, ilam=1, eps=1):
+                       alpha=1, beta=1, mu=1, ilam=1, eps=1, curv=0):
         """Is better to start the chains at masses equal one, othewise
         may take much longer"""
 
@@ -23,7 +23,7 @@ class PhiCosmology(LCDMCosmology):
         self.varybeta    = varybeta
         self.varyalpha   = varyalpha
 
-        self.Ok     = Ok_par.value
+        self.Ok     = curv
         self.alpha  = alpha
         self.beta   = beta
         self.mu     = mu
@@ -67,6 +67,7 @@ class PhiCosmology(LCDMCosmology):
                 self.setCurvature(self.Ok)
                 if (abs(self.Ok) > 1.0):
                     return False
+
         self.set_ini()
 
 
@@ -149,8 +150,8 @@ class PhiCosmology(LCDMCosmology):
                 ini_lam = -self.alpha*np.arctan(0.5*self.alpha*self.ilam)
             else: sys.exit('wrong potential')
         else:
-            ini_lam=self.ilam
-            """
+            #ini_lam=self.ilam
+
             if self.beta==0:                        #pow
                 ini_lam= self.mu*self.ilam
             else:
@@ -166,12 +167,11 @@ class PhiCosmology(LCDMCosmology):
                 else:                               #pow_exp
                     if self.alpha == 1:
                         ini_lam= self.mu*self.ilam + self.beta
-            """
+
 
         #we'll use the sign of lambda to describe either quint or phant
-        ini_lam = -ini_lam
-        self.eps = np.sign(ini_lam)*1.
-        self.ini_gamma = 1.0e-4*self.eps
+        self.eps = np.sign(-ini_lam)*1.
+        self.ini_gamma  = 1.0e-4*self.eps
         ini_lam = np.abs(ini_lam)
 
         ini_hub = 100*self.h*self.Om**0.5*np.exp(-1.5*self.lna[0])
@@ -202,8 +202,10 @@ class PhiCosmology(LCDMCosmology):
             self.hub_SF   = interp1d(self.lna, x_vec[4])
             #self.hub_SF_z = self.logatoz(x_vec[3])
             self.w_eos    = interp1d(self.lna, x_vec[0])
+            self.Ophi    = interp1d(self.lna, x_vec[1])
+            self.Oka      = interp1d(self.lna, x_vec[3])
         except RuntimeError:
-            if np.abs(self.ilam) < 0.02 or np.abs(self.mu) < 0.02:
+            if np.abs(self.ilam) < 0.01 or np.abs(self.mu) < 0.01:
                 self.do = 0
                 self.w_eos    = interp1d(self.lna, np.zeros(len(self.lna)))
             else:
@@ -238,4 +240,10 @@ class PhiCosmology(LCDMCosmology):
     def w_de(self, a):
         lna = np.log(a)
         return self.eps*self.w_eos(lna)-1
+
+    def Omegaphi(self, lna):
+        return self.Ophi(lna)
+
+    def Omegak(self, lna):
+        return self.Oka(lna)
 
