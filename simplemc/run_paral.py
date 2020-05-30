@@ -1,6 +1,4 @@
 #mpirun -np 2 python3 Run/run_paral.py model data
-
-
 from mpi4py import MPI
 import os, sys
 
