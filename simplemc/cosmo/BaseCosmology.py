@@ -15,7 +15,7 @@ from scipy import constants
 import scipy.integrate as intg
 
 
-from ParamDefs import h_par, Pr_par, s8_par
+from .paramDefs import h_par, Pr_par, s8_par
 
 
 class BaseCosmology:

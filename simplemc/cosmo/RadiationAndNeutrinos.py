@@ -6,9 +6,10 @@
 ##
 
 import sys
-from ParamDefs import mnu_par, Nnu_par
-from NuDensity import ZeroNuDensity, NuDensity
-import CosmoApprox as CA
+from .paramDefs import mnu_par, Nnu_par
+from .NuDensity import ZeroNuDensity, NuDensity
+from simplemc.cosmo import cosmoApprox as CA
+# import CosmoApprox as CA
 
 
 class RadiationAndNeutrinos:

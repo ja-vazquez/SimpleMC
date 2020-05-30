@@ -9,7 +9,7 @@ from scipy import constants as ct
 from scipy.special import zeta
 from scipy.integrate import quad
 from scipy.interpolate import interp1d
-import CosmoApprox as CA
+from simplemc.cosmo import cosmoApprox as CA
 #from numba import autojit
 
 class NuIntegral:
