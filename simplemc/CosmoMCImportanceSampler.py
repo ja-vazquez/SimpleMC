@@ -7,7 +7,7 @@ from random import *
 from math import *
 import numpy as np
 import os.path as path
-from Parameter import *
+from simplemc.cosmo.Parameter import *
 
 
 class CosmoMCImportanceSampler:
