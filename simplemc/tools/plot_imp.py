@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import sys
-from Simple_plots import Simple_plots
+from .Simple_Plots import Simple_plots
 import matplotlib.pyplot as plt
 import numpy as np
 
