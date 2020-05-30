@@ -10,51 +10,55 @@ sys.path = ["py", "../py", "Models", "Cosmo", "Likelihoods"] + sys.path
 #TODO -- Add Compress Pantheon
 
 # Cosmologies already included
-from LCDMCosmology import LCDMCosmology
-from oLCDMCosmology import oLCDMCosmology
-from wCDMCosmology import wCDMCosmology
-from owa0CDMCosmology import owa0CDMCosmology
-from PolyCDMCosmology import PolyCDMCosmology
-from JordiCDMCosmology import JordiCDMCosmology
-from WeirdCDMCosmology import WeirdCDMCosmology
-from TiredLightDecorator import TiredLightDecorator
-from SplineLCDMCosmology import SplineLCDMCosmology
-from DecayLCDMCosmology import DecayLCDMCosmology
-from StepCDMCosmology import StepCDMCosmology
-from EarlyDECosmology import EarlyDECosmology
-from SlowRDECosmology import SlowRDECosmology
-from BinnedWCosmology import BinnedWCosmology
-from PhiCDMCosmology import PhiCosmology
+from simplemc.models.LCDMCosmology import LCDMCosmology
+from simplemc.models.oLCDMCosmology import oLCDMCosmology
+from simplemc.models.wCDMCosmology import wCDMCosmology
+from simplemc.models.owa0CDMCosmology import owa0CDMCosmology
+from simplemc.models.PolyCDMCosmology import PolyCDMCosmology
+from simplemc.models.JordiCDMCosmology import JordiCDMCosmology
+from simplemc.models.WeirdCDMCosmology import WeirdCDMCosmology
+from simplemc.models.TiredLightDecorator import TiredLightDecorator
+from simplemc.models.SplineLCDMCosmology import SplineLCDMCosmology
+from simplemc.models.DecayLCDMCosmology import DecayLCDMCosmology
+from simplemc.models.StepCDMCosmology import StepCDMCosmology
+from simplemc.models.EarlyDECosmology import EarlyDECosmology
+from simplemc.models.SlowRDECosmology import SlowRDECosmology
+from simplemc.models.BinnedWCosmology import BinnedWCosmology
+from simplemc.models.PhiCDMCosmology import PhiCosmology
 #from STCDMCosmology import STCDMCosmology
 
 #from DGPCDMCosmology import DGPCDMCosmology
 
 #Generic model
-from GenericCosmology import GenericCosmology
-from GenericPantheon import GenericPantheon
+from simplemc.models.GenericCosmology import GenericCosmology
+from simplemc.models.GenericPantheon import GenericPantheon
+from simplemc.models.SimpleCosmoModel import SimpleCosmoModel
+from simplemc.models.SimpleModel import SimpleModel
 
 # Composite Likelihood
-from CompositeLikelihood import CompositeLikelihood
+from simplemc.likelihoods.CompositeLikelihood import CompositeLikelihood
 
 # Likelihood Multiplier
-from LikelihoodMultiplier import LikelihoodMultiplier
+from simplemc.likelihoods.LikelihoodMultiplier import LikelihoodMultiplier
 
 # Likelihood modules
-from BAOLikelihoods import DR11LOWZ, DR11CMASS, DR14LyaAuto, DR14LyaCross, \
+from simplemc.likelihoods.BAOLikelihoods import DR11LOWZ, DR11CMASS, DR14LyaAuto, DR14LyaCross, \
         SixdFGS, SDSSMGS, DR11LyaAuto, DR11LyaCross, eBOSS, DR12Consensus
-from SimpleCMB import PlanckLikelihood, PlanckLikelihood_15, WMAP9Likelihood
-from CompressedSNLikelihood    import BetouleSN, UnionSN, BinnedPantheon
-from PantheonSNLikelihood      import PantheonSNLikelihood
-from HubbleParameterLikelihood import RiessH0
-from CompressedHDLikelihood    import HubbleDiagram
-from Compressedfs8Likelihood import fs8Diagram
+from simplemc.likelihoods.SimpleCMB import PlanckLikelihood, PlanckLikelihood_15, WMAP9Likelihood
+from simplemc.likelihoods.CompressedSNLikelihood    import BetouleSN, UnionSN, BinnedPantheon
+from simplemc.likelihoods.PantheonSNLikelihood      import PantheonSNLikelihood
+from simplemc.likelihoods.HubbleParameterLikelihood import RiessH0
+from simplemc.likelihoods.CompressedHDLikelihood    import HubbleDiagram
+from simplemc.likelihoods.Compressedfs8Likelihood import fs8Diagram
 
-from GenericLikelihood import StraightLine
-from GenericPantheonSNLikelihood import GenericPantheonSNLikelihood
+#from simplemc.likelihoods.GenericLikelihood import StraightLine
+from .likelihoods.SimpleLikelihood import GenericLikelihood
+from .likelihoods.SimpleLikelihood import StraightLine
+from .likelihoods.GenericPantheonSNLikelihood import GenericPantheonSNLikelihood
 
 
 #Importance Sampling
-from CosmoMCImportanceSampler import *
+from .CosmoMCImportanceSampler import *
 
 
 # String parser Aux routines
@@ -63,7 +67,7 @@ model_list = "LCDOM, LCDMasslessnu, nuLCDM, NeffLCDM, noradLCDM, nuoLCDM, nuwLCD
     "EarlyDE, EarlyDE_rd_DE, SlowRDE"
 
 
-def ParseModel(model):
+def ParseModel(model, **kwargs):
     """ 
     Parameters
     -----------
@@ -75,6 +79,8 @@ def ParseModel(model):
     object - info/calculations based on this model: i.e. d_L, d_A, d_H
 
     """
+    custom_parameters = kwargs.pop('custom_parameters', None)
+    custom_function = kwargs.pop('custom_function', None)
 
     if model == "LCDM":
         T = LCDMCosmology()
@@ -145,6 +151,10 @@ def ParseModel(model):
         T = wCDMCosmology()
     elif model == 'sline':
         T = GenericCosmology()
+    elif model == 'custom':
+        T = SimpleModel(custom_parameters, custom_function)
+    elif model == 'simpleCosmo':
+        T = SimpleCosmoModel()
     elif model == 'GPantheon':
         T = GenericPantheon()
     #elif model == 'DGP':
@@ -180,7 +190,7 @@ data_list = "BBAO, GBAO, GBAO_no6dF, CMASS, LBAO, LaBAO, LxBAO, MGS, Planck, WMA
     "CMBW, SN, SNx10, UnionSN, RiessH0, 6dFGS"
 
 
-def ParseDataset(datasets):
+def ParseDataset(datasets, **kwargs):
     """ 
     Parameters
     -----------
@@ -192,6 +202,9 @@ def ParseDataset(datasets):
     object - likelihood
 
     """
+    path_to_data = kwargs.pop('path_to_data', None)
+    path_to_cov = kwargs.pop('path_to_cov', None)
+
     dlist = datasets.split('+')
     L = CompositeLikelihood([])
     for name in dlist:
@@ -296,6 +309,9 @@ def ParseDataset(datasets):
             L.addLikelihood(StraightLine())
         elif name == 'CPantheon_15':
             L.addLikelihood(GenericPantheonSNLikelihood())
+        elif name == 'custom':
+            L.addLikelihood(GenericLikelihood(path_to_data=path_to_data,
+                                              path_to_cov=path_to_cov))
         else:
             print("Cannot parse data, unrecognizable part:", name)
             sys.exit(1)
