@@ -28,7 +28,7 @@ print ("Hello, World! "
 
 class MCMCAnalyzer:
     def __init__(self, like, outfile, skip=5000, nsamp=100000, temp=1.0,
-                 cov=None, chain_num=None, derived=False):
+                 cov=None, chain_num=None, addDerived=False):
 
         self.like      = like
         self.outfile   = outfile
@@ -38,7 +38,7 @@ class MCMCAnalyzer:
         self.chain_num = comm.rank+1 #chain_num
         self.cpars     = like.freeParameters()
         self.N         = len(self.cpars)
-        self.derived   = derived == 'True'
+        self.derived   = addDerived
 
         minvals, maxvals = [], []
         for lb, hb in [p.bounds for p in self.cpars]:
