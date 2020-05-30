@@ -1,5 +1,4 @@
 import sys,os
-sys.path=["py","../py"]+sys.path
 import pandas as pd
 import numpy as np 
 import os
