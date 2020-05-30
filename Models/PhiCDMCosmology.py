@@ -89,7 +89,7 @@ class PhiCosmology(LCDMCosmology):
 
 
     def MGama(self, lam):
-        if self.mu == type('st'):
+        if type(self.mu) == type('st'):
             tmp = self.alpha**2/lam**2
             if self.beta == 0:  #cosh
                 return tmp
@@ -108,8 +108,8 @@ class PhiCosmology(LCDMCosmology):
                     elif self.alpha== 2: #exp_pow2
                         return 1+ 2*self.beta/lam**2
                     else:           #'exp_pow_a'
-                        fac = (self.alpha-1)/(self.beta*self.alpha)
-                        return 1 + fac*(lam/np.abs(self.beta*self.alpha))**(-self.alpha/(self.alpha-1))
+                        fac = self.alpha*(self.alpha-1)*self.beta/lam**2
+                        return 1- fac*(-lam/(self.alpha*self.beta))**((self.alpha-2)/(self.alpha-1))
                 elif self.mu==2 and self.alpha==2:   #pow2_exp_pow2
                     fac= lam*np.sqrt(lam**2-16*self.beta)
                     return 1 + (4*self.beta/lam**2)*(-16*self.beta-lam**2+fac)/(-16*self.beta-2*lam**2+2*fac)
@@ -122,26 +122,23 @@ class PhiCosmology(LCDMCosmology):
 
 
     def RHS(self, x_vec , lna):
-        gamma, Ophi, lam, Ok, hub = x_vec
+        wphi, Ophi, lam, Ok, hub = x_vec
 
         Mgamma = self.MGama(lam)
-        term   = np.sqrt(3*np.abs(gamma*Ophi))
-        wphi   = self.eps*gamma -1
+        term   = np.sqrt(3*np.abs((1+wphi)*self.eps*Ophi))
         Pi     = -1.5*(-Ok/3. + wphi*Ophi + 1)
-        delta  = 1
 
-        #gamma_prime = (2 - self.eps*gamma)*(self.eps*delta*lam*term -3*gamma)
-        gamma_prime = (2 - self.eps*gamma)*(delta*lam*term -3*gamma)
-        Ophi_prime  = -Ophi*(3*self.eps*gamma + 2*Pi)
-        lam_prime   = -delta*lam**2*(Mgamma -1)*term
-        Ok_prime    = -2*Ok - 2*Pi*Ok
+        Ophi_prime  = -3*Ophi*(1+ wphi + 2*Pi/3.)
+        Ok_prime    = -3*Ok*(1 - 1./3. + 2*Pi/3.)
+        wphi_prime  = -(1-wphi)*(3*(1+wphi)- lam*term)
+        lam_prime   = -lam**2*(Mgamma -1)*term
         hub_prime   = hub*Pi
 
-        return [gamma_prime, Ophi_prime, lam_prime, Ok_prime, hub_prime]
+        return [wphi_prime, Ophi_prime, lam_prime, Ok_prime, hub_prime]
         
 
     def solver(self, ini_Ophi):
-        if self.mu == type('st'):
+        if type(self.mu) == type('st'):
             if self.beta == 0:                  #cosh
                 ini_lam = self.alpha*np.tanh(self.alpha*self.ilam)
             elif self.beta == -1:
@@ -161,7 +158,7 @@ class PhiCosmology(LCDMCosmology):
                     elif self.alpha== 2:            #exp_pow2
                         ini_lam= 2*self.beta*self.ilam
                     else:                           #'exp_pow_a'
-                        ini_lam= self.alpha*self.beta*self.ilam#**(self.alpha-1)
+                        ini_lam= self.alpha*self.beta*self.ilam #**(self.alpha-1)
                 elif self.mu==2 and self.alpha==2:   #pow2_exp_pow2
                         ini_lam= self.ilam #2*(self.ilam + self.beta/self.ilam)
                 else:                               #pow_exp
@@ -170,13 +167,14 @@ class PhiCosmology(LCDMCosmology):
 
 
         #we'll use the sign of lambda to describe either quint or phant
-        self.eps = np.sign(-ini_lam)*1.
-        self.ini_gamma  = 1.0e-4*self.eps
-        ini_lam = np.abs(ini_lam)
+        ini_lam=-ini_lam
+        self.eps = np.sign(ini_lam)
+        self.ini_wphi = -1 + 1.0e-4*self.eps
+
 
         ini_hub = 100*self.h*self.Om**0.5*np.exp(-1.5*self.lna[0])
         ini_Ok  = self.Ok*np.exp(-2*self.lna[0])/(self.Om**0.5*np.exp(-1.5*self.lna[0]))**2
-        y0      = [self.ini_gamma, 10**(-ini_Ophi), ini_lam, ini_Ok, ini_hub]
+        y0      = [self.ini_wphi, 10**(-ini_Ophi), ini_lam, ini_Ok, ini_hub]
         y_result = odeint(self.RHS, y0, self.lna, h0=1E-5)
         return y_result
 
@@ -201,16 +199,17 @@ class PhiCosmology(LCDMCosmology):
             self.do = 1
             self.hub_SF   = interp1d(self.lna, x_vec[4])
             #self.hub_SF_z = self.logatoz(x_vec[3])
-            self.w_eos    = interp1d(self.lna, x_vec[0])
-            self.Ophi    = interp1d(self.lna, x_vec[1])
-            self.Oka      = interp1d(self.lna, x_vec[3])
+            #self.w_eos    = interp1d(self.lna, x_vec[0])
+            #self.Ophi    = interp1d(self.lna, x_vec[1])
+            #self.Oka      = interp1d(self.lna, x_vec[3])
         except RuntimeError:
             if np.abs(self.ilam) < 0.01 or np.abs(self.mu) < 0.01:
                 self.do = 0
-                self.w_eos    = interp1d(self.lna, np.zeros(len(self.lna)))
+                print('Cosmological constant', 'a=',self.alpha, 'b=',self.beta, 'l=', self.ilam, 'm=', self.mu)
+                #self.w_eos    = interp1d(self.lna, -1+np.zeros(len(self.lna)))
             else:
-                self.w_eos    = interp1d(self.lna, np.zeros(len(self.lna)))
-                print('troubles', 'a=',self.alpha, 'b=',self.beta, 'l=', self.ilam, 'm=', self.mu)
+                #self.w_eos    = interp1d(self.lna, -1+np.zeros(len(self.lna)))
+                #print('troubles', 'a=',self.alpha, 'b=',self.beta, 'l=', self.ilam, 'm=', self.mu)
                 self.do = 2
 
 
@@ -239,7 +238,8 @@ class PhiCosmology(LCDMCosmology):
 
     def w_de(self, a):
         lna = np.log(a)
-        return self.eps*self.w_eos(lna)-1
+        #print (self.w_eos(lna))
+        return self.w_eos(lna)
 
     def Omegaphi(self, lna):
         return self.Ophi(lna)
