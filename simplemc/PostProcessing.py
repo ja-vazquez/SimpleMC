@@ -2,7 +2,7 @@
 This module processes the samples from a nested sampler and prints, saves chains in a text file
 and creates a param file.
 """
-from simplemc.tools.Simple_Plots import Simple_plots
+# from simplemc.tools.Simple_Plots import Simple_plots
 import sys
 import os.path as path
 import numpy as np
