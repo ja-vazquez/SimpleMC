@@ -1,10 +1,10 @@
 ## This is phiCDM cosmology
 
 import numpy as np
-from LCDMCosmology import *
+from simplemc.models.LCDMCosmology import LCDMCosmology
 from scipy.interpolate import interp1d
 from scipy.integrate import odeint
-from ParamDefs import phialp_par, philam_par, phimu_par, \
+from simplemc.cosmo.paramDefs import phialp_par, philam_par, phimu_par, \
                       phibeta_par, Ok_par
 from scipy.optimize import newton
 

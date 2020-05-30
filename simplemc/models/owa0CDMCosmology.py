@@ -2,8 +2,8 @@
 
 
 import math as N
-from LCDMCosmology import LCDMCosmology
-from ParamDefs import w_par, wa_par, Ok_par
+from simplemc.models.LCDMCosmology import LCDMCosmology
+from simplemc.cosmo.paramDefs import w_par, wa_par, Ok_par
 
 class owa0CDMCosmology(LCDMCosmology):
     def __init__(self, varyw=True, varywa=True, varyOk=True):

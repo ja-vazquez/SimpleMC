@@ -1,9 +1,8 @@
 
 #from __future__ import print_function
-from ParamDefs import *
+from simplemc.cosmo.paramDefs import *
 import sys
 import numpy as np
-sys.path = ["../Cosmo"] + sys.path
 import matplotlib.pyplot as plt
 
 class BaseGenericPModel:

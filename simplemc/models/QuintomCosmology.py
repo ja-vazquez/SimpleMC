@@ -6,12 +6,12 @@
 #TODO Clean up the code.
 
 #import math as N
+from simplemc.models.LCDMCosmology import LCDMCosmology
+from simplemc.cosmo.paramDefs import mquin_par, mphan_par, beta_par, iniphi_par
 import numpy as np
 from scipy.integrate import odeint
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
-from LCDMCosmology import LCDMCosmology
-from ParamDefs import mquin_par, mphan_par, beta_par, iniphi_par
 from scipy.optimize import newton
 
 class QuintomCosmology(LCDMCosmology):

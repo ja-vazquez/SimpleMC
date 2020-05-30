@@ -1,5 +1,5 @@
 #from __future__ import print_function
-from ParamDefs import a_par, b_par
+from simplemc.cosmo.paramDefs import a_par, b_par
 import sys
 
 class BaseGenericModel:

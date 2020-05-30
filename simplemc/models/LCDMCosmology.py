@@ -4,12 +4,11 @@
 # hassle.
 
 import sys
-sys.path = ["Cosmo"] + sys.path
 import scipy as sp
-import CosmoApprox as CA
-from BaseCosmology import BaseCosmology
-from RadiationAndNeutrinos import RadiationAndNeutrinos
-from ParamDefs import Obh2_par, Om_par, h_par, mnu_par, Nnu_par
+from simplemc.cosmo import cosmoApprox as CA
+from simplemc.cosmo.BaseCosmology import BaseCosmology
+from simplemc.cosmo.RadiationAndNeutrinos import RadiationAndNeutrinos
+from simplemc.cosmo.paramDefs import Obh2_par, Om_par, h_par, mnu_par, Nnu_par
 from scipy.misc import derivative
 
 

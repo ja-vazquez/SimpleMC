@@ -5,8 +5,8 @@
 
 import sys
 import math as N
-from LCDMCosmology import LCDMCosmology
-from ParamDefs import Ok_par, q_par, za_par, zb_par, wd_par, Od_par
+from simplemc.models.LCDMCosmology import LCDMCosmology
+from simplemc.cosmo.paramDefs import Ok_par, q_par, za_par, zb_par, wd_par, Od_par
 
 
 class JordiCDMCosmology(LCDMCosmology):

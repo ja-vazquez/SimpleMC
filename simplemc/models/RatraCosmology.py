@@ -1,10 +1,11 @@
 ## This is phiCDM cosmology
 
+from simplemc.models.LCDMCosmology import LCDMCosmology
+from simplemc.cosmo.paramDefs import alpha_par, Ok_par
 import numpy as np
-from LCDMCosmology import *
 from scipy.interpolate import interp1d
 from scipy.integrate import odeint
-from ParamDefs import alpha_par, Ok_par
+
 import matplotlib.pyplot as plt
 
 class SureshCosmology(LCDMCosmology):

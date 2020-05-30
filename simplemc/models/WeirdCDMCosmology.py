@@ -3,8 +3,8 @@
 
 
 import math as N
-from LCDMCosmology import LCDMCosmology
-from ParamDefs import Ok_par, mu_par, Amp_par, sig_par
+from .LCDMCosmology import LCDMCosmology
+from simplemc.cosmo.paramDefs import Ok_par, mu_par, Amp_par, sig_par
 
 
 class WeirdCDMCosmology(LCDMCosmology):

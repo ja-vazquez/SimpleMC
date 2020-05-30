@@ -3,7 +3,7 @@ from pylab import *
 import numpy as np
 from scipy.integrate import odeint
 from scipy.interpolate import interp1d
-from LCDMCosmology import *
+from simplemc.models.LCDMCosmology import *
 
 
 class EarlyDECosmology(LCDMCosmology):

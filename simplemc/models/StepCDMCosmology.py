@@ -3,8 +3,8 @@
 #
 
 import numpy
-from LCDMCosmology import LCDMCosmology
-from ParamDefs import *
+from .LCDMCosmology import LCDMCosmology
+from simplemc.cosmo.paramDefs import *
 
 
 class StepCDMCosmology(LCDMCosmology):

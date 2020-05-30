@@ -2,7 +2,7 @@
 # This helper class adds a "tired light" parameter
 # to any class
 ##
-from ParamDefs import beta_par
+from simplemc.cosmo.paramDefs import beta_par
 import math as N
 
 

@@ -2,8 +2,8 @@
 # curvature which you can set up with
 # setVaryOk()
 
-from LCDMCosmology import LCDMCosmology
-from ParamDefs import Ok_par
+from simplemc.models.LCDMCosmology import LCDMCosmology
+from simplemc.cosmo.paramDefs import Ok_par
 
 class oLCDMCosmology(LCDMCosmology):
     # zeroDE forces Ol to zero.

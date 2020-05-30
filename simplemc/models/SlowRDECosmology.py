@@ -3,8 +3,8 @@
 # I do not.
 #
 
-from LCDMCosmology import LCDMCosmology
-from ParamDefs import Ok_par, dw_par
+from simplemc.models.LCDMCosmology import LCDMCosmology
+from simplemc.cosmo.paramDefs import Ok_par, dw_par
 
 
 class SlowRDECosmology(LCDMCosmology):

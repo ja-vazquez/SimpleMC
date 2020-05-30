@@ -2,10 +2,9 @@
 # This si a cosmology where w(z) is defined by splines.
 ##
 
-
 from scipy.interpolate import InterpolatedUnivariateSpline
-from LCDMCosmology import LCDMCosmology
-from ParamDefs import Sp1_par, Sp2_par, Sp3_par, Sp4_par
+from .LCDMCosmology import LCDMCosmology
+from simplemc.cosmo.paramDefs import Sp1_par, Sp2_par, Sp3_par, Sp4_par
 import math as N
 
 

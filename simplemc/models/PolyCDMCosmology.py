@@ -1,8 +1,8 @@
 # This is LCDM cosmology with optional
 # free parameters on the Hubble function
 
-from LCDMCosmology import LCDMCosmology
-from ParamDefs import Ok_par, Om1_par, Om2_par
+from simplemc.models.LCDMCosmology import LCDMCosmology
+from simplemc.cosmo.paramDefs import Ok_par, Om1_par, Om2_par
 
 
 class PolyCDMCosmology(LCDMCosmology):

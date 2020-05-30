@@ -1,7 +1,7 @@
 # This is a CDM cosmology with constant eos w for DE
 
-from LCDMCosmology import LCDMCosmology
-from ParamDefs import w_par
+from .LCDMCosmology import LCDMCosmology
+from simplemc.cosmo.paramDefs import w_par
 
 
 class wCDMCosmology(LCDMCosmology):
