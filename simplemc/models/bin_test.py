@@ -1,8 +1,8 @@
 import sys
-sys.path = ["../tools", 'tools'] + sys.path
+# sys.path = ["../tools", 'tools'] + sys.path
 import numpy as np
 import matplotlib.pyplot as plt
-from cosmich import cosmochain
+from simplemc.tools.cosmich import cosmochain
 
 class GenericPantheona():
     def __init__(self):

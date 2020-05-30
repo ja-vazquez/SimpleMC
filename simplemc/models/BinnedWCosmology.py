@@ -1,10 +1,10 @@
 # This is a CDM cosmology with binned w
 # Still testing the file -- don't trust it
 
-from LCDMCosmology import LCDMCosmology
+from .LCDMCosmology import LCDMCosmology
 from scipy.interpolate import interp1d
 from scipy.integrate import quad
-from Parameter import Parameter
+from simplemc.cosmo.Parameter import Parameter
 import numpy as np
 
 class BinnedWCosmology(LCDMCosmology):

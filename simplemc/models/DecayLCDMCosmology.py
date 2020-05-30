@@ -7,8 +7,8 @@ import numpy as np
 from scipy.integrate import odeint
 from scipy.interpolate import interp1d
 from scipy.optimize import minimize
-from LCDMCosmology import LCDMCosmology
-from ParamDefs import xfrac_par, lambda_par
+from .LCDMCosmology import LCDMCosmology
+from simplemc.cosmo.paramDefs import xfrac_par, lambda_par
 
 
 class DecayLCDMCosmology(LCDMCosmology):
