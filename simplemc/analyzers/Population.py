@@ -1,4 +1,4 @@
-from Individual import Individual
+from .Individual import Individual
 import numpy as np
 import copy
 import pandas as pd
