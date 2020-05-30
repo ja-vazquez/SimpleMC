@@ -3,7 +3,7 @@
 # and then tries to maximize it and get the errors from the
 # second derivative matrix. It kinda works, but not very well.
 #
-
+import sys
 import scipy as sp
 from scipy.optimize import minimize
 import scipy.linalg as la
