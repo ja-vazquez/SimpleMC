@@ -1,5 +1,5 @@
 
-from cosmich import cosmochain
+from .cosmich import cosmochain
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 import numpy as np
