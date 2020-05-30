@@ -2,7 +2,7 @@
 # This module calculates likelihood for Hubble Diagram.
 # based on the CompressSN file
 
-from BaseLikelihood import BaseLikelihood
+from .BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
 import scipy as sp
 
@@ -37,5 +37,5 @@ class CompressedHDLikelihood(BaseLikelihood):
 class HubbleDiagram(CompressedHDLikelihood):
     # data from https://arxiv.org/abs/1802.01505
     def __init__(self):
-        CompressedHDLikelihood.__init__(self,"HD","data/HDiagramCompilacion-data_31.txt",
-                                             "data/HDiagramCompilacion-cov_31.txt")
+        CompressedHDLikelihood.__init__(self,"HD","simplemc/data/HDiagramCompilacion-data_31.txt",
+                                             "simplemc/data/HDiagramCompilacion-cov_31.txt")

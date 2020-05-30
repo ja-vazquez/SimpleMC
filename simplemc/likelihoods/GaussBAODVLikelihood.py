@@ -3,7 +3,7 @@
 # at which chi2 is cut.
 #
 
-from BaseLikelihood import BaseLikelihood
+from .BaseLikelihood import BaseLikelihood
 
 
 

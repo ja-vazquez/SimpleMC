@@ -3,7 +3,7 @@
 #
 
 
-from BaseLikelihood import BaseLikelihood
+from .BaseLikelihood import BaseLikelihood
 
 
 

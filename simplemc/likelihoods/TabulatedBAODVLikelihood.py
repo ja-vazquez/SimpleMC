@@ -3,7 +3,7 @@
 ##
 
 import scipy as sp
-from BaseLikelihood import BaseLikelihood
+from .BaseLikelihood import BaseLikelihood
 from scipy.interpolate import interp1d
 from scipy.optimize import minimize
 from scipy.integrate import quad

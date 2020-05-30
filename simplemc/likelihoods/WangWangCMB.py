@@ -8,7 +8,7 @@
 ##
 
 import sys
-from BaseLikelihood import BaseLikelihood
+from .BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
 import scipy as sp
 

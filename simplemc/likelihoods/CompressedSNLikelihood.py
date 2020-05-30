@@ -2,7 +2,7 @@
 # This module calculates likelihood for the compressed SN.
 #
 
-from BaseLikelihood import BaseLikelihood
+from .BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
 import scipy as sp
 
@@ -37,17 +37,17 @@ class CompressedSNLikelihood(BaseLikelihood):
 
 class BetouleSN(CompressedSNLikelihood):
     def __init__(self):
-        CompressedSNLikelihood.__init__(self, "BetouleSN", "data/jla_binned_distances_31nodes_v1.txt",
-                                        "data/cov_jla_binned_distances_31nodes_v1.txt")
+        CompressedSNLikelihood.__init__(self, "BetouleSN", "simplemc/data/jla_binned_distances_31nodes_v1.txt",
+                                        "simplemc/data/cov_jla_binned_distances_31nodes_v1.txt")
 
 
 class UnionSN(CompressedSNLikelihood):
     def __init__(self):
-        CompressedSNLikelihood.__init__(self, "UnionSNV2", "data/binned-sne-union21-v2.txt",
-                                        "data/binned-covariance-sne-union21-v2.txt")
+        CompressedSNLikelihood.__init__(self, "UnionSNV2", "simplemc/data/binned-sne-union21-v2.txt",
+                                        "simplemc/data/binned-covariance-sne-union21-v2.txt")
 
 
 class BinnedPantheon(CompressedSNLikelihood):
     def __init__(self):
-        CompressedSNLikelihood.__init__(self, "BinnedPantheon", "data/binned_pantheon_15.txt",
-                                        "data/binned_cov_pantheon_15.txt")
+        CompressedSNLikelihood.__init__(self, "BinnedPantheon", "simplemc/data/binned_pantheon_15.txt",
+                                        "simplemc/data/binned_cov_pantheon_15.txt")

@@ -2,9 +2,8 @@
 # This module calculates likelihood for Hubble Diagram.
 # based on the CompressSN file
 import sys
-sys.path = ["Cosmo"] + sys.path
 
-from BaseLikelihood import BaseLikelihood
+from .BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
 import scipy as sp
 
@@ -36,5 +35,5 @@ class Compressedfs8Likelihood(BaseLikelihood):
 class fs8Diagram(Compressedfs8Likelihood):
     # data from arXiv:1806.10822
     def __init__(self):
-        Compressedfs8Likelihood.__init__(self,"fs8","data/fs8Diagram.txt",
-                                             "data/fs8Diagram-cov.txt")
+        Compressedfs8Likelihood.__init__(self,"fs8","simplemc/data/fs8Diagram.txt",
+                                             "simplemc/data/fs8Diagram-cov.txt")

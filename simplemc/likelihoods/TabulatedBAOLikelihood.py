@@ -5,7 +5,7 @@
 
 
 import scipy as sp
-from BaseLikelihood import BaseLikelihood
+from .BaseLikelihood import BaseLikelihood
 from scipy.interpolate import RectBivariateSpline
 
 

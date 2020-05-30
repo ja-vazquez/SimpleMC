@@ -3,7 +3,7 @@
 # which is a composite of many.
 #
 
-from BaseLikelihood import BaseLikelihood
+from .BaseLikelihood import BaseLikelihood
 import scipy as sp
 
 

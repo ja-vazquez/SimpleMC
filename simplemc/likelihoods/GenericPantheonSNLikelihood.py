@@ -2,7 +2,7 @@
 # This module calculates likelihood for the compressed SN.
 #
 
-from BaseLikelihood import *
+from .BaseLikelihood import *
 import numpy as np
 import scipy.linalg as la
 from scipy.interpolate import interp1d
@@ -12,13 +12,13 @@ class GenericPantheonSNLikelihood(BaseLikelihood):
     def __init__ (self, ninterp=150):
         ## first read data file
         self.name_="PantheonSN"
-        da=[x.split() for x in open('data/pantheon_lcparam_full_long_zhel.txt').readlines()[1:]]
+        da=[x.split() for x in open('simplemc/data/pantheon_lcparam_full_long_zhel.txt').readlines()[1:]]
         self.zcmb = np.array([float(line[1]) for line in da])
         self.zhelio = np.array([float(line[2]) for line in da])
         self.mag = np.array([float(line[4]) for line in da])
         self.dmag = np.array([float(line[5]) for line in da])
         self.N=len(self.mag)
-        self.syscov=np.loadtxt('data/pantheon_sys_full_long.txt',skiprows=1).reshape((self.N,self.N))
+        self.syscov=np.loadtxt('simplemc/data/pantheon_sys_full_long.txt',skiprows=1).reshape((self.N,self.N))
         self.cov=np.copy(self.syscov)
         self.cov[np.diag_indices_from(self.cov)]+=self.dmag**2
         self.xdiag=1/self.cov.diagonal() ## diagonal before marginalising constant

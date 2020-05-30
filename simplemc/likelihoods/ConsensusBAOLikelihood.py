@@ -3,7 +3,7 @@
 ##BAO-only consensus results, Alam et al. 2016
 #https://arxiv.org/abs/1607.03155
 
-from BaseLikelihood import BaseLikelihood
+from .BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
 import scipy as sp
 from scipy import constants

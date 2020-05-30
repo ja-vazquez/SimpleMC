@@ -3,7 +3,7 @@
 # where we compress to just obh2, obh2+och2 and thetas
 ##
 
-from BaseLikelihood import BaseLikelihood
+from .BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
 import scipy as sp
 

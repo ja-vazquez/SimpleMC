@@ -1,7 +1,7 @@
 #
 # This module calculates likelihood for a Generic DATA.
 #
-from BaseLikelihood import BaseLikelihood
+from .BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
 import scipy as sp
 
@@ -30,5 +30,5 @@ class CompressedGenericLikelihood (BaseLikelihood):
 
 class StraightLine(CompressedGenericLikelihood):
     def __init__(self):
-        CompressedGenericLikelihood.__init__(self,"GenericData","data/line_data.txt",
-            "data/line_cov.txt")
+        CompressedGenericLikelihood.__init__(self,"GenericData","simplemc/data/line_data.txt",
+            "simplemc/data/line_cov.txt")
