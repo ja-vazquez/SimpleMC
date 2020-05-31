@@ -50,7 +50,7 @@ class DriverMC:
                 logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
                             'DriverMC **kwargs are:\n\tmodel\n\t'
                             'datasets\n\t'
-                            'analyzername {"nested", "mcmc", "MaxLikeAnalyzer", "emcee" , "genetic"} Default: mcmc'
+                            'analyzername {"nested", "mcmc", "maxlike", "emcee" , "genetic"} Default: mcmc'
                             '\n\tchainsdir Default: SimpleMC_chains\n\t')
                 sys.exit(1)
 
@@ -70,11 +70,11 @@ class DriverMC:
     def executer(self, **kwargs):
         ti = time.time()
         if self.analyzername == 'mcmc':
-            self.result = self.MCMCRunner(iniFile=self.iniFile, **kwargs)
+            self.result = self.mcmcRunner(iniFile=self.iniFile, **kwargs)
         elif self.analyzername == 'nested':
-            self.result = self.NestedRunner(iniFile=self.iniFile, **kwargs)
-        elif self.analyzername == 'MaxLikeAnalyzer':
-            self.result = self.MaxLikeRunner(iniFile=self.iniFile, **kwargs)
+            self.result = self.nestedRunner(iniFile=self.iniFile, **kwargs)
+        elif self.analyzername == 'maxlike':
+            self.result = self.maxLikeRunner(iniFile=self.iniFile, **kwargs)
         elif self.analyzername == 'emcee':
             self.result = self.emceeRunner(iniFile=self.iniFile, **kwargs)
         elif self.analyzername == 'genetic':
@@ -285,7 +285,7 @@ class DriverMC:
             return -np.inf
 #################################################Samplers ################################
 
-    def MCMCRunner(self, iniFile=None, **kwargs):
+    def mcmcRunner(self, iniFile=None, **kwargs):
         """
             This method calls MCMCAnalyzer.
             Returns [MCMCAnalyzer object, time, evidence via MCEvidence (if it is possible)]
@@ -311,7 +311,7 @@ class DriverMC:
                 logger.critical('Unexpected **kwargs for MCMC: {}'.format(kwargs))
                 logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
                             'MCMC executer kwargs are:\n\tnsamp (int) Default: 15000\n\t'
-                            'skip (int) Default 0\n\ttemp (float) Default: 2.0'
+                            'skip (int) Default 1000\n\ttemp (float) Default: 2.0'
                             '\n\tchainno (int) Default: 1\n\t'
                             'addDerived (boolean) Default: False\n\tevidence (boolean) Default: False')
                 sys.exit(1)
@@ -319,11 +319,10 @@ class DriverMC:
         logger.info("\n\tnsamp: {}\n\tskip: {}\n\t"
                     "temp: {} chain num: {} evidence: {}".format(
                     nsamp, skip, temp, chainno, evidence))
+        self.outputChecker()
         M = MCMCAnalyzer(self.L, self.outputpath,
                         skip=skip, nsamp=nsamp, temp = temp,
                         chain_num=chainno, addDerived=self.addDerived)
-        #,\        GRcriteria = self.GRcriteria)
-        # self.postprocess(self.addDerived)
         if evidence:
             try:
                 from MCEvidence import MCEvidence
@@ -340,7 +339,7 @@ class DriverMC:
 
 
 
-    def NestedRunner(self, iniFile=None, **kwargs):
+    def nestedRunner(self, iniFile=None, **kwargs):
         """
             This method calls Dynesty samplers:
             --
@@ -385,6 +384,10 @@ class DriverMC:
                 sys.exit(1)
 
         self.outputpath += '_{}_{}'.format(self.engine, nestedType)
+        if neuralNetwork:
+            self.outputpath = "{}+ANN_".format(self.outputpath)
+        self.outputChecker()
+
         pool, nprocess = self.mppool(nproc)
         logger.info("\n\tnlivepoints: {}\n"
                     "\taccuracy: {}\n"
@@ -405,7 +408,6 @@ class DriverMC:
             #from bambi import run_pyBAMBI
             split = self.config.getfloat('neural', 'split', fallback=0.8)
             numNeurons = self.config.getint('neural', 'numNeurons', fallback=100)
-            self.outputpath = "{}+ANN_".format(self.outputpath)
             from simplemc.analyzers.pybambi.pybambimanager import BambiManager
             learner = 'keras'
             kerasmodel = None
@@ -442,7 +444,6 @@ class DriverMC:
             pool = pool, queue_size = nprocess)
         else:
             logger.critical('wrong selection')
-            # print('wrong selection')
             sys.exit(1)
         try:
             pool.close()
@@ -462,7 +463,7 @@ class DriverMC:
         else:
             walkers = kwargs.pop('walkers', 30)
             nsamp = kwargs.pop('nsamp', 20000)
-            burnin = kwargs.pop('burnin', 0)
+            burnin = kwargs.pop('burnin',0)
             nproc = kwargs.pop('nproc', 1)
             if kwargs:
                 logger.critical('Unexpected **kwargs for emcee sampler: {}'.format(kwargs))
@@ -477,6 +478,7 @@ class DriverMC:
                     "\tburnin: {}\n\t"
                     "nproc: {}".format(walkers, nsamp, burnin, nproc))
         self.outputpath = "{}_{}_walkers".format(self.outputpath, walkers)
+        self.outputChecker()
         pool, _ = self.mppool(nproc)
         # initial_state = None
         ini = []
@@ -504,14 +506,15 @@ class DriverMC:
         return ['emcee', sampler, 'walkers : {}'.format(walkers), 'samples: {}'.format(nsamp)]
 ###################################Optimizers##############################################
 
-    def MaxLikeRunner(self, iniFile=None, **kwargs):
+    def maxLikeRunner(self, iniFile=None, **kwargs):
         self.outputpath += 'optimization'
+        self.outputChecker()
         if iniFile:
-            withErrors = self.config.getboolean('MaxLikeAnalyzer', 'withErrors', fallback=False)
+            withErrors = self.config.getboolean('MaxLike', 'withErrors', fallback=False)
         else:
             withErrors = kwargs.pop('withErrors', False)
             if kwargs:
-                logger.critical('Unexpected **kwargs for MaxLikeAnalyzer: {}'.format(kwargs))
+                logger.critical('Unexpected **kwargs for MaxLike: {}'.format(kwargs))
                 logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
                             'MaxLikeAnalyzer executer options are:'
                             '\n\twithErrors (boolean) Default: False')
@@ -523,6 +526,7 @@ class DriverMC:
 
     def geneticRunner(self, iniFile=None, **kwargs):
         self.outputpath = '{}_optimization'.format(self.outputpath)
+        self.outputChecker()
 
         if iniFile:
             n_individuals = self.config.getint('genetic', 'n_individuals', fallback=100)
@@ -556,6 +560,33 @@ class DriverMC:
 
 
 ###############################Post-processing############################################
+    def outputChecker(self):
+        while True:
+            if os.path.isfile(self.outputpath+".txt"):
+                logger.info("{0} file already exists, {0}_new was created".format(self.outputpath))
+                self.outputpath = "{}_new".format(self.outputpath)
+            else:
+                break
+        while True:
+            flag = False
+            for i in range(1,10):
+                if os.path.isfile("{}_{}.txt".format(self.outputpath, i)):
+                    flag = True
+            if flag:
+                logger.info("{0}_{1} file already exists, {0}_new was created".format(self.outputpath, i))
+                self.outputpath = "{}_new".format(self.outputpath)
+            else:
+                break
+        if self.analyzername == 'nested':
+            while True:
+                if os.path.isfile(self.outputpath + "_live.txt") or os.path.isfile(self.outputpath + "_dead.txt"):
+                    logger.info("{0} file already exists, {0}_new was created".format(self.outputpath))
+                    self.outputpath = "{}_new".format(self.outputpath)
+                else:
+                    break
+
+        return True
+
     def postprocess(self, summary=False, stats=False, addtxt=None):
         if addtxt:
             self.result.extend(addtxt)
