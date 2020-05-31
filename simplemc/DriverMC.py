@@ -293,7 +293,7 @@ class DriverMC:
         """
         if iniFile:
             nsamp = self.config.getint('mcmc', 'nsamp', fallback=15000)
-            skip = self.config.getint('mcmc', 'skip', fallback=1000)
+            skip = self.config.getint('mcmc', 'skip', fallback=0)
             ## temperature at which to sample, weights get readjusted on the fly
             temp = self.config.getint('mcmc', 'temp', fallback=2)
             chainno = self.config.getint('mcmc', 'chainno', fallback=1)
@@ -302,7 +302,7 @@ class DriverMC:
             evidence = self.config.getboolean('mcmc', 'addDerived', fallback=False)
         else:
             nsamp = kwargs.pop('nsamp', 15000)
-            skip = kwargs.pop('skip', 1000)
+            skip = kwargs.pop('skip', 0)
             temp = kwargs.pop('temp', 2)
             chainno = kwargs.pop('chainno', 1)
             self.addDerived = kwargs.pop('addDerived', False)
@@ -311,7 +311,7 @@ class DriverMC:
                 logger.critical('Unexpected **kwargs for MCMC: {}'.format(kwargs))
                 logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
                             'MCMC executer kwargs are:\n\tnsamp (int) Default: 15000\n\t'
-                            'skip (int) Default 1000\n\ttemp (float) Default: 2.0'
+                            'skip (int) Default 0\n\ttemp (float) Default: 2.0'
                             '\n\tchainno (int) Default: 1\n\t'
                             'addDerived (boolean) Default: False\n\tevidence (boolean) Default: False')
                 sys.exit(1)
@@ -457,12 +457,12 @@ class DriverMC:
         if iniFile:
             walkers = self.config.getint('emcee', 'walkers', fallback=500)
             nsamp = self.config.getint('emcee', 'nsamp', fallback=20000)
-            burnin = self.config.getint('emcee', 'burnin', fallback=1000)
+            burnin = self.config.getint('emcee', 'burnin', fallback=0)
             nproc = self.config.getint('emcee', 'nproc', fallback=1)
         else:
             walkers = kwargs.pop('walkers', 30)
             nsamp = kwargs.pop('nsamp', 20000)
-            burnin = kwargs.pop('burnin', 1000)
+            burnin = kwargs.pop('burnin', 0)
             nproc = kwargs.pop('nproc', 1)
             if kwargs:
                 logger.critical('Unexpected **kwargs for emcee sampler: {}'.format(kwargs))
@@ -470,7 +470,7 @@ class DriverMC:
                             'Emcee executer options are:'
                             '\n\twalkers (int) Default: 30\n\t'
                             'nsamp (int) Default: 20000\n\t'
-                            'burnin (int) Default: 1000\n\t'
+                            'burnin (int) Default: 0\n\t'
                             'nproc (int) Default: 1')
                 sys.exit(1)
         logger.info("\n\twalkers: {}\n\tnsamp: {}\n"
