@@ -458,10 +458,14 @@ class DriverMC:
 
 
         elif self.engine == 'nestle':
-            import nestle
-            M = nestle.sample(self.logLike, self.priorTransform, ndim=self.dims, method=nestedType,
-            npoints=nlivepoints, dlogz=accuracy, callback=nestle.print_progress,
-            pool = pool, queue_size = nprocess)
+            try:
+                import nestle
+                M = nestle.sample(self.logLike, self.priorTransform, ndim=self.dims, method=nestedType,
+                npoints=nlivepoints, dlogz=accuracy, callback=nestle.print_progress,
+                pool = pool, queue_size = nprocess)
+            except ImportError as error:
+                sys.exit("{}: Please install nestle module"
+                         "or use dynesty engine".format(error.__class__.__name__))
         else:
             logger.critical('wrong selection')
             sys.exit(1)
