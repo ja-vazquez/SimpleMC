@@ -467,8 +467,7 @@ class DriverMC:
                 sys.exit("{}: Please install nestle module"
                          "or use dynesty engine".format(error.__class__.__name__))
         else:
-            logger.critical('wrong selection')
-            sys.exit(1)
+            sys.exit('wrong selection')
         try:
             pool.close()
         except:
