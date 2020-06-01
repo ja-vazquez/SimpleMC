@@ -211,9 +211,9 @@ class MCMCAnalyzer:
             cfname  = outfile + "_%i.txt" % (self.chain_num)
             mlfname = outfile + "_%i.maxlike" % (self.chain_num)
 
-        if (path.isfile(cfname)):
-            print("Due to bad habits in the past, won't open existing file.", cfname)
-            sys.exit(1)
+        # if (path.isfile(cfname)):
+        #     print("Due to bad habits in the past, won't open existing file.", cfname)
+        #     sys.exit(1)
         self.fout    = open(cfname, 'w')
         self.mlfout  = open(mlfname, 'w')
         self.formstr = formstr
