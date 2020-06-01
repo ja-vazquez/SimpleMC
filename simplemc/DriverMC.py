@@ -96,7 +96,6 @@ class DriverMC:
 
 
     def executer(self, **kwargs):
-        ti = time.time()
         if self.analyzername == 'mcmc':
             self.result = self.mcmcRunner(iniFile=self.iniFile, **kwargs)
         elif self.analyzername == 'nested':
@@ -109,7 +108,6 @@ class DriverMC:
             self.result = self.geneticRunner(iniFile=self.iniFile, **kwargs)
         else:
             sys.exit("Sampler/Analyzer name invalid")
-        self.ttime = time.time() - ti
         return self.outputname, self.T.freeParameters()
 
 
@@ -185,9 +183,11 @@ class DriverMC:
                     "temp: {}\n\tchain num: {}\n\tevidence: {}".format(
                     nsamp, skip, temp, chainno, evidence))
         self.outputChecker()
+        ti = time.time()
         M = MCMCAnalyzer(self.L, self.outputpath,
                         skip=skip, nsamp=nsamp, temp = temp,
                         chain_num=chainno, addDerived=self.addDerived)
+        self.ttime = time.time() - ti
         if evidence:
             try:
                 from MCEvidence import MCEvidence
@@ -421,7 +421,7 @@ class DriverMC:
                     import dynesty
                 except:
                     from simplemc.analyzers.dynesty import dynesty
-
+        ti = time.time()
         if neuralNetwork:
             logger.info("\tUsing neural network.")
             #from bambi import run_pyBAMBI
@@ -472,7 +472,7 @@ class DriverMC:
             pool.close()
         except:
             pass
-
+        self.ttime = time.time() - ti
         return ['nested', M, M.summary(), 'nested :{}'.format(nestedType),
                 'dynamic : {}'.format(dynamic), 'ANN :{}'.format(neuralNetwork)]
 
@@ -510,11 +510,13 @@ class DriverMC:
         inisamples = np.array(ini).T # initial samples
         try:
             import emcee
+            ti = time.time()
             sampler = emcee.EnsembleSampler(walkers, self.dims, self.logPosterior, pool=pool)
             # pass the initial samples and total number of samples required
             sampler.run_mcmc(inisamples, nsamp + burnin, progress=True)
             # extract the samples (removing the burn-in)
             # postsamples = sampler.chain[:, burnin:, :].reshape((-1, self.dims))
+            self.ttime = time.time() - ti
         except ImportError as error:
             sys.exit("{}: Please install this module"
                      "or try using other sampler".format(error.__class__.__name__))
@@ -543,9 +545,10 @@ class DriverMC:
                             'MaxLikeAnalyzer executer options are:'
                             '\n\twithErrors (boolean) Default: False')
                 sys.exit(1)
-
+        ti = time.time()
         A = MaxLikeAnalyzer(self.L, withErrors=withErrors)
         params = self.T.printParameters(A.params)
+        self.ttime = time.time() - ti
         return ['maxlike', A, params]
 
     def geneticRunner(self, iniFile=None, **kwargs):
@@ -575,11 +578,16 @@ class DriverMC:
                     "\n\tselection method: {}\n\t"
                     "mut prob: {}".format(n_individuals, n_generations,
                                         selection_method,mut_prob))
+        ti = time.time()
+
         M = SimpleGenetic(self.logLikeGenetic, self.dims, self.bounds,
                           n_individuals=n_individuals,
                           n_generations=n_generations,
                           prob_mut=mut_prob, method_selection=selection_method,
                           outputname=self.outputpath)
+
+        self.ttime = time.time() - ti
+
         return ['genetic', M]
 
 
