@@ -1,6 +1,8 @@
 
 
 from simplemc.analyzers.MaxLikeAnalyzer import MaxLikeAnalyzer
+from simplemc.analyzers.SimpleGenetic import SimpleGenetic
+from simplemc.analyzers.MCMCAnalyzer import MCMCAnalyzer
 from simplemc.analyzers.MCMCAnalyzer import MCMCAnalyzer
 from simplemc.runbase import ParseModel, ParseDataset
 from simplemc.PostProcessing import PostProcessing
@@ -45,6 +47,8 @@ class DriverMC:
             self.datasets     = kwargs.pop('datasets', 'HD')
             self.analyzername = kwargs.pop('analyzername', 'mcmc')
             self.addDerived   = kwargs.pop('addDerived', False)
+            self.priortype = kwargs.pop('priortype', 'u')
+            self.varys8 = kwargs.pop('varys8', False)
 
             ## Next two are for custom model
             self.custom_parameters = kwargs.pop('custom_parameters', None)
@@ -147,9 +151,6 @@ class DriverMC:
         self.path_to_data = self.config.get('custom', 'path_to_data', fallback=None)
         self.path_to_cov  = self.config.get('custom', 'path_to_cov',  fallback=None)
         return True
-
-
-
 
 
 
