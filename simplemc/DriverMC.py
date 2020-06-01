@@ -40,10 +40,10 @@ class DriverMC:
             self.iniReader(iniFile)
         else:
             self.chainsdir    = kwargs.pop('chainsdir', 'simplemc/chains')
-            self.model        = kwargs.pop('model', None)
+            self.model        = kwargs.pop('model',   None)
             self.prefact      = kwargs.pop('prefact', 'phy')
-            self.varys8       = kwargs.pop('varys8', False)
-            self.datasets     = kwargs.pop('datasets', 'HD')
+            self.varys8       = kwargs.pop('varys8',  False)
+            self.datasets     = kwargs.pop('datasets','HD')
             self.analyzername = kwargs.pop('analyzername', 'mcmc')
             self.addDerived   = kwargs.pop('addDerived', False)
 
@@ -96,6 +96,7 @@ class DriverMC:
         self.outputpath = "{}/{}".format(self.chainsdir, self.outputname)
 
 
+
     def executer(self, **kwargs):
         if self.analyzername == 'mcmc':
             self.result = self.mcmcRunner(iniFile=self.iniFile, **kwargs)
@@ -112,7 +113,7 @@ class DriverMC:
         return self.outputname, self.T.freeParameters()
 
 
-######################################Initialization#############################
+##----------------------Initialization ------------------------
 
     def iniReader(self, iniFile):
         """
@@ -130,22 +131,24 @@ class DriverMC:
         self.config = configparser.ConfigParser()
 
         self.config.read(iniFile)
-        self.chainsdir    = self.config.get('custom', 'chainsdir',
+        self.chainsdir    = self.config.get(        'custom', 'chainsdir',\
                                          fallback=os.path.join('simplemc/chains'))
-        self.model        = self.config.get('custom', 'model')
-        self.prefact      = self.config.get('custom', 'prefact',      fallback='phy')
-        self.datasets     = self.config.get('custom', 'datasets',     fallback='HD')
-        self.analyzername = self.config.get('custom', 'analyzername', fallback='mcmc')
-        self.varys8       = self.config.getboolean('custom', 'varys8',       fallback=False)
-        self.addDerived   = self.config.getboolean('custom', 'addDerived',   fallback=False)
+        self.model        = self.config.get(        'custom', 'model')
+        self.prefact      = self.config.get(        'custom', 'prefact',      fallback='phy')
+        self.datasets     = self.config.get(        'custom', 'datasets',     fallback='HD')
+        self.analyzername = self.config.get(        'custom', 'analyzername', fallback='mcmc')
+        self.varys8       = self.config.getboolean( 'custom', 'varys8',       fallback=False)
+        self.addDerived   = self.config.getboolean( 'custom', 'addDerived',   fallback=False)
 
-        self.custom_parameters = self.config.get('custom', 'custom_parameters', fallback=None)
-        self.custom_function   = self.config.get('custom', 'custom_function',   fallback=None)
+        self.custom_parameters = self.config.get(   'custom', 'custom_parameters', fallback=None)
+        self.custom_function   = self.config.get(   'custom', 'custom_function',   fallback=None)
         ## Following two are for custom data
-        self.path_to_data = self.config.get('custom', 'path_to_data', fallback=None)
-        self.path_to_cov  = self.config.get('custom', 'path_to_cov',  fallback=None)
+        self.path_to_data = self.config.get(        'custom', 'path_to_data', fallback=None)
+        self.path_to_cov  = self.config.get(        'custom', 'path_to_cov',  fallback=None)
         return True
 
+
+##----------------------Samplers ----------------------
 
 
 
@@ -156,17 +159,17 @@ class DriverMC:
 
         """
         if iniFile:
-            nsamp   = self.config.getint('mcmc', 'nsamp', fallback=50000)
-            skip    = self.config.getint('mcmc', 'skip',  fallback=300)
+            nsamp    = self.config.getint(      'mcmc', 'nsamp',   fallback=50000)
+            skip     = self.config.getint(      'mcmc', 'skip',    fallback=300)
             ## temperature at which to sample, weights get readjusted on the fly
-            temp    = self.config.getint('mcmc', 'temp',  fallback=2)
-            chainno = self.config.getint('mcmc', 'chainno', fallback=1)
-            GRstop  = self.config.getfloat('mcmc', 'GRstop',  fallback=0.01)
-            evidence = self.config.getboolean('mcmc', 'evidence', fallback=False)
+            temp     = self.config.getfloat(    'mcmc', 'temp',    fallback=2)
+            chainno  = self.config.getint(      'mcmc', 'chainno', fallback=1)
+            GRstop   = self.config.getfloat(    'mcmc', 'GRstop',  fallback=0.01)
+            evidence = self.config.getboolean(  'mcmc', 'evidence',fallback=False)
         else:
             nsamp    = kwargs.pop('nsamp', 50000)
-            skip     = kwargs.pop('skip', 300)
-            temp     = kwargs.pop('temp', 2)
+            skip     = kwargs.pop('skip',  300)
+            temp     = kwargs.pop('temp',  2)
             chainno  = kwargs.pop('chainno', 1)
             GRstop   = kwargs.pop('GRstop', 0.01)
             evidence = kwargs.pop('evidence', False)
@@ -210,156 +213,6 @@ class DriverMC:
 
 
 
-    def setPriors(self):
-        """
-        After setTheory, you can set the priors.
-
-        Returns a list of lists of the object of the Parameter class.
-        """
-        self.parameters = self.T.freeParameters()
-        names      = []
-        values     = []
-        errorlist  = []
-        boundlist  = []
-        latexnames = []
-        for parameter in self.parameters:
-            names.append(parameter.name)
-            values.append(parameter.value)
-            errorlist.append(parameter.error)
-            boundlist.append(parameter.bounds)
-            latexnames.append(parameter.Ltxname)
-        return [names, values, errorlist, boundlist, latexnames]
-
-
-#################################### logLike and prior Transform function ###########################
-
-    def instantiatePars(self, value):
-        """
-        This method returns an instance of
-        Parameter objects with the sampler values
-
-        -- value : it is the generated vector by the sampler
-        """
-        aux=[]
-        for item in value:
-            aux.append(item)
-        names, values, errorlist, boundlist, latexnames = self.setPriors()
-        instances = []
-        for i in range(len(names)):
-            instances.append(Parameter(names[i],
-                aux[i], errorlist[i], boundlist[i], latexnames[i]))
-        return instances
-
-    def logLike(self, values):
-        """
-            If the sampler used isn't the MCMC of MCMCAnalyzer
-            then, we need to set other types of likelihoods and
-            priors objects. This method allows that. Therefore, it is a
-            likelihood defined for an external samplers and it is used
-            as parameter of the sampler run function.
-
-            Parameters:
-
-            values:     implicit values, they are generated by the sampler.
-
-        """
-        listPars = self.instantiatePars(values)
-        self.T.updateParams(listPars)
-        self.L.setTheory(self.T)
-        if (self.L.name()=="Composite"):
-            cloglikes=self.L.compositeLogLikes_wprior()
-            loglike=cloglikes.sum()
-        else:
-            loglike = self.L.loglike_wprior()
-        return loglike
-
-    #priorsTransform
-    def priorTransform(self, theta):
-        """prior Transform for gaussian and flat priors"""
-        priors = []
-        try:
-            n = self.nsigma
-        except:
-            n = 2.
-
-        if self.priortype == 'g':
-            for c, bound in enumerate(self.bounds):
-                mu = self.means[c]
-                sigma = (bound[1]-bound[0])/n
-                priors.append(mu+sigma*(ndtri(theta[c])))
-        else:
-            for c, bound in enumerate(self.bounds):
-            # When theta 0-> append bound[0], if theta 1-> append bound[1]
-                priors.append(theta[c]*(bound[1]-bound[0])+bound[0])
-                # At this moment, np.array(priors) has shape (dims,)
-        return np.array(priors)
-
-###########loglike for genetic
-    def logLikeGenetic(self, *v):
-        values = []
-        # print("Parameters:")
-        for i, element in enumerate(v):
-            values.append(element)
-        listPars = self.instantiatePars(values)
-        self.T.updateParams(listPars)
-        self.L.setTheory(self.T)
-        if (self.L.name() == "Composite"):
-            cloglikes = self.L.compositeLogLikes_wprior()
-            loglike = cloglikes.sum()
-        else:
-            loglike = self.L.loglike_wprior()
-
-        return loglike
-
-############# for emcee: logPosterior and logPrior
-    def logPosterior(self, theta):
-        """
-        The natural logarithm of the joint posterior.
-
-        Args:
-            theta (tuple): a sample containing individual parameter values
-            data (list): the set of data/observations
-            sigma (float): the standard deviation of the data points
-            x (list): the abscissa values at which the data/model is defined
-        """
-
-        lp = self.logPrior(theta)  # get the prior
-
-        # if the prior is not finite return a probability of zero (log probability of -inf)
-        if not np.isfinite(lp):
-            return -np.inf
-
-        # return the likeihood times the prior (log likelihood plus the log prior)
-        return lp + self.logLike(theta)
-
-    def logPrior(self, theta):
-        """
-        The natural logarithm of the prior probability.
-
-        Args:
-            theta (tuple): a sample containing individual parameter values
-
-        Note:
-            We can ignore the normalisations of the prior here.
-            Uniform prior on all the parameters.
-        """
-
-        # set prior to 1 (log prior to 0) if in the range and zero (-inf) outside the range
-
-        for i, bound in enumerate(self.bounds):
-            if bound[0] < theta[i] < bound[1]:
-                flag = True
-            else:
-                flag = False
-                break
-
-        if flag == True:
-            return 0.0
-        else:
-            return -np.inf
-#################################################Samplers ################################
-
-
 
     def nestedRunner(self, iniFile=None, **kwargs):
         """
@@ -369,21 +222,22 @@ class DriverMC:
             bound : {'none', 'single', 'multi', 'balls', 'cubes'},
         """
         if iniFile:
-            nlivepoints = self.config.getint('nested', 'nlivepoints', fallback=1024)
-            accuracy = self.config.getfloat('nested', 'accuracy', fallback=0.01)
+            self.engine = self.config.get(          'nested', 'engine',       fallback='dynesty')
+            dynamic     = self.config.getboolean(   'nested', 'dynamic',      fallback=False)
+            neuralNetwork = self.config.getboolean( 'nested', 'neuralNetwork',fallback=False)
+            nestedType  = self.config.get(          'nested', 'nestedType',   fallback='multi')
+            nlivepoints = self.config.getint(       'nested', 'nlivepoints',  fallback=1024)
+            accuracy    = self.config.getfloat(     'nested', 'accuracy',     fallback=0.01)
+            nproc       = self.config.getint(       'nested', 'nproc',        fallback=1)
+            showfiles   = self.config.getboolean(   'nested', 'showfiles',    fallback=True)
+
             self.priortype = self.config.get('nested', 'priortype', fallback='u')
              #nsigma is the default value for sigma in gaussian priors
-            self.nsigma  = self.config.get('nested', 'sigma', fallback=2)
-            nestedType = self.config.get('nested', 'nestedType', fallback='multi')
-            neuralNetwork = self.config.getboolean('nested', 'neuralNetwork', fallback=False)
-            dynamic = self.config.getboolean('nested', 'dynamic', fallback=False)
-            nproc = self.config.getint('nested', 'nproc', fallback=1)
-            self.engine = self.config.get('nested', 'engine', fallback='dynesty')
-            self.addDerived = self.config.getboolean('nested', 'addDerived', fallback=False)
-            showfiles = self.config.getboolean('nested', 'showfiles', fallback=True)
+            self.nsigma = self.config.get(   'nested', 'sigma', fallback=2)
+
             if neuralNetwork:
-                split = self.config.getfloat('neural', 'split', fallback=0.8)
-                numNeurons = self.config.getint('neural', 'numNeurons', fallback=100)
+                split      = self.config.getfloat('neural', 'split', fallback=0.8)
+                numNeurons = self.config.getint(  'neural', 'numNeurons', fallback=100)
         else:
             nlivepoints = kwargs.pop('nlivepoints', 1024)
             accuracy = kwargs.pop('accuracy', 0.01)
@@ -481,6 +335,161 @@ class DriverMC:
         self.ttime = time.time() - ti
         return ['nested', M, M.summary(), 'nested :{}'.format(nestedType),
                 'dynamic : {}'.format(dynamic), 'ANN :{}'.format(neuralNetwork)]
+
+
+
+
+
+    def setPriors(self):
+        """
+        After setTheory, you can set the priors.
+
+        Returns a list of lists of the object of the Parameter class.
+        """
+        self.parameters = self.T.freeParameters()
+        names      = []
+        values     = []
+        errorlist  = []
+        boundlist  = []
+        latexnames = []
+        for parameter in self.parameters:
+            names.append(parameter.name)
+            values.append(parameter.value)
+            errorlist.append(parameter.error)
+            boundlist.append(parameter.bounds)
+            latexnames.append(parameter.Ltxname)
+        return [names, values, errorlist, boundlist, latexnames]
+
+
+#################################### logLike and prior Transform function ###########################
+
+    def instantiatePars(self, value):
+        """
+        This method returns an instance of
+        Parameter objects with the sampler values
+
+        -- value : it is the generated vector by the sampler
+        """
+        aux=[]
+        for item in value:
+            aux.append(item)
+        names, values, errorlist, boundlist, latexnames = self.setPriors()
+        instances = []
+        for i in range(len(names)):
+            instances.append(Parameter(names[i],
+                aux[i], errorlist[i], boundlist[i], latexnames[i]))
+        return instances
+
+
+    def logLike(self, values):
+        """
+            If the sampler used isn't the MCMC of MCMCAnalyzer
+            then, we need to set other types of likelihoods and
+            priors objects. This method allows that. Therefore, it is a
+            likelihood defined for an external samplers and it is used
+            as parameter of the sampler run function.
+
+            Parameters:
+
+            values:     implicit values, they are generated by the sampler.
+
+        """
+        listPars = self.instantiatePars(values)
+        self.T.updateParams(listPars)
+        self.L.setTheory(self.T)
+        if (self.L.name()=="Composite"):
+            cloglikes=self.L.compositeLogLikes_wprior()
+            loglike=cloglikes.sum()
+        else:
+            loglike = self.L.loglike_wprior()
+        return loglike
+
+
+    #priorsTransform
+    def priorTransform(self, theta):
+        """prior Transform for gaussian and flat priors"""
+        priors = []
+        try:
+            n = self.nsigma
+        except:
+            n = 2.
+
+        if self.priortype == 'g':
+            for c, bound in enumerate(self.bounds):
+                mu = self.means[c]
+                sigma = (bound[1]-bound[0])/n
+                priors.append(mu+sigma*(ndtri(theta[c])))
+        else:
+            for c, bound in enumerate(self.bounds):
+            # When theta 0-> append bound[0], if theta 1-> append bound[1]
+                priors.append(theta[c]*(bound[1]-bound[0])+bound[0])
+                # At this moment, np.array(priors) has shape (dims,)
+        return np.array(priors)
+
+###########loglike for genetic
+    def logLikeGenetic(self, *v):
+        values = []
+        # print("Parameters:")
+        for i, element in enumerate(v):
+            values.append(element)
+        listPars = self.instantiatePars(values)
+        self.T.updateParams(listPars)
+        self.L.setTheory(self.T)
+        if (self.L.name() == "Composite"):
+            cloglikes = self.L.compositeLogLikes_wprior()
+            loglike = cloglikes.sum()
+        else:
+            loglike = self.L.loglike_wprior()
+
+        return loglike
+
+############# for emcee: logPosterior and logPrior
+    def logPosterior(self, theta):
+        """
+        The natural logarithm of the joint posterior.
+
+        Args:
+            theta (tuple): a sample containing individual parameter values
+            data (list): the set of data/observations
+            sigma (float): the standard deviation of the data points
+            x (list): the abscissa values at which the data/model is defined
+        """
+
+        lp = self.logPrior(theta)  # get the prior
+
+        # if the prior is not finite return a probability of zero (log probability of -inf)
+        if not np.isfinite(lp):
+            return -np.inf
+
+        # return the likeihood times the prior (log likelihood plus the log prior)
+        return lp + self.logLike(theta)
+
+    def logPrior(self, theta):
+        """
+        The natural logarithm of the prior probability.
+
+        Args:
+            theta (tuple): a sample containing individual parameter values
+
+        Note:
+            We can ignore the normalisations of the prior here.
+            Uniform prior on all the parameters.
+        """
+
+        # set prior to 1 (log prior to 0) if in the range and zero (-inf) outside the range
+
+        for i, bound in enumerate(self.bounds):
+            if bound[0] < theta[i] < bound[1]:
+                flag = True
+            else:
+                flag = False
+                break
+
+        if flag == True:
+            return 0.0
+        else:
+            return -np.inf
+
 
 
     def emceeRunner(self, iniFile=None, **kwargs):

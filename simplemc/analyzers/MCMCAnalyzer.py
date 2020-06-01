@@ -143,8 +143,8 @@ class MCMCAnalyzer:
                         condition = None
                 recvmsg = comm.bcast(condition, root=0)
                 if recvmsg ==1:
-                    sys.exit('---- Gelman-Rubin achived ---- ')
-
+                    print('---- Gelman-Rubin achived ---- ')
+                    return True
 
 
 
