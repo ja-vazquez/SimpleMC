@@ -75,7 +75,7 @@ class DriverMC:
 
         pars_info = self.L.freeParameters()
         self.bounds     = [p.bounds for p in pars_info]
-        self.means      = [p.means  for p in pars_info]
+        self.means      = [p.value  for p in pars_info]
         self.paramsList = [p.name   for p in pars_info]
         self.dims       = len(self.paramsList)
 
