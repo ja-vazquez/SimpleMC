@@ -2,17 +2,15 @@
 
 Author: Will Handley (wh260@cam.ac.uk)
 Date: November 2018
+
+Modified for SimpleMC use by I Gomez-Vargas (2020)
 """
 import os
-import sys
-
-import nestle
 from .pybambimanager import BambiManager
 
 
-####IGV: probando meter MH de SimpleMC
-def run_pyBAMBI(loglikelihood, prior, nDims, **kwargs):
-    """Run pyBAMBI.
+def loglike_thumper(loglikelihood, nDims, **kwargs):
+    """loglike_thumper.
 
     Parameters
     ----------
@@ -49,8 +47,6 @@ def run_pyBAMBI(loglikelihood, prior, nDims, **kwargs):
         Required accuracy of proxy.
         Default `0.01`
 
-    ns_output: int
-        Nested sampling output level.
 
     """
     # Process kwargs
@@ -63,13 +59,6 @@ def run_pyBAMBI(loglikelihood, prior, nDims, **kwargs):
     proxy_tolerance = kwargs.pop('proxy_tolerance', 0.1)
     failure_tolerance = kwargs.pop('failure_tolerance', 0.5)
     ntrain = kwargs.pop('ntrain', nlive)
-    ###############kwargs of Metropolis-Hastings####################
-#    nsamp = kwargs.pop('nsamp', 10000)
-#    chainsdir = kwargs.pop('chainsdir', '/chains')
-#    skip = kwargs.pop('skip', nsamp/10)
-#    chain_num = kwargs.pop('chain_num', 1)
-#    temp = kwargs.pop('temp', 1.0)
-
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
 
@@ -77,19 +66,8 @@ def run_pyBAMBI(loglikelihood, prior, nDims, **kwargs):
     thumper = BambiManager(loglikelihood, learner, proxy_tolerance,
                            failure_tolerance, ntrain)
 
-    # Choose and run sampler
-    if sampler == 'mnest':
-        method = 'multi'
-    elif sampler == 'snest':
-        method = 'single'
-    
-    else:
-        raise NotImplementedError('sampler %s is not implemented' % sampler)
-        sys.exit()
-    
-    
-    M = nestle.sample(thumper.loglikelihood, prior, ndim=nDims, \
-                method=method, npoints=nlive, dlogz=0.5, \
-                callback=nestle.print_progress)
+    return thumper.loglikelihood()
 
-    return M
+    
+
+
