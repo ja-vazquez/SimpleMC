@@ -1,8 +1,8 @@
 
 
+from simplemc.analyzers.MaxLikeAnalyzer import MaxLikeAnalyzer
 from simplemc.analyzers.SimpleGenetic import SimpleGenetic
 from simplemc.analyzers.MCMCAnalyzer import MCMCAnalyzer
-from simplemc.analyzers.MaxLikeAnalyzer import MaxLikeAnalyzer
 from simplemc.runbase import ParseModel, ParseDataset
 from simplemc.PostProcessing import PostProcessing
 from simplemc.cosmo.Parameter import Parameter
@@ -46,8 +46,7 @@ class DriverMC:
             self.datasets     = kwargs.pop('datasets', 'HD')
             self.analyzername = kwargs.pop('analyzername', 'mcmc')
             self.addDerived   = kwargs.pop('addDerived', False)
-            self.priortype = kwargs.pop('priortype', 'u')
-            self.varys8 = kwargs.pop('varys8', False)
+
 
             ## Next two are for custom model
             self.custom_parameters = kwargs.pop('custom_parameters', None)
@@ -71,7 +70,20 @@ class DriverMC:
                 sys.exit(1)
 
 
-        self.T, self.L = self.TLinit()
+        #Initialize the Theory & Datasets
+        T = ParseModel(self.model, custom_parameters=self.custom_parameters,
+                                   custom_function=self.custom_function)
+        L = ParseDataset(self.datasets, path_to_data=self.path_to_data,
+                                        path_to_cov=self.path_to_cov)
+
+        if self.prefact == "pre":  T.setVaryPrefactor()
+        if self.varys8  == "True": T.setVarys8()
+        T.printFreeParameters()
+
+        #set the likelihood for a model
+        L.setTheory(T)
+
+        self.T, self.L = T, L
 
         pars_info = self.L.freeParameters()
         self.bounds     = [p.bounds for p in pars_info]
@@ -101,7 +113,8 @@ class DriverMC:
         else:
             sys.exit("Sampler/Analyzer name invalid")
         self.ttime = time.time() - ti
-        return self.outputname, self.parameters
+        return self.outputname, self.T.freeParameters()
+
 
 ######################################Initialization#############################
 
@@ -135,38 +148,63 @@ class DriverMC:
         ## Following two are for custom data
         self.path_to_data = self.config.get('custom', 'path_to_data', fallback=None)
         self.path_to_cov  = self.config.get('custom', 'path_to_cov',  fallback=None)
+        return True
 
 
 
 
-    def TLinit(self):
+    def mcmcRunner(self, iniFile=None, **kwargs):
         """
-        Returns
-        -------
-        T evaluated at the model, and L in at the datasets.
+            This method calls MCMCAnalyzer.
+            Returns [MCMCAnalyzer object, time, evidence via MCEvidence (if it is possible)]
+
         """
-        T = ParseModel(self.model, custom_parameters=self.custom_parameters,
-                                   custom_function=self.custom_function)
-        L = ParseDataset(self.datasets, path_to_data=self.path_to_data,
-                                        path_to_cov=self.path_to_cov)
+        if iniFile:
+            nsamp = self.config.getint('mcmc', 'nsamp', fallback=15000)
+            skip = self.config.getint('mcmc', 'skip', fallback=0)
+            ## temperature at which to sample, weights get readjusted on the fly
+            temp = self.config.getint('mcmc', 'temp', fallback=2)
+            chainno = self.config.getint('mcmc', 'chainno', fallback=1)
+            # self.GRcriteria = float(config['mcmc']['GRcriteria'])
+            self.addDerived = self.config.getboolean('mcmc', 'addDerived', fallback=False)
+            evidence = self.config.getboolean('mcmc', 'addDerived', fallback=False)
+        else:
+            nsamp = kwargs.pop('nsamp', 15000)
+            skip = kwargs.pop('skip', 0)
+            temp = kwargs.pop('temp', 2)
+            chainno = kwargs.pop('chainno', 1)
+            self.addDerived = kwargs.pop('addDerived', False)
+            evidence = kwargs.pop('evidence', False)
+            if kwargs:
+                logger.critical('Unexpected **kwargs for MCMC: {}'.format(kwargs))
+                logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
+                            'MCMC executer kwargs are:\n\tnsamp (int) Default: 15000\n\t'
+                            'skip (int) Default 1000\n\ttemp (float) Default: 2.0'
+                            '\n\tchainno (int) Default: 1\n\t'
+                            'addDerived (boolean) Default: False\n\tevidence (boolean) Default: False')
+                sys.exit(1)
+                #raise TypeError('Unexpected **kwargs: {}'.format(kwargs))
+        logger.info("\n\tnsamp: {}\n\tskip: {}\n\t"
+                    "temp: {}\n\tchain num: {}\n\tevidence: {}".format(
+                    nsamp, skip, temp, chainno, evidence))
+        self.outputChecker()
+        M = MCMCAnalyzer(self.L, self.outputpath,
+                        skip=skip, nsamp=nsamp, temp = temp,
+                        chain_num=chainno, addDerived=self.addDerived)
+        if evidence:
+            try:
+                from MCEvidence import MCEvidence
+                logger.info("Aproximating bayesian evidence with MCEvidence (arXiv:1704.03472)\n")
+                MLE = MCEvidence(self.outputpath + ".txt" ).evidence()
+                return ['mcmc', M, "Evidence with MCEvidence : {}\n".format(MLE)]
+            except:
+                #writeSummary(self.chainsdir, outputname, ttime)
+                # print("Warning!")
+                # print("MCEvidence could not calculate the Bayesian evidence [very small weights]\n")
+                logger.error("MCEvidence could not calculate the Bayesian evidence [very small weights]")
+        else:
+            return ['mcmc', M]
 
-        if self.prefact == "pre":
-            T.setVaryPrefactor()
-        if self.varys8 == "True":
-            T.setVarys8()
-
-        T.printFreeParameters()
-        L.setTheory(T)
-        return T, L
-
-
-
-
-    def priorValues(self):
-        """Returns some values for the priorTransform """
-        bounds = self.setPriors()[3]
-        means  = np.array(self.setPriors()[1])
-        return bounds, means
 
 
 
@@ -315,58 +353,6 @@ class DriverMC:
         else:
             return -np.inf
 #################################################Samplers ################################
-
-    def mcmcRunner(self, iniFile=None, **kwargs):
-        """
-            This method calls MCMCAnalyzer.
-            Returns [MCMCAnalyzer object, time, evidence via MCEvidence (if it is possible)]
-
-        """
-        if iniFile:
-            nsamp = self.config.getint('mcmc', 'nsamp', fallback=15000)
-            skip = self.config.getint('mcmc', 'skip', fallback=0)
-            ## temperature at which to sample, weights get readjusted on the fly
-            temp = self.config.getint('mcmc', 'temp', fallback=2)
-            chainno = self.config.getint('mcmc', 'chainno', fallback=1)
-            # self.GRcriteria = float(config['mcmc']['GRcriteria'])
-            self.addDerived = self.config.getboolean('mcmc', 'addDerived', fallback=False)
-            evidence = self.config.getboolean('mcmc', 'addDerived', fallback=False)
-        else:
-            nsamp = kwargs.pop('nsamp', 15000)
-            skip = kwargs.pop('skip', 0)
-            temp = kwargs.pop('temp', 2)
-            chainno = kwargs.pop('chainno', 1)
-            self.addDerived = kwargs.pop('addDerived', False)
-            evidence = kwargs.pop('evidence', False)
-            if kwargs:
-                logger.critical('Unexpected **kwargs for MCMC: {}'.format(kwargs))
-                logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
-                            'MCMC executer kwargs are:\n\tnsamp (int) Default: 15000\n\t'
-                            'skip (int) Default 1000\n\ttemp (float) Default: 2.0'
-                            '\n\tchainno (int) Default: 1\n\t'
-                            'addDerived (boolean) Default: False\n\tevidence (boolean) Default: False')
-                sys.exit(1)
-                #raise TypeError('Unexpected **kwargs: {}'.format(kwargs))
-        logger.info("\n\tnsamp: {}\n\tskip: {}\n\t"
-                    "temp: {}\n\tchain num: {}\n\tevidence: {}".format(
-                    nsamp, skip, temp, chainno, evidence))
-        self.outputChecker()
-        M = MCMCAnalyzer(self.L, self.outputpath,
-                        skip=skip, nsamp=nsamp, temp = temp,
-                        chain_num=chainno, addDerived=self.addDerived)
-        if evidence:
-            try:
-                from MCEvidence import MCEvidence
-                logger.info("Aproximating bayesian evidence with MCEvidence (arXiv:1704.03472)\n")
-                MLE = MCEvidence(self.outputpath + ".txt" ).evidence()
-                return ['mcmc', M, "Evidence with MCEvidence : {}\n".format(MLE)]
-            except:
-                #writeSummary(self.chainsdir, outputname, ttime)
-                # print("Warning!")
-                # print("MCEvidence could not calculate the Bayesian evidence [very small weights]\n")
-                logger.error("MCEvidence could not calculate the Bayesian evidence [very small weights]")
-        else:
-            return ['mcmc', M]
 
 
 
