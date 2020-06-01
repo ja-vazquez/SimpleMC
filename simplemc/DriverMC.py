@@ -437,6 +437,7 @@ class DriverMC:
                                addDerived=self.addDerived, smcloglike=self.L)
             M = sampler.results
 
+
         elif self.engine == 'nestle':
             import nestle
             M = nestle.sample(self.logLike, self.priorTransform, ndim=self.dims, method=nestedType,
@@ -450,8 +451,8 @@ class DriverMC:
         except:
             pass
 
-        return ['nested', M, M.summary(), 'nested : '.format(nestedType),
-                'dynamic : {}'.format(dynamic), 'ANN : '.format(neuralNetwork)]
+        return ['nested', M, M.summary(), 'nested :{}'.format(nestedType),
+                'dynamic : {}'.format(dynamic), 'ANN :{}'.format(neuralNetwork)]
 
 
     def emceeRunner(self, iniFile=None, **kwargs):
@@ -587,7 +588,7 @@ class DriverMC:
 
         return True
 
-    def postprocess(self, summary=False, stats=False, addtxt=None):
+    def postprocess(self, summary=True, stats=False, addtxt=None):
         if addtxt:
             self.result.extend(addtxt)
         if self.analyzername == 'nested':
