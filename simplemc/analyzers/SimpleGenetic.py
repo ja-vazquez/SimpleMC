@@ -7,7 +7,8 @@ class SimpleGenetic:
                 n_generations=250, method_selection="tournament", elitism=0.01,
                 prob_mut=0.1, distribution="uniform", media_distribution=1,
                 sd_distribution=1, min_distribution=-1, max_distribution=1,
-                stopping_early=False, rounds_stopping=5, tolerance_stopping=0.1):
+                stopping_early=False, rounds_stopping=5, tolerance_stopping=0.1,
+                outputname="geneticOutput"):
 
         self.target_function = target_function
         # These limits are a list where every input is the limit of a param
@@ -37,6 +38,7 @@ class SimpleGenetic:
         self.sd_distribution = sd_distribution
         self.tolerance_stopping  = tolerance_stopping
         self.verbose = verbose
+        self.outputname = outputname
 
         self.optimize()
 
@@ -60,5 +62,5 @@ class SimpleGenetic:
                             max_distribution=self.max_distribution,
                             stopping_early=self.stopping_early,
                             rounds_stopping=self.rounds_stopping,
-                            verbose=self.verbose)
+                            verbose=self.verbose, outputname=self.outputname)
         return o

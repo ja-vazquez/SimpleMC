@@ -61,9 +61,6 @@ class Individual:
                 self.limits_inf[i],
                 self.limits_sup[i]
             )
-            print("type value_variables {}".format(self.value_variables))
-        # IGV
-        # self.value_variables = tuple(self.value_variables)
         if verbose:
             print("New individal created")
             print("----------------------")

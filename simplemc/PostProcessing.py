@@ -127,6 +127,8 @@ class PostProcessing:
                 fpar.write(pd.name + "\t\t\t" + pd.Ltxname + "\n")
 
     def writeSummary(self, time, *args):
+        if self.analyzername == 'genetic':
+            sys.exit(1)
         file = open(self.filename + "_Summary" + ".txt", 'w')
         file.write('SUMMARY\n-------\n')
 

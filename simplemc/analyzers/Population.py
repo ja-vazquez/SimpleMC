@@ -25,7 +25,7 @@ class Population:
         self.historical_best_value_variables = []
         self.historical_best_fitness = []
         self.historical_best_function_value = []
-        self.diferencia_abs = []
+        self.difference_abs = []
         self.results_df = None
         self.fitness_optimal = None
         self.value_variables_optimal = None
@@ -155,7 +155,7 @@ class Population:
 
         return(offspring)
     
-    def selectionar_individual(self, n, return_indexs=True,
+    def select_individual(self, n, return_indexs=True,
                               method_selection="tournament", verbose=False):
 
         if method_selection not in ["ruleta", "rank", "tournament"]:
@@ -236,13 +236,13 @@ class Population:
                     [copy.deepcopy(self.individuals[i]) for i in ind_selectionado]
                 )
             
-    def crear_new_generecion(self, method_selection="tournament",
+    def create_new_generation(self, method_selection="tournament",
                                elitism=0.1, prob_mut=0.01,
                                distribution="uniform",
                                media_distribution=1, sd_distribution=1,
                                min_distribution=-1, max_distribution=1,
                                verbose=False, verbose_selection=False,
-                               verbose_cruce=False, verbose_mutation=False):
+                               verbose_cross=False, verbose_mutation=False):
 
         news_individuals = []
 
@@ -258,8 +258,8 @@ class Population:
             n_elitism = 0
             
         for i in np.arange(self.n_individuals-n_elitism):
-            # selectionar parentales
-            index_parentales = self.selectionar_individual(
+            # select parents
+            index_parents = self.select_individual(
                                     n                = 2,
                                     return_indexs   = True,
                                     method_selection = method_selection,
@@ -267,9 +267,9 @@ class Population:
                                  )
             
             offspring = self.cross_individuals(
-                            parental_1=index_parentales[0],
-                            parental_2=index_parentales[1],
-                            verbose=verbose_cruce
+                            parental_1=index_parents[0],
+                            parental_2=index_parents[1],
+                            verbose=verbose_cross
                            )
             
             offspring.mutate(
@@ -304,8 +304,8 @@ class Population:
                   stopping_early=False, rounds_stopping=None,
                   tolerance_stopping=None,verbose=False,
                   verbose_new_generation=False,
-                  verbose_selection=False, verbose_cruce=False,
-                  verbose_mutation=False, verbose_evaluacion=False):
+                  verbose_selection=False, verbose_cross=False,
+                  verbose_mutation=False, verbose_evaluacion=False, outputname="geneticOutput"):
 
 
         if stopping_early and (rounds_stopping is None or tolerance_stopping is None):
@@ -314,6 +314,8 @@ class Population:
 
         start = time.time()
 
+        f = open("{}.txt".format(outputname), "+w")
+        f.write("# Generation, best_fitness\n")
         for i in np.arange(n_generations):
             if verbose:
                 print("-------------")
@@ -336,15 +338,15 @@ class Population:
                                 )
 
             if i == 0:
-                self.diferencia_abs.append(None)
+                self.difference_abs.append(None)
             else:
-                diferencia = abs(self.historical_best_fitness[i] \
+                difference = abs(self.historical_best_fitness[i] \
                                  - self.historical_best_fitness[i-1])
-                self.diferencia_abs.append(diferencia)
-
+                self.difference_abs.append(difference)
+            f.write(" {} {} \n".format(i, self.best_fitness))
             if stopping_early and i > rounds_stopping:
-                ultimos_n = np.array(self.diferencia_abs[-(rounds_stopping):])
-                if all(ultimos_n < tolerance_stopping):
+                latest_n = np.array(self.difference_abs[-(rounds_stopping):])
+                if all(latest_n < tolerance_stopping):
                     print("Algorithm stopped in the {} generation"
                           "for lack of absolute minimum change of {}"
                           "while {} consecutive generations".format(i, tolerance_stopping,
@@ -352,17 +354,17 @@ class Population:
 
                     break
                    
-            self.crear_new_generecion(
+            self.create_new_generation(
                 method_selection=method_selection,
                 elitism=elitism,
                 prob_mut=prob_mut,
                 distribution=distribution,
                 verbose=verbose_new_generation,
                 verbose_selection=verbose_selection,
-                verbose_cruce=verbose_cruce,
+                verbose_cross=verbose_cross,
                 verbose_mutation=verbose_mutation
                 )
-
+        f.close()
         end = time.time()
         self.optimized = True
         self.iter_optimization = i
@@ -379,15 +381,18 @@ class Population:
             "best_fitness"        : self.historical_best_fitness,
             "best_function_value"  : self.historical_best_fitness,
             "best_value_variables": self.historical_best_value_variables,
-            "diferencia_abs"       : self.diferencia_abs
+            "difference_abs"       : self.difference_abs
             }
         )
         self.results_df["generation"] = self.results_df.index
         
-        print("-------------------------------------------")
-        print("End of optimization {} ".format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
-        print("-------------------------------------------")
         print("optimization duration: {}".format(end - start))
-        print("Number of generations: {}".format(self.iter_optimization))
+        print("Number of generations: {}".format(self.iter_optimization+1))
         print("Optimal value of variables: {}".format(self.value_variables_optimal))
         print("Target function value: {}".format(self.function_value_optimal))
+        file = open("{}_Summary.txt".format(outputname), "+w")
+        file.write("Optimization duration: {}\n".format(end - start))
+        file.write("Number of generations: {}\n".format(self.iter_optimization+1))
+        file.write("Optimal value of variables: {}\n".format(self.value_variables_optimal))
+        file.write("Target function value: {}\n".format(self.function_value_optimal))
+        file.close()
