@@ -46,13 +46,9 @@ class DriverMC:
             self.datasets     = kwargs.pop('datasets', 'HD')
             self.analyzername = kwargs.pop('analyzername', 'mcmc')
             self.addDerived   = kwargs.pop('addDerived', False)
-
-<<<<<<< HEAD
             self.priortype = kwargs.pop('priortype', 'u')
             self.varys8 = kwargs.pop('varys8', False)
 
-=======
->>>>>>> cf78d87c8eed793712a073d92d9278930cd3979a
             ## Next two are for custom model
             self.custom_parameters = kwargs.pop('custom_parameters', None)
             self.custom_function   = kwargs.pop('custom_function', None)
@@ -125,21 +121,12 @@ class DriverMC:
         self.config = configparser.ConfigParser()
 
         self.config.read(iniFile)
-<<<<<<< HEAD
-        self.chainsdir = self.config.get('custom', 'chainsdir',
-                                         fallback=os.path.join('SimpleMC_chains'))
-        self.model = self.config.get('custom', 'model')
-        self.prefact = self.config.get('custom', 'prefact', fallback='phy')
-        self.varys8 = self.config.getboolean('custom', 'varys8', fallback=False)
-        self.datasets = self.config.get('custom', 'datasets', fallback='HD')
-=======
         self.chainsdir    = self.config.get('custom', 'chainsdir',
                                          fallback=os.path.join('simplemc/chains'))
         self.model        = self.config.get('custom', 'model')
         self.prefact      = self.config.get('custom', 'prefact',      fallback='phy')
         self.varys8       = self.config.get('custom', 'varys8',       fallback=False)
         self.datasets     = self.config.get('custom', 'datasets',     fallback='HD')
->>>>>>> cf78d87c8eed793712a073d92d9278930cd3979a
         self.analyzername = self.config.get('custom', 'analyzername', fallback='mcmc')
         self.addDerived   = self.config.get('custom', 'addDerived',   fallback=False)
 
