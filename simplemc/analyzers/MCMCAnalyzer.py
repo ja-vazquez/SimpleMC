@@ -97,6 +97,7 @@ class MCMCAnalyzer:
         self.percen  = 0.4
         self.checkgr = 500
         self.GRcondition = 0.01
+        gr = None
 
         print("Starting chain...")
 
@@ -123,12 +124,13 @@ class MCMCAnalyzer:
             else:
                 self.cw += 1
 
-
+            print("Accepted: {:d} | loglike: {:.4f} | "
+                  "GR: {}".format(self.co, self.cloglike, gr), end="\r")
             if (self.co >0 and self.co % self.checkgr == 0):
                 chains = comm.gather(self.lpars, root=0)
                 if comm.rank ==0:
                     gr = self.GRDRun(chains)
-                    print('Gelman-Rubin R-1:', gr)
+                    # print('Gelman-Rubin R-1:', gr)
                     if (sp.all(gr< self.GRcondition)):
                         condition = 1
                         self.closeFiles()
@@ -175,9 +177,6 @@ class MCMCAnalyzer:
 
         result = sp.array(sp.absolute(1- sp.sqrt(R/W)))
         return result
-
-
-
 
     def openFiles(self):
         outfile = self.outfile
@@ -249,19 +248,15 @@ class MCMCAnalyzer:
             if all(vec > self.minvals) and all(vec < self.maxvals):
                 return ppars, numreject
             numreject += 1
-            
-
 
     def draw_pcov(self):
         a = sp.array([random.gauss(0., 1,) for _ in range(self.N)])
         return sp.dot(a, self.chol)
 
-
-
     def ProcessAccepted(self, ppars, ploglike, ploglikes):
         self.co += 1
-        if (self.co % 100 == 0): #JAV 1000
-            print("Accepted samples", self.co, self.cw)
+        # if (self.co % 100 == 0): #JAV 1000
+        #     print("Accepted samples", self.co, self.cw)
         vec = [p.value for p in self.cpars]
 
         #for convergence
@@ -291,10 +286,11 @@ class MCMCAnalyzer:
 
             if (self.cloglike > self.maxloglike):
                 self.maxloglike = self.cloglike
-                print("New maxloglike", self.maxloglike)
+                #print("New maxloglike", self.maxloglike)
                 self.mlfout.seek(0)
                 self.mlfout.write(outstr)
                 self.mlfout.flush()
+                self.maxloglike,
 
             if self.co > self.nsamp:
                 self.done = True
@@ -307,15 +303,16 @@ class MCMCAnalyzer:
             if (self.cw > 30):
                 print("Still burning in, weight too large")
                 self.chol *= 0.9
-                print(self.cw)
+                # print(self.cw)
         else:  # co==skip
             self.meanx  /= self.swx
             self.meanxx /= self.swx
             self.meanxx -= sp.outer(self.meanx, self.meanx)
             print("Re-initializing covariance matrix after burn-in")
-            print(self.meanxx)
+            # print(self.meanxx)
+            print()
             for i, p in enumerate(self.cpars):
-                print(p.name, p.value, sp.sqrt(self.meanxx[i, i]))
+                print("{}: {} +/- {}".format(p.name, p.value, sp.sqrt(self.meanxx[i, i])))
 
             self.init_pcov(self.meanxx)
 
