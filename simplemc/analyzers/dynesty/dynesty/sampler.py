@@ -6,6 +6,7 @@ The base `Sampler` class containing various helpful functions. All other
 samplers inherit this class either explicitly or implicitly.
 
 """
+from simplemc.cosmo.Derivedparam import AllDerived
 from six.moves import range
 
 import sys
@@ -1022,51 +1023,51 @@ class Sampler(object):
         #     if pbar is not None:
         #         pbar.close()
 
-class AllDerived:
-    def __init__(self):
-        #self.cpars = cpars
-        self.Ol   = Derivedparam('Ol', 0, '\Omega_\Lambda*')
-        self.H0   = Derivedparam('H0', 0, 'H_0*')
-        self.Age  = Derivedparam('Age', 0, 'Age[Gyr]*')
-        self.list = [self.Ol, self.H0, self.Age]
-
-    def listDerived(self, like):
-        self.like  = like
-        self.cpars = like.freeParameters()
-        self.Ol.setValue(self.computeDerived('Ol'))
-        self.H0.setValue(self.computeDerived('H0'))
-        self.Age.setValue(self.computeDerived('Age'))
-        return self.list
-
-    def computeDerived(self, parname):
-        import scipy.integrate as integrate
-        if parname == 'Ol':
-            for par in self.cpars:
-                if par.name == 'Om':
-                    return 1- par.value
-        elif parname == 'H0':
-            for par in self.cpars:
-                if par.name == 'h':
-                    return par.value*100
-        elif parname == 'Age':
-            return integrate.quad(self.compuAge, 0, 10**5)[0]/3.24076E-20/(3.154E7*1.0E9)
-        else:
-            sys.exit('Define derived parameter', parname)
-
-    def compuAge(self, z):
-        return 1.0/((1+z)*100.0*self.like.theory_.h*sp.sqrt(self.like.theory_.RHSquared_a(1.0/(1+z))))
-
-class Derivedparam:
-    def __init__(self, name, value, Ltxname=None):
-        self.name = name
-        if Ltxname:
-            self.Ltxname = Ltxname
-        else:
-            self.Ltxname = name
-        self.value = value
-
-    def setLatexName(self, Ltx):
-        self.Ltxname = Ltx
-
-    def setValue(self, val):
-        self.value = val
+# class AllDerived:
+#     def __init__(self):
+#         #self.cpars = cpars
+#         self.Ol   = Derivedparam('Ol', 0, '\Omega_\Lambda*')
+#         self.H0   = Derivedparam('H0', 0, 'H_0*')
+#         self.Age  = Derivedparam('Age', 0, 'Age[Gyr]*')
+#         self.list = [self.Ol, self.H0, self.Age]
+#
+#     def listDerived(self, like):
+#         self.like  = like
+#         self.cpars = like.freeParameters()
+#         self.Ol.setValue(self.computeDerived('Ol'))
+#         self.H0.setValue(self.computeDerived('H0'))
+#         self.Age.setValue(self.computeDerived('Age'))
+#         return self.list
+#
+#     def computeDerived(self, parname):
+#         import scipy.integrate as integrate
+#         if parname == 'Ol':
+#             for par in self.cpars:
+#                 if par.name == 'Om':
+#                     return 1- par.value
+#         elif parname == 'H0':
+#             for par in self.cpars:
+#                 if par.name == 'h':
+#                     return par.value*100
+#         elif parname == 'Age':
+#             return integrate.quad(self.compuAge, 0, 10**5)[0]/3.24076E-20/(3.154E7*1.0E9)
+#         else:
+#             sys.exit('Define derived parameter', parname)
+#
+#     def compuAge(self, z):
+#         return 1.0/((1+z)*100.0*self.like.theory_.h*sp.sqrt(self.like.theory_.RHSquared_a(1.0/(1+z))))
+#
+# class Derivedparam:
+#     def __init__(self, name, value, Ltxname=None):
+#         self.name = name
+#         if Ltxname:
+#             self.Ltxname = Ltxname
+#         else:
+#             self.Ltxname = name
+#         self.value = value
+#
+#     def setLatexName(self, Ltx):
+#         self.Ltxname = Ltx
+#
+#     def setValue(self, val):
+#         self.value = val
