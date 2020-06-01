@@ -78,8 +78,12 @@ class BaseCosmology:
 
 
     def printParameters(self, params):
+        l = []
         for p in params:
             print(p.name, '=', p.value, '+/-', p.error)
+            l.append("{}: {} = +/- {}".format(p.name, p.value, p.error))
+        return l
+
 
 
     def updateParams(self, pars):

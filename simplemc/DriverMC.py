@@ -527,7 +527,7 @@ class DriverMC:
 ###################################Optimizers##############################################
 
     def maxLikeRunner(self, iniFile=None, **kwargs):
-        self.outputpath += 'optimization'
+        self.outputpath = '{}_optimization'.format(self.outputpath)
         self.outputChecker()
         if iniFile:
             withErrors = self.config.getboolean('MaxLike', 'withErrors', fallback=False)
@@ -541,28 +541,29 @@ class DriverMC:
                 sys.exit(1)
 
         A = MaxLikeAnalyzer(self.L, withErrors=withErrors)
-        self.T.printParameters(A.params)
-        return A
+        params = self.T.printParameters(A.params)
+        print(type(params))
+        return ['maxlike', A, params]
 
     def geneticRunner(self, iniFile=None, **kwargs):
         self.outputpath = '{}_optimization'.format(self.outputpath)
         self.outputChecker()
 
         if iniFile:
-            n_individuals = self.config.getint('genetic', 'n_individuals', fallback=100)
+            n_individuals = self.config.getint('genetic', 'n_individuals', fallback=400)
             n_generations = self.config.getint('genetic', 'n_generations' , fallback=1000)
             selection_method = self.config.get('genetic', 'selection_method', fallback='tournament')
-            mut_prob = self.config.getfloat('genetic', 'mut_prob', fallback=0.4)
+            mut_prob = self.config.getfloat('genetic', 'mut_prob', fallback=0.6)
         else:
-            n_individuals = kwargs.pop('n_individuals', 100)
+            n_individuals = kwargs.pop('n_individuals', 400)
             n_generations = kwargs.pop('n_generations', 1000)
             selection_method = kwargs.pop('selection_method', 'tournament')
-            mut_prob = kwargs.pop('mut_prob', 0.4)
+            mut_prob = kwargs.pop('mut_prob', 0.6)
             if kwargs:
                 logger.critical('Unexpected **kwargs for genetic optimizer: {}'.format(kwargs))
                 logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
                             'genetic executer options are:'
-                            '\n\tn_individuals (int) Default: 100\n\t'
+                            '\n\tn_individuals (int) Default: 400\n\t'
                             'n_generations (int) Default: 1000\n\t'
                             'selection_method {"tournament","rank","roulette"} Default: "tournament"'
                             '\n\tmut_prob (float) Default: 0.4')
