@@ -36,8 +36,7 @@ class DriverMC:
 
         """
         self.iniFile = iniFile
-        if self.iniFile:
-            self.iniReader(iniFile)
+        if self.iniFile:    self.iniReader(iniFile)
         else:
             self.chainsdir    = kwargs.pop('chainsdir', 'simplemc/chains')
             self.model        = kwargs.pop('model',   None)
@@ -232,26 +231,30 @@ class DriverMC:
             showfiles   = self.config.getboolean(   'nested', 'showfiles',    fallback=True)
 
             self.priortype = self.config.get('nested', 'priortype', fallback='u')
-             #nsigma is the default value for sigma in gaussian priors
-            self.nsigma = self.config.get(   'nested', 'sigma', fallback=2)
+            #nsigma is the default value for sigma in gaussian priors
+            self.nsigma = self.config.get('nested', 'sigma', fallback=2)
 
             if neuralNetwork:
                 split      = self.config.getfloat('neural', 'split', fallback=0.8)
                 numNeurons = self.config.getint(  'neural', 'numNeurons', fallback=100)
         else:
-            nlivepoints = kwargs.pop('nlivepoints', 1024)
-            accuracy = kwargs.pop('accuracy', 0.01)
-            self.priortype = kwargs.pop('priortype', 'u')
-            nestedType = kwargs.pop('nestedType', 'multi')
+            self.engine = kwargs.pop('engine',    'dynesty')
+            dynamic     = kwargs.pop('dynamic',    False)
             neuralNetwork = kwargs.pop('neuralNetwork', False)
-            dynamic = kwargs.pop('dynamic', False)
-            nproc = kwargs.pop('nproc', 1)
-            self.engine = kwargs.pop('engine', 'dynesty')
-            self.addDerived = kwargs.pop('addDerived', False)
-            showfiles = kwargs.pop('showfiles', True)
+            nestedType  = kwargs.pop('nestedType', 'multi')
+            nlivepoints = kwargs.pop('nlivepoints', 1024)
+            accuracy    = kwargs.pop('accuracy',    0.01)
+            nproc       = kwargs.pop('nproc', 1)
+            showfiles   = kwargs.pop('showfiles', True)
+
+
+            self.priortype = kwargs.pop('priortype', 'u')
+            self.nsigma = kwargs.pop('sigma', 2)
+
             # For neural networks
             split = kwargs.pop('split', 0.8)
             numNeurons = kwargs.pop('numNeurons', 100)
+
 
             if kwargs:
                 logger.critical('Unexpected **kwargs for nested sampler: {}'.format(kwargs))
@@ -267,17 +270,19 @@ class DriverMC:
                             'showfiles (boolean). Default: True.')
                 sys.exit(1)
 
+        #stored output files
         self.outputpath += '_{}_{}'.format(self.engine, nestedType)
-        if neuralNetwork:
-            self.outputpath = "{}+ANN_".format(self.outputpath)
+        if neuralNetwork:   self.outputpath = "{}+ANN_".format(self.outputpath)
         self.outputChecker()
 
+        #paralel run
         pool, nprocess = self.mppool(nproc)
         logger.info("\n\tnlivepoints: {}\n"
                     "\taccuracy: {}\n"
                     "\tnested type: {}\n"
-                    "\tengine: {}".format(nlivepoints, accuracy,
-                                          nestedType, self.engine))
+                    "\tengine: {}".format(nlivepoints, accuracy, nestedType, self.engine))
+
+        #only to show live points on the fly
         if self.engine == 'dynesty':
             if showfiles:
                 from simplemc.analyzers.dynesty import dynesty
@@ -286,6 +291,7 @@ class DriverMC:
                     import dynesty
                 except:
                     from simplemc.analyzers.dynesty import dynesty
+
         ti = time.time()
         if neuralNetwork:
             logger.info("\tUsing neural network.")
@@ -293,7 +299,7 @@ class DriverMC:
             from simplemc.analyzers.pybambi.bambi import loglike_thumper
             learner = 'keras'
             kerasmodel = None
-            self.logLike = loglike_thumper(self.logLike, learner=learner,
+            self.logLike = loglike_thumper(self.logLike, learner=learner, \
                                              ntrain=nlivepoints, nDims=self.dims)
 
         if dynamic:
@@ -303,8 +309,7 @@ class DriverMC:
 
             sampler.run_nested(nlive_init=nlivepoints, dlogz_init=0.05, nlive_batch=100,
                             maxiter_init=10000, maxiter_batch=1000, maxbatch=10,
-                               outputname=self.outputpath,
-                               addDerived=self.addDerived, smcloglike=self.L)
+                            outputname=self.outputpath, addDerived=self.addDerived, smcloglike=self.L)
 
             M = sampler.results
 
@@ -338,7 +343,7 @@ class DriverMC:
 
 
 
-
+#################################### logLike and prior Transform function ###########################
 
     def setPriors(self):
         """
@@ -360,8 +365,6 @@ class DriverMC:
             latexnames.append(parameter.Ltxname)
         return [names, values, errorlist, boundlist, latexnames]
 
-
-#################################### logLike and prior Transform function ###########################
 
     def instantiatePars(self, value):
         """
@@ -405,6 +408,10 @@ class DriverMC:
         return loglike
 
 
+
+
+
+
     #priorsTransform
     def priorTransform(self, theta):
         """prior Transform for gaussian and flat priors"""
@@ -425,6 +432,8 @@ class DriverMC:
                 priors.append(theta[c]*(bound[1]-bound[0])+bound[0])
                 # At this moment, np.array(priors) has shape (dims,)
         return np.array(priors)
+
+
 
 ###########loglike for genetic
     def logLikeGenetic(self, *v):

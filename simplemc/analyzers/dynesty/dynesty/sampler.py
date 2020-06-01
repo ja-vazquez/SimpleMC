@@ -949,13 +949,14 @@ class Sampler(object):
                     AD = AllDerived()
                     # smc -> simpleMC loglike object
                     for pd in AD.listDerived(smcloglike):
-                        vstarstr = "{} {}".format(vstarstr, pd.value)
+                        vstarstr += "{} {}".format(vstarstr, pd.value)
                 f.write("{} {} {}\n".format(weights, -2 * results[3], vstarstr))
+                f.flush()
         f.close()
         # Add remaining live points to samples.
         if add_live:
             it = self.it - 1
-            f2 = open(outputname + '_live.txt', 'w+')
+            #-- f2 = open(outputname + '_live.txt', 'w+')
             for i, results in enumerate(self.add_live_points()):
                 (worst, ustar, vstar, loglstar, logvol, logwt,
                  logz, logzvar, h, nc, worst_it, boundidx, bounditer,
@@ -964,20 +965,21 @@ class Sampler(object):
                     delta_logz = np.inf
                 if logz <= -1e6:
                     logz = -np.inf
-                weights = np.exp(results[5])
-                weights = np.exp(self.results['logwt'] - self.results['logz'][-1])
-                vstarstr = str(results[2]).lstrip('[').rstrip(']')
-                f2.write("{} {} {}\n".format(weights, -1*results[3], vstarstr))
+
+                #--weights = np.exp(results[5])
+                #--weights = np.exp(self.results['logwt'] - self.results['logz'][-1])
+                #--vstarstr = str(results[2]).lstrip('[').rstrip(']')
+                #--f2.write("{} {} {}\n".format(weights, -1*results[3], vstarstr))
 
                 # Print progress.
-                if print_progress:
-                    sys.stdout.write("it: {} | ncall: {} | "
-                          "logz: {:.4f} | loglstar: {:.4f} | "
-                          "points: {}".format(i, ncall, logz, loglstar, vstarstr))
-                    sys.stdout.flush()
+                #--if print_progress:
+                    #--sys.stdout.write("it: {} | ncall: {} | "
+                    #--      "logz: {:.4f} | loglstar: {:.4f} | "
+                    #--      "points: {}\\".format(i, ncall, logz, loglstar, vstarstr))
+                    #--sys.stdout.flush()
                     # print_func(results, it, ncall, add_live_it=i+1,
                     #            dlogz=dlogz, logl_max=logl_max)
-            f2.close()
+            #--f2.close()
         # finally:
         #     if pbar is not None:
         #         pbar.close()
