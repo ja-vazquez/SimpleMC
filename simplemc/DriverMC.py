@@ -16,6 +16,7 @@ import time
 
 #TODO #import corner
 #TODO keras neural network
+#TODO GR criteria in .ini file
 
 class DriverMC:
     """
@@ -38,7 +39,7 @@ class DriverMC:
         if self.iniFile:
             self.iniReader(iniFile)
         else:
-            self.chainsdir    = kwargs.pop('chainsdir', 'chains')
+            self.chainsdir    = kwargs.pop('chainsdir', 'simplemc/chains')
             self.model        = kwargs.pop('model', None)
             self.prefact      = kwargs.pop('prefact', 'phy')
             self.varys8       = kwargs.pop('varys8', False)
@@ -130,13 +131,13 @@ class DriverMC:
 
         self.config.read(iniFile)
         self.chainsdir    = self.config.get('custom', 'chainsdir',
-                                         fallback=os.path.join('chains'))
+                                         fallback=os.path.join('simplemc/chains'))
         self.model        = self.config.get('custom', 'model')
         self.prefact      = self.config.get('custom', 'prefact',      fallback='phy')
-        self.varys8       = self.config.get('custom', 'varys8',       fallback=False)
         self.datasets     = self.config.get('custom', 'datasets',     fallback='HD')
         self.analyzername = self.config.get('custom', 'analyzername', fallback='mcmc')
-        self.addDerived   = self.config.get('custom', 'addDerived',   fallback=False)
+        self.varys8       = self.config.getboolean('custom', 'varys8',       fallback=False)
+        self.addDerived   = self.config.getboolean('custom', 'addDerived',   fallback=False)
 
         self.custom_parameters = self.config.get('custom', 'custom_parameters', fallback=None)
         self.custom_function   = self.config.get('custom', 'custom_function',   fallback=None)
@@ -155,20 +156,18 @@ class DriverMC:
 
         """
         if iniFile:
-            nsamp = self.config.getint('mcmc', 'nsamp', fallback=15000)
-            skip = self.config.getint('mcmc', 'skip', fallback=0)
+            nsamp   = self.config.getint('mcmc', 'nsamp', fallback=50000)
+            skip    = self.config.getint('mcmc', 'skip',  fallback=300)
             ## temperature at which to sample, weights get readjusted on the fly
-            temp = self.config.getint('mcmc', 'temp', fallback=2)
+            temp    = self.config.getint('mcmc', 'temp',  fallback=2)
             chainno = self.config.getint('mcmc', 'chainno', fallback=1)
             # self.GRcriteria = float(config['mcmc']['GRcriteria'])
-            self.addDerived = self.config.getboolean('mcmc', 'addDerived', fallback=False)
-            evidence = self.config.getboolean('mcmc', 'addDerived', fallback=False)
+            evidence = self.config.getboolean('mcmc', 'evidence', fallback=False)
         else:
-            nsamp = kwargs.pop('nsamp', 15000)
-            skip = kwargs.pop('skip', 0)
-            temp = kwargs.pop('temp', 2)
-            chainno = kwargs.pop('chainno', 1)
-            self.addDerived = kwargs.pop('addDerived', False)
+            nsamp    = kwargs.pop('nsamp', 50000)
+            skip     = kwargs.pop('skip', 300)
+            temp     = kwargs.pop('temp', 2)
+            chainno  = kwargs.pop('chainno', 1)
             evidence = kwargs.pop('evidence', False)
             if kwargs:
                 logger.critical('Unexpected **kwargs for MCMC: {}'.format(kwargs))
