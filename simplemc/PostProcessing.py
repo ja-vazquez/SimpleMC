@@ -3,6 +3,7 @@ This module processes the samples from a nested sampler and prints, saves chains
 and creates a param file.
 """
 # from simplemc.tools.Simple_Plots import Simple_plots
+from simplemc import logger
 import sys
 import os.path as path
 import numpy as np
@@ -125,19 +126,30 @@ class PostProcessing():
         for item in self.args:
             if type(item) is list:
                 for element in item:
-                    file.write(str(element) + '\n')
+                    if element is not None:
+                        file.write(str(element) + '\n')
             else:
-                file.write(str(item) + '\n')
+                if item is not None:
+                    file.write(str(item) + '\n')
 
         for item in args:
             if type(item) is list:
                 for element in item:
-                    file.write(str(element) + '\n')
+                    if element is not None:
+                        file.write(str(element) + '\n')
             else:
-                file.write(str(item) + '\n')
+                if item is not None:
+                    file.write(str(item) + '\n')
 
-        logger.info("\nElapsed time: %.3f minutes = %.3f seconds" % (time / 60, time))
-        file.write('\nElapsed time: %.3f minutes = %.3f seconds \n' % (time / 60, time))
+        if self.engine =='dynesty' and self.analyzername == 'nested':
+            file.write("nlive: {:d}\nniter: {:d}\nncall: {:d}\n"
+                       "eff(%): {:6.3f}\nlogz: "
+                       "{:6.3f} +/- {:6.3f}".format(self.result.nlive, self.result.niter,
+                                               sum(self.result.ncall), self.result.eff,
+                                               self.result.logz[-1], self.result.logzerr[-1]))
+
+        logger.info("\nElapsed time: {:.3f} minutes = {:.3f} seconds".format(time / 60, time))
+        file.write('\nElapsed time: {:.3f} minutes = {:.3f} seconds \n'.format(time / 60, time))
         file.close()
 
     def getdistAnalyzer(self, cov=False):
