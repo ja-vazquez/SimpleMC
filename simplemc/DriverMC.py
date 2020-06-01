@@ -275,7 +275,10 @@ class DriverMC:
     def priorTransform(self, theta):
         """prior Transform for gaussian and flat priors"""
         priors = []
-        n = self.nsigma
+        try:
+            n = self.nsigma
+        except:
+            n = 2.
 
         if self.priortype == 'g':
             for c, bound in enumerate(self.bounds):
