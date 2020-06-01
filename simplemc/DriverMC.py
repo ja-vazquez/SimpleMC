@@ -1,6 +1,6 @@
 
 
-
+from simplemc.analyzers.SimpleGenetic import SimpleGenetic
 from simplemc.analyzers.MCMCAnalyzer import MCMCAnalyzer
 from simplemc.analyzers.MaxLikeAnalyzer import MaxLikeAnalyzer
 from simplemc.runbase import ParseModel, ParseDataset
