@@ -567,7 +567,7 @@ class DriverMC:
                             'selection_method {"tournament","rank","roulette"} Default: "tournament"'
                             '\n\tmut_prob (float) Default: 0.4')
                 sys.exit(1)
-        logger.info("\n\tn_individuals: {}\n\tn_generations_ {}"
+        logger.info("\n\tn_individuals: {}\n\tn_generations: {}"
                     "\n\tselection method: {}\n\t"
                     "mut prob: {}".format(n_individuals, n_generations,
                                         selection_method,mut_prob))
