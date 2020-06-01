@@ -3,7 +3,6 @@
 from simplemc.analyzers.MaxLikeAnalyzer import MaxLikeAnalyzer
 from simplemc.analyzers.SimpleGenetic import SimpleGenetic
 from simplemc.analyzers.MCMCAnalyzer import MCMCAnalyzer
-from simplemc.analyzers.MCMCAnalyzer import MCMCAnalyzer
 from simplemc.runbase import ParseModel, ParseDataset
 from simplemc.PostProcessing import PostProcessing
 from simplemc.cosmo.Parameter import Parameter
@@ -47,8 +46,7 @@ class DriverMC:
             self.datasets     = kwargs.pop('datasets', 'HD')
             self.analyzername = kwargs.pop('analyzername', 'mcmc')
             self.addDerived   = kwargs.pop('addDerived', False)
-            self.priortype = kwargs.pop('priortype', 'u')
-            self.varys8 = kwargs.pop('varys8', False)
+
 
             ## Next two are for custom model
             self.custom_parameters = kwargs.pop('custom_parameters', None)
