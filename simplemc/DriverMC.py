@@ -39,29 +39,32 @@ class DriverMC:
         if self.iniFile:
             self.iniReader(iniFile)
         else:
-            self.model          = kwargs.pop('model', None)
-            self.prefact        = kwargs.pop('prefact', 'phy')
-            self.datasets       = kwargs.pop('datasets', 'HD')
-            self.analyzername   = kwargs.pop('analyzername', 'mcmc')
+            self.chainsdir    = kwargs.pop('chainsdir', 'simplemc/chains')
+            self.model        = kwargs.pop('model', None)
+            self.prefact      = kwargs.pop('prefact', 'phy')
+            self.varys8       = kwargs.pop('varys8', False)
+            self.datasets     = kwargs.pop('datasets', 'HD')
+            self.analyzername = kwargs.pop('analyzername', 'mcmc')
+            self.addDerived   = kwargs.pop('addDerived', False)
 
+<<<<<<< HEAD
             self.priortype = kwargs.pop('priortype', 'u')
             self.varys8 = kwargs.pop('varys8', False)
 
+=======
+>>>>>>> cf78d87c8eed793712a073d92d9278930cd3979a
             ## Next two are for custom model
             self.custom_parameters = kwargs.pop('custom_parameters', None)
-            self.custom_function = kwargs.pop('custom_function', None)
+            self.custom_function   = kwargs.pop('custom_function', None)
             ## Following two are for custom data
             self.path_to_data = kwargs.pop('path_to_data', None)
-            self.path_to_cov = kwargs.pop('path_to_cov', None)
-            self.chainsdir = kwargs.pop('chainsdir', 'simplemc/chains')
-            #nsigma is the default value for sigma in gaussian priors
-            self.nsigma  = 4.
+            self.path_to_cov  = kwargs.pop('path_to_cov', None)
+
             if os.path.exists(os.path.join(self.chainsdir)):
                 self.chainsdir = os.path.join(self.chainsdir)
             else:
-                logger.info("Your chains directory does not exist. Please create it and try again.")
+                logger.info("Your chains directory does not exist. Create a new one and try again.")
                 sys.exit(1)
-            self.addDerived = False
             if kwargs:
                 logger.critical('Unexpected **kwargs for DriverMC: {}'.format(kwargs))
                 logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
@@ -73,13 +76,17 @@ class DriverMC:
 
 
         self.T, self.L = self.TLinit()
-        #if you like to change the bounds, you need edit ParamDefs.py file.
-        self.bounds, self.means    = self.priorValues()
-        self.dims, self.paramsList = self.getDims()
-        #self.n_sigma = self.dims * self.nsigma
+
+        pars_info = self.L.freeParameters()
+        self.bounds     = [p.bounds for p in pars_info]
+        self.means      = [p.means  for p in pars_info]
+        self.paramsList = [p.name   for p in pars_info]
+        self.dims       = len(self.paramsList)
+
         self.outputname = "{}_{}_{}_{}".format(self.model, self.prefact,
                                     self.datasets, self.analyzername)
         self.outputpath = "{}/{}".format(self.chainsdir, self.outputname)
+
 
 
 
@@ -118,31 +125,43 @@ class DriverMC:
         self.config = configparser.ConfigParser()
 
         self.config.read(iniFile)
+<<<<<<< HEAD
         self.chainsdir = self.config.get('custom', 'chainsdir',
                                          fallback=os.path.join('SimpleMC_chains'))
         self.model = self.config.get('custom', 'model')
         self.prefact = self.config.get('custom', 'prefact', fallback='phy')
         self.varys8 = self.config.getboolean('custom', 'varys8', fallback=False)
         self.datasets = self.config.get('custom', 'datasets', fallback='HD')
+=======
+        self.chainsdir    = self.config.get('custom', 'chainsdir',
+                                         fallback=os.path.join('simplemc/chains'))
+        self.model        = self.config.get('custom', 'model')
+        self.prefact      = self.config.get('custom', 'prefact',      fallback='phy')
+        self.varys8       = self.config.get('custom', 'varys8',       fallback=False)
+        self.datasets     = self.config.get('custom', 'datasets',     fallback='HD')
+>>>>>>> cf78d87c8eed793712a073d92d9278930cd3979a
         self.analyzername = self.config.get('custom', 'analyzername', fallback='mcmc')
-        self.priortype = self.config.get('custom', 'priortype', fallback='u')
+        self.addDerived   = self.config.get('custom', 'addDerived',   fallback=False)
+
         self.custom_parameters = self.config.get('custom', 'custom_parameters', fallback=None)
-        self.custom_function = self.config.get('custom', 'custom_function', fallback=None)
+        self.custom_function   = self.config.get('custom', 'custom_function',   fallback=None)
         ## Following two are for custom data
         self.path_to_data = self.config.get('custom', 'path_to_data', fallback=None)
-        self.path_to_cov = self.config.get('custom', 'path_to_cov', fallback=None)
-        self.addDerived = False
+        self.path_to_cov  = self.config.get('custom', 'path_to_cov',  fallback=None)
+
+
+
 
     def TLinit(self):
         """
-        Returns T evaluated at the model, and L in at the datasets.
+        Returns
+        -------
+        T evaluated at the model, and L in at the datasets.
         """
-
         T = ParseModel(self.model, custom_parameters=self.custom_parameters,
-                       custom_function=self.custom_function)
-
+                                   custom_function=self.custom_function)
         L = ParseDataset(self.datasets, path_to_data=self.path_to_data,
-                         path_to_cov=self.path_to_cov)
+                                        path_to_cov=self.path_to_cov)
 
         if self.prefact == "pre":
             T.setVaryPrefactor()
@@ -153,11 +172,16 @@ class DriverMC:
         L.setTheory(T)
         return T, L
 
+
+
+
     def priorValues(self):
         """Returns some values for the priorTransform """
         bounds = self.setPriors()[3]
         means  = np.array(self.setPriors()[1])
         return bounds, means
+
+
 
     def setPriors(self):
         """
@@ -179,18 +203,6 @@ class DriverMC:
             latexnames.append(parameter.Ltxname)
         return [names, values, errorlist, boundlist, latexnames]
 
-## que hacer aqui?
-    def getDims(self):
-        """
-        Returns the numbers of dimensions and a parameters list.
-        """
-        #IGV: We need the names of parameters in a list and, on the other hand,
-        #    the dimensions. I don't found a fancy way, probably it exists.
-        freeP = self.T.freeParameters()
-        listP = []
-        for _, item in enumerate(freeP):
-            listP.append(item.name)
-        return len(listP), listP
 
 #################################### logLike and prior Transform function ###########################
 
@@ -238,7 +250,7 @@ class DriverMC:
     def priorTransform(self, theta):
         """prior Transform for gaussian and flat priors"""
         priors = []
-        n = 2.
+        n = self.nsigma
 
         if self.priortype == 'g':
             for c, bound in enumerate(self.bounds):
@@ -382,6 +394,8 @@ class DriverMC:
             nlivepoints = self.config.getint('nested', 'nlivepoints', fallback=1024)
             accuracy = self.config.getfloat('nested', 'accuracy', fallback=0.01)
             self.priortype = self.config.get('nested', 'priortype', fallback='u')
+             #nsigma is the default value for sigma in gaussian priors
+            self.nsigma  = self.config.get('nested', 'sigma', fallback=2)
             nestedType = self.config.get('nested', 'nestedType', fallback='multi')
             neuralNetwork = self.config.getboolean('nested', 'neuralNetwork', fallback=False)
             dynamic = self.config.getboolean('nested', 'dynamic', fallback=False)
