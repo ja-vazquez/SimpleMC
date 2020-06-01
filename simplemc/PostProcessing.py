@@ -4,6 +4,7 @@ and creates a param file.
 """
 # from simplemc.tools.Simple_Plots import Simple_plots
 from simplemc import logger
+from simplemc.cosmo.Derivedparam import AllDerived
 import sys
 import os.path as path
 import numpy as np
@@ -11,7 +12,7 @@ import re
 import scipy as sp
 
 
-class PostProcessing():
+class PostProcessing:
     """
     In this class we...
     """
@@ -61,7 +62,7 @@ class PostProcessing():
                 if self.derived:
                     for pd in self.AD.listDerived(self.loglike):
                         nrow += " " + str(pd.value)
-                f.write(nrow + '\n')
+                f.write("{}\n".format(nrow))
 
         elif self.engine == 'nestle':
             for i in range(len(self.result.samples)):
@@ -70,6 +71,9 @@ class PostProcessing():
                 strsamples = str(self.result.samples[i]).lstrip('[').rstrip(']')
                 row = strweights + ' ' + strlogl + ' ' + strsamples
                 nrow = " ".join(row.split())
+                if self.derived:
+                    for pd in self.AD.listDerived(self.loglike):
+                        nrow = "{} {}".format(nrow, pd.value)
                 f.write(nrow + '\n')
         f.close()
 
@@ -93,6 +97,9 @@ class PostProcessing():
             strsamples = "{} {} {}\n".format(1, -2 * (logprobs[i]), strsamples)
             strsamples = re.sub(' +', ' ', strsamples)
             strsamples = re.sub('\n ', ' ', strsamples)
+            if self.derived:
+                for pd in self.AD.listDerived(self.loglike):
+                    strsamples = "{} {}".format(strsamples, pd.value)
             f.write(strsamples)
         f.close()
 
@@ -121,7 +128,7 @@ class PostProcessing():
 
     def writeSummary(self, time, *args):
         file = open(self.filename + "_Summary" + ".txt", 'w')
-        file.write('SUMMARY\n')
+        file.write('SUMMARY\n-------\n')
 
         for item in self.args:
             if type(item) is list:
@@ -176,54 +183,3 @@ class PostProcessing():
             summaryResults.append(self.paramList[i] + " : " + str(round(means[i], 4)) + \
                                   "+/-" + str(round(stddev[i], 4)))
         return summaryResults
-
-
-class AllDerived:
-    def __init__(self):
-        # self.cpars = cpars
-        self.Ol = Derivedparam('Ol', 0, '\Omega_\Lambda*')
-        self.H0 = Derivedparam('H0', 0, 'H_0*')
-        self.Age = Derivedparam('Age', 0, 'Age[Gyr]*')
-        self.list = [self.Ol, self.H0, self.Age]
-
-    def listDerived(self, like):
-        self.like = like
-        self.cpars = like.freeParameters()
-        self.Ol.setValue(self.computeDerived('Ol'))
-        self.H0.setValue(self.computeDerived('H0'))
-        self.Age.setValue(self.computeDerived('Age'))
-        return self.list
-
-    def computeDerived(self, parname):
-        import scipy.integrate as integrate
-        if parname == 'Ol':
-            for par in self.cpars:
-                if par.name == 'Om':
-                    return 1 - par.value
-        elif parname == 'H0':
-            for par in self.cpars:
-                if par.name == 'h':
-                    return par.value * 100
-        elif parname == 'Age':
-            return integrate.quad(self.compuAge, 0, 10 ** 5)[0] / 3.24076E-20 / (3.154E7 * 1.0E9)
-        else:
-            sys.exit('Define derived parameter', parname)
-
-    def compuAge(self, z):
-        return 1.0 / ((1 + z) * 100.0 * self.like.theory_.h * sp.sqrt(self.like.theory_.RHSquared_a(1.0 / (1 + z))))
-
-
-class Derivedparam:
-    def __init__(self, name, value, Ltxname=None):
-        self.name = name
-        if Ltxname:
-            self.Ltxname = Ltxname
-        else:
-            self.Ltxname = name
-        self.value = value
-
-    def setLatexName(self, Ltx):
-        self.Ltxname = Ltx
-
-    def setValue(self, val):
-        self.value = val
