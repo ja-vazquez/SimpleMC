@@ -52,7 +52,6 @@ def loglike_thumper(loglikelihood, nDims, **kwargs):
     # Process kwargs
     sampler = kwargs.pop('sampler', 'mnest')
     nlive = kwargs.pop('nlive', nDims*25)
-    root = kwargs.pop('root', os.path.join('chains', sampler, '/'))
     num_repeats = kwargs.pop('num_repeats', nDims*5)
     eff = kwargs.pop('eff', 0.5**nDims)
     learner = kwargs.pop('learner', 'keras')
@@ -66,7 +65,7 @@ def loglike_thumper(loglikelihood, nDims, **kwargs):
     thumper = BambiManager(loglikelihood, learner, proxy_tolerance,
                            failure_tolerance, ntrain)
 
-    return thumper.loglikelihood()
+    return thumper.loglikelihood
 
     
 

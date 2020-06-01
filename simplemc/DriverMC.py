@@ -376,6 +376,9 @@ class DriverMC:
             self.engine = self.config.get('nested', 'engine', fallback='dynesty')
             self.addDerived = self.config.getboolean('nested', 'addDerived', fallback=False)
             showfiles = self.config.getboolean('nested', 'showfiles', fallback=True)
+            if neuralNetwork:
+                split = self.config.getfloat('neural', 'split', fallback=0.8)
+                numNeurons = self.config.getint('neural', 'numNeurons', fallback=100)
         else:
             nlivepoints = kwargs.pop('nlivepoints', 1024)
             accuracy = kwargs.pop('accuracy', 0.01)
@@ -387,6 +390,9 @@ class DriverMC:
             self.engine = kwargs.pop('engine', 'dynesty')
             self.addDerived = kwargs.pop('addDerived', False)
             showfiles = kwargs.pop('showfiles', True)
+            # For neural networks
+            split = kwargs.pop('split', 0.8)
+            numNeurons = kwargs.pop('numNeurons', 100)
 
             if kwargs:
                 logger.critical('Unexpected **kwargs for nested sampler: {}'.format(kwargs))
@@ -425,17 +431,12 @@ class DriverMC:
         if neuralNetwork:
             logger.info("\tUsing neural network.")
             #from bambi import run_pyBAMBI
-            split = self.config.getfloat('neural', 'split', fallback=0.8)
-            numNeurons = self.config.getint('neural', 'numNeurons', fallback=100)
-            from simplemc.analyzers.pybambi.pybambimanager import BambiManager
+            from simplemc.analyzers.pybambi.bambi import loglike_thumper
             learner = 'keras'
             kerasmodel = None
-            thumper = BambiManager(self.logLike, learner, proxy_tolerance=0.1,
-                                   failure_tolerance=0.5, ntrain=nlivepoints, model=kerasmodel)
-            self.logLike = thumper.loglikelihood
-            # M = run_pyBAMBI(self.logLike, self.priorTransform, self.dims,
-            #                 eff=accuracy, nestedType=nestedType, dynamic=dynamic,
-            #                 nlive=nlivepoints, learner='keras')
+            self.logLike = loglike_thumper(self.logLike, learner=learner,
+                                             ntrain=nlivepoints, nDims=self.dims)
+
         if dynamic:
             logger.info("\nUsing dynamic nested sampling...")
             sampler = dynesty.DynamicNestedSampler(self.logLike, self.priorTransform,
