@@ -24,6 +24,7 @@ except ImportError:
 from .results import Results, print_fn
 from .bounding import UnitCube
 from .sampling import sample_unif
+import sys
 
 __all__ = ["Sampler"]
 
@@ -940,8 +941,9 @@ class Sampler(object):
                 #            logl_max=logl_max)
                 weights = np.exp(results[5])
                 vstarstr = str(results[2]).lstrip('[').rstrip(']')
-                print("it: {} | ncall: {} | "
-                      "logz: {:.4f} | loglstar: {:.4f} | points {}".format(i, ncall, logz, loglstar, vstarstr), end="\r")
+                sys.stdout.write("\rit: {} | ncall: {} | "
+                      "logz: {:.4f} | loglstar: {:.4f} | points {}".format(i, ncall, logz, loglstar, vstarstr))
+                sys.stdout.flush()
                 # exp(logwt - loglstar)
                 if addDerived:
                     AD = AllDerived()
@@ -969,9 +971,10 @@ class Sampler(object):
 
                 # Print progress.
                 if print_progress:
-                    print("it: {} | ncall: {} | "
+                    sys.stdout.write("it: {} | ncall: {} | "
                           "logz: {:.4f} | loglstar: {:.4f} | "
-                          "points: {}".format(i, ncall, logz, loglstar, vstarstr), end="\r")
+                          "points: {}".format(i, ncall, logz, loglstar, vstarstr))
+                    sys.stdout.flush()
                     # print_func(results, it, ncall, add_live_it=i+1,
                     #            dlogz=dlogz, logl_max=logl_max)
             f2.close()
@@ -1016,8 +1019,9 @@ class Sampler(object):
 
             # Print progress.
             if print_progress:
-                print("it: {} | ncall: {} | "
-                      "logz: {} | loglstar: {}".format(i+1, ncall, logz, loglstar), end="\r")
+                sys.stdout.write("it: {} | ncall: {} | "
+                      "logz: {} | loglstar: {}".format(i+1, ncall, logz, loglstar))
+                sys.stdout.flush()
                 #print_func(results, it, ncall, add_live_it=i+1, dlogz=0.01)
         # finally:
         #     if pbar is not None:

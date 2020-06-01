@@ -125,8 +125,9 @@ class MCMCAnalyzer:
             else:
                 self.cw += 1
 
-            print("Accepted: {:d} | loglike: {:.4f} | "
-                  "GR: {}".format(self.co, self.cloglike, gr), end="\r")
+            sys.stdout.write("\rAccepted: {:d} | loglike: {:.4f} | "
+                  "GR: {}".format(self.co, self.cloglike, gr))
+            sys.stdout.flush()
             if (self.co >0 and self.co % self.checkgr == 0):
                 chains = comm.gather(self.lpars, root=0)
                 if comm.rank ==0:

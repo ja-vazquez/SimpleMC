@@ -342,7 +342,7 @@ class Population:
                 self.difference_abs.append(difference)
             f.write(" {} {} \n".format(i, self.best_fitness))
             sys.stdout.write("\r{}it | best fitness: {:.4f} | best individual: {}".format(i, self.best_fitness, self.best_value_variables))
-            #sys.stdout.flush()
+            sys.stdout.flush()
             if stopping_early and i > rounds_stopping:
                 latest_n = np.array(self.difference_abs[-(rounds_stopping):])
                 if all(latest_n < tolerance_stopping):
