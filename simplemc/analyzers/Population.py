@@ -3,6 +3,7 @@ import numpy as np
 import copy
 import pandas as pd
 import time
+import sys
 from datetime import datetime
 
 
@@ -46,34 +47,34 @@ class Population:
                             verbose     = verbose)
             self.individuals.append(individual_i)
 
-        if verbose:
-            print("----------------")
-            print("Population created")
-            print("----------------")
-            print("Number of individuals: {}".format(self.n_individuals))
-            print("lower limits: {}".format(np.array2string(self.limits_inf)))
-            print("Upper limits: {}".format(np.array2string(self.limits_sup)))
+        # if verbose:
+        #     print("----------------")
+        #     print("Population created")
+        #     print("----------------")
+        #     print("Number of individuals: {}".format(self.n_individuals))
+        #     print("lower limits: {}".format(np.array2string(self.limits_inf)))
+        #     print("Upper limits: {}".format(np.array2string(self.limits_sup)))
 
-    def __repr__(self):
-        """
-        Info for print population object
-        """
-        text = ("============================ \n  Population \n",
-                 "============================ \n Num of individuals: ",
-                 "{} \n lower limits: {}",
-                 "\n upper limits: {} \n Optimizated: {}",
-                 "\n Iterations of optimization (generations): {} ",
-                 "\n \n Information of best individual: {} \n",
-                 " ----------------------------",
-                 "\n Variables values {} \n",
-                 "Fitness: {} \n \n results after optimization: \n",
-                 " -------------------------- \n",
-                 "value optimal de variables: {} \n",
-                 "value optimal function target: {} \n Optimal fitness : {} ").format(
-                    self.n_individuals, self.limits_inf, self.limits_sup, self.optimized, self.iter_optimization, self.best_value_variables, self.best_fitness, self.value_variables_optimal,
-                    self.function_value_optimal, self.fitness_optimal)
-
-        return(text)
+    # def __repr__(self):
+    #     """
+    #     Info for print population object
+    #     """
+    #     text = ("============================ \n  Population \n",
+    #              "============================ \n Num of individuals: ",
+    #              "{} \n lower limits: {}",
+    #              "\n upper limits: {} \n Optimizated: {}",
+    #              "\n Iterations of optimization (generations): {} ",
+    #              "\n \n Information of best individual: {} \n",
+    #              " ----------------------------",
+    #              "\n Variables values {} \n",
+    #              "Fitness: {} \n \n results after optimization: \n",
+    #              " -------------------------- \n",
+    #              "value optimal de variables: {} \n",
+    #              "value optimal function target: {} \n Optimal fitness : {} ").format(
+    #                 self.n_individuals, self.limits_inf, self.limits_sup, self.optimized, self.iter_optimization, self.best_value_variables, self.best_fitness, self.value_variables_optimal,
+    #                 self.function_value_optimal, self.fitness_optimal)
+    #
+    #     return(text)
 
     def show_individuals(self, n=None):
         if n is None:
@@ -102,13 +103,13 @@ class Population:
         self.best_value_variables = self.best_individual.value_variables
         self.best_function_value = self.best_individual.function_value
         
-        if verbose:
-            print("------------------")
-            print("population evaluated")
-            print("------------------")
-            print("best fitness: " + str(self.best_fitness))
-            print("value of the function target: {}".format(self.best_function_value))
-            print("best value de variables encontrado: {}".format(self.best_value_variables))
+        # if verbose:
+        #     print("------------------")
+        #     print("population evaluated")
+        #     print("------------------")
+        #     print("best fitness: " + str(self.best_fitness))
+        #     print("value of the function target: {}".format(self.best_function_value))
+        #     print("best value of variables: {}".format(self.best_value_variables))
 
     def cross_individuals(self, parental_1, parental_2, verbose=False):
 
@@ -169,7 +170,7 @@ class Population:
         
         if method_selection == "ruleta":
             probabilidad_selection = array_fitness / np.sum(array_fitness)
-            ind_selectionado = np.random.choice(
+            ind_selected = np.random.choice(
                                     a       = np.arange(self.n_individuals),
                                     size    = n,
                                     p       = list(probabilidad_selection),
@@ -180,44 +181,44 @@ class Population:
             ranks = np.argsort(order) + 1
             probabilidad_selection = 1 / ranks
             probabilidad_selection = probabilidad_selection / np.sum(probabilidad_selection)
-            ind_selectionado = np.random.choice(
+            ind_selected = np.random.choice(
                                 a       = np.arange(self.n_individuals),
                                 size    = n,
                                 p       = list(probabilidad_selection),
                                 replace = True
                             )
         elif method_selection == "tournament":
-            ind_selectionado = np.repeat(None,n)
+            ind_selected = np.repeat(None,n)
             for i in np.arange(n):
                 # Se selectionan aleatoriamente dos parejas de individuals.
-                candidatos_a = np.random.choice(
+                candidates_a = np.random.choice(
                                 a       = np.arange(self.n_individuals),
                                 size    = 2,
                                 replace = False
                             )
-                candidatos_b = np.random.choice(
+                candidates_b = np.random.choice(
                                 a       = np.arange(self.n_individuals),
                                 size    = 2,
                                 replace = False
                             )
-                # De cada pareja se selectiona el de mayor fitness.
-                if array_fitness[candidatos_a[0]] > array_fitness[candidatos_a[1]]:
-                    ganador_a = candidatos_a[0]
+                # Selection best fitness of each pair.
+                if array_fitness[candidates_a[0]] > array_fitness[candidates_a[1]]:
+                    winner_a = candidates_a[0]
                 else:
-                    ganador_a = candidatos_a[1]
+                    winner_a = candidates_a[1]
 
-                if array_fitness[candidatos_b[0]] > array_fitness[candidatos_b[1]]:
-                    ganador_b = candidatos_b[0]
+                if array_fitness[candidates_b[0]] > array_fitness[candidates_b[1]]:
+                    winner_b = candidates_b[0]
                 else:
-                    ganador_b = candidatos_b[1]
+                    winner_b = candidates_b[1]
 
-                # Se comparan los dos ganadores de cada pareja.
-                if array_fitness[ganador_a] > array_fitness[ganador_b]:
-                    ind_final = ganador_a
+                # Se comparan los dos winneres de cada pareja.
+                if array_fitness[winner_a] > array_fitness[winner_b]:
+                    ind_final = winner_a
                 else:
-                    ind_final = ganador_b
+                    ind_final = winner_b
                 
-                ind_selectionado[i] = ind_final
+                ind_selected[i] = ind_final
 
         if verbose:
             print("---------------")
@@ -227,13 +228,13 @@ class Population:
 
 
         if(return_indexs):
-            return(ind_selectionado)
+            return(ind_selected)
         else:
             if n == 1:
-                return(copy.deepcopy(self.individuals[int(ind_selectionado)]))
+                return(copy.deepcopy(self.individuals[int(ind_selected)]))
             if n > 1:
                 return(
-                    [copy.deepcopy(self.individuals[i]) for i in ind_selectionado]
+                    [copy.deepcopy(self.individuals[i]) for i in ind_selected]
                 )
             
     def create_new_generation(self, method_selection="tournament",
@@ -317,11 +318,7 @@ class Population:
         f = open("{}.txt".format(outputname), "+w")
         f.write("# Generation, best_fitness\n")
         for i in np.arange(n_generations):
-            if verbose:
-                print("-------------")
-                print("generation: {}".format(i))
-                print("-------------")
-            
+
             self.evaluar_population(
                 target_function=target_function,
                 optimization=optimization,
@@ -344,6 +341,8 @@ class Population:
                                  - self.historical_best_fitness[i-1])
                 self.difference_abs.append(difference)
             f.write(" {} {} \n".format(i, self.best_fitness))
+            sys.stdout.write("\r{}it | best fitness: {:.4f} | best individual: {}".format(i, self.best_fitness, self.best_value_variables))
+            #sys.stdout.flush()
             if stopping_early and i > rounds_stopping:
                 latest_n = np.array(self.difference_abs[-(rounds_stopping):])
                 if all(latest_n < tolerance_stopping):
@@ -364,6 +363,7 @@ class Population:
                 verbose_cross=verbose_cross,
                 verbose_mutation=verbose_mutation
                 )
+
         f.close()
         end = time.time()
         self.optimized = True
@@ -385,8 +385,8 @@ class Population:
             }
         )
         self.results_df["generation"] = self.results_df.index
-        
-        print("optimization duration: {}".format(end - start))
+        print("\n\nSummary:\n--------")
+        print("Optimization duration: {}".format(end - start))
         print("Number of generations: {}".format(self.iter_optimization+1))
         print("Optimal value of variables: {}".format(self.value_variables_optimal))
         print("Target function value: {}".format(self.function_value_optimal))
