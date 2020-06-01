@@ -1,20 +1,22 @@
 
 
 
-import sys, os
 from simplemc.analyzers.MCMCAnalyzer import MCMCAnalyzer
 from simplemc.analyzers.MaxLikeAnalyzer import MaxLikeAnalyzer
-from simplemc.cosmo.Parameter import Parameter
 from simplemc.runbase import ParseModel, ParseDataset
-#from simplemc.analyzers.SimpleGenetic import SimpleGenetic
 from simplemc.PostProcessing import PostProcessing
-from simplemc import logger
-#import emcee
+from simplemc.cosmo.Parameter import Parameter
 from scipy.special import ndtri
 import multiprocessing as mp
+from simplemc import logger
 import numpy as np
+import sys, os
 import time
-import corner
+
+
+#TODO #from simplemc.analyzers.SimpleGenetic import SimpleGenetic
+#TODO #import corner
+#TODO ##import emcee
 
 class DriverMC:
     """
@@ -22,15 +24,26 @@ class DriverMC:
         the analyzers and the pertinent functions.
     """
     def __init__(self, iniFile=None, **kwargs):
-        # iniFile = iniFile
+        """
+        Read the input parameters or ini file
+        Parameters
+        ----------
+        iniFile
+        kwargs
+
+        Returns
+        -------
+
+        """
         self.iniFile = iniFile
         if self.iniFile:
             self.iniReader(iniFile)
         else:
-            self.model = kwargs.pop('model', None)
-            self.datasets = kwargs.pop('datasets', 'HD')
-            self.analyzername = kwargs.pop('analyzername', 'mcmc')
-            self.prefact = kwargs.pop('prefact', 'phy')
+            self.model          = kwargs.pop('model', None)
+            self.prefact        = kwargs.pop('prefact', 'phy')
+            self.datasets       = kwargs.pop('datasets', 'HD')
+            self.analyzername   = kwargs.pop('analyzername', 'mcmc')
+
             self.priortype = kwargs.pop('priortype', 'u')
             ## Next two are for custom model
             self.custom_parameters = kwargs.pop('custom_parameters', None)
@@ -66,9 +79,7 @@ class DriverMC:
                                     self.datasets, self.analyzername)
         self.outputpath = "{}/{}".format(self.chainsdir, self.outputname)
 
-        if self.prefact == "pre":
-            self.T.setVaryPrefactor()
-        self.T.printFreeParameters()
+
 
     def executer(self, **kwargs):
         ti = time.time()
@@ -91,7 +102,15 @@ class DriverMC:
 
     def iniReader(self, iniFile):
         """
-        It reads the ini file.
+         It reads the ini file.
+        Parameters
+            ini. file
+        ----------
+        iniFile
+
+        Returns
+        -------
+            settings
         """
         import configparser
         self.config = configparser.ConfigParser()
@@ -121,6 +140,13 @@ class DriverMC:
 
         L = ParseDataset(self.datasets, path_to_data=self.path_to_data,
                          path_to_cov=self.path_to_cov)
+
+        if self.prefact == "pre":
+            T.setVaryPrefactor()
+        if self.varys8  == "True":
+            T.setVarys8()
+
+        T.printFreeParameters()
         L.setTheory(T)
         return T, L
 
