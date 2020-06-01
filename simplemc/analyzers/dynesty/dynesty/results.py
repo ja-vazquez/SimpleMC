@@ -205,4 +205,4 @@ class Results(dict):
                .format(self.nlive, self.niter, sum(self.ncall),
                        self.eff, self.logz[-1], self.logzerr[-1]))
 
-        print('Summary\n=======\n'+res)
+        print('\nSummary\n=======\n'+res)

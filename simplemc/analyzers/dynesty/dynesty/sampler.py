@@ -6,8 +6,6 @@ The base `Sampler` class containing various helpful functions. All other
 samplers inherit this class either explicitly or implicitly.
 
 """
-
-from __future__ import (print_function, division)
 from six.moves import range
 
 import sys
@@ -21,11 +19,6 @@ try:
     from scipy.special import logsumexp
 except ImportError:
     from scipy.misc import logsumexp
-
-try:
-    import tqdm
-except ImportError:
-    tqdm = None
 
 from .results import Results, print_fn
 from .bounding import UnitCube
@@ -839,15 +832,15 @@ class Sampler(object):
                    logz, logzvar, h, nc, worst_it, boundidx, bounditer,
                    self.eff, delta_logz)
 
-    def _get_print_func(self, print_func, print_progress):
-        pbar = None
-        if print_func is None:
-            if tqdm is None or not print_progress:
-                print_func = print_fn
-            else:
-                pbar = tqdm.tqdm()
-                print_func = partial(print_fn, pbar=pbar)
-        return pbar, print_func
+    # def _get_print_func(self, print_func, print_progress):
+    #     pbar = None
+    #     if print_func is None:
+    #         if tqdm is None or not print_progress:
+    #             print_func = print_fn
+    #         else:
+    #             pbar = tqdm.tqdm()
+    #             print_func = partial(print_fn, pbar=pbar)
+    #     return pbar, print_func
 
     def run_nested(self, maxiter=None, maxcall=None, dlogz=None,
                    logl_max=np.inf, n_effective=None,
@@ -855,7 +848,7 @@ class Sampler(object):
                    print_func=None, save_bounds=True,
                    addDerived=False,
                    smcloglike=None,
-                   outputname="chains/dynestySamples"):
+                   outputname="outputDynesty"):
         """
         **A wrapper that executes the main nested sampling loop.**
         Iteratively replace the worst live point with a sample drawn
@@ -918,69 +911,72 @@ class Sampler(object):
                 dlogz = 0.01
 
         # Run the main nested sampling loop.
-        pbar, print_func = self._get_print_func(print_func, print_progress)
-        try:
-            ncall = self.ncall
-            f = open(outputname + '_live.txt', 'w+')
-            for it, results in enumerate(self.sample(maxiter=maxiter,
-                                                     maxcall=maxcall,
-                                                     dlogz=dlogz,
-                                                     logl_max=logl_max,
-                                                     save_bounds=save_bounds,
-                                                     save_samples=True,
-                                                     n_effective=n_effective,
-                                                     add_live=add_live)):
+        # pbar, print_func = self._get_print_func(print_func, print_progress)
+        # try:
+        ncall = self.ncall
+        f = open(outputname + '_dead.txt', 'w+')
+        for it, results in enumerate(self.sample(maxiter=maxiter,
+                                                 maxcall=maxcall,
+                                                 dlogz=dlogz,
+                                                 logl_max=logl_max,
+                                                 save_bounds=save_bounds,
+                                                 save_samples=True,
+                                                 n_effective=n_effective,
+                                                 add_live=add_live)):
+            (worst, ustar, vstar, loglstar, logvol, logwt,
+             logz, logzvar, h, nc, worst_it, boundidx, bounditer,
+             eff, delta_logz) = results
+            ncall += nc
+            if delta_logz > 1e6:
+                delta_logz = np.inf
+            if logz <= -1e6:
+                logz = -np.inf
+
+            # Print progress.
+            if print_progress:
+                i = self.it - 1
+                # print_func(results, i, ncall, dlogz=dlogz,
+                #            logl_max=logl_max)
+                weights = np.exp(results[5])
+                vstarstr = str(results[2]).lstrip('[').rstrip(']')
+                print("it: {} | ncall: {} | "
+                      "logz: {:.4f} | loglstar: {:.4f} | points {}".format(i, ncall, logz, loglstar, vstarstr), end="\r")
+                # exp(logwt - loglstar)
+                if addDerived:
+                    AD = AllDerived()
+                    # smc -> simpleMC loglike object
+                    for pd in AD.listDerived(smcloglike):
+                        vstarstr = "{} {}".format(vstarstr, pd.value)
+                f.write("{} {} {}\n".format(weights, -2 * results[3], vstarstr))
+        f.close()
+        # Add remaining live points to samples.
+        if add_live:
+            it = self.it - 1
+            f2 = open(outputname + '_live.txt', 'w+')
+            for i, results in enumerate(self.add_live_points()):
                 (worst, ustar, vstar, loglstar, logvol, logwt,
                  logz, logzvar, h, nc, worst_it, boundidx, bounditer,
                  eff, delta_logz) = results
-                ncall += nc
                 if delta_logz > 1e6:
                     delta_logz = np.inf
                 if logz <= -1e6:
                     logz = -np.inf
+                weights = np.exp(results[5])
+                weights = np.exp(self.results['logwt'] - self.results['logz'][-1])
+                vstarstr = str(results[2]).lstrip('[').rstrip(']')
+                f2.write("{} {} {}\n".format(weights, -1*results[3], vstarstr))
 
-                # Print progress.	
+                # Print progress.
                 if print_progress:
-                    i = self.it - 1
-                    print_func(results, i, ncall, dlogz=dlogz,
-                               logl_max=logl_max)
-                    # exp(logwt - loglstar)
-                    weights = np.exp(results[5])
-                    vstarstr = str(results[2]).lstrip('[').rstrip(']')
-
-                    if addDerived:
-                        AD = AllDerived()
-                        # smc -> simpleMC loglike object
-                        for pd in AD.listDerived(smcloglike):
-                            vstarstr = "{} {}".format(vstarstr, pd.value)
-
-                    f.write("{} {} {}\n".format(weights, -2 * results[3], vstarstr))
-
-            # Add remaining live points to samples.
-            if add_live:
-                it = self.it - 1
-                # f = open(outputname + '_test.txt', 'w+')
-                for i, results in enumerate(self.add_live_points()):
-                    (worst, ustar, vstar, loglstar, logvol, logwt,
-                     logz, logzvar, h, nc, worst_it, boundidx, bounditer,
-                     eff, delta_logz) = results
-                    if delta_logz > 1e6:
-                        delta_logz = np.inf
-                    if logz <= -1e6:
-                        logz = -np.inf
-                    weights = np.exp(results[5])
-                    # weights = np.exp(self.result['logwt'] - self.result['logz'][-1])
-                    # vstarstr = str(results[2]).lstrip('[').rstrip(']')
-                    # f.write("{} {} {}\n".format(weights, -1*results[3], vstarstr))
-
-                    # Print progress.
-                    if print_progress:
-                        print_func(results, it, ncall, add_live_it=i+1,
-                                   dlogz=dlogz, logl_max=logl_max)
-                f.close()
-        finally:
-            if pbar is not None:
-                pbar.close()
+                    print("it: {} | ncall: {} | "
+                          "logz: {:.4f} | loglstar: {:.4f} | "
+                          "points: {}".format(i, ncall, logz, loglstar, vstarstr), end="\r")
+                    # print_func(results, it, ncall, add_live_it=i+1,
+                    #            dlogz=dlogz, logl_max=logl_max)
+            f2.close()
+        # finally:
+        #     if pbar is not None:
+        #         pbar.close()
 
     def add_final_live(self, print_progress=True, print_func=None):
         """
@@ -1000,29 +996,31 @@ class Sampler(object):
 
         """
 
-        if print_func is None:
-            print_func = print_fn
+        # if print_func is None:
+        #     print_func = print_fn
 
         # Add remaining live points to samples.
-        pbar, print_func = self._get_print_func(print_func, print_progress)
-        try:
-            ncall = self.ncall
-            it = self.it - 1
-            for i, results in enumerate(self.add_live_points()):
-                (worst, ustar, vstar, loglstar, logvol, logwt,
-                 logz, logzvar, h, nc, worst_it, boundidx, bounditer,
-                 eff, delta_logz) = results
-                if delta_logz > 1e6:
-                    delta_logz = np.inf
-                if logz <= -1e6:
-                    logz = -np.inf
+        # pbar, print_func = self._get_print_func(print_func, print_progress)
+        # try:
+        ncall = self.ncall
+        it = self.it - 1
+        for i, results in enumerate(self.add_live_points()):
+            (worst, ustar, vstar, loglstar, logvol, logwt,
+             logz, logzvar, h, nc, worst_it, boundidx, bounditer,
+             eff, delta_logz) = results
+            if delta_logz > 1e6:
+                delta_logz = np.inf
+            if logz <= -1e6:
+                logz = -np.inf
 
-                # Print progress.
-                if print_progress:
-                    print_func(results, it, ncall, add_live_it=i+1, dlogz=0.01)
-        finally:
-            if pbar is not None:
-                pbar.close()
+            # Print progress.
+            if print_progress:
+                print("it: {} | ncall: {} | "
+                      "logz: {} | loglstar: {}".format(i+1, ncall, logz, loglstar), end="\r")
+                #print_func(results, it, ncall, add_live_it=i+1, dlogz=0.01)
+        # finally:
+        #     if pbar is not None:
+        #         pbar.close()
 
 class AllDerived:
     def __init__(self):
