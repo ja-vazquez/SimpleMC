@@ -29,7 +29,7 @@ print ("Hello, World! "
 
 class MCMCAnalyzer:
     def __init__(self, like, outfile, skip=5000, nsamp=100000, temp=1.0,
-                 cov=None, chain_num=None, addDerived=False):
+                 cov=None, chain_num=None, addDerived=False, GRstop=0.01):
 
         self.like      = like
         self.outfile   = outfile
@@ -63,6 +63,7 @@ class MCMCAnalyzer:
             self.init_pcov(cov)
 
         if self.derived: self.AD = AllDerived()
+        self.GRcondition = GRstop
 
         self.RunChain()
 
@@ -97,7 +98,7 @@ class MCMCAnalyzer:
         self.lpars   = []
         self.percen  = 0.4
         self.checkgr = 500
-        self.GRcondition = 0.01
+
         gr = None
 
         print("Starting chain...")

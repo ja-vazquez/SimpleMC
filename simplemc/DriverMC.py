@@ -1,7 +1,7 @@
 
 
 from simplemc.analyzers.MaxLikeAnalyzer import MaxLikeAnalyzer
-from simplemc.analyzers.SimpleGenetic import SimpleGenetic
+#from simplemc.analyzers.SimpleGenetic import SimpleGenetic
 from simplemc.analyzers.MCMCAnalyzer import MCMCAnalyzer
 from simplemc.runbase import ParseModel, ParseDataset
 from simplemc.PostProcessing import PostProcessing
@@ -161,19 +161,20 @@ class DriverMC:
             ## temperature at which to sample, weights get readjusted on the fly
             temp    = self.config.getint('mcmc', 'temp',  fallback=2)
             chainno = self.config.getint('mcmc', 'chainno', fallback=1)
-            # self.GRcriteria = float(config['mcmc']['GRcriteria'])
+            GRstop  = self.config.getfloat('mcmc', 'GRstop',  fallback=0.01)
             evidence = self.config.getboolean('mcmc', 'evidence', fallback=False)
         else:
             nsamp    = kwargs.pop('nsamp', 50000)
             skip     = kwargs.pop('skip', 300)
             temp     = kwargs.pop('temp', 2)
             chainno  = kwargs.pop('chainno', 1)
+            GRstop   = kwargs.pop('GRstop', 0.01)
             evidence = kwargs.pop('evidence', False)
             if kwargs:
                 logger.critical('Unexpected **kwargs for MCMC: {}'.format(kwargs))
-                logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
-                            'MCMC executer kwargs are:\n\tnsamp (int) Default: 15000\n\t'
-                            'skip (int) Default 1000\n\ttemp (float) Default: 2.0'
+                logger.info('You can skip writing any option and SimpleMC will use default values.\n'
+                            'MCMC executer kwargs are:\n\tnsamp (int) Default: 50000\n\t'
+                            'skip (int) Default 300\n\ttemp (float) Default: 2.0'
                             '\n\tchainno (int) Default: 1\n\t'
                             'addDerived (boolean) Default: False\n\tevidence (boolean) Default: False')
                 sys.exit(1)
@@ -181,12 +182,17 @@ class DriverMC:
         logger.info("\n\tnsamp: {}\n\tskip: {}\n\t"
                     "temp: {}\n\tchain num: {}\n\tevidence: {}".format(
                     nsamp, skip, temp, chainno, evidence))
+
+        #Check whether the file already exists
         self.outputChecker()
         ti = time.time()
-        M = MCMCAnalyzer(self.L, self.outputpath,
-                        skip=skip, nsamp=nsamp, temp = temp,
-                        chain_num=chainno, addDerived=self.addDerived)
+
+        #Main process
+        M = MCMCAnalyzer(self.L, self.outputpath, skip=skip, nsamp=nsamp, temp = temp,
+                        chain_num=chainno, addDerived=self.addDerived, GRstop=GRstop)
         self.ttime = time.time() - ti
+
+        #Compute Bayesian Evidence
         if evidence:
             try:
                 from MCEvidence import MCEvidence
@@ -616,8 +622,8 @@ class DriverMC:
                     self.outputpath = "{}_new".format(self.outputpath)
                 else:
                     break
-
         return True
+
 
     def postprocess(self, summary=True, stats=False, addtxt=None):
         if addtxt:
