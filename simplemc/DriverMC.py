@@ -1,13 +1,15 @@
-import sys
-import os
+
+
+
+import sys, os
 from simplemc.analyzers.MCMCAnalyzer import MCMCAnalyzer
 from simplemc.analyzers.MaxLikeAnalyzer import MaxLikeAnalyzer
 from simplemc.cosmo.Parameter import Parameter
 from simplemc.runbase import ParseModel, ParseDataset
-from simplemc.analyzers.SimpleGenetic import SimpleGenetic
+#from simplemc.analyzers.SimpleGenetic import SimpleGenetic
 from simplemc.PostProcessing import PostProcessing
 from simplemc import logger
-import emcee
+#import emcee
 from scipy.special import ndtri
 import multiprocessing as mp
 import numpy as np
@@ -20,8 +22,6 @@ class DriverMC:
         the analyzers and the pertinent functions.
     """
     def __init__(self, iniFile=None, **kwargs):
-        #nsigma is the default value for sigma in gaussian priors
-        self.nsigma  = 4.
         # iniFile = iniFile
         self.iniFile = iniFile
         if self.iniFile:
@@ -38,7 +38,9 @@ class DriverMC:
             ## Following two are for custom data
             self.path_to_data = kwargs.pop('path_to_data', None)
             self.path_to_cov = kwargs.pop('path_to_cov', None)
-            self.chainsdir = kwargs.pop('chainsdir', 'SimpleMC_chains')
+            self.chainsdir = kwargs.pop('chainsdir', 'simplemc/chains')
+            #nsigma is the default value for sigma in gaussian priors
+            self.nsigma  = 4.
             if os.path.exists(os.path.join(self.chainsdir)):
                 self.chainsdir = os.path.join(self.chainsdir)
             else:
@@ -53,6 +55,7 @@ class DriverMC:
                             'analyzername {"nested", "mcmc", "maxlike", "emcee" , "genetic"} Default: mcmc'
                             '\n\tchainsdir Default: SimpleMC_chains\n\t')
                 sys.exit(1)
+
 
         self.T, self.L = self.TLinit()
         #if you like to change the bounds, you need edit ParamDefs.py file.

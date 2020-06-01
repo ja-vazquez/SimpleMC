@@ -15,7 +15,7 @@ from simplemc.DriverMC import DriverMC
 from simplemc.PostProcessing import PostProcessing
 
 from simplemc.analyzers.MaxLikeAnalyzer import MaxLikeAnalyzer
-from simplemc.analyzers import SimpleGenetic
+#from simplemc.analyzers import SimpleGenetic
 
 from simplemc.models.LCDMCosmology import LCDMCosmology
 # from simplemc.models.oLCDMCosmology import oLCDMCosmology

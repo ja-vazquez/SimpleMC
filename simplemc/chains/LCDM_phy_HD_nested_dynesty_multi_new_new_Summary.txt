@@ -1,0 +1,10 @@
+SUMMARY
+nested :multi
+dynamic : False
+ANN :False
+nlive: 100
+niter: 852
+ncall: 4976
+eff(%): 19.132
+logz: -11.114 +/-  0.224
+Elapsed time: 0.434 minutes = 26.068 seconds 
