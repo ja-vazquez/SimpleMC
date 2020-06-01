@@ -542,7 +542,6 @@ class DriverMC:
 
         A = MaxLikeAnalyzer(self.L, withErrors=withErrors)
         params = self.T.printParameters(A.params)
-        print(type(params))
         return ['maxlike', A, params]
 
     def geneticRunner(self, iniFile=None, **kwargs):
