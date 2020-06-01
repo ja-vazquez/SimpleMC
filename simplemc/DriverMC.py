@@ -14,9 +14,7 @@ import sys, os
 import time
 
 
-#TODO #from simplemc.analyzers.SimpleGenetic import SimpleGenetic
 #TODO #import corner
-#TODO ##import emcee
 
 class DriverMC:
     """
@@ -94,8 +92,6 @@ class DriverMC:
         self.outputname = "{}_{}_{}_{}".format(self.model, self.prefact,
                                     self.datasets, self.analyzername)
         self.outputpath = "{}/{}".format(self.chainsdir, self.outputname)
-
-
 
 
     def executer(self, **kwargs):
@@ -508,17 +504,18 @@ class DriverMC:
         for bound in self.bounds:
             ini.append(np.random.uniform(bound[0], bound[1], walkers))
         inisamples = np.array(ini).T # initial samples
-
+        try:
+            import emcee
+            sampler = emcee.EnsembleSampler(walkers, self.dims, self.logPosterior, pool=pool)
+            # pass the initial samples and total number of samples required
+            sampler.run_mcmc(inisamples, nsamp + burnin, progress=True)
+            # extract the samples (removing the burn-in)
+            # postsamples = sampler.chain[:, burnin:, :].reshape((-1, self.dims))
+        except ImportError as error:
+            sys.exit("{}: Please install this module"
+                     "or try using other sampler".format(error.__class__.__name__))
         # set up the sampler
-        sampler = emcee.EnsembleSampler(walkers, self.dims, self.logPosterior, pool=pool)
-
-        # pass the initial samples and total number of samples required
-        sampler.run_mcmc(inisamples, nsamp+burnin, progress=True)
-
-        # extract the samples (removing the burn-in)
-        postsamples = sampler.chain[:, burnin:, :].reshape((-1, self.dims))
         self.burnin = burnin
-
         try:
             pool.close()
         except:
