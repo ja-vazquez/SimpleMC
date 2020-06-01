@@ -317,7 +317,7 @@ class DriverMC:
                 sys.exit(1)
                 #raise TypeError('Unexpected **kwargs: {}'.format(kwargs))
         logger.info("\n\tnsamp: {}\n\tskip: {}\n\t"
-                    "temp: {} chain num: {} evidence: {}".format(
+                    "temp: {}\n\tchain num: {}\n\tevidence: {}".format(
                     nsamp, skip, temp, chainno, evidence))
         self.outputChecker()
         M = MCMCAnalyzer(self.L, self.outputpath,
