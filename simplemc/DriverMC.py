@@ -45,6 +45,8 @@ class DriverMC:
             self.analyzername   = kwargs.pop('analyzername', 'mcmc')
 
             self.priortype = kwargs.pop('priortype', 'u')
+            self.varys8 = kwargs.pop('varys8', False)
+
             ## Next two are for custom model
             self.custom_parameters = kwargs.pop('custom_parameters', None)
             self.custom_function = kwargs.pop('custom_function', None)
@@ -120,6 +122,7 @@ class DriverMC:
                                          fallback=os.path.join('SimpleMC_chains'))
         self.model = self.config.get('custom', 'model')
         self.prefact = self.config.get('custom', 'prefact', fallback='phy')
+        self.varys8 = self.config.getboolean('custom', 'varys8', fallback=False)
         self.datasets = self.config.get('custom', 'datasets', fallback='HD')
         self.analyzername = self.config.get('custom', 'analyzername', fallback='mcmc')
         self.priortype = self.config.get('custom', 'priortype', fallback='u')
@@ -143,7 +146,7 @@ class DriverMC:
 
         if self.prefact == "pre":
             T.setVaryPrefactor()
-        if self.varys8  == "True":
+        if self.varys8 == "True":
             T.setVarys8()
 
         T.printFreeParameters()
