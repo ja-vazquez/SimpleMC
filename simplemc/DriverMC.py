@@ -39,7 +39,7 @@ class DriverMC:
         if self.iniFile:
             self.iniReader(iniFile)
         else:
-            self.chainsdir    = kwargs.pop('chainsdir', 'simplemc/chains')
+            self.chainsdir    = kwargs.pop('chainsdir', 'chains')
             self.model        = kwargs.pop('model', None)
             self.prefact      = kwargs.pop('prefact', 'phy')
             self.varys8       = kwargs.pop('varys8', False)
@@ -135,7 +135,7 @@ class DriverMC:
 
         self.config.read(iniFile)
         self.chainsdir    = self.config.get('custom', 'chainsdir',
-                                         fallback=os.path.join('simplemc/chains'))
+                                         fallback=os.path.join('chains'))
         self.model        = self.config.get('custom', 'model')
         self.prefact      = self.config.get('custom', 'prefact',      fallback='phy')
         self.varys8       = self.config.get('custom', 'varys8',       fallback=False)
