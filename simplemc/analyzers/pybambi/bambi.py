@@ -3,15 +3,11 @@
 Author: Will Handley (wh260@cam.ac.uk)
 Date: November 2018
 """
-from __future__ import absolute_import, unicode_literals, print_function
-
 import os
 import sys
 
-#sys.path=["../neuralnetworks"]+sys.path
-
 import nestle
-from pybambimanager import BambiManager
+from .pybambimanager import BambiManager
 
 
 ####IGV: probando meter MH de SimpleMC

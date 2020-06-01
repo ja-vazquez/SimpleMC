@@ -7,7 +7,7 @@ Date: December 2018
 
 """
 import numpy
-from base import Predictor
+from .base import Predictor
 #from neuralnetworks.base import Predictor
 from keras.models import Sequential
 from keras.layers import Dense

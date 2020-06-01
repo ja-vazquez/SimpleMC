@@ -3,14 +3,10 @@
 Author: Pat Scott (p.scott@imperial.ac.uk)
 Date: Feb 2019
 """
-from __future__ import absolute_import, unicode_literals, print_function
-
-import sys
-#sys.path=["neuralnetworks","../neuralnetworks"]+sys.path
 
 import numpy as np
-from kerasnet import KerasNetInterpolation
-from nearestneighbour import NearestNeighbourInterpolation
+from .kerasnet import KerasNetInterpolation
+from .nearestneighbour import NearestNeighbourInterpolation
 #
 import keras.models
 

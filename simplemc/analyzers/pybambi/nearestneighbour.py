@@ -9,7 +9,7 @@ placeholder predictor, rather than an actual neural network
 """
 import numpy
 #from neuralnetworks.base import Predictor
-from base import Predictor
+from .base import Predictor
 
 
 class NearestNeighbourInterpolation(Predictor):
