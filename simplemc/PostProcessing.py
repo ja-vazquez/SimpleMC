@@ -17,7 +17,7 @@ class PostProcessing:
        In this class we...
     """
     def __init__(self, list_result, paramList, filename, \
-                 skip=0.1, engine='dynesty', addDerived=True, loglike=None):
+                 skip=0.1, engine=None, addDerived=True, loglike=None):
         self.analyzername = list_result[0]
         self.result    = list_result[1]
         self.paramList = paramList
@@ -43,41 +43,19 @@ class PostProcessing:
         -------
 
         """
-        if path.isfile(self.filename + '_1.txt'):
-            logger.critical("Output file exists! Please choose another"
-                            " name or move the existing file.")
-            sys.exit(1)
-        else:
-            f = open(self.filename + '_1.txt', 'w+')
-        if self.engine == 'dynesty':
-            weights = np.exp(self.result['logwt'] - self.result['logz'][-1])
-            postsamples = self.result.samples
 
-            logger.info('\n Number of posterior samples is {}'.format(postsamples.shape[0]))
-
-            for i, sample in enumerate(postsamples):
-                strweights  = str(weights[i])
-                strlogl     = str(self.result['logl'][i])
-                strsamples  = self.cleanf(sample)
-                row  = strweights + ' ' + strlogl + ' ' + strsamples
-                nrow = " ".join(row.split())
-                if self.derived:
-                    for pd in self.AD.listDerived(self.loglike):
-                        nrow += " " + str(pd.value)
-                f.write("{}\n".format(nrow))
-
-
-        elif self.engine == 'nestle':
-            for i in range(len(self.result.samples)):
-                strweights  = self.cleanf(self.result.weights[i])
-                strlogl     = self.cleanf(-1 * self.result.logl[i])
-                strsamples  = self.cleanf(self.result.samples[i])
-                row  = strweights + ' ' + strlogl + ' ' + strsamples
-                nrow = " ".join(row.split())
-                if self.derived:
-                    for pd in self.AD.listDerived(self.loglike):
-                        nrow = "{} {}".format(nrow, pd.value)
-                f.write(nrow + '\n')
+        f = open(self.filename + '.txt', 'w+')
+        # Only for nestle
+        for i in range(len(self.result.samples)):
+            strweights  = self.cleanf(self.result.weights[i])
+            strlogl     = self.cleanf(-1 * self.result.logl[i])
+            strsamples  = self.cleanf(self.result.samples[i])
+            row  = strweights + ' ' + strlogl + ' ' + strsamples
+            nrow = " ".join(row.split())
+            if self.derived:
+                for pd in self.AD.listDerived(self.loglike):
+                    nrow = "{} {}".format(nrow, pd.value)
+            f.write(nrow + '\n')
         f.close()
 
 
@@ -135,7 +113,7 @@ class PostProcessing:
                 if item is not None:
                     file.write(str(item) + '\n')
 
-        if self.engine =='dynesty' and self.analyzername == 'nested':
+        if self.engine =='dynesty':
             file.write("nlive: {:d}\nniter: {:d}\nncall: {:d}\n"
                        "eff(%): {:6.3f}\nlogz: "
                        "{:6.3f} +/- {:6.3f}".format(self.result.nlive, self.result.niter,

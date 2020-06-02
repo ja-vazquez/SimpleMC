@@ -287,8 +287,8 @@ class DriverMC:
 
         #stored output files
         if self.analyzername is None: self.analyzername = 'nested'
-        self.outputpath = '{}_{}_{}'.format(self.outputpath, self.analyzername, nestedType)
-        if neuralNetwork:   self.outputpath = "{}+ANN_".format(self.outputpath)
+        self.outputpath = '{}_{}_{}_{}'.format(self.outputpath, self.analyzername, self.engine, nestedType)
+        if neuralNetwork: self.outputpath = "{}_ANN".format(self.outputpath)
         self.outputChecker()
 
         #paralel run
@@ -355,7 +355,8 @@ class DriverMC:
             pass
         self.ttime = time.time() - ti
         self.result = ['nested', M, M.summary(), 'nested :{}'.format(nestedType),
-                       'dynamic : {}'.format(dynamic), 'ANN :{}'.format(neuralNetwork)]
+                       'dynamic : {}'.format(dynamic), 'ANN :{}'.format(neuralNetwork),
+                       'engine: {}'.format(self.engine)]
         return True
 
 
@@ -651,7 +652,8 @@ class DriverMC:
             pp = PostProcessing(self.result, self.paramsList, self.outputpath,
                 engine=self.engine, addDerived=self.addDerived, loglike=self.L)
             pp.paramFiles()
-            pp.saveNestedChain()
+            if self.engine == 'nestle':
+                pp.saveNestedChain()
         elif self.analyzername == 'emcee':
             pp = PostProcessing(self.result, self.paramsList, self.outputpath,
                                 skip=self.burnin, addDerived=self.addDerived, loglike=self.L)
