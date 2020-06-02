@@ -1014,11 +1014,11 @@ class Sampler(object):
                 f.write("{}\n".format(rowstr))
 
                 # Print progress.
-                if print_progress:
-                    sys.stdout.write("it: {} | ncall: {} | "
-                          "logz: {:.4f} | loglstar: {:.4f} | "
-                          "points: {}\\".format(i, ncall, logz, loglstar, vstarstr))
-                    sys.stdout.flush()
+                # if print_progress:
+                #     sys.stdout.write("it: {} | ncall: {} | "
+                #           "logz: {:.4f} | loglstar: {:.4f} | "
+                #           "points: {}\\".format(i, ncall, logz, loglstar, vstarstr))
+                #     sys.stdout.flush()
             f.close()
 
     def add_final_live(self, print_progress=True, print_func=None):
