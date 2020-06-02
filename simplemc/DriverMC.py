@@ -42,7 +42,7 @@ class DriverMC:
             self.prefact      = kwargs.pop('prefact', 'phy')
             self.varys8       = kwargs.pop('varys8',  False)
             self.datasets     = kwargs.pop('datasets','HD')
-            self.analyzername = kwargs.pop('analyzername', 'mcmc')
+            self.analyzername = kwargs.pop('analyzername', None)
             self.addDerived   = kwargs.pop('addDerived', False)
 
 
@@ -88,27 +88,28 @@ class DriverMC:
         self.means      = [p.value  for p in self.pars_info]
         self.paramsList = [p.name   for p in self.pars_info]
         self.dims       = len(self.paramsList)
+        self.result     = None
 
-        self.outputname = "{}_{}_{}_{}".format(self.model, self.prefact,
-                                    self.datasets, self.analyzername)
+        self.outputname = "{}_{}_{}".format(self.model, self.prefact,
+                                    self.datasets)
         self.outputpath = "{}/{}".format(self.chainsdir, self.outputname)
 
 
 
     def executer(self, **kwargs):
         if self.analyzername == 'mcmc':
-            self.result = self.mcmcRunner(iniFile=self.iniFile, **kwargs)
+            self.mcmcRunner(iniFile=self.iniFile, **kwargs)
         elif self.analyzername == 'nested':
-            self.result = self.nestedRunner(iniFile=self.iniFile, **kwargs)
+            self.nestedRunner(iniFile=self.iniFile, **kwargs)
         elif self.analyzername == 'emcee':
-            self.result = self.emceeRunner(iniFile=self.iniFile, **kwargs)
+            self.emceeRunner(iniFile=self.iniFile, **kwargs)
         elif self.analyzername == 'maxlike':
-            self.result = self.maxLikeRunner(iniFile=self.iniFile, **kwargs)
+            self.maxLikeRunner(iniFile=self.iniFile, **kwargs)
         elif self.analyzername == 'genetic':
-            self.result = self.geneticRunner(iniFile=self.iniFile, **kwargs)
+            self.geneticRunner(iniFile=self.iniFile, **kwargs)
         else:
-            sys.exit("Sampler/Analyzer name invalid")
-        return self.outputname, self.pars_info
+            sys.exit("{}: Sampler/Analyzer name invalid".format(self.analyzername))
+        return True
 
 
 ##----------------------Initialization ------------------------
@@ -134,7 +135,7 @@ class DriverMC:
         self.model        = self.config.get(        'custom', 'model')
         self.prefact      = self.config.get(        'custom', 'prefact',      fallback='phy')
         self.datasets     = self.config.get(        'custom', 'datasets',     fallback='HD')
-        self.analyzername = self.config.get(        'custom', 'analyzername', fallback='mcmc')
+        self.analyzername = self.config.get(        'custom', 'analyzername', fallback=None)
         self.varys8       = self.config.getboolean( 'custom', 'varys8',       fallback=False)
         self.addDerived   = self.config.getboolean( 'custom', 'addDerived',   fallback=False)
 
@@ -180,13 +181,15 @@ class DriverMC:
                             'MCMC executer kwargs are:\n\tnsamp (int) Default: 50000\n\t'
                             'skip (int) Default 300\n\ttemp (float) Default: 2.0'
                             '\n\tchainno (int) Default: 1\n\t'
-                            'addDerived (boolean) Default: False\n\tevidence (boolean) Default: False')
+                            'evidence (boolean) Default: False')
                 sys.exit(1)
                 #raise TypeError('Unexpected **kwargs: {}'.format(kwargs))
         logger.info("\n\tnsamp: {}\n\tskip: {}\n\t"
                     "temp: {}\n\tchain num: {}\n\tevidence: {}".format(
                     nsamp, skip, temp, chainno, evidence))
-
+        if self.analyzername is None: self.analyzername = 'mcmc'
+        self.outputpath = "{}_{}".format(self.outputpath, self.analyzername)
+        self.outputChecker()
         #Check whether the file already exists
         self.outputChecker()
         ti = time.time()
@@ -211,14 +214,16 @@ class DriverMC:
                 from MCEvidence import MCEvidence
                 logger.info("Aproximating bayesian evidence with MCEvidence (arXiv:1704.03472)\n")
                 MLE = MCEvidence(self.outputpath + ".txt" ).evidence()
-                return ['mcmc', M, "Evidence with MCEvidence : {}\n".format(MLE), strresult]
+                self.result = ['mcmc', M, "Evidence with MCEvidence : {}\n".format(MLE), strresult]
             except:
                 #writeSummary(self.chainsdir, outputname, ttime)
                 # print("Warning!")
                 # print("MCEvidence could not calculate the Bayesian evidence [very small weights]\n")
                 logger.error("MCEvidence could not calculate the Bayesian evidence [very small weights]")
         else:
-            return ['mcmc', M, strresult]
+            self.result = ['mcmc', M, strresult]
+
+        return True
 
 
 
@@ -277,12 +282,12 @@ class DriverMC:
                             'dynamic (boolean) Default: False\n\t'
                             'addDerived (boolean) Default: True\n\t'
                             'engine {"dynesty", "nestle"} Default: "dynesty"\n\t'
-                            'addDerived (boolean). Default: False\n\t'
                             'showfiles (boolean). Default: True.')
                 sys.exit(1)
 
         #stored output files
-        self.outputpath += '_{}_{}'.format(self.engine, nestedType)
+        if self.analyzername is None: self.analyzername = 'nested'
+        self.outputpath = '{}_{}_{}'.format(self.outputpath, self.analyzername, nestedType)
         if neuralNetwork:   self.outputpath = "{}+ANN_".format(self.outputpath)
         self.outputChecker()
 
@@ -349,8 +354,9 @@ class DriverMC:
         except:
             pass
         self.ttime = time.time() - ti
-        return ['nested', M, M.summary(), 'nested :{}'.format(nestedType),
-                'dynamic : {}'.format(dynamic), 'ANN :{}'.format(neuralNetwork)]
+        self.result = ['nested', M, M.summary(), 'nested :{}'.format(nestedType),
+                       'dynamic : {}'.format(dynamic), 'ANN :{}'.format(neuralNetwork)]
+        return True
 
 
 ##---------------------- EMCEE ----------------------
@@ -378,7 +384,8 @@ class DriverMC:
         logger.info("\n\twalkers: {}\n\tnsamp: {}\n"
                     "\tburnin: {}\n\t"
                     "nproc: {}".format(walkers, nsamp, burnin, nproc))
-        self.outputpath = "{}_{}_walkers".format(self.outputpath, walkers)
+        if self.analyzername is None: self.analyzername = 'emcee'
+        self.outputpath = "{}_{}_{}_walkers".format(self.outputpath, self.analyzername, walkers)
         self.outputChecker()
         pool, _ = self.mppool(nproc)
         # initial_state = None
@@ -406,8 +413,8 @@ class DriverMC:
             pass
         # fig = corner.corner(postsamples)
         # fig.savefig('emcee.png')
-
-        return ['emcee', sampler, 'walkers : {}'.format(walkers), 'samples: {}'.format(nsamp)]
+        self.result = ['emcee', sampler, 'walkers : {}'.format(walkers), 'samples: {}'.format(nsamp)]
+        return True
 
 
 
@@ -417,7 +424,8 @@ class DriverMC:
 ##---------------------- MaxLikeAnalizer ----------------------
 
     def maxLikeRunner(self, iniFile=None, **kwargs):
-        self.outputpath = '{}_optimization'.format(self.outputpath)
+        if self.analyzername is None: self.analyzername = 'maxlike'
+        self.outputpath = '{}_{}_optimization'.format(self.outputpath, self.analyzername)
         self.outputChecker()
         if iniFile:
             withErrors = self.config.getboolean('MaxLike', 'withErrors', fallback=False)
@@ -433,14 +441,16 @@ class DriverMC:
         A = MaxLikeAnalyzer(self.L, withErrors=withErrors)
         params = self.T.printParameters(A.params)
         self.ttime = time.time() - ti
-        return ['maxlike', A, params]
+        self.result = ['maxlike', A, params]
+        return True
 
 
 ##---------------------- Genetic Algorithms ----------------------
 
 
     def geneticRunner(self, iniFile=None, **kwargs):
-        self.outputpath = '{}_optimization'.format(self.outputpath)
+        if self.analyzername is None: self.analyzername = 'genetic'
+        self.outputpath = '{}_{}_optimization'.format(self.outputpath, self.analyzername)
         self.outputChecker()
 
         if iniFile:
@@ -475,8 +485,8 @@ class DriverMC:
                           outputname=self.outputpath)
 
         self.ttime = time.time() - ti
-
-        return ['genetic', M]
+        self.result = ['genetic', M]
+        return True
 
 
 
