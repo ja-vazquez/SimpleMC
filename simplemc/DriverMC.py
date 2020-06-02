@@ -3,6 +3,7 @@
 from simplemc.analyzers.MaxLikeAnalyzer import MaxLikeAnalyzer
 #from simplemc.analyzers.SimpleGenetic import SimpleGenetic
 from simplemc.analyzers.MCMCAnalyzer import MCMCAnalyzer
+from simplemc.analyzers.dynesty import dynesty
 from simplemc.cosmo.Derivedparam import AllDerived
 from simplemc.runbase import ParseModel, ParseDataset
 from simplemc.PostProcessing import PostProcessing
@@ -245,7 +246,6 @@ class DriverMC:
             nlivepoints = self.config.getint(       'nested', 'nlivepoints',  fallback=1024)
             accuracy    = self.config.getfloat(     'nested', 'accuracy',     fallback=0.01)
             nproc       = self.config.getint(       'nested', 'nproc',        fallback=1)
-            showfiles   = self.config.getboolean(   'nested', 'showfiles',    fallback=True)
 
             self.priortype = self.config.get('nested', 'priortype', fallback='u')
             #nsigma is the default value for sigma in gaussian priors
@@ -262,8 +262,6 @@ class DriverMC:
             nlivepoints = kwargs.pop('nlivepoints', 1024)
             accuracy    = kwargs.pop('accuracy',    0.01)
             nproc       = kwargs.pop('nproc', 1)
-            showfiles   = kwargs.pop('showfiles', True)
-
 
             self.priortype = kwargs.pop('priortype', 'u')
             self.nsigma = kwargs.pop('sigma', 2)
@@ -282,8 +280,7 @@ class DriverMC:
                             'neuralNetwork (boolean) Default: True\n\t'
                             'dynamic (boolean) Default: False\n\t'
                             'addDerived (boolean) Default: True\n\t'
-                            'engine {"dynesty", "nestle"} Default: "dynesty"\n\t'
-                            'showfiles (boolean). Default: True.')
+                            'engine {"dynesty", "nestle"} Default: "dynesty"')
                 sys.exit(1)
 
         #stored output files
@@ -299,23 +296,13 @@ class DriverMC:
                     "\tnested type: {}\n"
                     "\tengine: {}".format(nlivepoints, accuracy, nestedType, self.engine))
 
-        #only to show live points on the fly
-        if self.engine == 'dynesty':
-            if showfiles:
-                from simplemc.analyzers.dynesty import dynesty
-            else:
-                try:
-                    import dynesty
-                except:
-                    from simplemc.analyzers.dynesty import dynesty
-
         ti = time.time()
         if neuralNetwork:
             logger.info("\tUsing neural network.")
             #from bambi import run_pyBAMBI
             from simplemc.analyzers.pybambi.bambi import loglike_thumper
             learner = 'keras'
-            kerasmodel = None
+            # kerasmodel = None
             self.logLike = loglike_thumper(self.logLike, learner=learner, \
                                              ntrain=nlivepoints, nDims=self.dims)
 
@@ -542,9 +529,6 @@ class DriverMC:
                 priors.append(theta[c]*(bound[1]-bound[0])+bound[0])
                 # At this moment, np.array(priors) has shape (dims,)
         return np.array(priors)
-
-
-
 
 
 ###########loglike for genetic
