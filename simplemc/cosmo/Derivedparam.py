@@ -1,5 +1,7 @@
-import scipy as sp
+
 import scipy.integrate as integrate
+import scipy as sp
+import sys
 
 class AllDerived:
     def __init__(self):
@@ -56,6 +58,7 @@ class AllDerived:
         h1 = h0**2*self.like.theory_.RHSquared_a(1.0/(1+z1))
         h2 = h0**2*self.like.theory_.RHSquared_a(1.0/(1+z2))
         return (h1-h2)/((1+z1)**3 - (1+z2)**3)
+
 
 
 class Derivedparam:

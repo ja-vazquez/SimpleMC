@@ -58,7 +58,7 @@ from .likelihoods.GenericPantheonSNLikelihood import GenericPantheonSNLikelihood
 
 
 #Importance Sampling
-from .CosmoMCImportanceSampler import *
+#from .CosmoMCImportanceSampler import *
 
 
 # String parser Aux routines

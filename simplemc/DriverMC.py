@@ -13,7 +13,7 @@ import sys, os
 import time
 
 
-#TODO #import corner
+#TODO import corner
 #TODO keras neural network
 #TODO GR criteria in .ini file
 
