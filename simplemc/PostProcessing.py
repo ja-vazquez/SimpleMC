@@ -64,37 +64,6 @@ class PostProcessing:
         return str(func).lstrip('[').rstrip(']')
 
 
-
-    # def paramFiles(self):
-    #     """
-    #     This method writes the .paramnames file with theirs LaTeX names.
-    #
-    #     Parameters:
-    #
-    #     T:          T is an instance of ParseModel(model)
-    #     L:          L is an instance of ParseDataset(datasets)
-    #
-    #     """
-    #     cpars   = self.loglike.freeParameters()
-    #     parfile = self.filename + ".paramnames"
-    #
-    #     if (path.isfile(parfile)):
-    #         logger.info("Existing parameters file!")
-    #
-    #     fpar = open(parfile, 'w')
-    #     for p in cpars:
-    #         fpar.write(p.name + "\t\t\t" + p.Ltxname + "\n")
-    #     if self.derived:
-    #         for pd in self.AD.list:
-    #             fpar.write(pd.name + "\t\t\t" + pd.Ltxname + "\n")
-    #     if self.engine == 'dynesty':
-    #         if (self.loglike.name() == "Composite"):
-    #             self.sublikenames = self.loglike.compositeNames()
-    #             for name in self.sublikenames:
-    #                 fpar.write(name + "_like \t\t\t" + name + "\n")
-    #             fpar.write("theory_prior \t\t\t None \n")
-
-
     def writeSummary(self, time, *args):
         if self.analyzername == 'genetic':
             sys.exit(1)
@@ -120,6 +89,14 @@ class PostProcessing:
                     file.write(str(item) + '\n')
 
         if self.engine =='dynesty':
+            pars = self.loglike.freeParameters()
+            dims = len(pars)
+            for i, p in enumerate(pars):
+                mean = np.mean(self.result.samples[:, i])
+                std = np.std(self.result.samples[:, i])
+                print("{}: {:.4f} +/- {:.4f}".format(p.name, mean, std))
+                file.write("{}: {:.4f} +/- {:.4f}\n".format(p.name, mean, std))
+
             file.write("nlive: {:d}\nniter: {:d}\nncall: {:d}\n"
                        "eff(%): {:6.3f}\nlogz: "
                        "{:6.3f} +/- {:6.3f}".format(self.result.nlive, self.result.niter,
