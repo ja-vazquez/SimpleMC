@@ -185,3 +185,10 @@ class BaseCosmology:
     def fs8(self, z):
         return -self.s8*(1+z)*derivative(self.growth, z, dx=1e-6)/self.growth(0)
 
+
+    def compuAge(self, z):
+        return 1.0/((1+z)*100.0*self.h*sp.sqrt(self.RHSquared_a(1.0/(1+z))))
+
+
+    def Age(self):
+        return intg.quad(self.compuAge, 0, 10**5)[0]/3.24076E-20/(3.154E7*1.0E9)
