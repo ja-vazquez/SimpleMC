@@ -143,7 +143,7 @@ class MCMCAnalyzer:
                         condition = None
                 recvmsg = comm.bcast(condition, root=0)
                 if recvmsg ==1:
-                    print('---- Gelman-Rubin achived ---- ')
+                    print('\n---- Gelman-Rubin achived ---- ')
                     return True
 
 
@@ -311,7 +311,7 @@ class MCMCAnalyzer:
             self.meanx  /= self.swx
             self.meanxx /= self.swx
             self.meanxx -= sp.outer(self.meanx, self.meanx)
-            print("Re-initializing covariance matrix after burn-in")
+            print("\nRe-initializing covariance matrix after burn-in")
             # print(self.meanxx)
             print()
             for i, p in enumerate(self.cpars):
