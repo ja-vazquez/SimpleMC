@@ -21,8 +21,7 @@ from mpi4py import MPI
 comm = MPI.COMM_WORLD
 name = MPI.Get_processor_name()
 
-
-
+#TODO remove list of pars
 print ("Hello, World! "
        "I am process %d of %d on %s" %
        (comm.rank, comm.size, name))
@@ -40,7 +39,6 @@ class MCMCAnalyzer:
         self.cpars     = like.freeParameters()
         self.N         = len(self.cpars)
         self.derived   = addDerived
-        self.sampleslist = []
 
         minvals, maxvals = [], []
         for lb, hb in [p.bounds for p in self.cpars]:
@@ -263,7 +261,6 @@ class MCMCAnalyzer:
                 outstr = self.formstr % tuple(tmp + self.cloglikes.tolist())
             else:
                 outstr = self.formstr % tuple(tmp)
-            self.sampleslist.append(tmp)
             self.fout.write(outstr)
             # Flush file on regular basis
             if (self.co % 100 == 0): #JAV 1000
