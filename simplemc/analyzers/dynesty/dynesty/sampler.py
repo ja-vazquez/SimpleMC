@@ -957,7 +957,7 @@ class Sampler(object):
                 f.write("{} {} {}\n".format(weights, -2 * results[3], vstarstr))
                 f.flush()
         f.close()
-        f = open(self.outputname, "+a")
+        f = open(self.outputname + '.txt', "+a")
         # Add remaining live points to samples.
         if add_live:
             it = self.it - 1
@@ -972,7 +972,7 @@ class Sampler(object):
                     logz = -np.inf
 
                 weights = np.exp(results[5])
-                weights = np.exp(self.results['logwt'] - self.results['logz'][-1])
+                # weights = np.exp(self.results['logwt'] - self.results['logz'][-1])
                 vstarstr = str(results[2]).lstrip('[').rstrip(']')
                 if addDerived:
                     self.AD = AllDerived()
