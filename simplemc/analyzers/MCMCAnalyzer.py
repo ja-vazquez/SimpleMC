@@ -183,21 +183,6 @@ class MCMCAnalyzer:
 
     def openFiles(self):
         outfile = self.outfile
-        if self.chain_num in [None, 1]:
-            fpar = open(outfile + ".paramnames", 'w')
-            for p in self.cpars:
-                fpar.write(p.name + "\t\t\t" + p.Ltxname + "\n")
-
-            if self.derived:
-                for pd in self.AD.list:
-                    fpar.write(pd.name + "\t\t\t" + pd.Ltxname + "\n")
-
-            if self.composite:
-                for name in self.sublikenames:
-                    fpar.write(name + "_like \t\t\t" + name + "\n")
-                fpar.write("theory_prior \t\t\t None \n")
-            fpar.close()
-
         formstr = '%g ' + '%g '*(self.N+1)
         if self.derived:
             formstr += '%g '*(len(self.AD.list))
@@ -213,9 +198,6 @@ class MCMCAnalyzer:
             cfname  = outfile + "_%i.txt" % (self.chain_num)
             mlfname = outfile + "_%i.maxlike" % (self.chain_num)
 
-        # if (path.isfile(cfname)):
-        #     print("Due to bad habits in the past, won't open existing file.", cfname)
-        #     sys.exit(1)
         self.fout    = open(cfname, 'w')
         self.mlfout  = open(mlfname, 'w')
         self.formstr = formstr

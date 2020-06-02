@@ -65,28 +65,34 @@ class PostProcessing:
 
 
 
-    def paramFiles(self):
-        """
-        This method writes the .paramnames file with theirs LaTeX names.
-
-        Parameters:
-
-        T:          T is an instance of ParseModel(model)
-        L:          L is an instance of ParseDataset(datasets)
-
-        """
-        cpars   = self.loglike.freeParameters()
-        parfile = self.filename + ".paramnames"
-
-        if (path.isfile(parfile)):
-            logger.info("Existing parameters file!")
-
-        fpar = open(parfile, 'w')
-        for p in cpars:
-            fpar.write(p.name + "\t\t\t" + p.Ltxname + "\n")
-        if self.derived:
-            for pd in self.AD.list:
-                fpar.write(pd.name + "\t\t\t" + pd.Ltxname + "\n")
+    # def paramFiles(self):
+    #     """
+    #     This method writes the .paramnames file with theirs LaTeX names.
+    #
+    #     Parameters:
+    #
+    #     T:          T is an instance of ParseModel(model)
+    #     L:          L is an instance of ParseDataset(datasets)
+    #
+    #     """
+    #     cpars   = self.loglike.freeParameters()
+    #     parfile = self.filename + ".paramnames"
+    #
+    #     if (path.isfile(parfile)):
+    #         logger.info("Existing parameters file!")
+    #
+    #     fpar = open(parfile, 'w')
+    #     for p in cpars:
+    #         fpar.write(p.name + "\t\t\t" + p.Ltxname + "\n")
+    #     if self.derived:
+    #         for pd in self.AD.list:
+    #             fpar.write(pd.name + "\t\t\t" + pd.Ltxname + "\n")
+    #     if self.engine == 'dynesty':
+    #         if (self.loglike.name() == "Composite"):
+    #             self.sublikenames = self.loglike.compositeNames()
+    #             for name in self.sublikenames:
+    #                 fpar.write(name + "_like \t\t\t" + name + "\n")
+    #             fpar.write("theory_prior \t\t\t None \n")
 
 
     def writeSummary(self, time, *args):
@@ -175,3 +181,5 @@ class PostProcessing:
                     strsamples = "{} {}".format(strsamples, pd.value)
             f.write(strsamples)
         f.close()
+
+
