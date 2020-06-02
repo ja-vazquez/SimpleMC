@@ -908,6 +908,15 @@ class Sampler(object):
         self.like = simpleLike
         self.derived = addDerived
         self.outputname = outputname
+        self.cpars     = self.like.freeParameters()
+
+        if (self.like.name() == "Composite"):
+            self.sublikenames = self.like.compositeNames()
+            self.composite = True
+        else:
+            self.composite = False
+
+
         # Define our stopping criteria.
         if dlogz is None:
             if add_live:
@@ -952,9 +961,20 @@ class Sampler(object):
                     self.AD = AllDerived()
                     # simpleLike -> simpleMC loglike object
                     derivedstr = str([pd.value for pd in self.AD.listDerived(self.like)]).lstrip('[').rstrip(']')
-                    derivedstr = derivedstr.replace(",","")
+                    derivedstr = derivedstr.replace(",", "")
                     vstarstr = "{} {}".format(vstarstr, derivedstr)
-                f.write("{} {} {}\n".format(weights, -2 * results[3], vstarstr))
+                if self.composite:
+                    _, self.cloglikes = self.getLikes()
+                    ppars = copy.deepcopy(self.cpars)
+                    for i, param in enumerate(ppars):
+                        param.value = results[2][i]
+                    self.like.updateParams(ppars)
+                    compositestr = str(self.cloglikes.tolist()).lstrip('[').rstrip(']')
+                    compositestr = compositestr.replace(",", "")
+                    vstarstr = "{} {}".format(vstarstr, compositestr)
+                rowstr = "{} {} {}".format(weights, -results[3], vstarstr)
+                rowstr = " ".join(rowstr.split())
+                f.write("{}\n".format(rowstr))
                 f.flush()
         f.close()
         f = open(self.outputname + '.txt', "+a")
@@ -980,7 +1000,18 @@ class Sampler(object):
                     derivedstr = str([pd.value for pd in self.AD.listDerived(self.like)]).lstrip('[').rstrip(']')
                     derivedstr = derivedstr.replace(",","")
                     vstarstr = "{} {}".format(vstarstr, derivedstr)
-                f.write("{} {} {}\n".format(weights, -1*results[3], vstarstr))
+                if self.composite:
+                    _, self.cloglikes = self.getLikes()
+                    ppars = copy.deepcopy(self.cpars)
+                    for i, param in enumerate(ppars):
+                        param.value = results[2][i]
+                    self.like.updateParams(ppars)
+                    compositestr = str(self.cloglikes.tolist()).lstrip('[').rstrip(']')
+                    compositestr = compositestr.replace(",", "")
+                    vstarstr = "{} {}".format(vstarstr, compositestr)
+                rowstr = "{} {} {}".format(weights, -results[3], vstarstr)
+                rowstr = " ".join(rowstr.split())
+                f.write("{}\n".format(rowstr))
 
                 # Print progress.
                 if print_progress:
@@ -1035,3 +1066,11 @@ class Sampler(object):
         #     if pbar is not None:
         #         pbar.close()
 
+    def getLikes(self):
+        if (self.composite):
+            cloglikes = self.like.compositeLogLikes_wprior()
+            cloglike = cloglikes.sum()
+        else:
+            cloglikes = []
+            cloglike = self.like.loglike_wprior()
+        return cloglike, cloglikes
