@@ -8,14 +8,12 @@
 # its Curvature parameter (Omega_k basically), so you need to update it
 #
 
-
-
-import scipy as sp
-from scipy import constants
-import scipy.integrate as intg
-
-
 from .paramDefs import h_par, Pr_par, s8_par
+from scipy.misc import derivative
+import scipy.integrate as intg
+from scipy import constants
+import scipy as sp
+
 
 
 class BaseCosmology:
@@ -182,4 +180,8 @@ class BaseCosmology:
         if hasattr(self, "Om"):
             gr *= 5/2.*self.Om
         return gr
+
+
+    def fs8(self, z):
+        return -self.s8*(1+z)*derivative(self.growth, z, dx=1e-6)/self.growth(0)
 

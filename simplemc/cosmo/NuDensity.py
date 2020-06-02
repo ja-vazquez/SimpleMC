@@ -4,12 +4,14 @@
 #
 
 from __future__ import print_function
-import scipy as sp
-from scipy import constants as ct
-from scipy.special import zeta
-from scipy.integrate import quad
-from scipy.interpolate import interp1d
 from simplemc.cosmo import cosmoApprox as CA
+from scipy.interpolate import interp1d
+from scipy import constants as ct
+from scipy.integrate import quad
+from scipy.special import zeta
+import scipy as sp
+
+
 #from numba import autojit
 
 class NuIntegral:

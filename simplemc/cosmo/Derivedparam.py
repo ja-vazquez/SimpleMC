@@ -4,6 +4,9 @@ import scipy as sp
 import sys
 
 class AllDerived:
+    """
+    Derived parameters, given the base ones.
+    """
     def __init__(self):
         #self.cpars = cpars
         self.Ol   = Derivedparam('Ol',    0, '\Omega_\Lambda*')
@@ -14,6 +17,7 @@ class AllDerived:
         self.Omh23= Derivedparam('Omh23', 0, 'Omh2(z2;z3)*')
         self.Orc  = Derivedparam('Orc',   0, '\Omega_{rc}*')
         self.list = [self.Ol, self.H0, self.Age, self.Omh12, self.Omh13, self.Omh23, self.Orc]
+
 
     def listDerived(self, like):
         self.like  = like
