@@ -101,10 +101,10 @@ class DriverMC:
             self.result = self.mcmcRunner(iniFile=self.iniFile, **kwargs)
         elif self.analyzername == 'nested':
             self.result = self.nestedRunner(iniFile=self.iniFile, **kwargs)
-        elif self.analyzername == 'maxlike':
-            self.result = self.maxLikeRunner(iniFile=self.iniFile, **kwargs)
         elif self.analyzername == 'emcee':
             self.result = self.emceeRunner(iniFile=self.iniFile, **kwargs)
+        elif self.analyzername == 'maxlike':
+            self.result = self.maxLikeRunner(iniFile=self.iniFile, **kwargs)
         elif self.analyzername == 'genetic':
             self.result = self.geneticRunner(iniFile=self.iniFile, **kwargs)
         else:
@@ -147,9 +147,12 @@ class DriverMC:
         return True
 
 
-##----------------------Samplers ----------------------
 
 
+##======== ======== ======== Samplers ======== ======== ========
+
+
+##---------------------- MCMC ----------------------
 
     def mcmcRunner(self, iniFile=None, **kwargs):
         """
@@ -211,7 +214,7 @@ class DriverMC:
 
 
 
-
+##---------------------- Nested ----------------------
 
     def nestedRunner(self, iniFile=None, **kwargs):
         """
@@ -342,60 +345,146 @@ class DriverMC:
                 'dynamic : {}'.format(dynamic), 'ANN :{}'.format(neuralNetwork)]
 
 
+##---------------------- EMCEE ----------------------
 
-#################################### logLike and prior Transform function ###########################
+    def emceeRunner(self, iniFile=None, **kwargs):
+        if iniFile:
+            walkers = self.config.getint('emcee', 'walkers', fallback=500)
+            nsamp   = self.config.getint('emcee', 'nsamp', fallback=20000)
+            burnin  = self.config.getint('emcee', 'burnin', fallback=0)
+            nproc   = self.config.getint('emcee', 'nproc', fallback=1)
+        else:
+            walkers = kwargs.pop('walkers', 30)
+            nsamp   = kwargs.pop('nsamp', 20000)
+            burnin  = kwargs.pop('burnin', 0)
+            nproc   = kwargs.pop('nproc', 1)
+            if kwargs:
+                logger.critical('Unexpected **kwargs for emcee sampler: {}'.format(kwargs))
+                logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
+                            'Emcee executer options are:'
+                            '\n\twalkers (int) Default: 30\n\t'
+                            'nsamp (int) Default: 20000\n\t'
+                            'burnin (int) Default: 0\n\t'
+                            'nproc (int) Default: 1')
+                sys.exit(1)
+        logger.info("\n\twalkers: {}\n\tnsamp: {}\n"
+                    "\tburnin: {}\n\t"
+                    "nproc: {}".format(walkers, nsamp, burnin, nproc))
+        self.outputpath = "{}_{}_walkers".format(self.outputpath, walkers)
+        self.outputChecker()
+        pool, _ = self.mppool(nproc)
+        # initial_state = None
+        ini = []
+        for bound in self.bounds:
+            ini.append(np.random.uniform(bound[0], bound[1], walkers))
+        inisamples = np.array(ini).T # initial samples
+        try:
+            import emcee
+            ti = time.time()
+            sampler = emcee.EnsembleSampler(walkers, self.dims, self.logPosterior, pool=pool)
+            # pass the initial samples and total number of samples required
+            sampler.run_mcmc(inisamples, nsamp + burnin, progress=True)
+            # extract the samples (removing the burn-in)
+            # postsamples = sampler.chain[:, burnin:, :].reshape((-1, self.dims))
+            self.ttime = time.time() - ti
+        except ImportError as error:
+            sys.exit("{}: Please install this module"
+                     "or try using other sampler".format(error.__class__.__name__))
+        # set up the sampler
+        self.burnin = burnin
+        try:
+            pool.close()
+        except:
+            pass
+        # fig = corner.corner(postsamples)
+        # fig.savefig('emcee.png')
 
-    '''
-    def setPriors(self):
-        #"""
-        After setTheory, you can set the priors.
-
-        Returns a list of lists of the object of the Parameter class.
-        """
-        self.parameters = self.T.freeParameters()
-        names      = []
-        values     = []
-        errorlist  = []
-        boundlist  = []
-        latexnames = []
-        for parameter in self.parameters:
-            names.append(parameter.name)
-            values.append(parameter.value)
-            errorlist.append(parameter.error)
-            boundlist.append(parameter.bounds)
-            latexnames.append(parameter.Ltxname)
-        #plist = [[p.name, p.value, p.error, p.bounds, p.Ltxname] for p in self.pars_info]
-        #print('listing ',list(zip(*plist)))
-
-        return [names, values, errorlist, boundlist, latexnames]
+        return ['emcee', sampler, 'walkers : {}'.format(walkers), 'samples: {}'.format(nsamp)]
 
 
-    def instantiatePars(self, value):
-        """
-        This method returns an instance of
-        Parameter objects with the sampler values
 
-        -- value : it is the generated vector by the sampler
-        """
-        aux=[]
-        for item in value:
-            aux.append(item)
+##======== ======== ======== Optimizers ======== ======== ========
 
-        names, values, errorlist, boundlist, latexnames = self.setPriors()
-        instances = []
-        for i in range(len(names)):
-            instances.append(Parameter(names[i],
-                aux[i], errorlist[i], boundlist[i], latexnames[i]))
-        return instances
-        '''
 
+##---------------------- MaxLikeAnalizer ----------------------
+
+    def maxLikeRunner(self, iniFile=None, **kwargs):
+        self.outputpath = '{}_optimization'.format(self.outputpath)
+        self.outputChecker()
+        if iniFile:
+            withErrors = self.config.getboolean('MaxLike', 'withErrors', fallback=False)
+        else:
+            withErrors = kwargs.pop('withErrors', False)
+            if kwargs:
+                logger.critical('Unexpected **kwargs for MaxLike: {}'.format(kwargs))
+                logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
+                            'MaxLikeAnalyzer executer options are:'
+                            '\n\twithErrors (boolean) Default: False')
+                sys.exit(1)
+        ti = time.time()
+        A = MaxLikeAnalyzer(self.L, withErrors=withErrors)
+        params = self.T.printParameters(A.params)
+        self.ttime = time.time() - ti
+        return ['maxlike', A, params]
+
+
+##---------------------- Genetic Algorithms ----------------------
+
+
+    def geneticRunner(self, iniFile=None, **kwargs):
+        self.outputpath = '{}_optimization'.format(self.outputpath)
+        self.outputChecker()
+
+        if iniFile:
+            n_individuals = self.config.getint('genetic', 'n_individuals', fallback=400)
+            n_generations = self.config.getint('genetic', 'n_generations' , fallback=1000)
+            selection_method = self.config.get('genetic', 'selection_method', fallback='tournament')
+            mut_prob = self.config.getfloat('genetic', 'mut_prob', fallback=0.6)
+        else:
+            n_individuals = kwargs.pop('n_individuals', 400)
+            n_generations = kwargs.pop('n_generations', 1000)
+            selection_method = kwargs.pop('selection_method', 'tournament')
+            mut_prob = kwargs.pop('mut_prob', 0.6)
+            if kwargs:
+                logger.critical('Unexpected **kwargs for genetic optimizer: {}'.format(kwargs))
+                logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
+                            'genetic executer options are:'
+                            '\n\tn_individuals (int) Default: 400\n\t'
+                            'n_generations (int) Default: 1000\n\t'
+                            'selection_method {"tournament","rank","roulette"} Default: "tournament"'
+                            '\n\tmut_prob (float) Default: 0.4')
+                sys.exit(1)
+        logger.info("\n\tn_individuals: {}\n\tn_generations: {}"
+                    "\n\tselection method: {}\n\t"
+                    "mut prob: {}".format(n_individuals, n_generations,
+                                        selection_method,mut_prob))
+        ti = time.time()
+
+        M = SimpleGenetic(self.logLikeGenetic, self.dims, self.bounds,
+                          n_individuals=n_individuals,
+                          n_generations=n_generations,
+                          prob_mut=mut_prob, method_selection=selection_method,
+                          outputname=self.outputpath)
+
+        self.ttime = time.time() - ti
+
+        return ['genetic', M]
+
+
+
+
+
+
+
+
+##---------------------- logLike and prior Transform function ----------------------
+##---------------------- for nested samplers ----------------------
 
     def logLike(self, values):
         """
-            If the sampler used isn't the MCMC of MCMCAnalyzer
-            then, we need to set other types of likelihoods and
-            priors objects. This method allows that. Therefore, it is a
-            likelihood defined for an external samplers and it is used
+            If the sampler used isn't the MCMC of MCMCAnalyzer then, we need to set
+            other types of likelihoods and priors objects. This method allows that. It is a
+            likelihood defined for an external samplers and is used
             as parameter of the sampler run function.
 
             Parameters:
@@ -420,16 +509,11 @@ class DriverMC:
 
 
 
-
-
     #priorsTransform
     def priorTransform(self, theta):
         """prior Transform for gaussian and flat priors"""
         priors = []
-        try:
-            n = self.nsigma
-        except:
-            n = 2.
+        n = self.nsigma
 
         if self.priortype == 'g':
             for c, bound in enumerate(self.bounds):
@@ -438,10 +522,12 @@ class DriverMC:
                 priors.append(mu+sigma*(ndtri(theta[c])))
         else:
             for c, bound in enumerate(self.bounds):
-            # When theta 0-> append bound[0], if theta 1-> append bound[1]
+               # When theta 0-> append bound[0], if theta 1-> append bound[1]
                 priors.append(theta[c]*(bound[1]-bound[0])+bound[0])
                 # At this moment, np.array(priors) has shape (dims,)
         return np.array(priors)
+
+
 
 
 
@@ -461,6 +547,7 @@ class DriverMC:
             loglike = self.L.loglike_wprior()
 
         return loglike
+
 
 ############# for emcee: logPosterior and logPrior
     def logPosterior(self, theta):
@@ -510,119 +597,6 @@ class DriverMC:
             return -np.inf
 
 
-
-    def emceeRunner(self, iniFile=None, **kwargs):
-        if iniFile:
-            walkers = self.config.getint('emcee', 'walkers', fallback=500)
-            nsamp = self.config.getint('emcee', 'nsamp', fallback=20000)
-            burnin = self.config.getint('emcee', 'burnin', fallback=0)
-            nproc = self.config.getint('emcee', 'nproc', fallback=1)
-        else:
-            walkers = kwargs.pop('walkers', 30)
-            nsamp = kwargs.pop('nsamp', 20000)
-            burnin = kwargs.pop('burnin',0)
-            nproc = kwargs.pop('nproc', 1)
-            if kwargs:
-                logger.critical('Unexpected **kwargs for emcee sampler: {}'.format(kwargs))
-                logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
-                            'Emcee executer options are:'
-                            '\n\twalkers (int) Default: 30\n\t'
-                            'nsamp (int) Default: 20000\n\t'
-                            'burnin (int) Default: 0\n\t'
-                            'nproc (int) Default: 1')
-                sys.exit(1)
-        logger.info("\n\twalkers: {}\n\tnsamp: {}\n"
-                    "\tburnin: {}\n\t"
-                    "nproc: {}".format(walkers, nsamp, burnin, nproc))
-        self.outputpath = "{}_{}_walkers".format(self.outputpath, walkers)
-        self.outputChecker()
-        pool, _ = self.mppool(nproc)
-        # initial_state = None
-        ini = []
-        for bound in self.bounds:
-            ini.append(np.random.uniform(bound[0], bound[1], walkers))
-        inisamples = np.array(ini).T # initial samples
-        try:
-            import emcee
-            ti = time.time()
-            sampler = emcee.EnsembleSampler(walkers, self.dims, self.logPosterior, pool=pool)
-            # pass the initial samples and total number of samples required
-            sampler.run_mcmc(inisamples, nsamp + burnin, progress=True)
-            # extract the samples (removing the burn-in)
-            # postsamples = sampler.chain[:, burnin:, :].reshape((-1, self.dims))
-            self.ttime = time.time() - ti
-        except ImportError as error:
-            sys.exit("{}: Please install this module"
-                     "or try using other sampler".format(error.__class__.__name__))
-        # set up the sampler
-        self.burnin = burnin
-        try:
-            pool.close()
-        except:
-            pass
-        # fig = corner.corner(postsamples)
-        # fig.savefig('emcee.png')
-
-        return ['emcee', sampler, 'walkers : {}'.format(walkers), 'samples: {}'.format(nsamp)]
-###################################Optimizers##############################################
-
-    def maxLikeRunner(self, iniFile=None, **kwargs):
-        self.outputpath = '{}_optimization'.format(self.outputpath)
-        self.outputChecker()
-        if iniFile:
-            withErrors = self.config.getboolean('MaxLike', 'withErrors', fallback=False)
-        else:
-            withErrors = kwargs.pop('withErrors', False)
-            if kwargs:
-                logger.critical('Unexpected **kwargs for MaxLike: {}'.format(kwargs))
-                logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
-                            'MaxLikeAnalyzer executer options are:'
-                            '\n\twithErrors (boolean) Default: False')
-                sys.exit(1)
-        ti = time.time()
-        A = MaxLikeAnalyzer(self.L, withErrors=withErrors)
-        params = self.T.printParameters(A.params)
-        self.ttime = time.time() - ti
-        return ['maxlike', A, params]
-
-    def geneticRunner(self, iniFile=None, **kwargs):
-        self.outputpath = '{}_optimization'.format(self.outputpath)
-        self.outputChecker()
-
-        if iniFile:
-            n_individuals = self.config.getint('genetic', 'n_individuals', fallback=400)
-            n_generations = self.config.getint('genetic', 'n_generations' , fallback=1000)
-            selection_method = self.config.get('genetic', 'selection_method', fallback='tournament')
-            mut_prob = self.config.getfloat('genetic', 'mut_prob', fallback=0.6)
-        else:
-            n_individuals = kwargs.pop('n_individuals', 400)
-            n_generations = kwargs.pop('n_generations', 1000)
-            selection_method = kwargs.pop('selection_method', 'tournament')
-            mut_prob = kwargs.pop('mut_prob', 0.6)
-            if kwargs:
-                logger.critical('Unexpected **kwargs for genetic optimizer: {}'.format(kwargs))
-                logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
-                            'genetic executer options are:'
-                            '\n\tn_individuals (int) Default: 400\n\t'
-                            'n_generations (int) Default: 1000\n\t'
-                            'selection_method {"tournament","rank","roulette"} Default: "tournament"'
-                            '\n\tmut_prob (float) Default: 0.4')
-                sys.exit(1)
-        logger.info("\n\tn_individuals: {}\n\tn_generations: {}"
-                    "\n\tselection method: {}\n\t"
-                    "mut prob: {}".format(n_individuals, n_generations,
-                                        selection_method,mut_prob))
-        ti = time.time()
-
-        M = SimpleGenetic(self.logLikeGenetic, self.dims, self.bounds,
-                          n_individuals=n_individuals,
-                          n_generations=n_generations,
-                          prob_mut=mut_prob, method_selection=selection_method,
-                          outputname=self.outputpath)
-
-        self.ttime = time.time() - ti
-
-        return ['genetic', M]
 
 
 ###############################Post-processing############################################
@@ -693,3 +667,50 @@ class DriverMC:
             pool = mp.Pool(processes=nprocess)
 
         return pool, nprocess
+
+
+
+
+    '''
+    def setPriors(self):
+        #"""
+        After setTheory, you can set the priors.
+
+        Returns a list of lists of the object of the Parameter class.
+        """
+        self.parameters = self.T.freeParameters()
+        names      = []
+        values     = []
+        errorlist  = []
+        boundlist  = []
+        latexnames = []
+        for parameter in self.parameters:
+            names.append(parameter.name)
+            values.append(parameter.value)
+            errorlist.append(parameter.error)
+            boundlist.append(parameter.bounds)
+            latexnames.append(parameter.Ltxname)
+        #plist = [[p.name, p.value, p.error, p.bounds, p.Ltxname] for p in self.pars_info]
+        #print('listing ',list(zip(*plist)))
+
+        return [names, values, errorlist, boundlist, latexnames]
+
+
+    def instantiatePars(self, value):
+        """
+        This method returns an instance of
+        Parameter objects with the sampler values
+
+        -- value : it is the generated vector by the sampler
+        """
+        aux=[]
+        for item in value:
+            aux.append(item)
+
+        names, values, errorlist, boundlist, latexnames = self.setPriors()
+        instances = []
+        for i in range(len(names)):
+            instances.append(Parameter(names[i],
+                aux[i], errorlist[i], boundlist[i], latexnames[i]))
+        return instances
+        '''
