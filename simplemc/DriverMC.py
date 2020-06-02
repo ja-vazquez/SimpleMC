@@ -1,7 +1,7 @@
 
 
 from simplemc.analyzers.MaxLikeAnalyzer import MaxLikeAnalyzer
-#from simplemc.analyzers.SimpleGenetic import SimpleGenetic
+from simplemc.analyzers.SimpleGenetic import SimpleGenetic
 from simplemc.analyzers.MCMCAnalyzer import MCMCAnalyzer
 from simplemc.analyzers.dynesty import dynesty
 from simplemc.cosmo.Derivedparam import AllDerived
