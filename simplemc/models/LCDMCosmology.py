@@ -9,7 +9,7 @@ from simplemc.cosmo import cosmoApprox as CA
 from simplemc.cosmo.BaseCosmology import BaseCosmology
 from simplemc.cosmo.RadiationAndNeutrinos import RadiationAndNeutrinos
 from simplemc.cosmo.paramDefs import Obh2_par, Om_par, h_par, mnu_par, Nnu_par
-from scipy.misc import derivative
+
 
 
 class LCDMCosmology(BaseCosmology, RadiationAndNeutrinos):
@@ -96,11 +96,6 @@ class LCDMCosmology(BaseCosmology, RadiationAndNeutrinos):
     def RHSquared_a(self, a):
         NuContrib = self.NuDensity.rho(a)/self.h**2
         return (self.Ocb/a**3+self.Omrad/a**4+NuContrib+(1.0-self.Om))
-
-
-    def fs8(self, z):
-        return -self.s8*(1+z)*derivative(self.growth, z, dx=1e-6)/self.growth(0)
-
 
 
     # Obh2 prior

@@ -10,13 +10,9 @@
 from .Parameter import Parameter
 
 # Parameters are value, variation, bounds
-#Om_par   = Parameter("Om",   0.3038,  0.05,    (0.05, 0.5),   "\Omega_m")
-#Obh2_par = Parameter("Obh2", 0.02234, 0.001, (0.02, 0.025), "\Omega_{b}h^2")
-#h_par    = Parameter("h",    0.6821,  0.05,   (0.4, 1.0),    "h")
-
-Om_par   = Parameter("Om",   0.3038,  0.05,    (0.1, 0.5),   "\Omega_m")
-Obh2_par = Parameter("Obh2", 0.02234, 0.001, (0.02, 0.024), "\Omega_{b}h^2")
-h_par    = Parameter("h",    0.6821,  0.05,   (0.5, 0.9),    "h")
+Om_par   = Parameter("Om",   0.3038,  0.05,    (0.05, 0.5),   "\Omega_m")
+Obh2_par = Parameter("Obh2", 0.02234, 0.001, (0.02, 0.025), "\Omega_{b}h^2")
+h_par    = Parameter("h",    0.6821,  0.05,   (0.4, 1.0),    "h")
 
 mnu_par  = Parameter("mnu",  0.06,    0.1,    (0, 1.0),      "\Sigma m_{\\nu}")
 Nnu_par  = Parameter("Nnu",  3.046,   0.5,    (3.046, 5.046),"N_{\\rm eff}")
@@ -108,7 +104,7 @@ zbin_par = [Parameter("zbin%d"%i, 1.3+step*i, 0.3, (step*i, 3+step*i), "zbin%d"%
 #Quintess Cosmology
 mphi_par   = Parameter("mphi", 0.2, 0.1, (-5, 1), "m_{\phi}")
 
-#PhiSuresh
+#PhiRatra
 alpha_par  = Parameter("alpha", 0.01, 0.005, (0.001, 0.05), "\\alpha")
 
 #Quintom Cosology

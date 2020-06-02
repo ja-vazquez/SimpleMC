@@ -2,7 +2,7 @@
 # Add paths, we want to be able to run in either root or Run/
 
 import sys
-sys.path = ["py", "../py", "Models", "Cosmo", "Likelihoods"] + sys.path
+#sys.path = ["py", "../py", "Models", "Cosmo", "Likelihoods"] + sys.path
 
 #TODO -- Include models used in several papers
 #TODO -- Add Planck 15
