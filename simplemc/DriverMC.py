@@ -473,10 +473,6 @@ class DriverMC:
 
 
 
-
-
-
-
 ##---------------------- logLike and prior Transform function ----------------------
 ##---------------------- for nested samplers ----------------------
 
@@ -547,6 +543,7 @@ class DriverMC:
             loglike = self.L.loglike_wprior()
 
         return loglike
+
 
 
 ############# for emcee: logPosterior and logPrior
@@ -625,6 +622,8 @@ class DriverMC:
                 else:
                     break
         return True
+
+
 
 
     def postprocess(self, summary=True, stats=False, addtxt=None):
