@@ -325,7 +325,7 @@ class DriverMC:
 
             sampler.run_nested(nlive_init=nlivepoints, dlogz_init=0.05, nlive_batch=100,
                             maxiter_init=10000, maxiter_batch=1000, maxbatch=10,
-                            outputname=self.outputpath, addDerived=self.addDerived, smcloglike=self.L)
+                            outputname=self.outputpath, addDerived=self.addDerived, simpleLike=self.L)
             M = sampler.results
 
 
@@ -334,7 +334,7 @@ class DriverMC:
                         bound=nestedType, sample = 'unif', nlive = nlivepoints,
                         pool = pool, queue_size=nprocess)
             sampler.run_nested(dlogz=accuracy, outputname=self.outputpath,
-                               addDerived=self.addDerived, smcloglike=self.L)
+                               addDerived=self.addDerived, simpleLike=self.L)
             M = sampler.results
 
 

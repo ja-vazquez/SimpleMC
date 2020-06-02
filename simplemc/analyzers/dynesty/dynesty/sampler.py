@@ -849,8 +849,8 @@ class Sampler(object):
                    add_live=True, print_progress=True,
                    print_func=None, save_bounds=True,
                    addDerived=False,
-                   smcloglike=None,
-                   outputname="outputDynesty"):
+                   outputname="outputDynesty",
+                   simpleLike=None):
         """
         **A wrapper that executes the main nested sampling loop.**
         Iteratively replace the worst live point with a sample drawn
@@ -905,6 +905,9 @@ class Sampler(object):
             the live points internally. Default is *True*.
 
         """
+        self.like = simpleLike
+        self.derived = addDerived
+        self.outputname = outputname
         # Define our stopping criteria.
         if dlogz is None:
             if add_live:
@@ -916,7 +919,7 @@ class Sampler(object):
         # pbar, print_func = self._get_print_func(print_func, print_progress)
         # try:
         ncall = self.ncall
-        f = open(outputname + '_dead.txt', 'w+')
+        f = open(self.outputname + '.txt', 'w+')
         for it, results in enumerate(self.sample(maxiter=maxiter,
                                                  maxcall=maxcall,
                                                  dlogz=dlogz,
@@ -942,17 +945,19 @@ class Sampler(object):
                 weights = np.exp(results[5])
                 vstarstr = str(results[2]).lstrip('[').rstrip(']')
                 sys.stdout.write("\rit: {} | ncall: {} | "
-                      "logz: {:.4f} | loglstar: {:.4f} | points {}".format(i, ncall, logz, loglstar, vstarstr))
+                      "logz: {:.4f} | loglstar: {:.4f} | point {}".format(i, ncall, logz, loglstar, vstarstr))
                 sys.stdout.flush()
                 # exp(logwt - loglstar)
                 if addDerived:
-                    AD = AllDerived()
-                    # smc -> simpleMC loglike object
-                    for pd in AD.listDerived(smcloglike):
-                        vstarstr += "{} {}".format(vstarstr, pd.value)
+                    self.AD = AllDerived()
+                    # simpleLike -> simpleMC loglike object
+                    derivedstr = str([pd.value for pd in self.AD.listDerived(self.like)]).lstrip('[').rstrip(']')
+                    derivedstr = derivedstr.replace(",","")
+                    vstarstr = "{} {}".format(vstarstr, derivedstr)
                 f.write("{} {} {}\n".format(weights, -2 * results[3], vstarstr))
                 f.flush()
         f.close()
+        f = open(self.outputname, "+a")
         # Add remaining live points to samples.
         if add_live:
             it = self.it - 1
@@ -966,23 +971,24 @@ class Sampler(object):
                 if logz <= -1e6:
                     logz = -np.inf
 
-                #--weights = np.exp(results[5])
-                #--weights = np.exp(self.results['logwt'] - self.results['logz'][-1])
-                #--vstarstr = str(results[2]).lstrip('[').rstrip(']')
-                #--f2.write("{} {} {}\n".format(weights, -1*results[3], vstarstr))
+                weights = np.exp(results[5])
+                weights = np.exp(self.results['logwt'] - self.results['logz'][-1])
+                vstarstr = str(results[2]).lstrip('[').rstrip(']')
+                if addDerived:
+                    self.AD = AllDerived()
+                    # simpleLike -> simpleMC loglike object
+                    derivedstr = str([pd.value for pd in self.AD.listDerived(self.like)]).lstrip('[').rstrip(']')
+                    derivedstr = derivedstr.replace(",","")
+                    vstarstr = "{} {}".format(vstarstr, derivedstr)
+                f.write("{} {} {}\n".format(weights, -1*results[3], vstarstr))
 
                 # Print progress.
-                #--if print_progress:
-                    #--sys.stdout.write("it: {} | ncall: {} | "
-                    #--      "logz: {:.4f} | loglstar: {:.4f} | "
-                    #--      "points: {}\\".format(i, ncall, logz, loglstar, vstarstr))
-                    #--sys.stdout.flush()
-                    # print_func(results, it, ncall, add_live_it=i+1,
-                    #            dlogz=dlogz, logl_max=logl_max)
-            #--f2.close()
-        # finally:
-        #     if pbar is not None:
-        #         pbar.close()
+                if print_progress:
+                    sys.stdout.write("it: {} | ncall: {} | "
+                          "logz: {:.4f} | loglstar: {:.4f} | "
+                          "points: {}\\".format(i, ncall, logz, loglstar, vstarstr))
+                    sys.stdout.flush()
+            f.close()
 
     def add_final_live(self, print_progress=True, print_func=None):
         """
@@ -1029,51 +1035,3 @@ class Sampler(object):
         #     if pbar is not None:
         #         pbar.close()
 
-# class AllDerived:
-#     def __init__(self):
-#         #self.cpars = cpars
-#         self.Ol   = Derivedparam('Ol', 0, '\Omega_\Lambda*')
-#         self.H0   = Derivedparam('H0', 0, 'H_0*')
-#         self.Age  = Derivedparam('Age', 0, 'Age[Gyr]*')
-#         self.list = [self.Ol, self.H0, self.Age]
-#
-#     def listDerived(self, like):
-#         self.like  = like
-#         self.cpars = like.freeParameters()
-#         self.Ol.setValue(self.computeDerived('Ol'))
-#         self.H0.setValue(self.computeDerived('H0'))
-#         self.Age.setValue(self.computeDerived('Age'))
-#         return self.list
-#
-#     def computeDerived(self, parname):
-#         import scipy.integrate as integrate
-#         if parname == 'Ol':
-#             for par in self.cpars:
-#                 if par.name == 'Om':
-#                     return 1- par.value
-#         elif parname == 'H0':
-#             for par in self.cpars:
-#                 if par.name == 'h':
-#                     return par.value*100
-#         elif parname == 'Age':
-#             return integrate.quad(self.compuAge, 0, 10**5)[0]/3.24076E-20/(3.154E7*1.0E9)
-#         else:
-#             sys.exit('Define derived parameter', parname)
-#
-#     def compuAge(self, z):
-#         return 1.0/((1+z)*100.0*self.like.theory_.h*sp.sqrt(self.like.theory_.RHSquared_a(1.0/(1+z))))
-#
-# class Derivedparam:
-#     def __init__(self, name, value, Ltxname=None):
-#         self.name = name
-#         if Ltxname:
-#             self.Ltxname = Ltxname
-#         else:
-#             self.Ltxname = name
-#         self.value = value
-#
-#     def setLatexName(self, Ltx):
-#         self.Ltxname = Ltx
-#
-#     def setValue(self, val):
-#         self.value = val
