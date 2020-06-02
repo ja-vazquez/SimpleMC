@@ -3,6 +3,7 @@
 from simplemc.analyzers.MaxLikeAnalyzer import MaxLikeAnalyzer
 #from simplemc.analyzers.SimpleGenetic import SimpleGenetic
 from simplemc.analyzers.MCMCAnalyzer import MCMCAnalyzer
+from simplemc.cosmo.Derivedparam import AllDerived
 from simplemc.runbase import ParseModel, ParseDataset
 from simplemc.PostProcessing import PostProcessing
 from scipy.special import ndtri
@@ -633,16 +634,34 @@ class DriverMC:
                 self.outputpath = "{}_new".format(self.outputpath)
             else:
                 break
-        if self.analyzername == 'nested':
-            while True:
-                if os.path.isfile(self.outputpath + "_live.txt") or os.path.isfile(self.outputpath + "_dead.txt"):
-                    logger.info("{0} file already exists, {0}_new was created".format(self.outputpath))
-                    self.outputpath = "{}_new".format(self.outputpath)
-                else:
-                    break
+        self.paramFiles()
         return True
 
+    def paramFiles(self):
+        """
+        This method writes the .paramnames file with theirs LaTeX names.
 
+        Parameters:
+
+        T:          T is an instance of ParseModel(model)
+        L:          L is an instance of ParseDataset(datasets)
+
+        """
+        cpars   = self.L.freeParameters()
+        parfile = self.outputpath + ".paramnames"
+        fpar = open(parfile, 'w')
+        for p in cpars:
+            fpar.write(p.name + "\t\t\t" + p.Ltxname + "\n")
+        if self.addDerived:
+            AD = AllDerived()
+            for pd in AD.list:
+                fpar.write(pd.name + "\t\t\t" + pd.Ltxname + "\n")
+        if self.analyzername == 'mcmc' or (self.analyzername == 'nested' and self.engine=='dynesty'):
+            if (self.L.name() == "Composite"):
+                self.sublikenames = self.L.compositeNames()
+                for name in self.sublikenames:
+                    fpar.write(name + "_like \t\t\t" + name + "\n")
+                fpar.write("theory_prior \t\t\t None \n")
 
 
     def postprocess(self, summary=True, stats=False, addtxt=None):
@@ -651,13 +670,11 @@ class DriverMC:
         if self.analyzername == 'nested':
             pp = PostProcessing(self.result, self.paramsList, self.outputpath,
                 engine=self.engine, addDerived=self.addDerived, loglike=self.L)
-            pp.paramFiles()
             if self.engine == 'nestle':
                 pp.saveNestedChain()
         elif self.analyzername == 'emcee':
             pp = PostProcessing(self.result, self.paramsList, self.outputpath,
                                 skip=self.burnin, addDerived=self.addDerived, loglike=self.L)
-            pp.paramFiles()
             pp.saveEmceeSamples()
         else:
             pp = PostProcessing(self.result, self.paramsList, self.outputpath)
