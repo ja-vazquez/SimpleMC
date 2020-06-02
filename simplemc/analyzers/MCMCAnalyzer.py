@@ -21,7 +21,6 @@ from mpi4py import MPI
 comm = MPI.COMM_WORLD
 name = MPI.Get_processor_name()
 
-#TODO remove list of pars
 print ("Hello, World! "
        "I am process %d of %d on %s" %
        (comm.rank, comm.size, name))
