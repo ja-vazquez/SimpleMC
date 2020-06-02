@@ -199,14 +199,6 @@ class DriverMC:
         #Main process
         M = MCMCAnalyzer(self.L, self.outputpath, skip=skip, nsamp=nsamp, temp = temp,
                         chain_num=chainno, addDerived=self.addDerived, GRstop=GRstop)
-        result = np.array(M.sampleslist)
-        _, c = np.shape(result)
-        means = np.mean(result, axis=0)
-        devstds = np.std(result, axis=0)
-        strresult = ""
-        for i in range(2, c):
-            print("{} +/- {}".format(means[i], devstds[i]))
-            strresult ="{}\n{} +/- {}".format(strresult, means[i], devstds[i])
 
         self.ttime = time.time() - ti
 
@@ -223,7 +215,7 @@ class DriverMC:
                 # print("MCEvidence could not calculate the Bayesian evidence [very small weights]\n")
                 logger.error("MCEvidence could not calculate the Bayesian evidence [very small weights]")
         else:
-            self.result = ['mcmc', M, strresult]
+            self.result = ['mcmc', M, "Maxlike: {}".format(M.maxloglike)]
 
         return True
 
