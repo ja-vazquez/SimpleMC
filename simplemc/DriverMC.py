@@ -194,6 +194,15 @@ class DriverMC:
         #Main process
         M = MCMCAnalyzer(self.L, self.outputpath, skip=skip, nsamp=nsamp, temp = temp,
                         chain_num=chainno, addDerived=self.addDerived, GRstop=GRstop)
+        result = np.array(M.sampleslist)
+        _, c = np.shape(result)
+        means = np.mean(result, axis=0)
+        devstds = np.std(result, axis=0)
+        strresult = ""
+        for i in range(2, c):
+            print("{} +/- {}".format(means[i], devstds[i]))
+            strresult ="{}\n{} +/- {}".format(strresult, means[i], devstds[i])
+
         self.ttime = time.time() - ti
 
         #Compute Bayesian Evidence
@@ -202,14 +211,14 @@ class DriverMC:
                 from MCEvidence import MCEvidence
                 logger.info("Aproximating bayesian evidence with MCEvidence (arXiv:1704.03472)\n")
                 MLE = MCEvidence(self.outputpath + ".txt" ).evidence()
-                return ['mcmc', M, "Evidence with MCEvidence : {}\n".format(MLE)]
+                return ['mcmc', M, "Evidence with MCEvidence : {}\n".format(MLE), strresult]
             except:
                 #writeSummary(self.chainsdir, outputname, ttime)
                 # print("Warning!")
                 # print("MCEvidence could not calculate the Bayesian evidence [very small weights]\n")
                 logger.error("MCEvidence could not calculate the Bayesian evidence [very small weights]")
         else:
-            return ['mcmc', M]
+            return ['mcmc', M, strresult]
 
 
 

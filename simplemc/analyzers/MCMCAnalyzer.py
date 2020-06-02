@@ -40,6 +40,7 @@ class MCMCAnalyzer:
         self.cpars     = like.freeParameters()
         self.N         = len(self.cpars)
         self.derived   = addDerived
+        self.sampleslist = []
 
         minvals, maxvals = [], []
         for lb, hb in [p.bounds for p in self.cpars]:
@@ -66,7 +67,6 @@ class MCMCAnalyzer:
         self.GRcondition = GRstop
 
         self.RunChain()
-
 
     def init_pcov(self, mat):
         self.chol = la.cholesky(mat)
@@ -110,7 +110,7 @@ class MCMCAnalyzer:
             self.like.updateParams(ppars)
             ploglike, ploglikes = self.getLikes()
             if (sp.isnan(ploglike)):
-                print("Something bad has happened, nan in loglike, assuming zero log")
+                print("\nSomething bad has happened, nan in loglike, assuming zero log")
                 ploglike = -1e50
             # print cloglike, ploglike, [p.value for p in like.freeParameters()], [p.value for p in self.cpars]
             if (ploglike > self.cloglike):
@@ -123,11 +123,13 @@ class MCMCAnalyzer:
             # stop
             if (accept):
                 self.ProcessAccepted(ppars, ploglike, ploglikes)
+                # for i, item in enumerate(ppars):
+                #     print("\nPPARS", i, item.value, ploglike, ploglikes)
             else:
                 self.cw += 1
 
-            sys.stdout.write("\rAccepted: {:d} | loglike: {:.4f} | "
-                  "GR: {}".format(self.co, self.cloglike, gr))
+            print("Accepted: {:d} | loglike: {:.4f} | "
+                  "GR: {}".format(self.co, self.cloglike, gr), end='\r')
             sys.stdout.flush()
             if (self.co >0 and self.co % self.checkgr == 0):
                 chains = comm.gather(self.lpars, root=0)
@@ -145,8 +147,6 @@ class MCMCAnalyzer:
                 if recvmsg ==1:
                     print('\n---- Gelman-Rubin achived ---- ')
                     return True
-
-
 
     def GRDRun(self, chains):
         """This is a implementation of the Gelman Rubin diagnostic"""
@@ -281,7 +281,7 @@ class MCMCAnalyzer:
                 outstr = self.formstr % tuple(tmp + self.cloglikes.tolist())
             else:
                 outstr = self.formstr % tuple(tmp)
-
+            self.sampleslist.append(tmp)
             self.fout.write(outstr)
             # Flush file on regular basis
             if (self.co % 100 == 0): #JAV 1000
@@ -304,7 +304,7 @@ class MCMCAnalyzer:
             self.meanx  += v*self.cw
             self.meanxx += sp.outer(v, v)*self.cw
             if (self.cw > 30):
-                print("Still burning in, weight too large")
+                print("\nStill burning in, weight too large")
                 self.chol *= 0.9
                 # print(self.cw)
         else:  # co==skip
@@ -312,10 +312,10 @@ class MCMCAnalyzer:
             self.meanxx /= self.swx
             self.meanxx -= sp.outer(self.meanx, self.meanx)
             print("\nRe-initializing covariance matrix after burn-in")
-            # print(self.meanxx)
+            print(self.meanxx)
             print()
-            for i, p in enumerate(self.cpars):
-                print("{}: {} +/- {}".format(p.name, p.value, sp.sqrt(self.meanxx[i, i])))
+            # for i, p in enumerate(self.cpars):
+            #     print("{}: {} +/- {}".format(p.name, p.value, sp.sqrt(self.meanxx[i, i])))
 
             self.init_pcov(self.meanxx)
 
