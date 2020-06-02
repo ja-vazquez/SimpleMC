@@ -5,7 +5,6 @@ from simplemc.analyzers.MaxLikeAnalyzer import MaxLikeAnalyzer
 from simplemc.analyzers.MCMCAnalyzer import MCMCAnalyzer
 from simplemc.runbase import ParseModel, ParseDataset
 from simplemc.PostProcessing import PostProcessing
-from simplemc.cosmo.Parameter import Parameter
 from scipy.special import ndtri
 import multiprocessing as mp
 from simplemc import logger
