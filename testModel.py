@@ -21,13 +21,7 @@ def model(parameterlist, x):
     m, b = parameterlist
     return m*x+b+10
 
-from simplemc.likelihoods.GenericLikelihood import StraightLine
-
-# like = StraightLine.setTheory(model)
-# 4) Create an object of the SimpleModel class
-# ownmodel = SimpleModel(parameters=parameterlist, function=model)
-
-# 5) Use SimpleMC as usually, but with model = custom_model
+# 4) Use SimpleMC as usually, but with model = custom_model
 analyzer = DriverMC(model='custom', datasets='dline', analyzername='mcmc',
                     custom_parameters=parameterlist, custom_function=model)
 analyzer.executer()
