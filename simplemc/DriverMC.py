@@ -525,20 +525,20 @@ class DriverMC:
 ###########loglike for genetic
     def logLikeGenetic(self, *v):
         values = []
-        # print("Parameters:")
         for i, element in enumerate(v):
             values.append(element)
-        listPars = self.instantiatePars(values)
-        self.T.updateParams(listPars)
+        assert len(self.pars_info) == len(values)
+        for pars, val in zip(self.pars_info, values):
+            pars.setValue(val)
+
+        self.T.updateParams(self.pars_info)
         self.L.setTheory(self.T)
         if (self.L.name() == "Composite"):
             cloglikes = self.L.compositeLogLikes_wprior()
             loglike = cloglikes.sum()
         else:
             loglike = self.L.loglike_wprior()
-
         return loglike
-
 
 
 ############# for emcee: logPosterior and logPrior
