@@ -8,12 +8,11 @@ class SimplePlotter:
         self.filename = path
         print("filename")
         self.root = path.replace("{}/".format(chainsdir), "")
-        print("ROOT", self.root)
         self.listpars = listpars
         self.ndim = len(listpars)
         self.show = show
         self.weights = weights
-        self.readFile()
+
 
 
     def simpleGetdist(self, **kwargs):
@@ -30,7 +29,7 @@ class SimplePlotter:
         filled = kwargs.pop("filled", False)
         normalized = kwargs.pop("normalized", False)
         shaded = kwargs.pop("shaded", False)
-        title = kwargs.pop("title", None)
+        label = kwargs.pop("label", None)
         roots = kwargs.pop('roots', [self.root])
 
         g = plots.getSinglePlotter(chain_dir=self.chainsdir, width_inch=10,
@@ -47,7 +46,7 @@ class SimplePlotter:
                         normalized=normalized, shaded=shaded)
 
         self.image = "{}_getdist.png".format(self.filename)
-        self.saveFig(title)
+        self.saveFig(label)
 
 
     def simpleCorner(self, **kwargs):
@@ -68,7 +67,7 @@ class SimplePlotter:
         plot_density =kwargs.pop("plot_density", True)
         truths = kwargs.pop("plot_", None)
         print("Plotting with Corner!")
-
+        self.readFile()
         figure = corner.corner(self.samples, labels=self.latexnames[0:self.ndim],
                                bins=bins, weights=self.weights, color=color,
                                quantiles=[0.5], show_titles=show_titles, title_fmt='.4f',
@@ -128,12 +127,18 @@ class SimplePlotter:
             self.paramnames.append(item.split('\t\t\t')[0].strip('\n'))
 
         labelsfile.close()
+        try:
+            npchain = np.loadtxt(self.filename+'.txt')
+        except:
+            npchain = np.loadtxt(self.filename + '_1.txt')
+
+        self.samples = npchain[:, 2:self.ndim + 2]
 
 
 
-    def saveFig(self, title=None):
-        if title is not None:
-            plt.legend(title=title)
+    def saveFig(self, label=None):
+        if label is not None:
+            plt.text(0.6, 2.0, label, transform=plt.gca().transAxes)
         plt.savefig(self.image, bbox_inches='tight')
         if self.show:
             webbrowser.open(self.image)

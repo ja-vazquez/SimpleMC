@@ -92,9 +92,9 @@ class DriverMC:
         self.dims       = len(self.paramsList)
         self.result     = None
 
-        self.outputname = "{}_{}_{}".format(self.model, self.prefact,
+        self.root = "{}_{}_{}".format(self.model, self.prefact,
                                     self.datasets)
-        self.outputpath = "{}/{}".format(self.chainsdir, self.outputname)
+        self.outputpath = "{}/{}".format(self.chainsdir, self.root)
 
 
 
@@ -191,7 +191,6 @@ class DriverMC:
                     nsamp, skip, temp, chainno, evidence))
         if self.analyzername is None: self.analyzername = 'mcmc'
         self.outputpath = "{}_{}".format(self.outputpath, self.analyzername)
-        self.outputChecker()
         #Check whether the file already exists
         self.outputChecker()
         ti = time.time()
@@ -611,6 +610,7 @@ class DriverMC:
             else:
                 break
         self.paramFiles()
+
         return True
 
     def paramFiles(self):
