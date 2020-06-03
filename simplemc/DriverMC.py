@@ -657,9 +657,11 @@ class DriverMC:
         if summary:
             pp.writeSummary(self.ttime)
 
-    #def plotter(self):
-    #    from PlotterMC import PlotterMC
-    #    plot = PlotterMC(self.dims, chainsdir = self.chainsdir, chainsfile = self.outputname)
+    def plot(self, show=False):
+        from .tools.SimplePlotter import SimplePlotter
+        figure = SimplePlotter(self.chainsdir, self.outputpath, self.paramsList, show=show)
+
+        return figure
 
 # ### pool from multiprocessing
 
