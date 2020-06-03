@@ -8,5 +8,5 @@ analyzer.postprocess()
 
 fig = analyzer.plot(show=True)
 txt = "Bienvenid@ al\ntaller de cosmología\ncon SimpleMC 2.0"
-fig.simpleGetdist(smooth1d=0.5, smooth2d=0.5, label=txt)
+fig.simpleCorner(label=txt)
 

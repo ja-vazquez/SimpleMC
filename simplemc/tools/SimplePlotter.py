@@ -66,6 +66,8 @@ class SimplePlotter:
         plot_contours = kwargs.pop("plot_contours",True)
         plot_density =kwargs.pop("plot_density", True)
         truths = kwargs.pop("plot_", None)
+        label = kwargs.pop("label", None)
+
         print("Plotting with Corner!")
         self.readFile()
         figure = corner.corner(self.samples, labels=self.latexnames[0:self.ndim],
@@ -75,7 +77,7 @@ class SimplePlotter:
                                plot_contours=plot_contours, plot_density=plot_density,
                                truths=truths, truth_color='#4682b4', title_kwargs={"fontsize": 12})
         self.image = "{}_corner.png".format(self.filename)
-        self.saveFig()
+        self.saveFig(label)
 
     def simpleFgivenx(self, **kwargs):
         """
