@@ -6,10 +6,11 @@ class SimplePlotter:
     def __init__(self, chainsdir, path, listpars, show=False, weights=None):
         self.chainsdir = chainsdir
         self.filename = path
-        self.root = path.strip(chainsdir)
+        print("filename")
+        self.root = path.replace("{}/".format(chainsdir), "")
+        print("ROOT", self.root)
         self.listpars = listpars
         self.ndim = len(listpars)
-        #self.listpars = listpars[:self.ndim + 2]
         self.show = show
         self.weights = weights
         self.readFile()
@@ -20,7 +21,7 @@ class SimplePlotter:
         Lewis (2019)
         arXiv:1910.13970v1 [astro-ph.IM]
         """
-        from getdist import plots
+        from getdist import plots, MCSamples, chains
         smooth2d = kwargs.pop("smooth2d", 0.3)
         smooth1d = kwargs.pop("smooth1d", 0.3)
         burnin = kwargs.pop("burnin", 0.2)
@@ -29,20 +30,24 @@ class SimplePlotter:
         filled = kwargs.pop("filled", False)
         normalized = kwargs.pop("normalized", False)
         shaded = kwargs.pop("shaded", False)
+        title = kwargs.pop("title", None)
+        roots = kwargs.pop('roots', [self.root])
 
         g = plots.getSinglePlotter(chain_dir=self.chainsdir, width_inch=10,
                                    ratio=0.9, scaling=2,
                                    analysis_settings={'smooth_scale_2D': smooth2d,
                                                       'smooth_scale_1D': smooth1d,
                                                       'ignore_rows': burnin})
-        g.triangle_plot(self.root, self.listpars,
+
+        g.triangle_plot(roots, self.listpars,
                         diag1d_kwargs={'colors':colors},
                         colors=colors,
                         legend_labels=legend_labels,
                         filled=filled,
                         normalized=normalized, shaded=shaded)
+
         self.image = "{}_getdist.png".format(self.filename)
-        self.saveFig()
+        self.saveFig(title)
 
 
     def simpleCorner(self, **kwargs):
@@ -114,7 +119,7 @@ class SimplePlotter:
         """
          This method reads the samples and the .param file.
         """
-        labelsfile = open(self.filename+".paramnames", 'r')
+        labelsfile = open(self.filename + ".paramnames", 'r')
         self.latexnames = []
         self.paramnames = []
 
@@ -124,10 +129,11 @@ class SimplePlotter:
 
         labelsfile.close()
 
-        npchain = np.loadtxt(self.filename + '.txt')
-        self.samples = npchain[:, 2:self.ndim + 2]
 
-    def saveFig(self):
+
+    def saveFig(self, title=None):
+        if title is not None:
+            plt.legend(title=title)
         plt.savefig(self.image, bbox_inches='tight')
         if self.show:
             webbrowser.open(self.image)
