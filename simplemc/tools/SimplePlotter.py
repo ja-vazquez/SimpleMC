@@ -65,7 +65,7 @@ class SimplePlotter:
         smooth = kwargs.pop("smooth" ,True)
         plot_contours = kwargs.pop("plot_contours",True)
         plot_density =kwargs.pop("plot_density", True)
-        truths = kwargs.pop("plot_", None)
+        truths = kwargs.pop("truths", None)
         label = kwargs.pop("label", None)
 
         print("Plotting with Corner!")
