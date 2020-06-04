@@ -54,6 +54,7 @@ class DriverMC:
             ## Following two are for custom data
             self.path_to_data = kwargs.pop('path_to_data', None)
             self.path_to_cov  = kwargs.pop('path_to_cov', None)
+            self.fn = kwargs.pop("fn", "generic")
 
             if os.path.exists(os.path.join(self.chainsdir)):
                 self.chainsdir = os.path.join(self.chainsdir)
@@ -74,7 +75,7 @@ class DriverMC:
         T = ParseModel(self.model, custom_parameters=self.custom_parameters,
                                    custom_function=self.custom_function)
         L = ParseDataset(self.datasets, path_to_data=self.path_to_data,
-                                        path_to_cov=self.path_to_cov)
+                                        path_to_cov=self.path_to_cov, fn=fn)
 
         if self.prefact == "pre":  T.setVaryPrefactor()
         if self.varys8  == "True": T.setVarys8()
@@ -146,6 +147,7 @@ class DriverMC:
         ## Following two are for custom data
         self.path_to_data = self.config.get(        'custom', 'path_to_data', fallback=None)
         self.path_to_cov  = self.config.get(        'custom', 'path_to_cov',  fallback=None)
+        self.fn = self.config.get('custom', 'path_to_cov',  fallback="generic")
         return True
 
 

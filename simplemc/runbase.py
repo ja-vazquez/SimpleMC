@@ -207,6 +207,7 @@ def ParseDataset(datasets, **kwargs):
     """
     path_to_data = kwargs.pop('path_to_data', None)
     path_to_cov = kwargs.pop('path_to_cov', None)
+    fn = kwargs.pop('fn', 'generic')
 
     dlist = datasets.split('+')
     L = CompositeLikelihood([])
@@ -316,7 +317,8 @@ def ParseDataset(datasets, **kwargs):
             L.addLikelihood(RotationCurvesLike())
         elif name == 'custom':
             L.addLikelihood(GenericLikelihood(path_to_data=path_to_data,
-                                              path_to_cov=path_to_cov))
+                                              path_to_cov=path_to_cov,
+                                              fn=fn))
         else:
             print("Cannot parse data, unrecognizable part:", name)
             sys.exit(1)
