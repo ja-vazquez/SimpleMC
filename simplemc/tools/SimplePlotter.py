@@ -1,12 +1,14 @@
-import numpy as np
+#!/usr/bin/env python
+import sys
+from simplemc.tools.Simple_Plots import Simple_plots
 import matplotlib.pyplot as plt
+import numpy as np
 import webbrowser
 
 class SimplePlotter:
     def __init__(self, chainsdir, path, listpars, show=False, weights=None):
         self.chainsdir = chainsdir
         self.filename = path
-        print("filename")
         self.root = path.replace("{}/".format(chainsdir), "")
         self.listpars = listpars
         self.ndim = len(listpars)
@@ -115,6 +117,42 @@ class SimplePlotter:
 
         self.image = "{}_fgivenx.png".format(self.filename)
         self.saveFig()
+
+    def simplePlot(self, **kwargs):
+        """For mcmc chains"""
+        from simplemc.tools.Simple_Plots import Simple_plots
+        type = kwargs.pop('type', 'triangle')
+        roots = kwargs.pop('roots', [self.root])
+        #roots = ['LCDM_phy_HD_mcmc']
+        #parlist = ["Om", "h"]
+        # parlist is a par for 2d
+        # list of paramnames for triangle
+        # one or more for 1d
+        pars2d = kwargs.pop('pars1d', [['Om', 'h']])
+        pars1d = kwargs.pop('parslist', ['Om', 'h'])
+        parstriangle = kwargs.pop('parstriangle', ['Om', 'Obh2', 'h'])
+        label = kwargs.pop("label", [""])
+        colors = kwargs.pop("colors", ['red', 'blue', 'green', 'orange'])
+        #1d
+        smooth1d = kwargs.pop("smooth1d", 2)
+        normpeak1d = kwargs.pop("normpeak1d", True)
+        #2d
+        pbest2d = kwargs.pop("pbest2d", True)
+        solid2d = kwargs.pop("solid2d", True)
+        #triangle
+        colortriangle = kwargs.pop("colortriangle", "blue")
+        fig = Simple_plots(self.chainsdir+"/", roots, label=label, colors=colors)
+        if type == "triangle" or "tri":
+            fig.triangle(parstriangle, color=colortriangle)
+        elif type == "1D" or "1d":
+            fig.Plots1D(pars1d, smooth=smooth1d, normpeak=normpeak1d)
+        elif type == "2D" or "2d":
+            fig.Plots2D(pars2d, pbest=pbest2d, solid=solid2d)
+        else:
+            sys.exit("Invalid option")
+        self.image = "{}_{}_simple.png".format(self.filename, type)
+        self.saveFig()
+
 
     def readFile(self):
         """
