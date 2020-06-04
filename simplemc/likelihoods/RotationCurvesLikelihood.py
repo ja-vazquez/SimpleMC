@@ -16,7 +16,7 @@ class RotationCurvesLikelihood(BaseLikelihood):
         self.cov = sp.loadtxt(cov_filename,skiprows=0)
         assert(len(self.cov) == len(self.xx))
         self.icov = la.inv(self.cov)
-      ß
+
 
 
     def loglike(self):
