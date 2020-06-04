@@ -75,7 +75,7 @@ class DriverMC:
         T = ParseModel(self.model, custom_parameters=self.custom_parameters,
                                    custom_function=self.custom_function)
         L = ParseDataset(self.datasets, path_to_data=self.path_to_data,
-                                        path_to_cov=self.path_to_cov, fn=fn)
+                                        path_to_cov=self.path_to_cov, fn=self.fn)
 
         if self.prefact == "pre":  T.setVaryPrefactor()
         if self.varys8  == "True": T.setVarys8()
