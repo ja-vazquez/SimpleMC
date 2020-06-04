@@ -1,7 +1,7 @@
 
 
 from simplemc.analyzers.MaxLikeAnalyzer import MaxLikeAnalyzer
-from simplemc.analyzers.SimpleGenetic import SimpleGenetic
+#from simplemc.analyzers.SimpleGenetic import SimpleGenetic
 from simplemc.analyzers.MCMCAnalyzer import MCMCAnalyzer
 from simplemc.analyzers.dynesty import dynesty
 from simplemc.cosmo.Derivedparam import AllDerived
@@ -408,9 +408,13 @@ class DriverMC:
         self.outputpath = '{}_{}_optimization'.format(self.outputpath, self.analyzername)
         self.outputChecker()
         if iniFile:
-            withErrors = self.config.getboolean('MaxLike', 'withErrors', fallback=False)
+            withErrors = self.config.getboolean('maxlike', 'withErrors', fallback=False)
+            plot_par1  = self.config.get('maxlike', 'plot_par1', fallback=False)
+            plot_par2  = self.config.get('maxlike', 'plot_par2', fallback=False)
         else:
             withErrors = kwargs.pop('withErrors', False)
+            plot_par1  = kwargs.pop('plot_par1', False)
+            plot_par2   = kwargs.pop('plot_par2', False)
             if kwargs:
                 logger.critical('Unexpected **kwargs for MaxLike: {}'.format(kwargs))
                 logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
@@ -418,7 +422,7 @@ class DriverMC:
                             '\n\twithErrors (boolean) Default: False')
                 sys.exit(1)
         ti = time.time()
-        A = MaxLikeAnalyzer(self.L, withErrors=withErrors)
+        A = MaxLikeAnalyzer(self.L, self.model, withErrors=withErrors, param1=plot_par1, param2=plot_par2)
         params = self.T.printParameters(A.params)
         self.ttime = time.time() - ti
         self.result = ['maxlike', A, params]
