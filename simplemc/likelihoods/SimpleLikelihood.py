@@ -22,13 +22,13 @@ class SimpleLikelihood (BaseLikelihood):
 
     def loglike(self):
         #delta is the difference between theory and data
-        if fn == "generic":
+        if self.fn == "generic":
             tvec  = sp.array([self.theory_.genericModel(z) for z in self.xx])
-        elif fn == "h":
+        elif self.fn == "h":
             tvec = sp.array([100.0 * self.theory_.h * sp.sqrt(self.theory_.RHSquared_a(1.0 / (1 + z))) for z in self.zs])
-        elif fn == "fs8":
+        elif self.fn == "fs8":
             tvec = sp.array([self.theory_.fs8(z) for z in self.zs])
-        elif fn == "distance_mod":
+        elif self.fn == "distance_mod":
             tvec = sp.array([self.theory_.distance_modulus(z) for z in self.zs])
 
         delta = self.yy - tvec
