@@ -18,7 +18,7 @@ class SimpleLikelihood (BaseLikelihood):
         self.cov = sp.loadtxt(cov_filename,skiprows=0)
         assert(len(self.cov) == len(self.xx))
         self.icov = la.inv(self.cov)
-        self.fn = fn
+        #self.fn = fn
 
     def loglike(self):
         #delta is the difference between theory and data
@@ -42,6 +42,6 @@ class StraightLine(SimpleLikelihood):
             "simplemc/data/line_cov.txt")
 
 class GenericLikelihood(SimpleLikelihood):
-    def __init__(self, path_to_data, path_to_cov):
+    def __init__(self, path_to_data, path_to_cov, fn):
         SimpleLikelihood.__init__(self, "GenericData", path_to_data,
-                                  path_to_cov)
+                                  path_to_cov, fn)
