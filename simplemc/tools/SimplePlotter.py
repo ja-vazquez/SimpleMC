@@ -123,23 +123,22 @@ class SimplePlotter:
         from simplemc.tools.Simple_Plots import Simple_plots
         type = kwargs.pop('type', 'triangle')
         roots = kwargs.pop('roots', [self.root])
-        #roots = ['LCDM_phy_HD_mcmc']
-        #parlist = ["Om", "h"]
+
         # parlist is a par for 2d
         # list of paramnames for triangle
         # one or more for 1d
-        pars2d = kwargs.pop('pars1d', [['Om', 'h']])
-        pars1d = kwargs.pop('parslist', ['Om', 'h'])
-        parstriangle = kwargs.pop('parstriangle', ['Om', 'Obh2', 'h'])
         label = kwargs.pop("label", [""])
         colors = kwargs.pop("colors", ['red', 'blue', 'green', 'orange'])
         #1d
+        pars1d = kwargs.pop('pars1d', ['Om', 'h'])
         smooth1d = kwargs.pop("smooth1d", 2)
         normpeak1d = kwargs.pop("normpeak1d", True)
         #2d
+        pars2d = kwargs.pop('pars2d', [['Om', 'h']])
         pbest2d = kwargs.pop("pbest2d", True)
         solid2d = kwargs.pop("solid2d", True)
         #triangle
+        parstriangle = kwargs.pop('parstriangle', ['Om', 'Obh2', 'h'])
         colortriangle = kwargs.pop("colortriangle", "blue")
         fig = Simple_plots(self.chainsdir+"/", roots, label=label, colors=colors)
         if type == "triangle" or type == "tri":
