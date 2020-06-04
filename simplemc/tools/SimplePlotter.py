@@ -142,11 +142,11 @@ class SimplePlotter:
         #triangle
         colortriangle = kwargs.pop("colortriangle", "blue")
         fig = Simple_plots(self.chainsdir+"/", roots, label=label, colors=colors)
-        if type == "triangle" or "tri":
+        if type == "triangle" or type == "tri":
             fig.triangle(parstriangle, color=colortriangle)
-        elif type == "1D" or "1d":
+        elif type == "1D" or type == "1d":
             fig.Plots1D(pars1d, smooth=smooth1d, normpeak=normpeak1d)
-        elif type == "2D" or "2d":
+        elif type == "2D" or type == "2d":
             fig.Plots2D(pars2d, pbest=pbest2d, solid=solid2d)
         else:
             sys.exit("Invalid option")
