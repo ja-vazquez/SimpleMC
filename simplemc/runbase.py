@@ -25,6 +25,7 @@ from simplemc.models.EarlyDECosmology import EarlyDECosmology
 from simplemc.models.SlowRDECosmology import SlowRDECosmology
 from simplemc.models.BinnedWCosmology import BinnedWCosmology
 from simplemc.models.PhiCDMCosmology import PhiCosmology
+from simplemc.models.RotationCurves import RotationCurves
 #from STCDMCosmology import STCDMCosmology
 
 #from DGPCDMCosmology import DGPCDMCosmology
@@ -55,7 +56,7 @@ from simplemc.likelihoods.Compressedfs8Likelihood import fs8Diagram
 from .likelihoods.SimpleLikelihood import GenericLikelihood
 from .likelihoods.SimpleLikelihood import StraightLine
 from .likelihoods.GenericPantheonSNLikelihood import GenericPantheonSNLikelihood
-
+from .likelihoods.RotationCurvesLikelihood import RotationCurvesLike
 
 #Importance Sampling
 #from .CosmoMCImportanceSampler import *
@@ -177,6 +178,8 @@ def ParseModel(model, **kwargs):
         T = PhiCosmology(beta=-1, mu=-1, varyalpha=True, varyilam=True)
     elif model == "Phi_cos_1":
         T = PhiCosmology(beta=1, mu=-1, varyalpha=True, varyilam=True)
+    elif model == "Rotation":
+        T = RotationCurves()
     #elif model == 'ST':
     #    T = STCDMCosmology()
     else:
@@ -309,6 +312,8 @@ def ParseDataset(datasets, **kwargs):
             L.addLikelihood(StraightLine())
         elif name == 'CPantheon_15':
             L.addLikelihood(GenericPantheonSNLikelihood())
+        elif name == 'RC':
+            L.addLikelihood(RotationCurvesLike())
         elif name == 'custom':
             L.addLikelihood(GenericLikelihood(path_to_data=path_to_data,
                                               path_to_cov=path_to_cov))
