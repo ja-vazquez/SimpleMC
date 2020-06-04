@@ -1,28 +1,27 @@
-
 from .cosmich import cosmochain
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 import numpy as np
 
-rcParams.update({'backend': 'pdf',
-               'axes.labelsize': 15,
-               'text.fontsize': 15,
-               'xtick.labelsize': 15,
-               'ytick.labelsize': 15,
-               'legend.fontsize': 10,
-               'lines.markersize': 6,
-               'font.size': 20,
-               'text.usetex': True})
+# rcParams.update({'backend': 'pdf',
+#                'axes.labelsize': 15,
+#                'text.fontsize': 15,
+#                'xtick.labelsize': 15,
+#                'ytick.labelsize': 15,
+#                'legend.fontsize': 10,
+#                'lines.markersize': 6,
+#                'font.size': 20,
+#                'text.usetex': True})
 
 class Simple_plots(cosmochain):
     name = 'jav'
 
-    def __init__(self, dir_name, roots, label=None):
+    def __init__(self, dir_name, roots, label=None, **kwargs):
         self.dir_name   = dir_name
         self.roots      = roots
 
         self.label    = label
-        self.colors   = ['red', 'blue', 'green', 'orange']
+        self.colors   = kwargs.pop("colors", ['red', 'blue', 'green', 'orange'])
 
         if (type(roots) == type("ch")):
             self.Clist = cosmochain(dir_name + roots)
@@ -32,11 +31,14 @@ class Simple_plots(cosmochain):
 
 
     def Plots1D(self, params, **kwargs):
+        smooth = kwargs.pop("smooth", 2)
+        normpeak = kwargs.pop("normpeak", True)
+
         plt.figure(figsize=(15, 3*(len(params)//4+1)))
         for i, C in enumerate(self.Clist):
             for j, param in enumerate(params):
                 plt.subplot((len(params)-1)//4+1, 4, j+1)
-                xx, yy = C.GetHisto(param, smooth=2, NormPeak=True)
+                xx, yy = C.GetHisto(param, smooth=smooth, NormPeak=normpeak)
                 plt.plot(xx, yy, label=self.label[i], color=self.colors[i])
 
                 plt.xlabel(C.latexname(str(param)))
@@ -44,35 +46,38 @@ class Simple_plots(cosmochain):
 
         self.draw_frame()
         plt.tight_layout()
-        plt.savefig('Plot_1D.pdf')
+        #plt.savefig('Plot_1D.pdf')
         #plt.show()
 
 
 
     def Plots2D(self, params_pair, **kwargs):
+        pbest = kwargs.pop("pbest", True)
+        solid = kwargs.pop("solid", True)
         plt.figure(figsize=(5*len(params_pair), 4))
         for i, C in enumerate(self.Clist):
             for j, params in enumerate(params_pair):
                 plt.subplot(1, len(params_pair), j+1)
-                C.Plot2D(params[0], params[1], label=self.label[i], pbest=True,
-                         filled=self.colors[i], solid=True, conts=[0.68, 0.95])
+                C.Plot2D(params[0], params[1], label=self.label[i], pbest=pbest,
+                         filled=self.colors[i], solid=solid, conts=[0.68, 0.95])
 
                 plt.xlabel(C.latexname(params[0]))
                 plt.ylabel(C.latexname(params[1]))
 
         self.draw_frame()
         plt.tight_layout()
-        plt.savefig('Plot_2D.pdf')
+        #plt.savefig('Plot_2D.pdf')
         #plt.show()
 
 
 
-    def triangle(self, parlist, new_style=True):
+    def triangle(self, parlist, new_style=True, **kwargs):
+        color = kwargs.pop("color", "blue")
         rcParams.update({'xtick.labelsize': 12,
                          'ytick.labelsize': 12,})
         for i, C in enumerate(self.Clist):
-            C.plotAll(color='blue', parlist=parlist, new_style=new_style)
-            plt.savefig('Plot_triangle.pdf')
+            C.plotAll(color=color, parlist=parlist, new_style=new_style)
+            #plt.savefig('Plot_triangle.pdf')
             #plt.show()
 
 
