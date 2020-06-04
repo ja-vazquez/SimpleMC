@@ -18,7 +18,7 @@ class SimpleLikelihood (BaseLikelihood):
         self.cov = sp.loadtxt(cov_filename,skiprows=0)
         assert(len(self.cov) == len(self.xx))
         self.icov = la.inv(self.cov)
-        #self.fn = fn
+        self.fn = fn
 
     def loglike(self):
         #delta is the difference between theory and data
