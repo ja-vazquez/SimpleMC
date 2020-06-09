@@ -1,14 +1,6 @@
-# Base Cosmology class doesn't know about your
-# parameterization of the equation of state or densities or anything.
-# However, it does know about Hubble's constant at z=0 OR the prefactor
-# c/(H0*rd) which should be fit for in the case of "rd agnostic" fits.
-# That is why you should let it declare those parameters based on its settings
-##
-# However, to get the angular diameter distance you need to pass it
-# its Curvature parameter (Omega_k basically), so you need to update it
-#
 
-from .paramDefs import h_par, Pr_par, s8_par
+
+from simplemc.cosmo.paramDefs import h_par, Pr_par, s8_par
 from scipy.misc import derivative
 import scipy.integrate as intg
 from scipy import constants
@@ -21,6 +13,25 @@ class BaseCosmology:
     c_ = constants.c/1000.
 
     def __init__(self, h=h_par.value):
+        """
+        Base Cosmology class doesn't know about your
+        parameterization of the equation of state or densities or anything.
+        However, it does know about Hubble's constant at z=0 OR the prefactor
+        c/(H0*rd) which should be fit for in the case of "rd agnostic" fits.
+        That is why you should let it declare those parameters based on its settings
+
+        However, to get the angular diameter distance you need to pass it
+        its Curvature parameter (Omega_k basically), so you need to update it.
+
+        Also to use fs8 dataset you need to add s8 parameter
+        Parameters
+        ----------
+        h
+
+        Returns
+        -------
+
+        """
         self.Curv    = 0
         self.rd      = 149.50
         self.h       = h
@@ -29,6 +40,7 @@ class BaseCosmology:
         self.varys8  = False
         self.varyPrefactor = False
         BaseCosmology.updateParams(self, [])
+
 
     def setCurvature(self, R):
         self.Curv = R
@@ -51,6 +63,7 @@ class BaseCosmology:
             return self.prefact
         else:
             return self.c_/(self.rd*self.h*100)
+
 
     def setVarys8(self, T=True):
         self.varys8= T
