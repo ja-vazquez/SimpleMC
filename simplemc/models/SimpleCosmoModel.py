@@ -3,6 +3,10 @@ from simplemc.cosmo.Parameter import Parameter
 from simplemc.cosmo.paramDefs import Ok_par, w_par, wa_par
 import math as N
 
+
+#TODO There's SimpleModel, SimpleCosmology and Generic, unify them
+
+
 class SimpleCosmoModel(LCDMCosmology):
     def __init__(self):
         # Create a list with your parameters,

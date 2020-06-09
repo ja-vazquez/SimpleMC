@@ -1,7 +1,4 @@
-#
-# Jose Vazquez knows what this is... :)
-# I do not.
-#
+
 
 from simplemc.models.LCDMCosmology import LCDMCosmology
 from simplemc.cosmo.paramDefs import Ok_par, dw_par
@@ -9,7 +6,18 @@ from simplemc.cosmo.paramDefs import Ok_par, dw_par
 
 class SlowRDECosmology(LCDMCosmology):
     def __init__(self, varyw=True, varyOk=True):
-        # two parameters: Om and h
+        """
+        Jose Vazquez knows what this is... :)
+        I do not.
+        Parameters
+        ----------
+        varyw
+        varyOk
+
+        Returns
+        -------
+
+        """
 
         self.varyw  = varyw
         self.varyOk = varyOk
@@ -28,6 +36,7 @@ class SlowRDECosmology(LCDMCosmology):
         return l
 
 
+
     def updateParams(self, pars):
         ok = LCDMCosmology.updateParams(self, pars)
         if not ok:
@@ -41,6 +50,7 @@ class SlowRDECosmology(LCDMCosmology):
                 if (abs(self.Ok) > 1.0):
                     return False
         return True
+
 
 
     # this is relative hsquared as a function of a

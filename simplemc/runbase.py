@@ -18,21 +18,23 @@ from simplemc.models.PolyCDMCosmology import PolyCDMCosmology
 from simplemc.models.JordiCDMCosmology import JordiCDMCosmology
 from simplemc.models.WeirdCDMCosmology import WeirdCDMCosmology
 from simplemc.models.TiredLightDecorator import TiredLightDecorator
-from simplemc.models.SplineLCDMCosmology import SplineLCDMCosmology
 from simplemc.models.DecayLCDMCosmology import DecayLCDMCosmology
-from simplemc.models.StepCDMCosmology import StepCDMCosmology
 from simplemc.models.EarlyDECosmology import EarlyDECosmology
 from simplemc.models.SlowRDECosmology import SlowRDECosmology
-from simplemc.models.BinnedWCosmology import BinnedWCosmology
 from simplemc.models.PhiCDMCosmology import PhiCosmology
 from simplemc.models.RotationCurves import RotationCurves
 #from STCDMCosmology import STCDMCosmology
-
 #from DGPCDMCosmology import DGPCDMCosmology
 
+#Non-parametric functions
+from simplemc.models.SplineLCDMCosmology import SplineLCDMCosmology
+from simplemc.models.StepCDMCosmology import StepCDMCosmology
+from simplemc.models.BinnedWCosmology import BinnedWCosmology
+from simplemc.models.CompressPantheon import CompressPantheon
+
+
 #Generic model
-from simplemc.models.GenericCosmology import GenericCosmology
-from simplemc.models.GenericPantheon import GenericPantheon
+from simplemc.models.GenericModel import GenericModel
 from simplemc.models.SimpleCosmoModel import SimpleCosmoModel
 from simplemc.models.SimpleModel import SimpleModel
 
@@ -55,7 +57,7 @@ from simplemc.likelihoods.Compressedfs8Likelihood import fs8Diagram
 #from simplemc.likelihoods.GenericLikelihood import StraightLine
 from .likelihoods.SimpleLikelihood import GenericLikelihood
 from .likelihoods.SimpleLikelihood import StraightLine
-from .likelihoods.GenericPantheonSNLikelihood import GenericPantheonSNLikelihood
+from .likelihoods.CompressPantheonLikelihood import CompressPantheonLikelihood
 from .likelihoods.RotationCurvesLikelihood import RotationCurvesLike
 
 #Importance Sampling
@@ -106,6 +108,8 @@ def ParseModel(model, **kwargs):
     elif model == "nuwCDM":
         T = wCDMCosmology()
         T.setVaryMnu()
+    elif model == 'wDM':
+        T = wCDMCosmology()
     elif model == "waCDM":
         T = owa0CDMCosmology(varyOk=False)
     elif model == "owCDM":
@@ -148,16 +152,13 @@ def ParseModel(model, **kwargs):
         T = SlowRDECosmology(varyOk=False)
     elif model == "Binned":
         T = BinnedWCosmology()
-    elif model == 'wDM':
-        T = wCDMCosmology()
-    elif model == 'sline':
-        T = GenericCosmology()
-    elif model == 'custom':
-        T = SimpleModel(custom_parameters, custom_function)
-    elif model == 'simpleCosmo':
-        T = SimpleCosmoModel()
-    elif model == 'GPantheon':
-        T = GenericPantheon()
+    elif model == 'generic':
+        T = GenericModel()
+    elif model == 'CPantheon':
+        T = CompressPantheon()
+
+
+
     #elif model == 'DGP':
     #    T = DGPCDMCosmology()
     elif model == "Phi_exp_p0":
@@ -182,6 +183,13 @@ def ParseModel(model, **kwargs):
         T = RotationCurves()
     #elif model == 'ST':
     #    T = STCDMCosmology()
+
+
+    elif model == 'custom':
+        T = SimpleModel(custom_parameters, custom_function)
+    elif model == 'simpleCosmo':
+        T = SimpleCosmoModel()
+
     else:
         print("Cannot recognize model", model)
         sys.exit(1)
@@ -295,7 +303,7 @@ def ParseDataset(datasets, **kwargs):
             L.addLikelihood(WMAP9Likelihood())
         elif name == 'Pantheon':
             L.addLikelihood(PantheonSNLikelihood())
-        elif name == 'BPantheon_15':
+        elif name == 'BPantheon':
             L.addLikelihood(BinnedPantheon())
         elif name == 'SN':
             L.addLikelihood(BetouleSN())
@@ -312,7 +320,7 @@ def ParseDataset(datasets, **kwargs):
         elif name == 'dline':
             L.addLikelihood(StraightLine())
         elif name == 'CPantheon_15':
-            L.addLikelihood(GenericPantheonSNLikelihood())
+            L.addLikelihood(PantheonLikelihood())
         elif name == 'RC':
             L.addLikelihood(RotationCurvesLike())
         elif name == 'custom':

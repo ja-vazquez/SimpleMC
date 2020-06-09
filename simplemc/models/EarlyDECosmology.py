@@ -18,7 +18,7 @@ class EarlyDECosmology(LCDMCosmology):
         """
 
         self.userd_DE = userd_DE
-        print 'userd', userd_DE
+        print ('userd', userd_DE)
 
         self.varyw = varyw
         self.varyOde = varyOde
