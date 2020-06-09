@@ -1,11 +1,23 @@
-#
-# Simple class for dealing with Parameter.
-# Parameter has a name, a value, an error and some bounds
-# Names are also latex names.
-
 
 class Parameter:
     def __init__(self, name, value, err=0.0, bounds=None, Ltxname=None):
+        """
+        Simple class for dealing with Parameter.
+        Parameter has a name, a value, an error and some bounds
+        Names are also latex names.
+
+        Parameters
+        ----------
+        name: parameter name
+        value: default value
+        err: estimated error, in mcmc will be the step
+        bounds: priors
+        Ltxname: Latex name, use mainly for plotting
+
+        Returns
+        -------
+
+        """
         self.name = name
         if Ltxname:
             self.Ltxname = Ltxname

@@ -1,14 +1,15 @@
 
-import scipy.integrate as integrate
-import scipy as sp
-import sys
+
+
 
 class AllDerived:
-    """
-    Derived parameters, given the base ones.
-    """
     def __init__(self):
-        #self.cpars = cpars
+        """
+        Given base parameters, add some Derived ones.
+        Returns
+        -------
+
+        """
         self.Ol   = Derivedparam('Ol',    0, '\Omega_\Lambda*')
         self.H0   = Derivedparam('H0',    0, 'H_0*')
         self.Age  = Derivedparam('Age',   0, 'Age[Gyr]*')
@@ -48,13 +49,12 @@ class AllDerived:
         elif parname == 'Omh23':
             return self.Omh2(0.57, 2.34)
         elif parname == 'Age':
-            return integrate.quad(self.compuAge, 0, 10**5)[0]/3.24076E-20/(3.154E7*1.0E9)
+            return self.like.theory_.Age()
         else:
+            import sys
             sys.exit('Define derived parameter', parname)
 
 
-    def compuAge(self, z):
-        return 1.0/((1+z)*100.0*self.like.theory_.h*sp.sqrt(self.like.theory_.RHSquared_a(1.0/(1+z))))
 
 
     def Omh2(self, z1, z2):
@@ -67,6 +67,18 @@ class AllDerived:
 
 class Derivedparam:
     def __init__(self, name, value, Ltxname=None):
+        """
+        Auxiliary class, based on Parameter class
+        Parameters
+        ----------
+        name: parameter name
+        value: standard value
+        Ltxname: Latex name
+
+        Returns
+        -------
+
+        """
         self.name = name
         if Ltxname:
             self.Ltxname = Ltxname
