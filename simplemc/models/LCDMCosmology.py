@@ -1,7 +1,3 @@
-# This is LCDM cosmology
-# I didn't intend it that way, but it is used as a base class
-# for most other cosmologies, mostly because it treats Neutrinos and Radiation
-# hassle.
 
 import sys
 import scipy as sp
@@ -18,6 +14,28 @@ class LCDMCosmology(BaseCosmology, RadiationAndNeutrinos):
 
     def __init__(self, Obh2=Obh2_par.value, Om=Om_par.value, h=h_par.value, mnu=mnu_par.value,
                  Nnu=Nnu_par.value, degenerate_nu=False, disable_radiation=False, fixOm=False):
+        """
+        This is LCDM cosmology
+        I didn't intend it that way, but it is used as a base class
+        for most other cosmologies, mostly because it treats Neutrinos and Radiation
+        hassle.
+
+        Parameters
+        ----------
+        Obh2
+        Om
+        h
+        mnu
+        Nnu
+        degenerate_nu
+        disable_radiation
+        fixOm
+
+        Returns
+        -------
+
+        """
+
         # two parameters: Om and h
         self.Om    = Om
         self.Obh2  = Obh2
@@ -52,7 +70,7 @@ class LCDMCosmology(BaseCosmology, RadiationAndNeutrinos):
         self.noObh2prior = val
 
 
-    # my free parameters, note that h is defined in Base
+    # my free parameters, note that h is defined in BaseCosmology
     # to change parameters/priors see ParamDefs.py
     def freeParameters(self):
         Om_par.setValue(self.Om)
@@ -77,6 +95,7 @@ class LCDMCosmology(BaseCosmology, RadiationAndNeutrinos):
                 self.Om = p.value
             elif p.name == "Obh2":
                 self.Obh2 = p.value
+
         self.Ocb = self.Om-self.Omnu-self.Omrad
         if (not self.varyPrefactor):
             Nnu = self.Nnu()

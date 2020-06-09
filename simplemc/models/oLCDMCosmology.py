@@ -1,6 +1,4 @@
-# This is LCDM cosmology with optional
-# curvature which you can set up with
-# setVaryOk()
+
 
 from simplemc.models.LCDMCosmology import LCDMCosmology
 from simplemc.cosmo.paramDefs import Ok_par
@@ -8,7 +6,18 @@ from simplemc.cosmo.paramDefs import Ok_par
 class oLCDMCosmology(LCDMCosmology):
     # zeroDE forces Ol to zero.
     def __init__(self, zeroDE=False, kwargs_LCDM={}):
-        # two parameters: Om and h
+        """
+        This is LCDM cosmology with optional
+        curvature which you can set up with setVaryOk()
+        Parameters
+        ----------
+        zeroDE
+        kwargs_LCDM
+
+        Returns
+        -------
+
+        """
         self.Ok     = Ok_par.value
         self.zeroDE = zeroDE
         LCDMCosmology.__init__(self, **kwargs_LCDM)
@@ -17,10 +26,10 @@ class oLCDMCosmology(LCDMCosmology):
     # my free parameters. We add Ok on top of LCDM ones (we inherit LCDM)
     def freeParameters(self):
         Ok_par.setValue(self.Ok)
-        l = []
+        l = LCDMCosmology.freeParameters(self)
         if not self.zeroDE:
             l.append(Ok_par)
-        return l+LCDMCosmology.freeParameters(self)
+        return l
 
 
     def updateParams(self, pars):

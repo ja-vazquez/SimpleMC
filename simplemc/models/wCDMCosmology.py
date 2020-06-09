@@ -1,4 +1,4 @@
-# This is a CDM cosmology with constant eos w for DE
+
 
 from .LCDMCosmology import LCDMCosmology
 from simplemc.cosmo.paramDefs import w_par
@@ -6,7 +6,16 @@ from simplemc.cosmo.paramDefs import w_par
 
 class wCDMCosmology(LCDMCosmology):
     def __init__(self, varyw=True):
-        # two parameters: Om and h
+        """
+        This is a CDM cosmology with constant eos w for DE
+        Parameters
+        ----------
+        varyw
+
+        Returns
+        -------
+
+        """
 
         self.varyw = varyw
         self.w = w_par.value
