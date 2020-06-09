@@ -22,9 +22,11 @@ from simplemc.models.DecayLCDMCosmology import DecayLCDMCosmology
 from simplemc.models.EarlyDECosmology import EarlyDECosmology
 from simplemc.models.SlowRDECosmology import SlowRDECosmology
 from simplemc.models.PhiCDMCosmology import PhiCosmology
+from simplemc.models.DGPCDMCosmology import DGPCDMCosmology
 from simplemc.models.RotationCurves import RotationCurves
+
 #from STCDMCosmology import STCDMCosmology
-#from DGPCDMCosmology import DGPCDMCosmology
+
 
 #Non-parametric functions
 from simplemc.models.SplineLCDMCosmology import SplineLCDMCosmology
@@ -156,11 +158,13 @@ def ParseModel(model, **kwargs):
         T = GenericModel()
     elif model == 'CPantheon':
         T = CompressPantheon()
+    elif model == 'DGP':
+        T = DGPCDMCosmology()
+    elif model == "Rotation":
+        T = RotationCurves()
 
 
 
-    #elif model == 'DGP':
-    #    T = DGPCDMCosmology()
     elif model == "Phi_exp_p0":
         T = PhiCosmology(mu=0, alpha=1, varybeta=True)
     elif model == "Phi_pow_test_i":
@@ -179,8 +183,7 @@ def ParseModel(model, **kwargs):
         T = PhiCosmology(beta=-1, mu=-1, varyalpha=True, varyilam=True)
     elif model == "Phi_cos_1":
         T = PhiCosmology(beta=1, mu=-1, varyalpha=True, varyilam=True)
-    elif model == "Rotation":
-        T = RotationCurves()
+
     #elif model == 'ST':
     #    T = STCDMCosmology()
 
