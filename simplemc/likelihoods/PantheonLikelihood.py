@@ -2,10 +2,10 @@
 # This module calculates likelihood for the full SN Pantheon
 #
 
-from .BaseLikelihood import *
-import numpy as np
-import scipy.linalg as la
+from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 from scipy.interpolate import interp1d
+import scipy.linalg as la
+import numpy as np
 
 
 class CompressPantheonLikelihood(BaseLikelihood):
