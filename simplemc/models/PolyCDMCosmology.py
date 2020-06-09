@@ -1,5 +1,4 @@
-# This is LCDM cosmology with optional
-# free parameters on the Hubble function
+
 
 from simplemc.models.LCDMCosmology import LCDMCosmology
 from simplemc.cosmo.paramDefs import Ok_par, Om1_par, Om2_par
@@ -7,6 +6,19 @@ from simplemc.cosmo.paramDefs import Ok_par, Om1_par, Om2_par
 
 class PolyCDMCosmology(LCDMCosmology):
     def __init__(self, polyvary=['Om1','Om2','Ok'], Ok_prior=0.1):
+        """
+        This is LCDM cosmology with optional
+        free parameters on the Hubble function
+        Parameters
+        ----------
+        polyvary
+        Ok_prior
+
+        Returns
+        -------
+
+        """
+
         # Ok, LCDM has Omega_m, we also have Omega_1 and Omega_2
         # and Lambda is then what remains
         ##
