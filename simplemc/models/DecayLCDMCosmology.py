@@ -1,13 +1,11 @@
-# This is a CDM cosmology with a decaying
-# dark matter component.
-##
+
 
 import sys
 import numpy as np
 from scipy.integrate import odeint
 from scipy.interpolate import interp1d
 from scipy.optimize import minimize
-from .LCDMCosmology import LCDMCosmology
+from simplemc.models.LCDMCosmology import LCDMCosmology
 from simplemc.cosmo.paramDefs import xfrac_par, lambda_par
 
 
@@ -15,11 +13,24 @@ class DecayLCDMCosmology(LCDMCosmology):
     # note that if we don't varyOr, it will be set so that
     # density at early a is zero.
     def __init__(self, varylam=True, varyxfrac=True, xfrac=xfrac_par.value):
+        """
+        This is a CDM cosmology with a decaying
+        dark matter component.
+        Parameters
+        ----------
+        varylam
+        varyxfrac
+        xfrac
+
+        Returns
+        -------
+
+        """
 
         self.varylam   = varylam
         self.varyxfrac = varyxfrac
 
-        self.lam = lambda_par.value
+        self.lam   = lambda_par.value
         self.xfrac = xfrac
 
         LCDMCosmology.__init__(self)

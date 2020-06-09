@@ -1,16 +1,25 @@
-##
-# This si a cosmology where w(z) is defined by splines.
-##
 
 from scipy.interpolate import InterpolatedUnivariateSpline
-from .LCDMCosmology import LCDMCosmology
+from simplemc.models.LCDMCosmology import LCDMCosmology
 from simplemc.cosmo.paramDefs import Sp1_par, Sp2_par, Sp3_par, Sp4_par
 import math as N
 
 
 class SplineLCDMCosmology(LCDMCosmology):
     def __init__(self, varySp1=True, varySp2=True, varySp3=True, varySp4=True):
+        """
+        This si a cosmology where rho_de(z) is defined by splines.
+        Parameters
+        ----------
+        varySp1
+        varySp2
+        varySp3
+        varySp4
 
+        Returns
+        -------
+
+        """
         self.varySp1 = varySp1
         self.varySp2 = varySp2
         self.varySp3 = varySp3

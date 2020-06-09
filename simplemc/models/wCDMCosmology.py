@@ -1,6 +1,6 @@
 
 
-from .LCDMCosmology import LCDMCosmology
+from simplemc.models.LCDMCosmology import LCDMCosmology
 from simplemc.cosmo.paramDefs import w_par
 
 
