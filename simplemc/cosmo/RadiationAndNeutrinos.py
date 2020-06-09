@@ -6,10 +6,9 @@
 ##
 
 
-from .paramDefs import mnu_par, Nnu_par
-from .NuDensity import ZeroNuDensity, NuDensity
+from simplemc.cosmo.NuDensity import ZeroNuDensity, NuDensity
 from simplemc.cosmo import cosmoApprox as CA
-from .paramDefs import mnu_par, Nnu_par
+from simplemc.cosmo.paramDefs import mnu_par, Nnu_par
 import sys
 
 
@@ -17,12 +16,28 @@ class RadiationAndNeutrinos:
     # type this shit into google
     # 8*pi^5*(boltzmann constant)^4/(15*(h*c)^3))*(1 Kelvin)**4/(3*(100 km/s/Mpc)^2/(8*Pi*G)*(speed of light)^2)
     # to get
-    omrad_pref_ = 4.48130979e-7*CA.Tcmb**4
+    omrad_fac   = 4.48130979e-7
+    omrad_pref_ = omrad_fac*CA.Tcmb**4
     # check  4.48130979e-7*(2.725**4)=2.47099e-05 c.f. Doddie p. 41
     # now Omrad= omread_pref_/h**2
 
     def __init__(self, mnu=mnu_par.value, Nnu=Nnu_par.value,
                  varyMnu=False, varyNnu=False, degenerate=False, disable=False):
+        """
+        Class for neutrinos, Mnu and Nnu
+        Parameters
+        ----------
+        mnu: standard value for the mass of neutrinos
+        Nnu: standard value for the number of families
+        varyMnu: Whether varying mass for neutrinos
+        varyNnu: Whether varying families for neutrinos
+        degenerate
+        disable: set radiation to zero
+
+        Returns
+        -------
+
+        """
         self.disabled = disable
         if (self.disabled):
             self.Omrad     = 0
@@ -32,7 +47,7 @@ class RadiationAndNeutrinos:
             return
         self.varyMnu = False
         self.varyNnu = False
-        self.NuDensity = NuDensity(CA.Tcmb, Nnu, mnu, degenerate)
+        self.NuDensity = NuDensity(CA.Tcmb, Nnu, mnu, degenerate, fact=self.omrad_fac)
         # print "Relic neutrino density:",self.NuDensity.omnuh2today
 
 

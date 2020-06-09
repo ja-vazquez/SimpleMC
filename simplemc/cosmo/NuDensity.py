@@ -1,7 +1,4 @@
-#
-# This module calculates the predictions for the evolution
-# of neutrino energy densities.
-#
+
 
 from __future__ import print_function
 from simplemc.cosmo import cosmoApprox as CA
@@ -10,20 +7,28 @@ from scipy import constants as ct
 from scipy.integrate import quad
 from scipy.special import zeta
 import scipy as sp
-
-
 #from numba import autojit
+
 
 class NuIntegral:
     def __init__(self):
-        "this integrates the stupid integral"
+        """
+
+        This module calculates the predictions for the evolution
+        of neutrino energy densities.
+
+        Returns
+        -------
+        this computes the integral
+        """
+
         print("Initalizing nu density look up table...", end=' ')
         rat = 10**(sp.arange(-4, 5, 0.1))
         intg = []
         for r in rat:
             # min below is to supress the stupid overlow warning
-            res = quad(lambda x: sp.sqrt(x*x+r**2) /
-                       (sp.exp(min(x, 400))+1.0)*x**2, 0, 1000)
+            res = quad(lambda x: sp.sqrt(x**2 + r**2) /
+                       (sp.exp(min(x, 400)) + 1.0)*x**2, 0, 1000)
             intg.append(res[0]/(1+r))
         intg = sp.array(intg)
         intg *= 7/8./intg[0]  # the right normalization
@@ -45,7 +50,7 @@ class NuIntegral:
 
 
 class ZeroNuDensity:
-    # fake class that returns zeros if want to disable this
+    #Fake class that returns zeros if want to disable this
     def __init__(self):
         return
 
@@ -56,7 +61,20 @@ class ZeroNuDensity:
 class NuDensity:
     I = NuIntegral()
 
-    def __init__(self, TCMB, Nnu=3.046, mnu=0.06, degenerate=False):
+    def __init__(self, TCMB, Nnu=3.046, mnu=0.06, degenerate=False, fact=None):
+        """
+        Compute Density parameter for neutrinos
+        Parameters
+        ----------
+        TCMB: Temperature of the CMB
+        Nnu: Families of neutrinos
+        mnu: Sum of the mass
+        degenerate: Combinations of massive neutrinos
+
+        Returns
+        -------
+
+        """
         # self.I=NuIntegral()
         # one neutrino species
         self.mnu_ = mnu
@@ -68,6 +86,7 @@ class NuDensity:
         # one neutrino worth of radiation at the nominal temperature, or heated on?
         # See CAMB notes Eq. 4-7.
 
+        #internal degrees of freedom
         self.gfact    = (3.046/3.0)
         self.gfact_o4 = self.gfact**(0.25)
         # ideal neutrino temp
@@ -75,7 +94,7 @@ class NuDensity:
         # actual neutrino temp
         self.Tnu      = self.Tnu0*self.gfact_o4
         # same for prefactors
-        self.prefix0  = 4.48130979e-7 * TCMB**4 * ((4./11.)**(4./3.))
+        self.prefix0  = fact * TCMB**4 * ((4./11.)**(4./3.))
         self.prefix   = self.prefix0*self.gfact
 
         self.degenerate = degenerate
@@ -102,9 +121,18 @@ class NuDensity:
 
     # @autojit
     def rho(self, a):
-        # This returns the density at a normalized so that
-        # we get nuh2 at a=0
-        # (1 eV) / (Boltzmann constant * 1 kelvin) = 11 604.5193
+        """
+        Neutrinos density
+        Parameters
+        ----------
+        a
+
+        Returns
+        -------
+        This returns the density at a normalized so that
+        we get nuh2 at a=0
+        (1 eV) / (Boltzmann constant * 1 kelvin) = 11 604.5193
+        """
 
         if (self.mnuone == 0):
             return self.Nnu_*7/8.*self.prefix0/a**4
@@ -114,9 +142,9 @@ class NuDensity:
         # Here for massive we use 1*prefix (accounting for 1.015 in Tnu)
         # For massles we use Neff*prefix0 (so we account
         if self.degenerate:
-            return 3*self.I.SevenEights(mnuOT)*self.prefix/a**4 + (self.Nnu_-3.014)*7/8.*self.prefix0/a**4
+            return 3*self.I.SevenEights(mnuOT)*self.prefix/a**4 + (self.Nnu_ -3.014)*7/8.*self.prefix0/a**4
         else:
-            return ((self.I.SevenEights(mnuOT)*self.prefix+(self.Nnu_-1.015)*7/8.*self.prefix0))/a**4
+            return ((self.I.SevenEights(mnuOT)*self.prefix+(self.Nnu_ -1.015)*7/8.*self.prefix0))/a**4
 
 
 

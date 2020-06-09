@@ -32,6 +32,7 @@ class AllDerived:
         self.Orc.setValue(  self.computeDerived('Orc'))
         return self.list
 
+
     def computeDerived(self, parname):
         if parname == 'Ol':
             for par in self.cpars:
