@@ -1,13 +1,25 @@
-# This is CDM cosmology with w, wa and Ok
 
 
-import math as N
 from simplemc.models.LCDMCosmology import LCDMCosmology
 from simplemc.cosmo.paramDefs import w_par, wa_par, Ok_par
+import math as N
+
+#TODO Add more DE EoS for comparison
 
 class owa0CDMCosmology(LCDMCosmology):
     def __init__(self, varyw=True, varywa=True, varyOk=True):
-        # three parameters: w, wa, Ok
+        """
+        This is CDM cosmology with w, wa and Ok
+        Parameters
+        ----------
+        varyw
+        varywa
+        varyOk
+
+        Returns
+        -------
+
+        """
 
         self.varyw  = varyw
         self.varywa = varywa

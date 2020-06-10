@@ -907,7 +907,7 @@ class Sampler(object):
         """
         self.like = simpleLike
         self.derived = addDerived
-        self.outputname = outputname
+        self.outputname = outputname +'_live'
         self.cpars     = self.like.freeParameters()
 
         if (self.like.name() == "Composite"):

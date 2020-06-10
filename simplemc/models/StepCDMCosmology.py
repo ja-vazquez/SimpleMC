@@ -1,18 +1,22 @@
-#
-# This is a cosmology with steps in rho_DE(z).
-#
 
-import numpy
-from .LCDMCosmology import LCDMCosmology
+
+from simplemc.models.LCDMCosmology import LCDMCosmology
 from simplemc.cosmo.paramDefs import *
+import numpy as np
 
 
 class StepCDMCosmology(LCDMCosmology):
     def __init__(self):
+        """
+        This is a cosmology with steps in rho_DE(z).
+        Returns
+        -------
+
+        """
 
         self.NZ = int(step_nz_par.value)
-        self.Z  = numpy.zeros((self.NZ))  # redshifts of bin boundaries
-        self.R  = numpy.zeros((self.NZ+1))  # rho_de/rho_c in bins
+        self.Z  = np.zeros((self.NZ))  # redshifts of bin boundaries
+        self.R  = np.zeros((self.NZ+1))  # rho_de/rho_c in bins
 
         # see ParamDefs.py for the values of parameters
         if(self.NZ > 0):

@@ -1,13 +1,25 @@
 #
 # This module calculates likelihood for a Generic DATA.
 #
-from .BaseLikelihood import BaseLikelihood
+from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
 import scipy as sp
 
 #uncoment lines for use a covariance matrix
 class RotationCurvesLikelihood(BaseLikelihood):
     def __init__(self, name, values_filename, cov_filename):
+        """
+        Class that includes the likelihood for a  Particular rotation curve: NGC2403
+        Parameters
+        ----------
+        name
+        values_filename
+        cov_filename
+
+        Returns
+        -------
+
+        """
         BaseLikelihood.__init__(self,name)
         print("Loading ", values_filename)
         data = sp.loadtxt(values_filename)

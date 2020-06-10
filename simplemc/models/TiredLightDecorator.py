@@ -1,7 +1,6 @@
-##
-# This helper class adds a "tired light" parameter
-# to any class
-##
+
+
+
 from simplemc.cosmo.paramDefs import beta_par
 import math as N
 
@@ -9,6 +8,17 @@ import math as N
 def TiredLightDecorator(LikeInstance):
     class TiredLightLikelihood(LikeInstance.__class__):
         def __init__(self, LikeInstance):
+            """
+            This helper class adds a "tired light" parameter
+            to any class
+            Parameters
+            ----------
+            LikeInstance
+
+            Returns
+            -------
+
+            """
             # copy  instance into my class
             self.__dict__.update(LikeInstance.__dict__)
             # save type since we need to call parent type

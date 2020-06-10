@@ -1,5 +1,4 @@
-# This is LCDM cosmology with optional
-# free parameters on the Hubble function
+
 
 from simplemc.models.LCDMCosmology import LCDMCosmology
 from simplemc.cosmo.paramDefs import Ok_par, Om1_par, Om2_par
@@ -7,6 +6,19 @@ from simplemc.cosmo.paramDefs import Ok_par, Om1_par, Om2_par
 
 class PolyCDMCosmology(LCDMCosmology):
     def __init__(self, polyvary=['Om1','Om2','Ok'], Ok_prior=0.1):
+        """
+        This is LCDM cosmology with optional
+        free parameters on the Hubble function
+        Parameters
+        ----------
+        polyvary
+        Ok_prior
+
+        Returns
+        -------
+
+        """
+
         # Ok, LCDM has Omega_m, we also have Omega_1 and Omega_2
         # and Lambda is then what remains
         ##
@@ -28,6 +40,7 @@ class PolyCDMCosmology(LCDMCosmology):
         Ok_par.setError(0.7)
         if self.varyOk:  l.append(Ok_par)
         return l
+
 
 
     def updateParams(self, pars):
@@ -53,6 +66,7 @@ class PolyCDMCosmology(LCDMCosmology):
         # ok, there is really no point in adding neutrinos to this
         # as 3/23 -- note Om1 and Om2 used to be swapped
         return (self.Om/a**3+self.Om2/a**2+self.Ok/a**2+self.Om1/a+(1-self.Om-self.Om1-self.Om2-self.Ok))
+
 
 
     def prior_loglike(self):

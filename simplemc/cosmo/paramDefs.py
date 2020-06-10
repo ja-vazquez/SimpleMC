@@ -7,7 +7,7 @@
 ##
 
 
-from .Parameter import Parameter
+from simplemc.cosmo.Parameter import Parameter
 
 # Parameters are value, variation, bounds
 Om_par   = Parameter("Om",   0.3038,  0.05,    (0.05, 0.5),   "\Omega_m")

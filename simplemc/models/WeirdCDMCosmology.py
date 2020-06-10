@@ -1,19 +1,32 @@
-# This is what is called Oscillating model or whatever
-# It is really a scam to decrease lya BAO chi2.
 
 
-import math as N
-from .LCDMCosmology import LCDMCosmology
+
+
+
 from simplemc.cosmo.paramDefs import Ok_par, mu_par, Amp_par, sig_par
-
+from simplemc.models.LCDMCosmology import LCDMCosmology
+import math as N
 
 class WeirdCDMCosmology(LCDMCosmology):
     def __init__(self, varymu=True, varyAmp=True, varysig=True, varyCos=True):
-        # several parameters:
+        """
+        This is what is called Oscillating model or whatever
+        It is really a scam to decrease lya BAO chi2.
+        This is "original cosmology" -- outside gaussian not much will change.
+        Parameters
+        ----------
+        varymu
+        varyAmp
+        varysig
+        varyCos
 
+        Returns
+        -------
+
+        """
         # we start with false here...
         varyOk = False
-        # this is my "original cosmology" -- outside gaussian not much will change.
+
 
         self.varyOk  = varyOk
         self.varymu  = varymu
@@ -63,7 +76,16 @@ class WeirdCDMCosmology(LCDMCosmology):
 
 
     def Weird(self, a):
-        # return W(z) and dW(z)/dz
+        """
+
+        Parameters
+        ----------
+        a
+
+        Returns
+        -------
+        return W(z) and dW(z)/dz
+        """
         z   = 1.0/a-1
         lmu = N.log(self.mu+1)
         lz  = N.log(z+1)

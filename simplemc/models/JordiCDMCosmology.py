@@ -1,7 +1,4 @@
-#
-# This is a cosmological model that Jordi Miralda came up with.
-# The world is full of mystery.
-#
+
 
 import sys
 import math as N
@@ -11,6 +8,15 @@ from simplemc.cosmo.paramDefs import Ok_par, q_par, za_par, zb_par, wd_par, Od_p
 
 class JordiCDMCosmology(LCDMCosmology):
     def __init__(self):
+        """
+        #
+        This is a cosmological model that Jordi Miralda came up with.
+        The world is full of mystery.
+
+        Returns
+        -------
+
+        """
         # Adding bunch of parameters.
         self.Ok = Ok_par.value
         self.q  = q_par.value

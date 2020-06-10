@@ -80,7 +80,7 @@ def rd_anderson_approx(obh2, ocbh2, onuh2, Nnu):
 
 def rd_cuesta_approx(obh2, ocbh2, onuh2, Nnu):
     if (abs(Nnu-3) > 0.1):
-        print("ERROR, Tony Cuesta says: 'not in this ceral box.'")
+        print("ERROR, Tony Cuesta says: 'not in this cereal box.'")
         print("Nnu=", Nnu)
         sys.exit(1)
     return 55.154 / (ocbh2**0.25351 * (obh2)**0.12807 * N.exp(

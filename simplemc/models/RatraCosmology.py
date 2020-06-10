@@ -7,6 +7,7 @@ from scipy.interpolate import interp1d
 from scipy.integrate import odeint
 
 import matplotlib.pyplot as plt
+#TODO In construction, not updated on github but in my computer
 
 class SureshCosmology(LCDMCosmology):
     def __init__(self, varyalpha = True, varyOk=False):

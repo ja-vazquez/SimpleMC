@@ -1,14 +1,25 @@
-# This is a CDM cosmology with binned w
-# Still testing the file -- don't trust it
 
-from .LCDMCosmology import LCDMCosmology
+
+from simplemc.models.LCDMCosmology import LCDMCosmology
+from simplemc.cosmo.Parameter import Parameter
 from scipy.interpolate import interp1d
 from scipy.integrate import quad
-from simplemc.cosmo.Parameter import Parameter
 import numpy as np
 
 class BinnedWCosmology(LCDMCosmology):
     def __init__(self, dz=0.2, zmax=1.0):
+        """
+        This is a CDM cosmology with binned w
+        Still testing the file but it seems to be working just fine
+        Parameters
+        ----------
+        dz
+        zmax
+
+        Returns
+        -------
+
+        """
         # bunch of parameters:
         self.zbins  = np.arange(0, zmax, dz)
         self.Nb     = len(self.zbins)
@@ -44,14 +55,15 @@ class BinnedWCosmology(LCDMCosmology):
 
 
     def integrateOmega(self):
-        abins = np.hstack((1./(1+self.zbins), [1e-4]))
-        w = np.hstack((self.wvals, [self.wvals[-1]]))
-        itg = interp1d(np.log(abins), 3*(1+w))
+        abins  = np.hstack((1./(1+self.zbins), [1e-4]))
+        w      = np.hstack((self.wvals, [self.wvals[-1]]))
+        itg    = interp1d(np.log(abins), 3*(1+w))
         oabins = np.hstack((np.logspace(-4, -1, 10), np.linspace(0.1, 1, 100)))
         olnrho = [quad(itg, np.log(a), 0)[0] for a in oabins]
         print(1/oabins**4)
         print(np.exp(olnrho))
         self.DEomega = interp1d(oabins, np.exp(olnrho))
+
 
 
     # this is relative hsquared as a function of a

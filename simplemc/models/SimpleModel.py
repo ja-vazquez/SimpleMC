@@ -1,5 +1,9 @@
 from simplemc import logger
 
+
+#TODO There's SimpleModel, SimpleCosmology and Generic, unify them
+
+
 class SimpleModel:
     def __init__(self, parameters, function):
         """

@@ -1,43 +1,18 @@
 
-#from __future__ import print_function
-from simplemc.cosmo.paramDefs import *
-import sys
+
+from simplemc.cosmo.paramDefs import zbin_par
 import numpy as np
-import matplotlib.pyplot as plt
 
-class BaseGenericPModel:
+
+class CompressPantheon():
     def __init__(self):
-        #This class may be used to add your own model
-        BaseGenericPModel.updateParams(self,[])
+        """
+        Class to compress Pantheon dataset (or any other) into a small number of bins.
+        It uses bins and an interpolation.
+        Returns
+        -------
 
-    def freeParameters(self):
-        l = []
-        return l
-
-    def printFreeParameters(self):
-        print("Free parameters and values currently accepted:")
-        self.printParameters(self.freeParameters())
-
-    def printParameters(self, params):
-        for p in params:
-            print(p.name, '=' , p.value , '+/-' , p.error)
-
-    def updateParams(self, pars):
-        return True
-
-
-    def prior_loglike(self):
-        return 0 
-
-    ## this is relative hsquared as a function of a
-    ## i.e. H(z)^2/H(z=0)^2
-    def genericModel(self,a):
-        print("You should not instatiate BaseGenericModel")
-        sys.exit(1)
-
-
-class GenericPantheon(BaseGenericPModel):
-    def __init__(self):
+        """
         self.zini    = 0 # 13.9
         self.parvals = zbin_par
 
@@ -47,19 +22,26 @@ class GenericPantheon(BaseGenericPModel):
 
         self.zvals = np.logspace(np.log10(0.01),np.log10(2.261), len(self.parvals)+1)
 
-        BaseGenericPModel.__init__(self)
-
 
 
     # my free params (parameters/priors see ParamDefs.py)
     def freeParameters(self):
-        l = BaseGenericPModel.freeParameters(self)
+        l = []
         l+= self.parvals
         return l
 
 
+    def printFreeParameters(self):
+        print("Free parameters and values currently accepted:")
+        self.printParameters(self.freeParameters())
+
+
+    def printParameters(self, params):
+        for p in params:
+            print(p.name, '=' , p.value , '+/-' , p.error)
+
+
     def updateParams(self, pars):
-        #BaseGenericModel.updateParams(self,pars)
         for p in pars:
             i = self.index[p.name]
             self.zs[i] = p.value
@@ -83,6 +65,8 @@ class GenericPantheon(BaseGenericPModel):
         else:
             y = 0
         return y
+
+
 
     def prior_loglike(self):
         return 0
