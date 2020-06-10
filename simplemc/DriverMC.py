@@ -1,7 +1,7 @@
 
 
 from simplemc.analyzers.MaxLikeAnalyzer import MaxLikeAnalyzer
-#from simplemc.analyzers.SimpleGenetic import SimpleGenetic
+from simplemc.analyzers.SimpleGenetic import SimpleGenetic
 from simplemc.analyzers.MCMCAnalyzer import MCMCAnalyzer
 from simplemc.analyzers.dynesty import dynesty
 from simplemc.cosmo.Derivedparam import AllDerived
@@ -18,7 +18,8 @@ import time
 #TODO import corner
 #TODO keras neural network
 #TODO GR criteria in .ini file
-
+#TODO Remove Nestle?
+#TODO join genetic likelihood with the other one
 class DriverMC:
     """
         This class is the manager and wrapper between all
@@ -26,16 +27,57 @@ class DriverMC:
     """
     def __init__(self, iniFile=None, **kwargs):
         """
-        Read the input parameters or ini file
-        Parameters
-        ----------
-        iniFile
-        kwargs
+        Read the input parameters or ini file.
 
-        Returns
-        -------
+        Parameters
+        -----------
+        iniFile: ini file
+            Text file with ini extension that contains all the settings
+            to SimpleMC. If use this option the following kwargs not are necessary.
+
+        chainsdir : str
+            Directory for the outputs.
+        model : str
+            Choose the model {LCDOM, LCDMasslessnu, nuLCDM, NeffLCDM, noradLCDM, nuoLCDM, nuwLCDM, oLCDM, wCDM, waCDM, owCDM,"\
+            owaCDM, JordiCDM, WeirdCDM, TLight, StepCDM, Spline, PolyCDM, fPolyCDM, Decay, Decay01, Decay05,"\
+            EarlyDE, EarlyDE_rd_DE, SlowRDE}
+
+        prefact :str
+            {phy, pre}
+
+        vary8 : bool
+            Default False
+
+        datasets str:
+            Default HD (Hubble distance, i. e. Cosmic Chronometers).
+            You can combine HD+SN+BBAO+Planck+UnionSN+...
+
+        analyzername : str
+            The name of the analyzer. It can be a sampler: {mcmc, nested, emcee}
+            or a optimizer: {maxlike, genetic}
+
+        addDerived : bool
+            True generates at the flight some derived parameters (such as
+            Omega_Lambda or Universe Age, and save them in the output text file.
+
+        custom_parameters : list
+            List of Parameter instances.
+
+        custom_function : method
+            Custom method that reads a parameter list and a vector x, unzip the list,
+            and return a f(x) in terms of the parameters.
+
+        path_to_data : str
+            path of a dataset text file.
+
+        path_to_cov : str
+            path of a covariance matrix text file.
+
+        fn : str
+            Type of function to use in the likelihood due a custom data {"generic", "hz", ...}.
 
         """
+
         self.iniFile = iniFile
         if self.iniFile:    self.iniReader(iniFile)
         else:
@@ -100,6 +142,21 @@ class DriverMC:
 
 
     def executer(self, **kwargs):
+        """
+        This is a wrapper of the runners of the analyzer in order to make
+        easier the execution, mainly if is through an ini file.
+
+        Parameters
+        ----------
+        All the parameters of the methods:
+
+            - mcmcRunner
+            - nestedRunner
+            - emceeRunner
+            - geneticRunner
+            - maxlikeRunner
+
+        """
         if self.analyzername == 'mcmc':
             self.mcmcRunner(iniFile=self.iniFile, **kwargs)
         elif self.analyzername == 'nested':
@@ -119,15 +176,13 @@ class DriverMC:
 
     def iniReader(self, iniFile):
         """
-         It reads the ini file.
-        Parameters
-            ini. file
-        ----------
-        iniFile
+        It reads the ini file through configparser.
 
-        Returns
-        -------
-            settings
+        Parameters
+        -----------
+        iniFile : file .ini
+            Text file with settings
+
         """
         import configparser
         self.config = configparser.ConfigParser()
@@ -160,8 +215,28 @@ class DriverMC:
 
     def mcmcRunner(self, iniFile=None, **kwargs):
         """
-            This method calls MCMCAnalyzer.
-            Returns [MCMCAnalyzer object, time, evidence via MCEvidence (if it is possible)]
+        This method calls MCMCAnalyzer.
+
+        Parameters
+        ------------
+        nsamp : int
+            Number of mcmc steps.
+
+        skip : int
+            Burn-in.
+
+        temp : float
+            Temperature for the weights.
+
+        chainno : int
+            Number of chains in parallel.
+
+        GRstop : float
+            Gelman Rubin criteria for stopping (0, 0.1].
+
+        evidence : bool
+            True if after the mcmc chain was generated,
+            estimates bayesian evidence throug MCEvidence (arXiv:1704.03472).
 
         """
         if iniFile:
@@ -185,7 +260,7 @@ class DriverMC:
                             'MCMC executer kwargs are:\n\tnsamp (int) Default: 50000\n\t'
                             'skip (int) Default 300\n\ttemp (float) Default: 2.0'
                             '\n\tchainno (int) Default: 1\n\t'
-                            'evidence (boolean) Default: False')
+                            'evidence (bool) Default: False')
                 sys.exit(1)
                 #raise TypeError('Unexpected **kwargs: {}'.format(kwargs))
         logger.info("\n\tnsamp: {}\n\tskip: {}\n\t"
@@ -226,10 +301,40 @@ class DriverMC:
 
     def nestedRunner(self, iniFile=None, **kwargs):
         """
-            This method calls Dynesty samplers:
-            --
-            -- MULTINEST
-            bound : {'none', 'single', 'multi', 'balls', 'cubes'},
+        This method calls Dynesty samplers.
+
+        Parameters
+        ___________
+        engine : str
+            Use dynesty or nestle library
+
+        dynamic : bool
+            Default `False`
+
+        neuralNetwork : bool
+            If True use a pybambi neural network.
+            Default: False.
+
+        nestedType : str
+            {single, multi, balls, cubes}
+
+        nlivepoints : int
+            Number of live points.
+
+        accuracy : float
+            Stopping criteria in terms of logz.
+
+        nproc : int
+            Number of processors to parallelize.
+            Use 1 or 0 if you don't want parallelise.
+
+        priortype : str
+            Gaussian or uniform prior {'g', 'u'}.
+
+        nsigma : float
+            Sigma for gaussian priors.
+
+
         """
         if iniFile:
             self.engine = self.config.get(          'nested', 'engine',       fallback='dynesty')
@@ -270,9 +375,9 @@ class DriverMC:
                             'Nested executer options are:\n\tnlivepoints (int) Default: 1024\n\t'
                             'accuracy (float) Default: 0.01\n\tpriortype ({"u", "g"}) Default: "u"\n\t'
                             'nestedType {"multi", "single", "balls", "cubes"} Default: "multi"\n\t'
-                            'neuralNetwork (boolean) Default: True\n\t'
-                            'dynamic (boolean) Default: False\n\t'
-                            'addDerived (boolean) Default: True\n\t'
+                            'neuralNetwork (bool) Default: True\n\t'
+                            'dynamic (bool) Default: False\n\t'
+                            'addDerived (bool) Default: True\n\t'
                             'engine {"dynesty", "nestle"} Default: "dynesty"')
                 sys.exit(1)
 
@@ -344,6 +449,24 @@ class DriverMC:
 ##---------------------- EMCEE ----------------------
 
     def emceeRunner(self, iniFile=None, **kwargs):
+        """
+        This method calls the emcee library to use ensamble sampler.
+
+        Parameters
+        -----------
+        walkers : int
+            Number of walkers or ensambles.
+
+        nsamp : int
+            Number of mcmc steps for each walker.
+
+        burnin : int
+            skip steps.
+
+        nproc : int
+            Number of processors in order to parallelise.
+
+        """
         if iniFile:
             walkers = self.config.getint('emcee', 'walkers', fallback=500)
             nsamp   = self.config.getint('emcee', 'nsamp', fallback=20000)
@@ -406,6 +529,18 @@ class DriverMC:
 ##---------------------- MaxLikeAnalizer ----------------------
 
     def maxLikeRunner(self, iniFile=None, **kwargs):
+        """
+        It calls MaxLikeAnalyzer class.
+
+        Parameters
+        ----------
+        withErrors : bool
+
+        plot_par1 : bool
+
+        plot_par2 : bool
+
+        """
         if self.analyzername is None: self.analyzername = 'maxlike'
         self.outputpath = '{}_{}_optimization'.format(self.outputpath, self.analyzername)
         self.outputChecker()
@@ -421,7 +556,7 @@ class DriverMC:
                 logger.critical('Unexpected **kwargs for MaxLike: {}'.format(kwargs))
                 logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
                             'MaxLikeAnalyzer executer options are:'
-                            '\n\twithErrors (boolean) Default: False')
+                            '\n\twithErrors (bool) Default: False')
                 sys.exit(1)
         ti = time.time()
         A = MaxLikeAnalyzer(self.L, self.model, withErrors=withErrors, param1=plot_par1, param2=plot_par2)
@@ -435,6 +570,23 @@ class DriverMC:
 
 
     def geneticRunner(self, iniFile=None, **kwargs):
+        """
+        It calls SimpleGenetic class.
+
+        Parameters
+        -----------
+        n_individuals : int
+            Number of individuals.
+
+        n_generations : int
+            Number of generations.
+
+        selection_method : str
+            Selection method {tournament, roulette, rank}
+
+        mut_prob : float
+            Probability of mutation.
+        """
         if self.analyzername is None: self.analyzername = 'genetic'
         self.outputpath = '{}_{}_optimization'.format(self.outputpath, self.analyzername)
         self.outputChecker()
@@ -482,14 +634,16 @@ class DriverMC:
 
     def logLike(self, values):
         """
-            If the sampler used isn't the MCMC of MCMCAnalyzer then, we need to set
-            other types of likelihoods and priors objects. This method allows that. It is a
-            likelihood defined for an external samplers and is used
-            as parameter of the sampler run function.
+        If the sampler used isn't the MCMC of MCMCAnalyzer then, we need to set
+        other types of likelihoods and priors objects. This method allows that. It is a
+        likelihood defined for an external samplers and is used
+        as parameter of the sampler run function.
 
-            Parameters:
+        Parameters
+        -----------
 
-            values:     implicit values, they are generated by the sampler.
+        values : n-dim vector
+            implicit values, they are generated by the sampler.
 
         """
 
@@ -507,11 +661,9 @@ class DriverMC:
         return loglike
 
 
-
-
     #priorsTransform
     def priorTransform(self, theta):
-        """prior Transform for gaussian and flat priors"""
+        """Prior Transform for gaussian and flat priors"""
         priors = []
         n = self.nsigma
 
@@ -552,11 +704,19 @@ class DriverMC:
         """
         The natural logarithm of the joint posterior.
 
-        Args:
-            theta (tuple): a sample containing individual parameter values
-            data (list): the set of data/observations
-            sigma (float): the standard deviation of the data points
-            x (list): the abscissa values at which the data/model is defined
+        Parameters
+        ------------
+        theta : tuple
+            A sample containing individual parameter values
+
+        data : list
+            The set of data/observations
+
+        sigma : float
+            The standard deviation of the data points
+
+        x : list
+            The abscissa values at which the data/model is defined
         """
 
         lp = self.logPrior(theta)  # get the prior
@@ -572,12 +732,10 @@ class DriverMC:
         """
         The natural logarithm of the prior probability.
 
-        Args:
-            theta (tuple): a sample containing individual parameter values
-
-        Note:
-            We can ignore the normalisations of the prior here.
-            Uniform prior on all the parameters.
+        Parameters
+        -----------
+            theta : tuple
+                A sample containing individual parameter values
         """
 
         # set prior to 1 (log prior to 0) if in the range and zero (-inf) outside the range
@@ -599,6 +757,11 @@ class DriverMC:
 
 ###############################Post-processing############################################
     def outputChecker(self):
+        """
+        This method check if the name of the outputfile exists, if it already exists creates a
+        new one with extension _new in its name.
+
+        """
         while True:
             if os.path.isfile(self.outputpath+".txt"):
                 logger.info("{0} file already exists, {0}_new was created".format(self.outputpath))
@@ -623,10 +786,13 @@ class DriverMC:
         """
         This method writes the .paramnames file with theirs LaTeX names.
 
-        Parameters:
+        Parameters
+        -----------
 
-        T:          T is an instance of ParseModel(model)
-        L:          L is an instance of ParseDataset(datasets)
+        T : model
+            T is result of ParseModel(model)
+        L : likelihood
+            L is result of ParseDataset(datasets)
 
         """
         cpars   = self.L.freeParameters()
@@ -647,6 +813,17 @@ class DriverMC:
 
 
     def postprocess(self, summary=True, stats=False, addtxt=None):
+        """
+        It calls the PostProcessing class.
+
+        Parameters
+        ----------
+         summary : bool
+            True for save summary.
+
+         addtxt : list
+            A list with strings to save with the summary.
+        """
         if addtxt:
             self.result.extend(addtxt)
         if self.analyzername == 'nested':
@@ -664,6 +841,14 @@ class DriverMC:
             pp.writeSummary(self.ttime)
 
     def plot(self, show=False):
+        """
+        Simple connection with the plotters.
+
+        Parameters
+        -----------
+        show : bool
+            Default False
+        """
         from .tools.SimplePlotter import SimplePlotter
         figure = SimplePlotter(self.chainsdir, self.outputpath, self.paramsList, show=show)
 
@@ -672,6 +857,23 @@ class DriverMC:
 # ### pool from multiprocessing
 
     def mppool(self, nproc):
+        """
+        It creates a multiprocessing objet to parallelise nested and emcee samplers.
+
+        Parameters
+        ------------
+         nproc : int
+            number of processors to use.
+
+        Returns
+        ---------
+        pool : multiprocessing.Pool
+            object
+
+        nproc : int
+            Number of processes
+
+        """
         if nproc <= 0:
             ncores = mp.cpu_count()
             nprocess = ncores//2
