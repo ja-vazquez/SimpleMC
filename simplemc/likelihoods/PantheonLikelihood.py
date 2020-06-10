@@ -8,7 +8,7 @@ import scipy.linalg as la
 import numpy as np
 
 
-class CompressPantheonLikelihood(BaseLikelihood):
+class PantheonLikelihood(BaseLikelihood):
     def __init__ (self, ninterp=150):
         ## first read data file
         self.name_="PantheonSN"

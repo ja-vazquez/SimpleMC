@@ -2,7 +2,7 @@
 # This module calculates likelihood for the compressed SN.
 #
 
-from .BaseLikelihood import *
+from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 import numpy as np
 import scipy.linalg as la
 from scipy.interpolate import interp1d
