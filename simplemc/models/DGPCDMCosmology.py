@@ -7,8 +7,8 @@ import math as N
 class DGPCDMCosmology(LCDMCosmology):
     def __init__(self):
         """
-        Simple Class for Branes Cosmology,
-        here DGP model
+        Simple Class for Brane Cosmology,
+        here flat-DGP model
         Returns
         -------
 

@@ -42,6 +42,7 @@ class PolyCDMCosmology(LCDMCosmology):
         return l
 
 
+
     def updateParams(self, pars):
         ok = LCDMCosmology.updateParams(self, pars)
         if not ok:
@@ -65,6 +66,7 @@ class PolyCDMCosmology(LCDMCosmology):
         # ok, there is really no point in adding neutrinos to this
         # as 3/23 -- note Om1 and Om2 used to be swapped
         return (self.Om/a**3+self.Om2/a**2+self.Ok/a**2+self.Om1/a+(1-self.Om-self.Om1-self.Om2-self.Ok))
+
 
 
     def prior_loglike(self):

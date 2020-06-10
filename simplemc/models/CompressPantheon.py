@@ -4,11 +4,11 @@ from simplemc.cosmo.paramDefs import zbin_par
 import numpy as np
 
 
-
 class CompressPantheon():
     def __init__(self):
         """
-        Class to compress Pantheon dataset into a small number of bins.
+        Class to compress Pantheon dataset (or any other) into a small number of bins.
+        It uses bins and an interpolation.
         Returns
         -------
 

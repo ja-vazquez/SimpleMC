@@ -21,11 +21,8 @@ from simplemc.models.TiredLightDecorator import TiredLightDecorator
 from simplemc.models.DecayLCDMCosmology import DecayLCDMCosmology
 from simplemc.models.EarlyDECosmology import EarlyDECosmology
 from simplemc.models.SlowRDECosmology import SlowRDECosmology
-from simplemc.models.PhiCDMCosmology import PhiCosmology
 from simplemc.models.DGPCDMCosmology import DGPCDMCosmology
 from simplemc.models.RotationCurves import RotationCurves
-
-#from STCDMCosmology import STCDMCosmology
 
 
 #Non-parametric functions
@@ -57,10 +54,10 @@ from simplemc.likelihoods.CompressedHDLikelihood    import HubbleDiagram
 from simplemc.likelihoods.Compressedfs8Likelihood import fs8Diagram
 
 #from simplemc.likelihoods.GenericLikelihood import StraightLine
-from .likelihoods.SimpleLikelihood import GenericLikelihood
-from .likelihoods.SimpleLikelihood import StraightLine
-from .likelihoods.CompressPantheonLikelihood import CompressPantheonLikelihood
-from .likelihoods.RotationCurvesLikelihood import RotationCurvesLike
+from simplemc.likelihoods.SimpleLikelihood import GenericLikelihood
+from simplemc.likelihoods.SimpleLikelihood import StraightLine
+from simplemc.likelihoods.PantheonLikelihood import PantheonLikelihood
+from simplemc.likelihoods.RotationCurvesLikelihood import RotationCurvesLike
 
 #Importance Sampling
 #from .CosmoMCImportanceSampler import *
@@ -162,37 +159,10 @@ def ParseModel(model, **kwargs):
         T = DGPCDMCosmology()
     elif model == "Rotation":
         T = RotationCurves()
-
-
-
-    elif model == "Phi_exp_p0":
-        T = PhiCosmology(mu=0, alpha=1, varybeta=True)
-    elif model == "Phi_pow_test_i":
-        T = PhiCosmology(beta=0, varymu=True, varyilam=True)
-    elif model == "Phi_exp_pow2":
-        T = PhiCosmology(mu=0, alpha=2, varybeta=True, varyilam=True)
-    elif model == "Phi_pow_exp":
-        T = PhiCosmology(alpha=1, varybeta=True, varymu=True, varyilam=True)
-    elif model == "Phi_exp_pow_a":
-        T = PhiCosmology(mu=0, varybeta=True, varyalpha=True, varyilam=True)
-    elif model == "Phi_pow2_exp_pow2":
-        T = PhiCosmology(mu=2, alpha=2, varybeta=True, varyilam=True)
-    elif model == "Phi_cosh":
-        T = PhiCosmology(beta=0, mu=-1, varyalpha=True, varyilam=True)
-    elif model == "Phi_cosh_1":
-        T = PhiCosmology(beta=-1, mu=-1, varyalpha=True, varyilam=True)
-    elif model == "Phi_cos_1":
-        T = PhiCosmology(beta=1, mu=-1, varyalpha=True, varyilam=True)
-
-    #elif model == 'ST':
-    #    T = STCDMCosmology()
-
-
     elif model == 'custom':
         T = SimpleModel(custom_parameters, custom_function)
     elif model == 'simpleCosmo':
         T = SimpleCosmoModel()
-
     else:
         print("Cannot recognize model", model)
         sys.exit(1)

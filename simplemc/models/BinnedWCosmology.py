@@ -10,7 +10,7 @@ class BinnedWCosmology(LCDMCosmology):
     def __init__(self, dz=0.2, zmax=1.0):
         """
         This is a CDM cosmology with binned w
-        Still testing the file
+        Still testing the file but it seems to be working just fine
         Parameters
         ----------
         dz

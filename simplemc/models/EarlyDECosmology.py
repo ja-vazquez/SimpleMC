@@ -5,7 +5,8 @@ from simplemc.cosmo.paramDefs import w_par, Ode_par
 class EarlyDECosmology(LCDMCosmology):
     def __init__(self, varyw=True, varyOde=True, userd_DE=True):
         """
-        Early Dark Energy cosmology.
+        Early Dark Energy cosmology,
+        using Doran parameterization.
         Parameters
         ----------
         varyw
@@ -20,10 +21,10 @@ class EarlyDECosmology(LCDMCosmology):
         self.userd_DE = userd_DE
         print ('userd', userd_DE)
 
-        self.varyw = varyw
+        self.varyw   = varyw
         self.varyOde = varyOde
 
-        self.w0 = w_par.value
+        self.w0  = w_par.value
         self.Ode = Ode_par.value
 
         self.oC = LCDMCosmology()
@@ -34,7 +35,7 @@ class EarlyDECosmology(LCDMCosmology):
     ## my free parameters. We add Ok on top of LCDM ones (we inherit LCDM)
     def freeParameters(self):
         l = LCDMCosmology.freeParameters(self)
-        if (self.varyw): l.append(w_par)
+        if (self.varyw):  l.append(w_par)
         if (self.varyOde): l.append(Ode_par)
         return l
 

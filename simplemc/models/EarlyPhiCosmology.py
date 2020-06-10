@@ -11,7 +11,8 @@ from simplemc.models.LCDMCosmology import *
 class EarlyPhiCosmology(LCDMCosmology):
     def __init__(self, varylam=True, varyV0=True, varyA=True, varyB=True):
         """
-        This is a CDM cosmology with \phi
+        This is a CDM cosmology with \phi, for Early DE,
+        however it will be contained in the PhiCDM Cosmology
         Parameters
         ----------
         varylam
@@ -44,6 +45,8 @@ class EarlyPhiCosmology(LCDMCosmology):
         # force caching
         self.updateParams([])
 
+
+
     # my free parameters. We add Ok on top of LCDM ones (we inherit LCDM)
     def freeParameters(self):
         l = LCDMCosmology.freeParameters(self)
@@ -56,6 +59,8 @@ class EarlyPhiCosmology(LCDMCosmology):
         if (self.varyB):
             l.append(B_par)
         return l
+
+
 
     def updateParams(self, pars):
         ok = LCDMCosmology.updateParams(self, pars)
@@ -71,6 +76,8 @@ class EarlyPhiCosmology(LCDMCosmology):
         self.Ini_phi()
         return True
 
+
+
     def Pot(self, x, i):
         funct1 = (x-self.B)**2 + self.A
         funct2 = 2.0*(x-self.B) - self.lam*funct1
@@ -82,15 +89,21 @@ class EarlyPhiCosmology(LCDMCosmology):
             print('wrong choice')
             stop()
 
+
+
             # x ->\phi, y->\dotphi
     def RHS(self, x_vec, lna):
         x, y = x_vec
         return [sqrt(3.0)*y/self.hub(lna, x_vec), -3*y - self.Pot(x, 1)*self.h/(self.Cte*self.hub(lna, x_vec))]
 
+
+
     def solver(self, x0):
         y0 = [x0, 0]
         y_result = odeint(self.RHS, y0, self.lna, h0=1E-10)
         return y_result
+
+
 
     def Ini_phi(self):
         lowr, highr = -50, 50
@@ -130,11 +143,15 @@ class EarlyPhiCosmology(LCDMCosmology):
         self.hubble = interp1d(self.lna, (self.hub(self.lna, sol.T))**2)
         return self.sol
 
+
+
     def hub(self, lna, x_vec):
         a = exp(lna)
         x, y = x_vec
         NuContrib = self.NuDensity.rho(a)/self.h**2
         return sqrt(0.5*y**2 + self.Pot(x, 0)/self.Cte**2 + self.Ocb/a**3 + self.Omrad/a**4 + NuContrib)
+
+
 
     ## i.e. H(z)^2/H(z=0)^2
     def RHSquared_a(self, a):

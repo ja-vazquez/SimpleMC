@@ -138,11 +138,13 @@ class DecayLCDMCosmology(LCDMCosmology):
         sys.exit(1)
         return None
 
+
     # this returns the "SimpleCMB" variables in a vec
     def CMBSimpleVec(self):
         zstar = 1090.
         Dastar = self.Da_z(zstar)*self.c_/(self.h*100)
         return np.array([self.Obh2, self.Ocbh2_early, Dastar/self.rd])
+
 
     def Om_z(self, a):
         lna = np.log(a)

@@ -8,6 +8,8 @@ from simplemc.cosmo.paramDefs import phialp_par, philam_par, phimu_par, \
                       phibeta_par, Ok_par
 from scipy.optimize import newton
 
+#TODO In construction, not updated on github but in my computer
+
 class PhiCosmology(LCDMCosmology):
     def __init__(self, varyalpha=False, varybeta=False, varyilam=False,\
                        varymu=False, varyOk=False,

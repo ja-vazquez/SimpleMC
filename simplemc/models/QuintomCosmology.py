@@ -4,6 +4,7 @@
 #por positive power-law, otherwise hasn't been tested
 
 #TODO Clean up the code.
+#TODO In construction, not updated on github but in my computer
 
 #import math as N
 from simplemc.models.LCDMCosmology import LCDMCosmology

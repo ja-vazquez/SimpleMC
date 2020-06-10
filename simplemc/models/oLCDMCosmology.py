@@ -32,6 +32,7 @@ class oLCDMCosmology(LCDMCosmology):
         return l
 
 
+
     def updateParams(self, pars):
         ok = LCDMCosmology.updateParams(self, pars)
         if not ok:
@@ -52,6 +53,7 @@ class oLCDMCosmology(LCDMCosmology):
             self.Ok = 1-self.Om
             self.setCurvature(self.Ok)
         return True
+
 
 
     # this is relative Hsquared as a function of a

@@ -65,9 +65,11 @@ class LCDMCosmology(BaseCosmology, RadiationAndNeutrinos):
         self.noObh2prior = False
 
 
+
     def setNoObh2prior(self, val=True):
         #print("Disabling obh2 prior.")
         self.noObh2prior = val
+
 
 
     # my free parameters, note that h is defined in BaseCosmology
@@ -115,6 +117,7 @@ class LCDMCosmology(BaseCosmology, RadiationAndNeutrinos):
     def RHSquared_a(self, a):
         NuContrib = self.NuDensity.rho(a)/self.h**2
         return (self.Ocb/a**3+self.Omrad/a**4+NuContrib+(1.0-self.Om))
+
 
 
     # Obh2 prior
