@@ -27,7 +27,54 @@ class DriverMC:
     """
     def __init__(self, iniFile=None, **kwargs):
         """
-            Read the input parameters or ini file.
+        Read the input parameters or ini file.
+
+        Parameters
+        -----------
+        iniFile: ini file
+            Text file with ini extension that contains all the settings
+            to SimpleMC. If use this option the following kwargs not are necessary.
+
+        chainsdir : str
+            Directory for the outputs.
+        model : str
+            Choose the model {LCDOM, LCDMasslessnu, nuLCDM, NeffLCDM, noradLCDM, nuoLCDM, nuwLCDM, oLCDM, wCDM, waCDM, owCDM,"\
+            owaCDM, JordiCDM, WeirdCDM, TLight, StepCDM, Spline, PolyCDM, fPolyCDM, Decay, Decay01, Decay05,"\
+            EarlyDE, EarlyDE_rd_DE, SlowRDE}
+
+        prefact :str
+            {phy, pre}
+
+        vary8 : bool
+            Default False
+
+        datasets str:
+            Default HD (Hubble distance, i. e. Cosmic Chronometers).
+            You can combine HD+SN+BBAO+Planck+UnionSN+...
+
+        analyzername : str
+            The name of the analyzer. It can be a sampler: {mcmc, nested, emcee}
+            or a optimizer: {maxlike, genetic}
+
+        addDerived : bool
+            True generates at the flight some derived parameters (such as
+            Omega_Lambda or Universe Age, and save them in the output text file.
+
+        custom_parameters : list
+            List of Parameter instances.
+
+        custom_function : method
+            Custom method that reads a parameter list and a vector x, unzip the list,
+            and return a f(x) in terms of the parameters.
+
+        path_to_data : str
+            path of a dataset text file.
+
+        path_to_cov : str
+            path of a covariance matrix text file.
+
+        fn : str
+            Type of function to use in the likelihood due a custom data {"generic", "hz", ...}.
 
         """
 
