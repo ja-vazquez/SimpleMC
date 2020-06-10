@@ -7,6 +7,7 @@ class SimpleCosmoModel(LCDMCosmology):
     def __init__(self):
         # Create a list with your parameters,
         # pull it from paramDefs or create them
+        self.miparam = Parameter("nombre", 0.5, 0.005, (0.01, 1), "\LaTeX")
         # with the Parameter class
         # self.nuevoparm = Parameter("nombre", 0.5)
         self.parameters = [Ok_par, w_par, wa_par]
