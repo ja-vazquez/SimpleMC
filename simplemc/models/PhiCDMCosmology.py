@@ -4,11 +4,10 @@ import numpy as np
 from simplemc.models.LCDMCosmology import LCDMCosmology
 from scipy.interpolate import interp1d
 from scipy.integrate import odeint
+from scipy.optimize import newton
 from simplemc.cosmo.paramDefs import phialp_par, philam_par, phimu_par, \
                       phibeta_par, Ok_par
-from scipy.optimize import newton
 
-#TODO In construction, not updated on github but in my computer
 
 class PhiCosmology(LCDMCosmology):
     def __init__(self, varyalpha=False, varybeta=False, varyilam=False,\
@@ -132,8 +131,8 @@ class PhiCosmology(LCDMCosmology):
 
         Ophi_prime  = -3*Ophi*(1+ wphi + 2*Pi/3.)
         Ok_prime    = -3*Ok*(1 - 1./3. + 2*Pi/3.)
-        wphi_prime  = -(1-wphi)*(3*(1+wphi)- lam*term)
-        lam_prime   = -lam**2*(Mgamma -1)*term
+        wphi_prime  = -(1-wphi)*(3*(1+wphi)+self.eps*lam*term)
+        lam_prime   = self.eps*lam**2*(Mgamma -1)*term
         hub_prime   = hub*Pi
 
         return [wphi_prime, Ophi_prime, lam_prime, Ok_prime, hub_prime]
@@ -149,8 +148,6 @@ class PhiCosmology(LCDMCosmology):
                 ini_lam = -self.alpha*np.arctan(0.5*self.alpha*self.ilam)
             else: sys.exit('wrong potential')
         else:
-            #ini_lam=self.ilam
-
             if self.beta==0:                        #pow
                 ini_lam= self.mu*self.ilam
             else:
@@ -169,8 +166,9 @@ class PhiCosmology(LCDMCosmology):
 
 
         #we'll use the sign of lambda to describe either quint or phant
-        ini_lam=-ini_lam
+        #ini_lam=-ini_lam
         self.eps = np.sign(ini_lam)
+        ini_lam  =np.abs(ini_lam)
         self.ini_wphi = -1 + 1.0e-4*self.eps
 
 
@@ -201,18 +199,12 @@ class PhiCosmology(LCDMCosmology):
             self.do = 1
             self.hub_SF   = interp1d(self.lna, x_vec[4])
             #self.hub_SF_z = self.logatoz(x_vec[3])
-            #self.w_eos    = interp1d(self.lna, x_vec[0])
-            #self.Ophi    = interp1d(self.lna, x_vec[1])
-            #self.Oka      = interp1d(self.lna, x_vec[3])
+            self.w_eos    = interp1d(self.lna, x_vec[0])
+            self.Ophi    = interp1d(self.lna, x_vec[1])
+            self.Oka      = interp1d(self.lna, x_vec[3])
         except RuntimeError:
-            if np.abs(self.ilam) < 0.01 or np.abs(self.mu) < 0.01:
-                self.do = 0
-                print('Cosmological constant', 'a=',self.alpha, 'b=',self.beta, 'l=', self.ilam, 'm=', self.mu)
-                #self.w_eos    = interp1d(self.lna, -1+np.zeros(len(self.lna)))
-            else:
-                #self.w_eos    = interp1d(self.lna, -1+np.zeros(len(self.lna)))
-                #print('troubles', 'a=',self.alpha, 'b=',self.beta, 'l=', self.ilam, 'm=', self.mu)
-                self.do = 2
+            self.do = 2
+            self.w_eos    = interp1d(self.lna, -1+np.zeros(len(self.lna)))
 
 
 
@@ -226,21 +218,19 @@ class PhiCosmology(LCDMCosmology):
     ## i.e. H(z)^2/H(z=0)^2
     def RHSquared_a(self,a):
         lna = np.log(a)
-        if self.do==0:
-            return self.hubble(a)
-        elif self.do==1:
+        if self.do==2:
+            return self.Ocb/a**3
+        else:
             if (lna > self.lna[0]):
                 hubble = (self.hub_SF(lna)/100./self.h)**2.
             else:
                 hubble = self.hubble(a)
             return hubble
-        else:
-            return self.Ocb/a**3
+
 
 
     def w_de(self, a):
         lna = np.log(a)
-        #print (self.w_eos(lna))
         return self.w_eos(lna)
 
     def Omegaphi(self, lna):
