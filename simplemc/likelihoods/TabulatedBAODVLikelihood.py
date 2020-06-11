@@ -1,16 +1,28 @@
-##
-# This is a DV likelihood that comes in form of a table.
-##
 
-import scipy as sp
-from .BaseLikelihood import BaseLikelihood
+
+
+from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 from scipy.interpolate import interp1d
 from scipy.optimize import minimize
 from scipy.integrate import quad
+import scipy as sp
 
 
 class TabulatedBAODVLikelihood(BaseLikelihood):
     def __init__(self, name, filename, fid_theory, z):
+        """
+        This is a DV likelihood that comes in form of a table.
+        Parameters
+        ----------
+        name
+        filename
+        fid_theory
+        z
+
+        Returns
+        -------
+
+        """
         BaseLikelihood.__init__(self, name)
         print()
         print("Loading ", filename)

@@ -1,6 +1,4 @@
-#
-# This module calculates likelihood for Hubble Diagram.
-# based on the CompressSN file
+
 
 from .BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
@@ -8,6 +6,19 @@ import scipy as sp
 
 class CompressedHDLikelihood(BaseLikelihood):
     def __init__(self,name,values_filename, cov_filename):
+        """
+        This module calculates likelihood for Hubble Diagram.
+        based on the CompressSN file
+        Parameters
+        ----------
+        name
+        values_filename
+        cov_filename
+
+        Returns
+        -------
+
+        """
         BaseLikelihood.__init__(self,name)
         print("Loading ",values_filename)
         da = sp.loadtxt(values_filename)

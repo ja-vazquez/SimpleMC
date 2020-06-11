@@ -1,7 +1,7 @@
 #
 # This module calculates likelihood for a Generic DATA.
 #
-from .BaseLikelihood import BaseLikelihood
+from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
 import scipy as sp
 

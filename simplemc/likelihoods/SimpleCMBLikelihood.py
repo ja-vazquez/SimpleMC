@@ -1,14 +1,26 @@
-##
-# This is inspired by WangWang CMB, but ultimately simpler
-# where we compress to just obh2, obh2+och2 and thetas
-##
 
-from .BaseLikelihood import BaseLikelihood
+
+from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
 import scipy as sp
 
-class SimpleCMB (BaseLikelihood):
+class SimpleCMBLikelihood(BaseLikelihood):
     def __init__(self, name, mean, cov, kill_Da=False, kill_rd=False):
+        """
+        This is inspired by WangWang CMB, but ultimately simpler
+        where we compress to just obh2, obh2+och2 and thetas
+        Parameters
+        ----------
+        name
+        mean
+        cov
+        kill_Da
+        kill_rd
+
+        Returns
+        -------
+
+        """
         print("Initializing CMB likelihood:", name)
         cov = sp.array(cov)
         if kill_Da:
@@ -38,37 +50,37 @@ class SimpleCMB (BaseLikelihood):
 
 
 
-class PlanckLikelihood(SimpleCMB):
+class PlanckLikelihood(SimpleCMBLikelihood):
     def __init__(self, kill_Da= False, kill_rd= False):
         mean = sp.array([2.24519776e-02,   1.38572404e-01,   9.43303000e+01])
         cov  = sp.array([[1.28572727e-07,  -6.03323687e-07,   1.44305285e-05],
                         [-6.03323687e-07,   7.54205794e-06,  -3.60547663e-05],
                         [1.44305285e-05,  -3.60547663e-05,   4.26414740e-03]])
         name = "SPlanck"
-        SimpleCMB.__init__(self, name, mean, cov, kill_Da, kill_rd)
+        SimpleCMBLikelihood.__init__(self, name, mean, cov, kill_Da, kill_rd)
 
 
 
                 #Calibrated with plikHM_TTTEEE_lowTEB
-class PlanckLikelihood_15(SimpleCMB):
+class PlanckLikelihood_15(SimpleCMBLikelihood):
     def __init__(self, kill_Da= False, kill_rd= False):
         mean = sp.array([2.24001583e-02,   1.40200580e-01,   9.44043640e+01 ])
         cov = sp.array([[3.02751758e-08,  -1.54495460e-07,   4.26868164e-06],
                  [ -1.54495460e-07,   2.16079050e-06,  -1.49955437e-05 ],
                  [ 4.26868164e-06,  -1.49955437e-05,   1.30349464e-03  ]])
         name = "SPlanck_15"
-        SimpleCMB.__init__(self,name,mean,cov, kill_Da, kill_rd)
+        SimpleCMBLikelihood.__init__(self,name,mean,cov, kill_Da, kill_rd)
 
 
 
-class WMAP9Likelihood(SimpleCMB):
+class WMAP9Likelihood(SimpleCMBLikelihood):
     def __init__(self, kill_Da=False, kill_rd=False):
         mean = sp.array([2.25946978e-02,   1.35359318e-01,   9.45118918e+01])
         cov  = sp.array([[2.86459327e-07,  -4.80929954e-07,  -1.11081266e-05],
                         [-4.80929954e-07,   1.90757225e-05,   7.49542945e-06],
                         [-1.11081266e-05,   7.49542945e-06,   2.54207102e-02]])
         name = "SWMAP"
-        SimpleCMB.__init__(self, name, mean, cov, kill_Da, kill_rd)
+        SimpleCMBLikelihood.__init__(self, name, mean, cov, kill_Da, kill_rd)
 
 
 

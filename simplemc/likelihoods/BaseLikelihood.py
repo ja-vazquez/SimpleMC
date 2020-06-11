@@ -1,9 +1,10 @@
-#
-# This is the base likelihood object. Base for all other likelihoods.
-#
+
 
 
 class BaseLikelihood:
+    """
+    This is the base likelihood object. Base for all other likelihoods.
+    """
 
     def __init__(self, name):
         self.name_ = name

@@ -1,14 +1,23 @@
-#
-# This thing takes likelihoods and cooks one
-# which is a composite of many.
-#
 
-from .BaseLikelihood import BaseLikelihood
+
+from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 import scipy as sp
 
 
 class CompositeLikelihood(BaseLikelihood):
     def __init__(self, llist=[]):
+        """
+        This thing takes likelihoods and cooks one
+        which is a composite of many.
+
+        Parameters
+        ----------
+        llist
+
+        Returns
+        -------
+
+        """
         BaseLikelihood.__init__(self, "Composite")
         self.llist_ = llist
 
@@ -48,7 +57,7 @@ class CompositeLikelihood(BaseLikelihood):
         likes = [like.loglike() for like in self.llist_]
         return sp.array(likes).sum()
 
-    # The base si good enough as
+    # The base is good enough as
     # Everybody is holding the same reference
     # def updateParams(self,params):
         # ok=True

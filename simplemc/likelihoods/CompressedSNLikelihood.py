@@ -1,14 +1,24 @@
-#
-# This module calculates likelihood for the compressed SN.
-#
 
-from .BaseLikelihood import BaseLikelihood
+
+from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
 import scipy as sp
 
 
 class CompressedSNLikelihood(BaseLikelihood):
     def __init__(self, name, values_filename, cov_filename):
+        """
+        This module calculates likelihood for the compressed SN.
+        Parameters
+        ----------
+        name
+        values_filename
+        cov_filename
+
+        Returns
+        -------
+
+        """
         BaseLikelihood.__init__(self, name)
         print("Loading ", values_filename)
         da = sp.loadtxt(values_filename)

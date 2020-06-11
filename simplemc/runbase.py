@@ -1,13 +1,7 @@
 # coding=utf-8
-# Add paths, we want to be able to run in either root or Run/
 
 import sys
-#sys.path = ["py", "../py", "Models", "Cosmo", "Likelihoods"] + sys.path
 
-#TODO -- Include models used in several papers
-#TODO -- Add Planck 15
-#TODO -- Add DR12 Galaxies
-#TODO -- Add Compress Pantheon
 
 # Cosmologies already included
 from simplemc.models.LCDMCosmology import LCDMCosmology
@@ -46,7 +40,7 @@ from simplemc.likelihoods.LikelihoodMultiplier import LikelihoodMultiplier
 # Likelihood modules
 from simplemc.likelihoods.BAOLikelihoods import DR11LOWZ, DR11CMASS, DR14LyaAuto, DR14LyaCross, \
         SixdFGS, SDSSMGS, DR11LyaAuto, DR11LyaCross, eBOSS, DR12Consensus
-from simplemc.likelihoods.SimpleCMB import PlanckLikelihood, PlanckLikelihood_15, WMAP9Likelihood
+from simplemc.likelihoods.SimpleCMBLikelihood import PlanckLikelihood, PlanckLikelihood_15, WMAP9Likelihood
 from simplemc.likelihoods.CompressedSNLikelihood    import BetouleSN, UnionSN, BinnedPantheon
 from simplemc.likelihoods.PantheonSNLikelihood      import PantheonSNLikelihood
 from simplemc.likelihoods.HubbleParameterLikelihood import RiessH0

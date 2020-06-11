@@ -1,7 +1,7 @@
 #
 # This module calculates likelihood for a Generic DATA.
 #
-from .BaseLikelihood import BaseLikelihood
+from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 from simplemc import logger
 import scipy.linalg as la
 import scipy as sp
@@ -40,6 +40,7 @@ class StraightLine(SimpleLikelihood):
      def __init__(self):
          SimpleLikelihood.__init__(self,"GenericData","simplemc/data/line_data.txt",
             "simplemc/data/line_cov.txt")
+
 
 class GenericLikelihood(SimpleLikelihood):
     def __init__(self, path_to_data, path_to_cov, fn):

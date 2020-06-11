@@ -1,14 +1,22 @@
-#
-# Distance ladder hubble likelihoods.
-#
 
 
-from .BaseLikelihood import BaseLikelihood
 
+from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 
 
 class HubbleParameterLikelihood (BaseLikelihood):
     def __init__(self, mean=0.70, sigma=0.02):
+        """
+         Distance ladder hubble likelihoods.
+        Parameters
+        ----------
+        mean
+        sigma
+
+        Returns
+        -------
+
+        """
         BaseLikelihood.__init__(self, "Hubble_%g_pm_%g" % (mean, sigma))
         self.mean = mean
         self.pr = 1/(2*sigma**2)

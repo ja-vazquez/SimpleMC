@@ -1,15 +1,28 @@
-#
-# This module calculates likelihood for the consensus BAODR12.
-##BAO-only consensus results, Alam et al. 2016
-#https://arxiv.org/abs/1607.03155
+
 
 from .BaseLikelihood import BaseLikelihood
+from scipy import constants
 import scipy.linalg as la
 import scipy as sp
-from scipy import constants
+
 
 class ConsensusBAOLikelihood(BaseLikelihood):
     def __init__(self, name, values_filename, cov_filename, fidtheory):
+        """
+        This module calculates likelihood for the consensus BAODR12.
+        BAO-only consensus results, Alam et al. 2016
+        https://arxiv.org/abs/1607.03155
+        Parameters
+        ----------
+        name
+        values_filename
+        cov_filename
+        fidtheory
+
+        Returns
+        -------
+
+        """
         BaseLikelihood.__init__(self,name)
 
         self.rd = fidtheory.rd

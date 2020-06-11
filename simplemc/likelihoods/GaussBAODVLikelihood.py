@@ -1,14 +1,25 @@
-#
-# This is a BAO likelihood, where we give DV and its error and optionally a value
-# at which chi2 is cut.
-#
 
-from .BaseLikelihood import BaseLikelihood
-
+from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 
 
 class GaussBAODVLikelihood(BaseLikelihood):
     def __init__(self, name, z, DV, DVErr, fidtheory, maxchi2=1e30):
+        """
+        This is a BAO likelihood, where we give DV and its error and optionally a value
+        at which chi2 is cut.
+        Parameters
+        ----------
+        name
+        z
+        DV
+        DVErr
+        fidtheory
+        maxchi2
+
+        Returns
+        -------
+
+        """
         BaseLikelihood.__init__(self, name)
         self.z = z
         rd     = fidtheory.rd

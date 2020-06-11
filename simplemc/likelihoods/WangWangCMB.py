@@ -2,7 +2,7 @@
 ##
 # !!!!!THIS IS DEPRECATED!!!!!
 ##
-# SEE SimpleCMB.py
+# SEE SimpleCMBLikelihood.py
 ##
 # This module implements Wang+Wang CMB
 ##

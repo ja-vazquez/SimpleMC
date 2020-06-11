@@ -1,6 +1,3 @@
-#
-# This module calculates likelihood for the compressed SN.
-#
 
 from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 import numpy as np
@@ -9,6 +6,16 @@ from scipy.interpolate import interp1d
 
 class PantheonSNLikelihood(BaseLikelihood):
     def __init__ (self, ninterp=150):
+        """
+        This module calculates likelihood for the compressed SN.
+        Parameters
+        ----------
+        ninterp
+
+        Returns
+        -------
+
+        """
         ## first read data file
         self.name_="PantheonSN"
         da=[x.split() for x in open('simplemc/data/pantheon_lcparam_full_long_zhel.txt').readlines()[1:]]
@@ -29,7 +36,8 @@ class PantheonSNLikelihood(BaseLikelihood):
         print ("Pantheon SN: zmin=%f zmax=%f N=%i"%(self.zmin,self.zmax, self.N))
         self.zinter=np.linspace(1e-3,self.zmaxi,ninterp) 
         self.icov=la.inv(self.cov)
-        
+
+
     def loglike(self):
         ## we will interpolate distance
         dist=interp1d(self.zinter,[self.theory_.distance_modulus(z) for z in self.zinter],
@@ -49,7 +57,11 @@ class PantheonSNLikelihood(BaseLikelihood):
         return -chi2/2
     
     
-        
+"""
+Use this if you wanna compress Pantheon data
+dist=interp1d(self.zinter,[self.theory_.genericPModel(z) for z in self.zinter],
+                       kind='cubic',bounds_error=False)(self.zcmb)
+"""
         
         
     

@@ -1,7 +1,4 @@
-#
-# This module implements a BAO Likelihood which is supplied as
-# as chi2 table. See BAOLikelihoods.py
-#
+
 
 
 import scipy as sp
@@ -12,6 +9,25 @@ from scipy.interpolate import RectBivariateSpline
 
 class TabulatedBAOLikelihood(BaseLikelihood):
     def __init__(self, name, filename, chi2col, fid_theory, z, skiprows=0, aperp_col=0, apar_col=1):
+        """
+        This module implements a BAO Likelihood which is supplied as
+        as chi2 table. See BAOLikelihoods.py
+
+        Parameters
+        ----------
+        name
+        filename
+        chi2col
+        fid_theory
+        z
+        skiprows
+        aperp_col
+        apar_col
+
+        Returns
+        -------
+
+        """
         BaseLikelihood.__init__(self, name)
         print()
         print("Loading ", filename)

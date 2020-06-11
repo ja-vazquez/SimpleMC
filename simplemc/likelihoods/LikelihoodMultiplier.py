@@ -1,13 +1,22 @@
-# This is a helper class that takes a likelihood
-# and just multiplies loglike with some value to simulate
-# better or shittier data.
-##
-# You have to give python a credit for how effortlessly
-# one can hack classes!!
-##
 
 
 def LikelihoodMultiplier(LikeInstance, mult):
+    """
+    This is a helper class that takes a likelihood
+    and just multiplies loglike with some value to simulate
+    better or shittier data.
+
+    You have to give python a credit for how effortlessly
+    one can hack classes!!
+    Parameters
+    ----------
+    LikeInstance
+    mult
+
+    Returns
+    -------
+
+    """
     class MultipliedLikelihood(LikeInstance.__class__):
         def __init__(self, LikeInstance, mult):
             # copy  instance into my class
