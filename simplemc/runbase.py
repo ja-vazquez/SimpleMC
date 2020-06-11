@@ -50,7 +50,7 @@ from simplemc.likelihoods.Compressedfs8Likelihood import fs8Diagram
 #from simplemc.likelihoods.GenericLikelihood import StraightLine
 from simplemc.likelihoods.SimpleLikelihood import GenericLikelihood
 from simplemc.likelihoods.SimpleLikelihood import StraightLine
-from simplemc.likelihoods.PantheonLikelihood import PantheonLikelihood
+#from simplemc.likelihoods.PantheonLikelihood import PantheonLikelihood
 from simplemc.likelihoods.RotationCurvesLikelihood import RotationCurvesLike
 
 #Importance Sampling
