@@ -28,7 +28,38 @@ print ("Hello, World! "
 class MCMCAnalyzer:
     def __init__(self, like, outfile, skip=5000, nsamp=100000, temp=1.0,
                  cov=None, chain_num=None, addDerived=False, GRstop=0.01):
+        """
+        MCMC sampler (Metropolis-Hastings).
 
+        Parameters
+        -----------
+        like : Likelihood object
+            Object of a Likelihood class.
+
+        outfile : str
+             Output file.
+
+        skip : int
+            Burn-in.
+
+        nsamp : int
+            Number of mcmc samples.
+
+        temp : float
+            Temperature
+
+        cov : numpy.array
+            Covariance matrix. Default: None.
+
+        chain_num : int
+            Number of chains to run in parallel
+
+        addDerived : bool
+            In order to ad derived parameters such as age of the universe and Omega_{Lambda}
+
+        GRstop : float
+            Gelman-Rubin criteria
+        """
         self.like      = like
         self.outfile   = outfile
         self.nsamp     = nsamp
@@ -69,7 +100,6 @@ class MCMCAnalyzer:
         self.chol = la.cholesky(mat)
 
 
-
     def RunChain(self):
         self.openFiles()
         self.cloglike, self.cloglikes = self.getLikes()
@@ -99,7 +129,6 @@ class MCMCAnalyzer:
         gr = None
 
         print("Starting chain...")
-
 
         while not (self.done):
             ppars, numout = self.GetProposal()
@@ -146,7 +175,11 @@ class MCMCAnalyzer:
                     return True
 
     def GRDRun(self, chains):
-        """This is a implementation of the Gelman Rubin diagnostic"""
+        """
+        This is a implementation of the Gelman Rubin diagnostic.
+        If the number of chains is 1, then this method divide in two the chain
+        and do the diagnostic for convergence.
+        """
         mean_chain = []
         var_chain  = []
 
@@ -200,11 +233,9 @@ class MCMCAnalyzer:
         self.formstr = formstr
 
 
-
     def closeFiles(self):
         self.fout.close()
         self.mlfout.close()
-
 
     def getLikes(self):
         if (self.composite):
@@ -271,7 +302,7 @@ class MCMCAnalyzer:
                 self.mlfout.seek(0)
                 self.mlfout.write(outstr)
                 self.mlfout.flush()
-                self.maxloglike,
+                self.maxloglike
 
             if self.co > self.nsamp:
                 self.done = True
