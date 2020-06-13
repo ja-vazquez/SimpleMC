@@ -47,10 +47,8 @@ from simplemc.likelihoods.HubbleParameterLikelihood import RiessH0
 from simplemc.likelihoods.CompressedHDLikelihood    import HubbleDiagram
 from simplemc.likelihoods.Compressedfs8Likelihood import fs8Diagram
 
-#from simplemc.likelihoods.GenericLikelihood import StraightLine
 from simplemc.likelihoods.SimpleLikelihood import GenericLikelihood
 from simplemc.likelihoods.SimpleLikelihood import StraightLine
-#from simplemc.likelihoods.PantheonLikelihood import PantheonLikelihood
 from simplemc.likelihoods.RotationCurvesLikelihood import RotationCurvesLike
 
 #Importance Sampling
@@ -101,8 +99,6 @@ def ParseModel(model, **kwargs):
     elif model == "nuwCDM":
         T = wCDMCosmology()
         T.setVaryMnu()
-    elif model == 'wDM':
-        T = wCDMCosmology()
     elif model == "waCDM":
         T = owa0CDMCosmology(varyOk=False)
     elif model == "owCDM":
@@ -286,8 +282,8 @@ def ParseDataset(datasets, **kwargs):
             L.addLikelihood(fs8Diagram())
         elif name == 'dline':
             L.addLikelihood(StraightLine())
-        elif name == 'CPantheon_15':
-            L.addLikelihood(PantheonLikelihood())
+        #elif name == 'CPantheon_15':
+        #    L.addLikelihood(PantheonLikelihood())
         elif name == 'RC':
             L.addLikelihood(RotationCurvesLike())
         elif name == 'custom':

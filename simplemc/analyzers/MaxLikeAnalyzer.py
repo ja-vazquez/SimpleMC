@@ -1,14 +1,10 @@
-#
-# This is an analyzer that takes a Likelihood function
-# and then tries to maximize it and get the errors from the
-# second derivative matrix. It kinda works, but not very well.
-#
-from matplotlib.patches import Ellipse
+
+
+from simplemc.tools.Plot_elipses import plot_elipses
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 import scipy.linalg as la
 import scipy as sp
-import numpy as np
 import sys
 
 try:
@@ -18,7 +14,23 @@ except:
 
 
 class MaxLikeAnalyzer:
-    def __init__(self, like, model, withErrors=False, param1=False, param2=False):
+    def __init__(self, like, model, withErrors=False, showplot=False, param1=False, param2=False):
+        """
+        This is an analyzer that takes a Likelihood function
+        and then tries to maximize it and get the errors from the
+        second derivative matrix. It kinda works, but not very well.
+        Parameters
+        ----------
+        like
+        model
+        withErrors
+        param1
+        param2
+
+        Returns
+        -------
+
+        """
         self.like   = like
         self.model  = model
         self.params = like.freeParameters()
@@ -43,45 +55,14 @@ class MaxLikeAnalyzer:
         self.result(self.negloglike(self.res.x))
 
 
-        if param1 and param2:
-            for i, par in enumerate(self.like.freeParameters()):
-                if param1 == par.name: par1 = i
-                elif param2 == par.name: par2 = i
-
+        if showplot and param1 is not None:
+            for idx, par in enumerate(self.like.freeParameters()):
+                if param1 == par.name: par1 = idx
+                elif param2 == par.name: par2 = idx
 
             fig = plt.figure(figsize=(6,6))
-            ax = fig.add_subplot(111) #, aspect='equal')
-
-            val,vec = la.eig(self.cov[[par1,par2], :][:, [par1,par2]])
-            vec=vec.T
-            mn = self.res.x
-
-            vec[0]*=sp.sqrt(11.83*sp.real(val[0]))
-            vec[1]*=sp.sqrt(11.83*sp.real(val[1]))
-
-            plt.plot(mn[par1],mn[par2],'bo', label=self.model)
-            plt.plot([mn[par1]-vec[0][0],mn[par1]+vec[0][0]],
-                [mn[par2]-vec[0][1],mn[par2]+vec[0][1]],'r-')
-            plt.plot([mn[par1]-vec[1][0],mn[par1]+vec[1][0]],
-                [mn[par2]-vec[1][1],mn[par2]+vec[1][1]],'r-')
-
-            def eigsorted(cov):
-                vals, vecs = sp.linalg.eigh(cov)
-                order = vals.argsort()[::-1]
-                return vals[order], vecs[:,order]
-
-            vals, vecs = eigsorted(self.cov[[par1,par2], :][:, [par1,par2]])
-            theta = sp.degrees(np.arctan2(*vecs[:,0][::-1]))
-
-            sigmas = [2.3, 5.99, 11.83]
-            for sigs in sigmas:
-                w, h = 2  * sp.sqrt(vals) * sp.sqrt(sigs)
-                ell = Ellipse(xy=(mn[par1], mn[par2]),  width = w, height = h, angle=theta, color='green',  lw=4)
-                ell.set_facecolor('none')
-                ax.add_artist(ell)
-
-            plt.legend(loc='best')
-            plt.title('+'.join(self.like.compositeNames()), fontsize=10)
+            ax = fig.add_subplot(111)
+            plot_elipses(self.res.x, self.cov, par1, par2, ax=ax)
             plt.show()
 
 
@@ -103,3 +84,4 @@ class MaxLikeAnalyzer:
         print ("------")
         print("Done.")
         print("Optimal loglike : ", loglike)
+
