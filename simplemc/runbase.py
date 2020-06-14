@@ -1,35 +1,33 @@
 # coding=utf-8
-
 import sys
 
-
 # Cosmologies already included
-from simplemc.models.LCDMCosmology import LCDMCosmology
-from simplemc.models.oLCDMCosmology import oLCDMCosmology
-from simplemc.models.wCDMCosmology import wCDMCosmology
-from simplemc.models.owa0CDMCosmology import owa0CDMCosmology
-from simplemc.models.PolyCDMCosmology import PolyCDMCosmology
-from simplemc.models.JordiCDMCosmology import JordiCDMCosmology
-from simplemc.models.WeirdCDMCosmology import WeirdCDMCosmology
-from simplemc.models.TiredLightDecorator import TiredLightDecorator
-from simplemc.models.DecayLCDMCosmology import DecayLCDMCosmology
-from simplemc.models.EarlyDECosmology import EarlyDECosmology
-from simplemc.models.SlowRDECosmology import SlowRDECosmology
-from simplemc.models.DGPCDMCosmology import DGPCDMCosmology
-from simplemc.models.RotationCurves import RotationCurves
+from .models import LCDMCosmology
+from .models import oLCDMCosmology
+from .models import wCDMCosmology
+from .models import owa0CDMCosmology
+from .models import PolyCDMCosmology
+from .models import JordiCDMCosmology
+from .models import WeirdCDMCosmology
+from .models import TiredLightDecorator
+from .models import DecayLCDMCosmology
+from .models import EarlyDECosmology
+from .models import SlowRDECosmology
+from .models import DGPCDMCosmology
+from .models import RotationCurves
 
 
 #Non-parametric functions
-from simplemc.models.SplineLCDMCosmology import SplineLCDMCosmology
-from simplemc.models.StepCDMCosmology import StepCDMCosmology
-from simplemc.models.BinnedWCosmology import BinnedWCosmology
-from simplemc.models.CompressPantheon import CompressPantheon
+from .models import SplineLCDMCosmology
+from .models import StepCDMCosmology
+from .models import BinnedWCosmology
+from .models import CompressPantheon
 
 
 #Generic model
-from simplemc.models.GenericModel import GenericModel
-from simplemc.models.SimpleCosmoModel import SimpleCosmoModel
-from simplemc.models.SimpleModel import SimpleModel
+from .models import GenericModel
+from .models import SimpleCosmoModel
+from .models import SimpleModel
 
 # Composite Likelihood
 from simplemc.likelihoods.CompositeLikelihood import CompositeLikelihood
