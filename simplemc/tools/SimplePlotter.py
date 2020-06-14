@@ -39,7 +39,9 @@ class SimplePlotter:
                                    analysis_settings={'smooth_scale_2D': smooth2d,
                                                       'smooth_scale_1D': smooth1d,
                                                       'ignore_rows': burnin})
-
+        g.settings.lab_fontsize = 15
+        g.settings.legend_fontsize = 12
+        g.settings.axes_fontsize = 12
         g.triangle_plot(roots, self.listpars,
                         diag1d_kwargs={'colors':colors},
                         colors=colors,
