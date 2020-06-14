@@ -30,6 +30,11 @@ class MCMCAnalyzer:
                  cov=None, chain_num=None, addDerived=False, GRstop=0.01):
         """
         MCMC sampler (Metropolis-Hastings).
+        This is the MCMC module. It spits out chains that are compatible with CosmoMC
+        it calculates cov matrix during burn-in.
+        chain_num tells it to spit out multi-node chains.
+        optional temperature makes it sample at a higher temperature but note that
+        this guy, as opposed to cosmomc, reweights the weights on the fly.
 
         Parameters
         -----------
@@ -212,6 +217,10 @@ class MCMCAnalyzer:
         return result
 
     def openFiles(self):
+        """"
+        Open the files to save the samples and maxlike.
+        Also add the Dervided Parameters if addDerived option is True.
+        """
         outfile = self.outfile
         formstr = '%g ' + '%g '*(self.N+1)
         if self.derived:
@@ -238,6 +247,9 @@ class MCMCAnalyzer:
         self.mlfout.close()
 
     def getLikes(self):
+        """"
+        Get loglikelihoods values from the used data.
+        """
         if (self.composite):
             cloglikes = self.like.compositeLogLikes_wprior()
             cloglike  = cloglikes.sum()
@@ -248,6 +260,9 @@ class MCMCAnalyzer:
 
 
     def GetProposal(self):
+        """
+        Generation of proposal point in mcmc
+        """
         vec = sp.zeros(self.N)
         numreject = 0
         while True:
