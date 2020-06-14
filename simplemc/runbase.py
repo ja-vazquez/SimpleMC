@@ -16,7 +16,6 @@ from .models import SlowRDECosmology
 from .models import DGPCDMCosmology
 from .models import RotationCurves
 
-
 #Non-parametric functions
 from .models import SplineLCDMCosmology
 from .models import StepCDMCosmology
@@ -30,24 +29,24 @@ from .models import SimpleCosmoModel
 from .models import SimpleModel
 
 # Composite Likelihood
-from simplemc.likelihoods.CompositeLikelihood import CompositeLikelihood
+from .likelihoods.CompositeLikelihood import CompositeLikelihood
 
 # Likelihood Multiplier
-from simplemc.likelihoods.LikelihoodMultiplier import LikelihoodMultiplier
+from .likelihoods.LikelihoodMultiplier import LikelihoodMultiplier
 
 # Likelihood modules
-from simplemc.likelihoods.BAOLikelihoods import DR11LOWZ, DR11CMASS, DR14LyaAuto, DR14LyaCross, \
+from .likelihoods.BAOLikelihoods import DR11LOWZ, DR11CMASS, DR14LyaAuto, DR14LyaCross, \
         SixdFGS, SDSSMGS, DR11LyaAuto, DR11LyaCross, eBOSS, DR12Consensus
-from simplemc.likelihoods.SimpleCMBLikelihood import PlanckLikelihood, PlanckLikelihood_15, WMAP9Likelihood
-from simplemc.likelihoods.CompressedSNLikelihood    import BetouleSN, UnionSN, BinnedPantheon
-from simplemc.likelihoods.PantheonSNLikelihood      import PantheonSNLikelihood
-from simplemc.likelihoods.HubbleParameterLikelihood import RiessH0
-from simplemc.likelihoods.CompressedHDLikelihood    import HubbleDiagram
-from simplemc.likelihoods.Compressedfs8Likelihood import fs8Diagram
+from .likelihoods.SimpleCMBLikelihood import PlanckLikelihood, PlanckLikelihood_15, WMAP9Likelihood
+from .likelihoods.CompressedSNLikelihood    import BetouleSN, UnionSN, BinnedPantheon
+from .likelihoods.PantheonSNLikelihood      import PantheonSNLikelihood
+from .likelihoods.HubbleParameterLikelihood import RiessH0
+from .likelihoods.CompressedHDLikelihood    import HubbleDiagram
+from .likelihoods.Compressedfs8Likelihood import fs8Diagram
 
-from simplemc.likelihoods.SimpleLikelihood import GenericLikelihood
-from simplemc.likelihoods.SimpleLikelihood import StraightLine
-from simplemc.likelihoods.RotationCurvesLikelihood import RotationCurvesLike
+from .likelihoods.SimpleLikelihood import GenericLikelihood
+from .likelihoods.SimpleLikelihood import StraightLine
+from .likelihoods.RotationCurvesLikelihood import RotationCurvesLike
 
 #Importance Sampling
 #from .CosmoMCImportanceSampler import *
