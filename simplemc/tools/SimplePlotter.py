@@ -35,7 +35,7 @@ class SimplePlotter:
         roots = kwargs.pop('roots', [self.root])
 
         g = plots.getSinglePlotter(chain_dir=self.chainsdir, width_inch=10,
-                                   ratio=0.9, scaling=2,
+                                   ratio=0.9,
                                    analysis_settings={'smooth_scale_2D': smooth2d,
                                                       'smooth_scale_1D': smooth1d,
                                                       'ignore_rows': burnin})
