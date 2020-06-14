@@ -3,7 +3,7 @@
 # 12.Oct. 2018
 
 import math as N
-from LCDMCosmology import *
+from .LCDMCosmology import LCDMCosmology
 from   scipy      import interpolate, integrate
 import numpy as np
 import scipy as sci
