@@ -5,13 +5,18 @@ import sys
 import logging
 import datetime
 
-date = datetime.datetime.now()
-date = date.strftime("%Y-%b-%d, %A %I:%M:%S")
-logging.basicConfig(filename="simplemc_{}.log".format(date),
-                            filemode='a',
-                            format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                            datefmt='%H:%M:%S',
-                            level=logging.INFO)
+log = False
+
+if log:
+    date = datetime.datetime.now()
+    date = date.strftime("%Y-%b-%d, %A %I:%M:%S")
+    logging.basicConfig(filename="simplemc_{}.log".format(date),
+                                filemode='a',
+                                format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                                datefmt='%H:%M:%S',
+                                level=logging.INFO)
+else:
+    logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
