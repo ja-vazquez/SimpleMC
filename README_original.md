@@ -17,12 +17,12 @@ pedagogical reasons.
 
 Directory structure:
 --------------------
-simplemc (root) - actual executables - you should read them like scripts
-analyzers - analysis code  
+
+py - analysis code  
+Run - actual executables - you should read them like scripts  
 data - data files  
-cosmo - Cosmoligical issues
-likelihoods - Several likelihoods for several datasets
-models - Cosmological models based on LCDM 
+chains - empty directory to store chains  
+example - a simple example to see how the code works  
 tools - various tools we use for plotting, etc.  
 attick - various hacks and tests  
 
@@ -31,11 +31,22 @@ Quick start:
 
 A quick start with the code, try:
 
-`python3 test.py`  
+`examples/TestRun.py`  
+and then, after a few minutes  
+`examples/TestPlot.py`  
 
 
-You can set the `baseConfig.ini` with the analyzer, model and datasets that
-you need.  
+But this is now how we normally run the code. To fit for LCDM using
+BOSS BAO without assuming you know what rd is, say something
+
+`Run/driver.py pre LCDM BBAO`
+
+To fit for oLCDM using Lyman-alpha BAO and LyaCross BAO +Planck say 
+
+`Run/driver.py phy oLCDM LBAO+Planck`
+
+`Run/driver.py` will print all possible options
+
 
 How does it work:
 -----------------
