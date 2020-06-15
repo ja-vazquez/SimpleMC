@@ -124,15 +124,16 @@ class SimpleGenetic:
         self.tolerance_stopping  = tolerance_stopping
         self.outputname = outputname
 
-        self.optimize()
-
     def optimize(self):
         """
         This method generates a Population and then optimize it.
 
         Returns
         -------
-        Population.optimize : method
+        'Number of generations: {}\n'
+        'Optimal value of variables: {}\n'
+        'Target function value: {}'.format(iterations, optimalvalues,
+                                    target_function_val)
         """
         population = Population(n_individuals=self.n_individuals,
                 n_variables=self.n_variables,
