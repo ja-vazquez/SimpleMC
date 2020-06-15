@@ -1,9 +1,7 @@
 #
 
 from simplemc.cosmo.Derivedparam import AllDerived
-import scipy.integrate as integrate
 import scipy.linalg as la
-import os.path as path
 import scipy as sp
 import copy
 import random
@@ -23,12 +21,11 @@ print ("Hello, World! "
 
 class MCMCAnalyzer:
     def __init__(self, like, outfile, skip=5000, nsamp=100000, temp=1.0,
-                 cov=None, chain_num=None, addDerived=False, GRstop=0.01):
+                 cov=None, chain_num=None, addDerived=False, GRstop=0.01, checkGR=500):
         """
         MCMC sampler (Metropolis-Hastings).
         This is the MCMC module. It spits out chains that are compatible with CosmoM
         it calculates cov matrix during burn-in.
-        chain_num tells it to spit out multi-node chains.
         optional temperature makes it sample at a higher temperature but note that
         this guy, as opposed to cosmomc, reweights the weights on the fly.
 
@@ -52,9 +49,6 @@ class MCMCAnalyzer:
         cov : numpy.array
             Covariance matrix. Default: None.
 
-        chain_num : int
-            Number of chains to run in parallel
-
         addDerived : bool
             In order to ad derived parameters such as age of the universe and Omega_{Lambda}
 
@@ -70,6 +64,7 @@ class MCMCAnalyzer:
         self.cpars     = like.freeParameters()
         self.N         = len(self.cpars)
         self.derived   = addDerived
+        self.checkgr   = checkGR
 
         minvals, maxvals = [], []
         for lb, hb in [p.bounds for p in self.cpars]:
@@ -125,7 +120,6 @@ class MCMCAnalyzer:
         #converge
         self.lpars   = []
         self.percen  = 0.4
-        self.checkgr = 500
 
         gr = None
 
@@ -175,11 +169,20 @@ class MCMCAnalyzer:
                     print('\n---- Gelman-Rubin achived ---- ')
                     return True
 
+
+
     def GRDRun(self, chains):
         """
         This is a implementation of the Gelman Rubin diagnostic.
-        If the number of chains is 1, then this method divide in two the chain
-        and do the diagnostic for convergence.
+        If the number of chains is 1, then this method divides it in two
+        and does the diagnostic for convergence.
+        Parameters
+        ----------
+        chains
+
+        Returns
+        -------
+
         """
         mean_chain = []
         var_chain  = []
@@ -212,10 +215,15 @@ class MCMCAnalyzer:
         result = sp.array(sp.absolute(1- sp.sqrt(R/W)))
         return result
 
+
+
     def openFiles(self):
-        """"
+        """
         Open the files to save the samples and maxlike.
         Also add the Dervided Parameters if addDerived option is True.
+        Returns
+        -------
+
         """
         outfile = self.outfile
         formstr = '%g ' + '%g '*(self.N+1)
@@ -242,9 +250,14 @@ class MCMCAnalyzer:
         self.fout.close()
         self.mlfout.close()
 
+
+
     def getLikes(self):
-        """"
+        """
         Get loglikelihoods values from the used data.
+        Returns
+        -------
+
         """
         if (self.composite):
             cloglikes = self.like.compositeLogLikes_wprior()
@@ -258,6 +271,9 @@ class MCMCAnalyzer:
     def GetProposal(self):
         """
         Generation of proposal point in mcmc
+        Returns
+        -------
+
         """
         vec = sp.zeros(self.N)
         numreject = 0
@@ -273,9 +289,13 @@ class MCMCAnalyzer:
                 return ppars, numreject
             numreject += 1
 
+
+
     def draw_pcov(self):
         a = sp.array([random.gauss(0., 1,) for _ in range(self.N)])
         return sp.dot(a, self.chol)
+
+
 
     def ProcessAccepted(self, ppars, ploglike, ploglikes):
         self.co += 1

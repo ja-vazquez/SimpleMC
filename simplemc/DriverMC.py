@@ -243,6 +243,7 @@ class DriverMC:
             temp     = self.config.getfloat(    'mcmc', 'temp',    fallback=2)
             chainno  = self.config.getint(      'mcmc', 'chainno', fallback=1)
             GRstop   = self.config.getfloat(    'mcmc', 'GRstop',  fallback=0.01)
+            checkGR  = self.config.getfloat(    'mcmc', 'checkGR', fallback=500)
             evidence = self.config.getboolean(  'mcmc', 'evidence',fallback=False)
         else:
             nsamp    = kwargs.pop('nsamp', 50000)
@@ -250,6 +251,7 @@ class DriverMC:
             temp     = kwargs.pop('temp',  2)
             chainno  = kwargs.pop('chainno', 1)
             GRstop   = kwargs.pop('GRstop', 0.01)
+            checkGR  = kwargs.pop('checkGR', 500)
             evidence = kwargs.pop('evidence', False)
             if kwargs:
                 logger.critical('Unexpected **kwargs for MCMC: {}'.format(kwargs))
@@ -271,7 +273,7 @@ class DriverMC:
 
         #Main process
         M = MCMCAnalyzer(self.L, self.outputpath, skip=skip, nsamp=nsamp, temp = temp,
-                        chain_num=chainno, addDerived=self.addDerived, GRstop=GRstop)
+                        chain_num=chainno, addDerived=self.addDerived, GRstop=GRstop, checkGR=checkGR)
 
         self.ttime = time.time() - ti
 
