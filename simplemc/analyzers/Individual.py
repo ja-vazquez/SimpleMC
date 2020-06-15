@@ -94,7 +94,7 @@ class Individual:
                 "Optimization should be: 'maximize' or 'minimize'"
             )
 
-        self.function_value = target_function(*self.value_variables)
+        self.function_value = target_function(self.value_variables)
         if optimization == "maximize":
             self.fitness = self.function_value
         elif optimization == "minimize":
