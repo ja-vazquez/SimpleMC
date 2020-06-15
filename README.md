@@ -1,5 +1,5 @@
-april.
-=====
+simplemc 1.9.0
+===============
 
 A simple MCMC code for cosmological parameter estimation where only
 expansion history matters. Written by Anže Slosar and Jose Vazquez.
@@ -18,7 +18,7 @@ pedagogical reasons.
 Directory structure:
 --------------------
 simplemc (root) - actual executables - you should read them like scripts
-analyzers - analysis code  
+analyzers - analysis code (samplers and optimizers)
 data - data files  
 cosmo - Cosmoligical issues
 likelihoods - Several likelihoods for several datasets
@@ -65,7 +65,7 @@ chucked into one single CompositeLikelihood as seen in Run/TestRun.py.
 To see how models are created, have a look, for example at
 LCDMCosmology.py and oLCDMCosmology.py.
 
-Parameters and priors are defined in ParamDefs.py
+Parameters and priors are defined in paramDefs.py
 
 LCDMCosmology inherits BaseCosmology and defines three functions:
 
