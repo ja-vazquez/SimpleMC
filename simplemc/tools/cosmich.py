@@ -104,6 +104,7 @@ class cosmochain:
                     cdata = da[skip:-1]
                 else:
                     skip = skip_
+                    cdata = da[skip:-1]
                 print("skipping:", skip)
                 if (balance):
                     print("balancing...")
