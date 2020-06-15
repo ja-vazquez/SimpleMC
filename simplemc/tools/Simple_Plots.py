@@ -73,7 +73,7 @@ class Simple_plots(cosmochain):
         self.draw_frame()
         plt.tight_layout()
         #plt.savefig('Plot_2D.pdf')
-        #plt.show()
+        plt.show()
 
 
 

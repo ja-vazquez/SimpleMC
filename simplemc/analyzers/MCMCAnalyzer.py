@@ -1,11 +1,4 @@
 #
-# This is the MCMC module.
-# it spits out chains that are compatible with CosmoMC
-# it calculates cov matrix during burn-in.
-# chain_num tells it to spit out multi-node chains.
-# optional temperature makes it sample at a higher temperature but note that
-# this guy, as opposed to cosmomc, reweights the weights on the fly.
-#
 
 from simplemc.cosmo.Derivedparam import AllDerived
 import scipy.integrate as integrate
@@ -21,6 +14,9 @@ from mpi4py import MPI
 comm = MPI.COMM_WORLD
 name = MPI.Get_processor_name()
 
+#TODO si escribo (en el baseconfig) chainno=2, pero no use mpi
+#TODO solo se genera una cadena. Entonces chainno esta dato por el numero de procesadores.
+
 print ("Hello, World! "
        "I am process %d of %d on %s" %
        (comm.rank, comm.size, name))
@@ -30,7 +26,7 @@ class MCMCAnalyzer:
                  cov=None, chain_num=None, addDerived=False, GRstop=0.01):
         """
         MCMC sampler (Metropolis-Hastings).
-        This is the MCMC module. It spits out chains that are compatible with CosmoMC
+        This is the MCMC module. It spits out chains that are compatible with CosmoM
         it calculates cov matrix during burn-in.
         chain_num tells it to spit out multi-node chains.
         optional temperature makes it sample at a higher temperature but note that
@@ -70,7 +66,7 @@ class MCMCAnalyzer:
         self.nsamp     = nsamp
         self.skip      = skip
         self.temp      = float(temp)  # temperature
-        self.chain_num = comm.rank+1 #chain_num
+        self.chain_num = comm.rank+1  #chain_num
         self.cpars     = like.freeParameters()
         self.N         = len(self.cpars)
         self.derived   = addDerived

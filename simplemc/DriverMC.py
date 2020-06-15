@@ -546,11 +546,14 @@ class DriverMC:
             showplot   = self.config.getboolean('maxlike', 'showplot', fallback=False)
             plot_par1  = self.config.get('maxlike', 'plot_par1', fallback=None)
             plot_par2  = self.config.get('maxlike', 'plot_par2', fallback=None)
+            showderived= self.config.getboolean('maxlike', 'showderived', fallback=False)
+
         else:
-            withErrors = kwargs.pop('withErrors', False)
-            showplot   = kwargs.pop('showplot', False)
-            plot_par1  = kwargs.pop('plot_par1', None)
+            withErrors  = kwargs.pop('withErrors', False)
+            showplot    = kwargs.pop('showplot', False)
+            plot_par1   = kwargs.pop('plot_par1', None)
             plot_par2   = kwargs.pop('plot_par2', None)
+            showderived = kwargs.pop('showderived', False)
             if kwargs:
                 logger.critical('Unexpected **kwargs for MaxLike: {}'.format(kwargs))
                 logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
@@ -558,7 +561,7 @@ class DriverMC:
                             '\n\twithErrors (bool) Default: False')
                 sys.exit(1)
         ti = time.time()
-        A = MaxLikeAnalyzer(self.L, self.model, withErrors=withErrors, \
+        A = MaxLikeAnalyzer(self.L, self.model, withErrors=withErrors, showderived=showderived,\
                             showplot=showplot, param1=plot_par1, param2=plot_par2)
         params = self.T.printParameters(A.params)
         self.ttime = time.time() - ti
