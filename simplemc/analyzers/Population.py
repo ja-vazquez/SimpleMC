@@ -372,7 +372,7 @@ class Population:
                 difference = abs(self.historical_best_fitness[i] \
                                  - self.historical_best_fitness[i - 1])
                 self.difference_abs.append(difference)
-            f.write(" {} {} \n".format(i, self.best_fitness))
+            f.write("{} {} \n".format(i, self.best_fitness))
             sys.stdout.write("\r{}it | best fitness: {:.4f} | best individual: {}".format(i + 1, self.best_fitness,
                                                                                           self.best_value_variables))
             sys.stdout.flush()
