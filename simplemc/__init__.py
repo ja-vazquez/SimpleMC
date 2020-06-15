@@ -34,6 +34,3 @@ from . import likelihoods
 from . import models
 from . import tools
 from . import attick
-
-
-__version__ = "1.9.0"
