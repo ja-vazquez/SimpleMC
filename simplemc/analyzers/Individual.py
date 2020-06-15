@@ -14,7 +14,10 @@ class Individual:
             Number of variables or free parameters
 
         lower_bounds : list
-            List with the lower bounds
+            List with the lower bounds for each free parameter.
+
+        upper_bounds : list
+            List with the upper bounds for each free parameter.
         """
         self.n_variables = n_variables
         self.lower_bounds = lower_bounds
@@ -73,9 +76,22 @@ class Individual:
             )
 
     def calculate_fitness(self, target_function, optimization):
+        """
+        It calculates the fitness function.
+
+        Parameters
+        ----------
+        target_function : method
+            Function to optimize. Usually (in simplemc context) the likelihood.
+
+        optimization : str
+            {"maximize", "minimize}
+            Default: maximize
+
+        """
         if not optimization in ["maximize", "minimize"]:
             raise Exception(
-                "Arg should be: 'maximize' or 'minimize'"
+                "Optimization should be: 'maximize' or 'minimize'"
             )
 
         self.function_value = target_function(*self.value_variables)
@@ -84,16 +100,44 @@ class Individual:
         elif optimization == "minimize":
             self.fitness = -self.function_value
 
-    def mutate(self, prob_mut=0.01, distribution="uniform", media_distribution=1,
-              sd_distribution=1, min_distribution=-1, max_distribution=1):
+    def mutate(self, prob_mut=0.04, distribution="uniform", media_distribution=1.0,
+              sd_distribution=1.0, min_distribution=-1.0, max_distribution=1.0):
+        """
+        This mutates the individuals.
+
+        Parameters
+        ----------
+        prob_mut : float
+            Default: 0.04
+
+        distribution : str
+            {"uniform", "gaussian", "random"}
+            Default: "uniform"
+
+        media_distribution : float
+            Media value for gaussian distributions
+
+        sd_distribution : float
+            Standard deviation for gaussian distributions
+            Default: 1.0
+
+        min_distribution : float
+            Minimum value for uniform distributions
+            Default: -1.0
+
+        max_distribution : float
+            Maximum value for uniform distributions
+            Default: 1.0
+
+        """
         if not distribution in ["gaussian", "uniform", "random"]:
             raise Exception(
-                "Arg should be: 'gaussian', 'uniform' or 'random'"
+                "Distribution should be: 'gaussian', 'uniform' or 'random'"
             )
 
         pos_mutated = np.random.uniform(
-            low=0,
-            high=1,
+            low=0.0,
+            high=1.0,
             size=self.n_variables
         )
         pos_mutated = pos_mutated < prob_mut

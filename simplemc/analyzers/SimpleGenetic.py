@@ -6,6 +6,8 @@ class SimpleGenetic:
     def __init__(self, target_function, n_variables, bounds, **kwargs):
         """
         SimpleGenetic use the optimization method from Population class and execute it.
+        This script are a modified version of:
+        https://www.cienciadedatos.net/documentos/py01_optimizacion_ga
 
         Parameters
         ----------
@@ -43,27 +45,42 @@ class SimpleGenetic:
             {"uniform", "gaussian", "random"}
             Default: uniform
 
-        media_distribution : float
+         media_distribution : float
+            Media value for gaussian distributions
 
         sd_distribution : float
+            Standard deviation for gaussian distributions
+            Default: 1.0
 
-        min_distribution :
+        min_distribution : float
+            Minimum value for uniform distributions
+            Default: -1.0
 
-        max_distribution :
+        max_distribution : float
+            Maximum value for uniform distributions
+            Default: 1.0
 
         stopping_early : bool
-
+            It needs a not None value for "rounds_stopping" and "tolerance_stopping".
+            Default: True
 
         rounds_stopping : int
+            Rounds to consider to stopping early with the tolerance_stopping value.
+            Default : 100
 
         tolerance_stopping : float
+            Value to stopping early criteria. This value is the difference between the
+            best fit for the latest rounds_stopping generations.
+            Default : 0.01
 
         outputname : str
+            Name for the output text file.
+            Default: "geneticOutput"
         """
         n_individuals = kwargs.pop("n_individuals", 50)
         optimization = kwargs.pop("optimization", "maximize")
         n_generations = kwargs.pop("n_generations", 250)
-        method_selection = kwargs.pop("method_selection","tournament")
+        method_selection = kwargs.pop("method_selection", "tournament")
         elitism = kwargs.pop("elitism", 0.01)
         prob_mut = kwargs.pop("prob_mut", 0.4)
         distribution = kwargs.pop("distribution", "uniform")
@@ -72,8 +89,8 @@ class SimpleGenetic:
         min_distribution = kwargs.pop("min_distribution", -1)
         max_distribution = kwargs.pop("max_distribution", 1)
         stopping_early = kwargs.pop("stopping_early", True)
-        rounds_stopping = kwargs.pop("rounds_stopping", 500)
-        tolerance_stopping = kwargs.pop("tolerance_stopping", 0.1)
+        rounds_stopping = kwargs.pop("rounds_stopping", 100)
+        tolerance_stopping = kwargs.pop("tolerance_stopping", 0.01)
         outputname = kwargs.pop("outputname", "geneticOutput")
         if kwargs:
             logger.critical('Unexpected **kwargs for SimpleGenetic: {}'.format(kwargs))
@@ -110,6 +127,13 @@ class SimpleGenetic:
         self.optimize()
 
     def optimize(self):
+        """
+        This method generates a Population and then optimize it.
+
+        Returns
+        -------
+        Population.optimize : method
+        """
         population = Population(n_individuals=self.n_individuals,
                 n_variables=self.n_variables,
                 lower_bounds=self.lower_bounds,

@@ -2,14 +2,30 @@ from .Individual import Individual
 import numpy as np
 import copy
 import pandas as pd
-import time
 import sys
 from datetime import datetime
-
+from simplemc import logger
 
 class Population:
     def __init__(self, n_individuals, n_variables, lower_bounds=None,
                  upper_bounds=None):
+        """
+        It creates several objects of the Individual class and generates a Population.
+
+        Parameters
+        ----------
+        n_individuals : int
+            Number of initial individuals
+
+        n_variables : int
+            Number of variables or free parameters
+
+        lower_bounds : list
+            List with the lower bounds for each free parameter.
+
+        upper_bounds : list
+            List with the upper bounds for each free parameter.
+        """
 
         self.n_individuals = n_individuals
         self.n_variables = n_variables
@@ -33,10 +49,10 @@ class Population:
         self.function_value_optimal = None
 
         if self.lower_bounds is not None \
-        and not isinstance(self.lower_bounds,np.ndarray):
+        and not isinstance(self.lower_bounds, np.ndarray):
             self.lower_bounds = np.array(self.lower_bounds)
 
-        if self.upper_bounds is not None and not isinstance(self.upper_bounds,np.ndarray):
+        if self.upper_bounds is not None and not isinstance(self.upper_bounds, np.ndarray):
             self.upper_bounds = np.array(self.upper_bounds)
 
         for i in np.arange(n_individuals):
@@ -47,6 +63,21 @@ class Population:
             self.individuals.append(individual_i)
 
     def eval_population(self, target_function, optimization):
+        """
+
+        Parameters
+        ----------
+        target_function : method
+            Function to optimize. Usually (in simplemc context) the likelihood.
+
+        optimization : str
+            {"maximize", "minimize}
+            Default: maximize
+
+        Returns
+        -------
+
+        """
         for i in np.arange(self.n_individuals):
             self.individuals[i].calculate_fitness(
                 target_function = target_function,
@@ -64,6 +95,17 @@ class Population:
 
 
     def cross_individuals(self, parental_1, parental_2):
+        """
+        Method to cross two differents individuals
+        Parameters
+        ----------
+        parental_1
+        parental_2
+
+        Returns
+        -------
+
+        """
 
         if parental_1 not in np.arange(self.n_individuals):
             raise Exception(
@@ -105,6 +147,19 @@ class Population:
     
     def select_individual(self, n, return_indexs=True,
                               method_selection="tournament"):
+        """
+        This method selects an individual given a selection method.
+
+        Parameters
+        ----------
+        n : int
+        return_indexs : bool
+        method_selection : str
+
+        Returns
+        -------
+
+        """
 
         if method_selection not in ["roulette", "rank", "tournament"]:
             raise Exception(
@@ -116,28 +171,28 @@ class Population:
             array_fitness[i] = copy.copy(self.individuals[i].fitness)
         
         if method_selection == "roulette":
-            probabilidad_selection = array_fitness / np.sum(array_fitness)
+            selection_probability = array_fitness / np.sum(array_fitness)
             ind_selected = np.random.choice(
                                     a       = np.arange(self.n_individuals),
                                     size    = n,
-                                    p       = list(probabilidad_selection),
+                                    p       = list(selection_probability),
                                     replace = True
                                )
         elif method_selection == "rank":
             order = np.flip(np.argsort(a=array_fitness) + 1)
             ranks = np.argsort(order) + 1
-            probabilidad_selection = 1 / ranks
-            probabilidad_selection = probabilidad_selection / np.sum(probabilidad_selection)
+            selection_probability = 1 / ranks
+            selection_probability = selection_probability / np.sum(selection_probability)
             ind_selected = np.random.choice(
                                 a       = np.arange(self.n_individuals),
                                 size    = n,
-                                p       = list(probabilidad_selection),
+                                p       = list(selection_probability),
                                 replace = True
                             )
         elif method_selection == "tournament":
-            ind_selected = np.repeat(None,n)
+            ind_selected = np.repeat(None, n)
             for i in np.arange(n):
-                # Se selectionan aleatoriamente dos parejas de individuals.
+                # Random selection of a pair of Individuals
                 candidates_a = np.random.choice(
                                 a       = np.arange(self.n_individuals),
                                 size    = 2,
@@ -148,7 +203,7 @@ class Population:
                                 size    = 2,
                                 replace = False
                             )
-                # Selection best fitness of each pair.
+                # Selection of best fitness of each pair.
                 if array_fitness[candidates_a[0]] > array_fitness[candidates_a[1]]:
                     winner_a = candidates_a[0]
                 else:
@@ -229,13 +284,73 @@ class Population:
                   sd_distribution=1, min_distribution=-1, max_distribution=1,
                   stopping_early=False, rounds_stopping=3,
                   tolerance_stopping=0.1, outputname="geneticOutput"):
+        """
+        This is the crucial method of the genetic modules.
+        Within it, a target function is optimized.
+
+        Parameters
+        ----------
+        target_function : method
+            Usually the likelihood function.
+
+        optimization : str
+            Options {"maximize", "minimize"}. Default is "maximize"
+
+        n_generations : int
+            Number of generations to evolve the original population
+
+        method_selection : str
+            Type of selection method {"tournament", "rank", "roulette"}.
+            Default: "tournament"
+
+        elitism : float
+            Value of elitism.
+            Default: 0.01.
+
+        prob_mut : float
+            Probability of mutation.
+            Default: 0.4
+
+        distribution : str
+            {"uniform", "gaussian", "random"}
+            Default: uniform
+
+        media_distribution : float
+            Media value for gaussian distributions
+
+        sd_distribution : float
+            Standard deviation for gaussian distributions
+            Default: 1.0
+
+        min_distribution : float
+            Minimum value for uniform distributions
+            Default: -1.0
+
+        max_distribution : float
+            Maximum value for uniform distributions
+            Default: 1.0
+
+        stopping_early : bool
+            It needs a not None value for "rounds_stopping" and "tolerance_stopping".
+            Default: True
+
+        rounds_stopping : int
+            Rounds to consider to stopping early with the tolerance_stopping value.
+
+        tolerance_stopping : float
+            Value to stopping early criteria. This value is the difference between the
+            best fit for the latest rounds_stopping generations.
+
+        outputname : str
+            Name for the output text file.
+            Default: "geneticOutput"
+
+        """
 
 
         if stopping_early and (rounds_stopping is None or tolerance_stopping is None):
             raise Exception("To activate Stopping early it is necessary to indicate a",
                             "value of rounds_stopping and tolerance_stopping.")
-
-        start = time.time()
 
         f = open("{}.txt".format(outputname), "+w")
         f.write("# Generation, best_fitness\n")
@@ -261,14 +376,14 @@ class Population:
                                  - self.historical_best_fitness[i-1])
                 self.difference_abs.append(difference)
             f.write(" {} {} \n".format(i, self.best_fitness))
-            sys.stdout.write("\r{}it | best fitness: {:.4f} | best individual: {}".format(i, self.best_fitness, self.best_value_variables))
+            sys.stdout.write("\r{}it | best fitness: {:.4f} | best individual: {}".format(i+1, self.best_fitness, self.best_value_variables))
             sys.stdout.flush()
             if stopping_early and i > rounds_stopping:
                 latest_n = np.array(self.difference_abs[-(rounds_stopping):])
                 if all(latest_n < tolerance_stopping):
                     print("Algorithm stopped in the {} generation"
                           "for lack of absolute minimum change of {}"
-                          "while {} consecutive generations".format(i, tolerance_stopping,
+                          "while {} consecutive generations".format(i+1, tolerance_stopping,
                                                                     rounds_stopping))
 
                     break
@@ -280,7 +395,6 @@ class Population:
                 distribution=distribution)
 
         f.close()
-        end = time.time()
         self.optimized = True
         self.iter_optimization = i
         
@@ -300,14 +414,14 @@ class Population:
             }
         )
         self.results_df["generation"] = self.results_df.index
-        print("\n\nSummary:\n--------")
-        print("Optimization duration: {}".format(end - start))
-        print("Number of generations: {}".format(self.iter_optimization+1))
-        print("Optimal value of variables: {}".format(self.value_variables_optimal))
-        print("Target function value: {}".format(self.function_value_optimal))
-        file = open("{}_Summary.txt".format(outputname), "+w")
-        file.write("Optimization duration: {}\n".format(end - start))
+
+        file = open("{}_summary.txt".format(outputname), "+w")
         file.write("Number of generations: {}\n".format(self.iter_optimization+1))
         file.write("Optimal value of variables: {}\n".format(self.value_variables_optimal))
         file.write("Target function value: {}\n".format(self.function_value_optimal))
         file.close()
+        logger.info("Summary\n------\nNumber of generations: {}\n"
+                    "Optimal value of variables: {}\n"
+                    "Target function value: {}\n".format(self.iter_optimization+1,
+                                                         self.value_variables_optimal,
+                                                         self.function_value_optimal))
