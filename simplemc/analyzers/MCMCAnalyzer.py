@@ -12,8 +12,6 @@ from mpi4py import MPI
 comm = MPI.COMM_WORLD
 name = MPI.Get_processor_name()
 
-#TODO si escribo (en el baseconfig) chainno=2, pero no use mpi
-#TODO solo se genera una cadena. Entonces chainno esta dato por el numero de procesadores.
 
 print ("Hello, World! "
        "I am process %d of %d on %s" %
