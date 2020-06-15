@@ -121,7 +121,9 @@ class SimplePlotter:
         self.saveFig()
 
     def simplePlot(self, **kwargs):
-        """For mcmc chains"""
+        """
+        Native simplemc plotter
+        """
         from simplemc.tools.Simple_Plots import Simple_plots
         type = kwargs.pop('type', 'triangle')
         roots = kwargs.pop('roots', [self.root])
@@ -155,6 +157,29 @@ class SimplePlotter:
             sys.exit("Invalid option")
         self.image = "{}_{}_simple.png".format(self.filename, type)
         self.saveFig()
+
+    def simplex_vs_y(self, **kwargs):
+        """
+        Plot 2 columns given a text file
+        """
+        file = self.filename + ".txt"
+        usecols = kwargs.pop("usecols", (0, 1))
+        xlabel = kwargs.pop("xlabel", "x")
+        ylabel = kwargs.pop("ylabel", "y")
+        color = kwargs.pop("color", "g")
+        linestyle = kwargs.pop("linestyle", "-")
+        linewidth = kwargs.pop("linewidth", 4)
+
+        data = np.loadtxt(file, usecols=usecols)
+        x = data[:, 0]
+        y = data[:, 1]
+        plt.plot(x, y, color=color, linestyle=linestyle,
+                 linewidth=linewidth)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        self.image = "{}_{}_vs_{}.png".format(self.filename, xlabel, ylabel)
+        self.saveFig()
+
 
 
     def readFile(self):
