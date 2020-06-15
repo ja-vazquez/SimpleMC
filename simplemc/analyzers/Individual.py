@@ -144,7 +144,7 @@ class Individual:
 
         if distribution in ["gaussian", "uniform"]:
             if distribution == "gaussian":
-                factor_mut = np.random.gaussian(
+                factor_mut = np.random.normal(
                     loc=media_distribution,
                     scale=sd_distribution,
                     size=np.sum(pos_mutated)
