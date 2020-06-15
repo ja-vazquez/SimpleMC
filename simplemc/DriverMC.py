@@ -591,6 +591,39 @@ class DriverMC:
 
         mut_prob : float
             Probability of mutation.
+
+        distribution : str
+            {"uniform", "gaussian", "random"}
+            Default: uniform
+
+        media_distribution : float
+            Media value for gaussian distributions
+
+        sd_distribution : float
+            Standard deviation for gaussian distributions
+            Default: 1.0
+
+        min_distribution : float
+            Minimum value for uniform distributions
+            Default: -1.0
+
+        max_distribution : float
+            Maximum value for uniform distributions
+            Default: 1.0
+
+        stopping_early : bool
+            It needs a not None value for "rounds_stopping" and "tolerance_stopping".
+            Default: True
+
+        rounds_stopping : int
+            Rounds to consider to stopping early with the tolerance_stopping value.
+            Default : 100
+
+        tolerance_stopping : float
+            Value to stopping early criteria. This value is the difference between the
+            best fit for the latest rounds_stopping generations.
+            Default : 0.01
+
         """
         if self.analyzername is None: self.analyzername = 'genetic'
         self.outputpath = '{}_{}_optimization'.format(self.outputpath, self.analyzername)
@@ -601,11 +634,27 @@ class DriverMC:
             n_generations = self.config.getint('genetic', 'n_generations' , fallback=1000)
             selection_method = self.config.get('genetic', 'selection_method', fallback='tournament')
             mut_prob = self.config.getfloat('genetic', 'mut_prob', fallback=0.6)
+            distribution = self.config("distribution", fallback="uniform")
+            media_distribution = self.config.getfloat("media_distribution", fallback=1.0)
+            sd_distribution = self.config.getfloat("sd_distribution", fallback=1.0)
+            min_distribution = self.config.getfloat("min_distribution", fallback=-1.0)
+            max_distribution = self.config.getfloat("max_distribution", fallback=1.0)
+            stopping_early = self.config.getboolean("stopping_early", fallback=True)
+            rounds_stopping = self.config.getint("rounds_stopping", fallback=100)
+            tolerance_stopping = self.config.getfloat("tolerance_stopping", fallback=0.01)
         else:
             n_individuals = kwargs.pop('n_individuals', 400)
             n_generations = kwargs.pop('n_generations', 1000)
             selection_method = kwargs.pop('selection_method', 'tournament')
             mut_prob = kwargs.pop('mut_prob', 0.6)
+            distribution = kwargs.pop("distribution", "uniform")
+            media_distribution = kwargs.pop("media_distribution", 1)
+            sd_distribution = kwargs.pop("sd_distribution", 1)
+            min_distribution = kwargs.pop("min_distribution", -1)
+            max_distribution = kwargs.pop("max_distribution", 1)
+            stopping_early = kwargs.pop("stopping_early", True)
+            rounds_stopping = kwargs.pop("rounds_stopping", 100)
+            tolerance_stopping = kwargs.pop("tolerance_stopping", 0.01)
             if kwargs:
                 logger.critical('Unexpected **kwargs for genetic optimizer: {}'.format(kwargs))
                 logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
@@ -625,10 +674,19 @@ class DriverMC:
                           n_individuals=n_individuals,
                           n_generations=n_generations,
                           prob_mut=mut_prob, method_selection=selection_method,
+                          distribution=distribution,
+                          media_distribution=media_distribution,
+                          sd_distribution=sd_distribution,
+                          min_distribution=min_distribution,
+                          max_distribution=max_distribution,
+                          stopping_early=stopping_early,
+                          rounds_stopping=rounds_stopping,
+                          tolerance_stopping=tolerance_stopping,
                           outputname=self.outputpath)
 
+        result = M.optimize()
         self.ttime = time.time() - ti
-        self.result = ['genetic', M]
+        self.result = ['genetic', M, result]
         return True
 
 
