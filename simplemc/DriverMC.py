@@ -1,12 +1,10 @@
-
-
-from simplemc.analyzers.MaxLikeAnalyzer import MaxLikeAnalyzer
-from simplemc.analyzers.SimpleGenetic import SimpleGenetic
-from simplemc.analyzers.MCMCAnalyzer import MCMCAnalyzer
-from simplemc.analyzers.dynesty import dynesty
-from simplemc.cosmo.Derivedparam import AllDerived
-from simplemc.runbase import ParseModel, ParseDataset
-from simplemc.PostProcessing import PostProcessing
+from .analyzers import MaxLikeAnalyzer
+from .analyzers import SimpleGenetic
+from .analyzers import MCMCAnalyzer
+from .analyzers import DynamicNestedSampler, NestedSampler
+from .cosmo.Derivedparam import AllDerived
+from . import ParseDataset, ParseModel
+from . import PostProcessing
 from scipy.special import ndtri
 import multiprocessing as mp
 from simplemc import logger
@@ -15,7 +13,6 @@ import sys, os
 import time
 
 
-#TODO import corner
 #TODO keras neural network
 #TODO GR criteria in .ini file
 #TODO Remove Nestle?
@@ -406,7 +403,7 @@ class DriverMC:
 
         if dynamic:
             logger.info("\nUsing dynamic nested sampling...")
-            sampler = dynesty.DynamicNestedSampler(self.logLike, self.priorTransform,
+            sampler = DynamicNestedSampler(self.logLike, self.priorTransform,
                       self.dims, bound=nestedType, pool=pool, queue_size=nprocess)
 
             sampler.run_nested(nlive_init=nlivepoints, dlogz_init=0.05, nlive_batch=100,
@@ -416,7 +413,7 @@ class DriverMC:
 
 
         elif self.engine == 'dynesty':
-            sampler = dynesty.NestedSampler(self.logLike, self.priorTransform, self.dims,
+            sampler = NestedSampler(self.logLike, self.priorTransform, self.dims,
                         bound=nestedType, sample = 'unif', nlive = nlivepoints,
                         pool = pool, queue_size=nprocess)
             sampler.run_nested(dlogz=accuracy, outputname=self.outputpath,
@@ -633,12 +630,10 @@ class DriverMC:
         return True
 
 
-
-
 ##---------------------- logLike and prior Transform function ----------------------
 ##---------------------- for nested samplers ----------------------
 
-    def logLike(self, values):
+    def logLike(self, values, *v):
         """
         If the sampler used isn't the MCMC of MCMCAnalyzer then, we need to set
         other types of likelihoods and priors objects. This method allows that. It is a

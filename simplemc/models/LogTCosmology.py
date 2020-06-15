@@ -3,7 +3,7 @@
 
 import math as N
 import numpy as np
-from LCDMCosmology import *
+from .LCDMCosmology import LCDMCosmology
 
 class LogTCosmology(LCDMCosmology):
     def __init__(self, varyalpha=True, varyOk=False):

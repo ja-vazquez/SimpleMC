@@ -7,7 +7,7 @@ class SimpleGenetic:
                 n_generations=250, method_selection="tournament", elitism=0.01,
                 prob_mut=0.1, distribution="uniform", media_distribution=1,
                 sd_distribution=1, min_distribution=-1, max_distribution=1,
-                stopping_early=False, rounds_stopping=5, tolerance_stopping=0.1,
+                stopping_early=True, rounds_stopping=500, tolerance_stopping=0.1,
                 outputname="geneticOutput"):
 
         self.target_function = target_function

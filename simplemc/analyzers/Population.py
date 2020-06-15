@@ -212,20 +212,13 @@ class Population:
                 else:
                     winner_b = candidates_b[1]
 
-                # Se comparan los dos winneres de cada pareja.
+                # For each couple, comparison of winners
                 if array_fitness[winner_a] > array_fitness[winner_b]:
                     ind_final = winner_a
                 else:
                     ind_final = winner_b
                 
                 ind_selected[i] = ind_final
-
-        if verbose:
-            print("---------------")
-            print("individual selected")
-            print("---------------")
-            print("method selection: {}".format(method_selection))
-
 
         if(return_indexs):
             return(ind_selected)
@@ -289,21 +282,14 @@ class Population:
         self.best_value_variables = None
         self.best_function_value = None
         
-        if verbose:
-            print("-----------------------")
-            print("new generation created")
-            print("-----------------------")
-            print("method selection: {}".format(method_selection))
-            print("elitism: {}".format(elitism))
-            print("Number elite individuals: {}".format(n_elitism))
-            print("Number of new individuals: {}".format(self.n_individuals-n_elitism))
+        # New generation created! Known number of new individuals.
 
     def optimize(self, target_function, optimization, n_generations = 50,
                   method_selection="tournament", elitism=0.1, prob_mut=0.01,
                   distribution="uniform", media_distribution=1,
                   sd_distribution=1, min_distribution=-1, max_distribution=1,
-                  stopping_early=False, rounds_stopping=None,
-                  tolerance_stopping=None,verbose=False,
+                  stopping_early=False, rounds_stopping=3,
+                  tolerance_stopping=0.1, verbose=False,
                   verbose_new_generation=False,
                   verbose_selection=False, verbose_cross=False,
                   verbose_mutation=False, verbose_evaluacion=False, outputname="geneticOutput"):

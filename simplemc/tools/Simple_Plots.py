@@ -2,6 +2,7 @@ from .cosmich import cosmochain
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 import numpy as np
+import sys
 
 # rcParams.update({'backend': 'pdf',
 #                'axes.labelsize': 15,
@@ -22,11 +23,16 @@ class Simple_plots(cosmochain):
 
         self.label    = label
         self.colors   = kwargs.pop("colors", ['red', 'blue', 'green', 'orange'])
+        nchains = kwargs.pop("nchains", None)
+        skip = kwargs.pop("skip", 0)
 
         if (type(roots) == type("ch")):
             self.Clist = cosmochain(dir_name + roots)
         elif len(roots)>0:
-            self.Clist = [cosmochain(dir_name + r) for r in roots]
+            try:
+                self.Clist = [cosmochain(dir_name + r) for r in roots]
+            except:
+                self.Clist = [cosmochain(dir_name + roots[0]+".txt", nchains=nchains, skip_=skip)]
 
 
 

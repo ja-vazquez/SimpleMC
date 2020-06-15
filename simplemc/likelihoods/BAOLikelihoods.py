@@ -2,10 +2,10 @@
 # The BAO likelihoods.
 #
 
-from simplemc.likelihoods.TabulatedBAOLikelihood import TabulatedBAOLikelihood
-from simplemc.likelihoods.TabulatedBAODVLikelihood import TabulatedBAODVLikelihood
-from simplemc.likelihoods.GaussBAODVLikelihood import GaussBAODVLikelihood
-from simplemc.likelihoods.ConsensusBAOLikelihood import ConsensusBAOLikelihood
+from .TabulatedBAOLikelihood import TabulatedBAOLikelihood
+from .TabulatedBAODVLikelihood import TabulatedBAODVLikelihood
+from .GaussBAODVLikelihood import GaussBAODVLikelihood
+from .ConsensusBAOLikelihood import ConsensusBAOLikelihood
 from simplemc.models.LCDMCosmology import LCDMCosmology
 
 

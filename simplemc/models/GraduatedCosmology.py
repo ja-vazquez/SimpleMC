@@ -2,7 +2,7 @@
 
 
 import numpy as np
-from LCDMCosmology import *
+from .LCDMCosmology import LCDMCosmology
 
 class GraduatedCosmology(LCDMCosmology):
     def __init__(self, varyggama=True, varyglambda=False, varyOk=False):
