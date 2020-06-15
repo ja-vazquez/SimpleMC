@@ -86,9 +86,9 @@ class Individual:
 
     def mutate(self, prob_mut=0.01, distribution="uniform", media_distribution=1,
               sd_distribution=1, min_distribution=-1, max_distribution=1):
-        if not distribution in ["normal", "uniform", "random"]:
+        if not distribution in ["gaussian", "uniform", "random"]:
             raise Exception(
-                "Arg should be: 'normal', 'uniform' or 'random'"
+                "Arg should be: 'gaussian', 'uniform' or 'random'"
             )
 
         pos_mutated = np.random.uniform(
@@ -98,9 +98,9 @@ class Individual:
         )
         pos_mutated = pos_mutated < prob_mut
 
-        if distribution in ["normal", "uniform"]:
-            if distribution == "normal":
-                factor_mut = np.random.normal(
+        if distribution in ["gaussian", "uniform"]:
+            if distribution == "gaussian":
+                factor_mut = np.random.gaussian(
                     loc=media_distribution,
                     scale=sd_distribution,
                     size=np.sum(pos_mutated)

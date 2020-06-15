@@ -41,26 +41,17 @@ class Population:
 
         for i in np.arange(n_individuals):
             individual_i = Individual(
-                            n_variables=self.n_variables,
-                            lower_bounds=self.lower_bounds,
-                            upper_bounds=self.upper_bounds)
+                            n_variables = self.n_variables,
+                            lower_bounds = self.lower_bounds,
+                            upper_bounds = self.upper_bounds)
             self.individuals.append(individual_i)
 
-    def show_individuals(self, n=None):
-        if n is None:
-            n = self.n_individuals
-        elif n > self.n_individuals:
-            n = self.n_individuals
-
-        for i in np.arange(n):
-            print(self.individuals[i])
-        return(None)
-
-    def evaluar_population(self, target_function, optimization):
+    def eval_population(self, target_function, optimization):
         for i in np.arange(self.n_individuals):
             self.individuals[i].calculate_fitness(
-                target_function=target_function,
-                optimization=optimization)
+                target_function = target_function,
+                optimization     = optimization
+            )
 
         self.best_individual = copy.deepcopy(self.individuals[0])
         for i in np.arange(self.n_individuals):
@@ -250,7 +241,7 @@ class Population:
         f.write("# Generation, best_fitness\n")
         for i in np.arange(n_generations):
 
-            self.evaluar_population(
+            self.eval_population(
                 target_function=target_function,
                 optimization=optimization)
 
