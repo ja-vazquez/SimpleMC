@@ -149,7 +149,7 @@ class MCMCAnalyzer:
             else:
                 self.cw += 1
 
-            print("Accepted: {:d} | loglike: {:.4f} | "
+            print("Accepted: {:d} | loglike: {:3.4f} | "
                   "GR: {}".format(self.co, self.cloglike, gr), end='\r')
             sys.stdout.flush()
             if (self.co >0 and self.co % self.checkgr == 0):
@@ -336,6 +336,7 @@ class MCMCAnalyzer:
                 self.maxloglike
 
             if self.co > self.nsamp:
+                print('Number of steps achieved')
                 self.done = True
 
         elif (self.co < self.skip):
