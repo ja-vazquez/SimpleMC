@@ -39,7 +39,7 @@ class SimplePlotter:
                                    analysis_settings={'smooth_scale_2D': smooth2d,
                                                       'smooth_scale_1D': smooth1d,
                                                       'ignore_rows': burnin})
-        g.settings.lab_fontsize = 15
+        g.settings.lab_fontsize = 14
         g.settings.legend_fontsize = 12
         g.settings.axes_fontsize = 12
         g.triangle_plot(roots, self.listpars,
@@ -125,6 +125,7 @@ class SimplePlotter:
         from simplemc.tools.Simple_Plots import Simple_plots
         type = kwargs.pop('type', 'triangle')
         roots = kwargs.pop('roots', [self.root])
+        nchains = kwargs.pop('nchains', None)
 
         # parlist is a par for 2d
         # list of paramnames for triangle
@@ -142,7 +143,8 @@ class SimplePlotter:
         #triangle
         parstriangle = kwargs.pop('parstriangle', ['Om', 'Obh2', 'h'])
         colortriangle = kwargs.pop("colortriangle", "blue")
-        fig = Simple_plots(self.chainsdir+"/", roots, label=label, colors=colors)
+        fig = Simple_plots(self.chainsdir+"/", roots, label=label,
+                           colors=colors, nchains=nchains)
         if type == "triangle" or type == "tri":
             fig.triangle(parstriangle, color=colortriangle)
         elif type == "1D" or type == "1d":
