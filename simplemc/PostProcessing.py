@@ -132,22 +132,14 @@ class PostProcessing:
 
 
     # AJUSTAR!
-    def saveEmceeSamples(self):
+    def saveEmceeSamples(self, thin=1):
         dims = len(self.paramList)
-        # postsamples = self.result.chain[:, self.skip:, :].reshape((-1, dims))
-        tau = self.result.get_autocorr_time()
-        logger.info("Autocorrelation time: {}".format(tau))
-        tau = np.mean(tau)
-        burnin = int(0.5 * np.max(tau))
-        thin = int(0.5 * np.min(tau))
         f = open(self.filename + '.txt', 'w+')
-        logprobs = self.result.get_log_prob(discard=burnin, flat=True, thin=thin)
-        flat_log_prior_samps = self.result.get_blobs(flat=True)
-        postsamples = self.result.get_chain(discard=burnin, flat=True, thin=thin)
+        logprobs = self.result.get_log_prob(discard=self.skip, flat=True, thin=thin)
+        postsamples = self.result.get_chain(discard=self.skip, flat=True, thin=thin)
 
         for i, row in enumerate(postsamples):
             strsamples = str(row).lstrip('[').rstrip(']')
-            # strsamples = "{} {} {}\n".format(1, -2 * (logprobs[i] - flat_log_prior_samps[i]), strsamples)
             strsamples = "{} {} {}\n".format(1, -2 * (logprobs[i]), strsamples)
             strsamples = re.sub(' +', ' ', strsamples)
             strsamples = re.sub('\n ', ' ', strsamples)

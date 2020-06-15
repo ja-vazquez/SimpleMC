@@ -463,13 +463,13 @@ class DriverMC:
 
         """
         if iniFile:
-            walkers = self.config.getint('emcee', 'walkers', fallback=500)
-            nsamp   = self.config.getint('emcee', 'nsamp', fallback=20000)
+            walkers = self.config.getint('emcee', 'walkers', fallback=self.dims*2+2)
+            nsamp   = self.config.getint('emcee', 'nsamp', fallback=10000)
             burnin  = self.config.getint('emcee', 'burnin', fallback=0)
             nproc   = self.config.getint('emcee', 'nproc', fallback=1)
         else:
-            walkers = kwargs.pop('walkers', 30)
-            nsamp   = kwargs.pop('nsamp', 20000)
+            walkers = kwargs.pop('walkers', self.dims*2+2)
+            nsamp   = kwargs.pop('nsamp', 10000)
             burnin  = kwargs.pop('burnin', 0)
             nproc   = kwargs.pop('nproc', 1)
             if kwargs:
@@ -481,9 +481,11 @@ class DriverMC:
                             'burnin (int) Default: 0\n\t'
                             'nproc (int) Default: 1')
                 sys.exit(1)
+
         logger.info("\n\twalkers: {}\n\tnsamp: {}\n"
                     "\tburnin: {}\n\t"
                     "nproc: {}".format(walkers, nsamp, burnin, nproc))
+
         if self.analyzername is None: self.analyzername = 'emcee'
         self.outputpath = "{}_{}_{}_walkers".format(self.outputpath, self.analyzername, walkers)
         self.outputChecker()
@@ -496,23 +498,22 @@ class DriverMC:
         try:
             import emcee
             ti = time.time()
-            sampler = emcee.EnsembleSampler(walkers, self.dims, self.logPosterior, pool=pool)
+            sampler = emcee.EnsembleSampler(walkers, self.dims,
+                                            self.logPosterior, pool=pool)
+            #testing
+            sampler.sample(initial_state=self.means, tune=True, thin_by=3)
             # pass the initial samples and total number of samples required
-            sampler.run_mcmc(inisamples, nsamp + burnin, progress=True)
-            # extract the samples (removing the burn-in)
-            # postsamples = sampler.chain[:, burnin:, :].reshape((-1, self.dims))
+            sampler.run_mcmc(inisamples, nsamp + burnin,
+                             progress=True)
             self.ttime = time.time() - ti
         except ImportError as error:
             sys.exit("{}: Please install this module"
                      "or try using other sampler".format(error.__class__.__name__))
-        # set up the sampler
         self.burnin = burnin
         try:
             pool.close()
         except:
             pass
-        # fig = corner.corner(postsamples)
-        # fig.savefig('emcee.png')
         self.result = ['emcee', sampler, 'walkers : {}'.format(walkers), 'samples: {}'.format(nsamp)]
         return True
 
