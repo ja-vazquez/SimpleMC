@@ -18,12 +18,19 @@ pedagogical reasons.
 Directory structure:
 --------------------
 simplemc (root) - actual executables - you should read them like scripts
+
 analyzers - analysis code (samplers and optimizers)
+
 data - data files  
+
 cosmo - Cosmoligical issues
+
 likelihoods - Several likelihoods for several datasets
+
 models - Cosmological models based on LCDM 
+
 tools - various tools we use for plotting, etc.  
+
 attick - various hacks and tests  
 
 Quick start:
