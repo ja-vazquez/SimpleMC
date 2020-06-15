@@ -888,7 +888,8 @@ class DriverMC:
         """
         from .tools.SimplePlotter import SimplePlotter
         figure = SimplePlotter(self.chainsdir, self.outputpath, self.paramsList, show=show)
-
+        if self.analyzername == "genetic":
+            figure.simplex_vs_y(xlabel="iterations", ylabel="best fitness")
         return figure
 
 # ### pool from multiprocessing
