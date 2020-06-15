@@ -953,8 +953,8 @@ class Sampler(object):
                 #            logl_max=logl_max)
                 weights = np.exp(results[5])
                 vstarstr = str(results[2]).lstrip('[').rstrip(']')
-                sys.stdout.write("\rit: {} | ncall: {} | "
-                      "logz: {:.4f} | loglstar: {:.4f} | point {}".format(i, ncall, logz, loglstar, vstarstr))
+                sys.stdout.write("\rit: {} | ncall: {} | logz: {:.4f} | "
+                      "dlogz: {:.4f} | loglstar: {:.4f} | point {}".format(i, ncall, logz, delta_logz, loglstar, vstarstr))
                 sys.stdout.flush()
                 # exp(logwt - loglstar)
                 if addDerived:
@@ -1013,12 +1013,6 @@ class Sampler(object):
                 rowstr = " ".join(rowstr.split())
                 f.write("{}\n".format(rowstr))
 
-                # Print progress.
-                # if print_progress:
-                #     sys.stdout.write("it: {} | ncall: {} | "
-                #           "logz: {:.4f} | loglstar: {:.4f} | "
-                #           "points: {}\\".format(i, ncall, logz, loglstar, vstarstr))
-                #     sys.stdout.flush()
             f.close()
 
     def add_final_live(self, print_progress=True, print_func=None):
