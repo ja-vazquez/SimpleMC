@@ -65,8 +65,6 @@ class PostProcessing:
 
 
     def writeSummary(self, time, *args):
-        if self.analyzername == 'genetic':
-            sys.exit(1)
         file = open(self.filename + "_Summary" + ".txt", 'w')
         file.write('SUMMARY\n-------\n')
 
