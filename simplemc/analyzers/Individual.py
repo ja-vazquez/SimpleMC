@@ -4,7 +4,7 @@ import warnings
 
 
 class Individual:
-    def __init__(self, n_variables, lower_lims=None, upper_lims=None):
+    def __init__(self, n_variables, lower_bounds=None, upper_bounds=None):
         """
         This class generates the individuals within the bounds of the parameter space.
 
@@ -13,77 +13,64 @@ class Individual:
         n_variables : int
             Number of variables or free parameters
 
-        lower_lims : list
+        lower_bounds : list
             List with the lower bounds
         """
         self.n_variables = n_variables
-        self.lower_lims = lower_lims
-        self.upper_lims = upper_lims
+        self.lower_bounds = lower_bounds
+        self.upper_bounds = upper_bounds
         self.value_variables = np.repeat(None, n_variables)
         self.fitness = None
         self.function_value = None
 
-        if self.lower_lims is not None and not isinstance(self.lower_lims, np.ndarray):
-            self.lower_lims = np.array(self.lower_lims)
+        if self.lower_bounds is not None and not isinstance(self.lower_bounds, np.ndarray):
+            self.lower_bounds = np.array(self.lower_bounds)
 
-        if self.upper_lims is not None \
-                and not isinstance(self.upper_lims, np.ndarray):
-            self.upper_lims = np.array(self.upper_lims)
+        if self.upper_bounds is not None \
+                and not isinstance(self.upper_bounds, np.ndarray):
+            self.upper_bounds = np.array(self.upper_bounds)
 
-        if self.lower_lims is not None and len(self.lower_lims) != self.n_variables:
+        if self.lower_bounds is not None and len(self.lower_bounds) != self.n_variables:
             raise Exception(
-                "lower_lims must have a value for each variable." +
+                "lower_bounds must have a value for each variable." +
                 "If you do not want to limit any variable, use None." +
-                "Ex: lower_lims = [10, None, 5]"
+                "Ex: lower_bounds = [10, None, 5]"
             )
-        elif self.upper_lims is not None \
-                and len(self.upper_lims) != self.n_variables:
+        elif self.upper_bounds is not None \
+                and len(self.upper_bounds) != self.n_variables:
             raise Exception(
-                "upper_lims must have a value for each variable." +
+                "upper_bounds must have a value for each variable." +
                 "If you do not want to limit any variable, use None." +
-                "Ex: lower_lims = [10, None, 5]"
+                "Ex: lower_bounds = [10, None, 5]"
             )
-        elif (self.lower_lims is None) or (self.upper_lims is None):
+        elif (self.lower_bounds is None) or (self.upper_bounds is None):
             warnings.warn(
                 "It is highly recommended to indicate" +
-                " the limits within which the solution of each variable." +
+                " the bounds within which the solution of each variable." +
                 "By default: [-10^3, 10^3]."
             )
-        elif any(np.concatenate((self.lower_lims, self.upper_lims)) == None):
+        elif any(np.concatenate((self.lower_bounds, self.upper_bounds)) == None):
             warnings.warn(
-                "By default the limits are: [-10^3, 10^3]."
+                "By default the bounds are: [-10^3, 10^3]."
             )
 
-        if self.lower_lims is None:
-            self.lower_lims = np.repeat(-10 ** 3, self.n_variables)
+        if self.lower_bounds is None:
+            self.lower_bounds = np.repeat(-10 ** 3, self.n_variables)
 
-        if self.upper_lims is None:
-            self.upper_lims = np.repeat(+10 ** 3, self.n_variables)
+        if self.upper_bounds is None:
+            self.upper_bounds = np.repeat(+10 ** 3, self.n_variables)
 
-        if self.lower_lims is not None:
-            self.lower_lims[self.lower_lims == None] = -10 ** 3
+        if self.lower_bounds is not None:
+            self.lower_bounds[self.lower_bounds == None] = -10 ** 3
 
-        if self.upper_lims is not None:
-            self.upper_lims[self.upper_lims == None] = +10 ** 3
+        if self.upper_bounds is not None:
+            self.upper_bounds[self.upper_bounds == None] = +10 ** 3
 
         for i in np.arange(self.n_variables):
             self.value_variables[i] = random.uniform(
-                self.lower_lims[i],
-                self.upper_lims[i]
+                self.lower_bounds[i],
+                self.upper_bounds[i]
             )
-
-    # def __repr__(self):
-    #     """
-    #     Info for print individual object.
-    #     """
-    #     text = ("Individual \n --------- \n  Variables values:"
-    #              "{} \n Target function value: {} \n Fitness:"
-    #              "{} \n lower limits for each variable: {}"
-    #              "upper bounds for each variable:  {} \n").format(
-    #              self.value_variables, self.function_value,
-    #              self.fitness, self.lower_lims, self.upper_lims)
-    #
-    #     return(text)
 
     def calculate_fitness(self, target_function, optimization):
         if not optimization in ["maximize", "minimize"]:
@@ -128,16 +115,16 @@ class Individual:
                 self.value_variables[pos_mutated] + factor_mut
 
             for i in np.flatnonzero(pos_mutated):
-                if self.value_variables[i] < self.lower_lims[i]:
-                    self.value_variables[i] = self.lower_lims[i]
-                if self.value_variables[i] > self.upper_lims[i]:
-                    self.value_variables[i] = self.upper_lims[i]
+                if self.value_variables[i] < self.lower_bounds[i]:
+                    self.value_variables[i] = self.lower_bounds[i]
+                if self.value_variables[i] > self.upper_bounds[i]:
+                    self.value_variables[i] = self.upper_bounds[i]
 
         if distribution == "random":
             for i in np.flatnonzero(pos_mutated):
                 self.value_variables[i] = random.uniform(
-                    self.lower_lims[i],
-                    self.upper_lims[i]
+                    self.lower_bounds[i],
+                    self.upper_bounds[i]
                 )
 
         self.fitness = None

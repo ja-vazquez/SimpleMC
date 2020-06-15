@@ -8,13 +8,13 @@ from datetime import datetime
 
 
 class Population:
-    def __init__(self, n_individuals, n_variables, lower_lims=None,
-                 upper_lims=None):
+    def __init__(self, n_individuals, n_variables, lower_bounds=None,
+                 upper_bounds=None):
 
         self.n_individuals = n_individuals
         self.n_variables = n_variables
-        self.lower_lims = lower_lims
-        self.upper_lims = upper_lims
+        self.lower_bounds = lower_bounds
+        self.upper_bounds = upper_bounds
         self.individuals = []
         self.optimized = False
         self.iter_optimization = None
@@ -32,18 +32,18 @@ class Population:
         self.value_variables_optimal = None
         self.function_value_optimal = None
 
-        if self.lower_lims is not None \
-        and not isinstance(self.lower_lims,np.ndarray):
-            self.lower_lims = np.array(self.lower_lims)
+        if self.lower_bounds is not None \
+        and not isinstance(self.lower_bounds,np.ndarray):
+            self.lower_bounds = np.array(self.lower_bounds)
 
-        if self.upper_lims is not None and not isinstance(self.upper_lims,np.ndarray):
-            self.upper_lims = np.array(self.upper_lims)
+        if self.upper_bounds is not None and not isinstance(self.upper_bounds,np.ndarray):
+            self.upper_bounds = np.array(self.upper_bounds)
 
         for i in np.arange(n_individuals):
             individual_i = Individual(
-                            n_variables = self.n_variables,
-                            lower_lims = self.lower_lims,
-                            upper_lims = self.upper_lims)
+                            n_variables=self.n_variables,
+                            lower_bounds=self.lower_bounds,
+                            upper_bounds=self.upper_bounds)
             self.individuals.append(individual_i)
 
     def show_individuals(self, n=None):
@@ -59,9 +59,8 @@ class Population:
     def evaluar_population(self, target_function, optimization):
         for i in np.arange(self.n_individuals):
             self.individuals[i].calculate_fitness(
-                target_function = target_function,
-                optimization     = optimization
-            )
+                target_function=target_function,
+                optimization=optimization)
 
         self.best_individual = copy.deepcopy(self.individuals[0])
         for i in np.arange(self.n_individuals):

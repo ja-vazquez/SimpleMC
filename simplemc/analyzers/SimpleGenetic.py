@@ -2,7 +2,7 @@ from .Population import Population
 
 
 class SimpleGenetic:
-    def __init__(self, target_function, n_variables, limits, n_individuals=50,
+    def __init__(self, target_function, n_variables, bounds, n_individuals=50,
                 optimization="maximize",
                 n_generations=250, method_selection="tournament", elitism=0.01,
                 prob_mut=0.1, distribution="uniform", media_distribution=1,
@@ -11,15 +11,15 @@ class SimpleGenetic:
                 outputname="geneticOutput"):
 
         self.target_function = target_function
-        # These limits are a list where every input is the limit of a param
-        limits = limits
+        # These bounds are a list where every input is the limit of a param
+        bounds = bounds
 
-        self.lower_lims = []
-        self.upper_lims = []
+        self.lower_bounds = []
+        self.upper_bounds = []
 
-        for limit in limits:
-            self.lower_lims.append(limit[0])
-            self.upper_lims.append(limit[1])
+        for bound in bounds:
+            self.lower_bounds.append(bound[0])
+            self.upper_bounds.append(bound[1])
 
         self.n_individuals = n_individuals
         self.n_variables = n_variables
@@ -44,8 +44,8 @@ class SimpleGenetic:
     def optimize(self):
         population = Population(n_individuals=self.n_individuals,
                 n_variables=self.n_variables,
-                lower_lims=self.lower_lims,
-                upper_lims=self.upper_lims)
+                lower_bounds=self.lower_bounds,
+                upper_bounds=self.upper_bounds)
 
         o = population.optimize(target_function=self.target_function,
                             optimization=self.optimization,
