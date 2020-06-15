@@ -888,7 +888,7 @@ class DriverMC:
             Default False
         """
         from .tools.SimplePlotter import SimplePlotter
-        figure = SimplePlotter(self.chainsdir, self.outputpath, self.paramsList, show=show)
+        figure = SimplePlotter(self.chainsdir, self.paramsList, path=self.outputpath, show=show)
         if self.analyzername == "genetic":
             figure.simplex_vs_y(xlabel="iterations", ylabel="best fitness")
         return figure

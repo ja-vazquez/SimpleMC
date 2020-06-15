@@ -6,11 +6,14 @@ import numpy as np
 import webbrowser
 
 class SimplePlotter:
-    def __init__(self, chainsdir, path, listpars, show=False, weights=None):
+    def __init__(self, chainsdir, listpars, path=None, root=None, show=False, weights=None):
         self.chainsdir = chainsdir
         self.filename = path
-        self.root = path.replace("{}/".format(chainsdir), "")
         self.listpars = listpars
+        if root == None:
+            self.root = path.replace("{}/".format(chainsdir), "")
+        else:
+            self.root = root
         self.ndim = len(listpars)
         self.show = show
         self.weights = weights
