@@ -13,10 +13,6 @@ import sys, os
 import time
 
 
-#TODO keras neural network
-#TODO GR criteria in .ini file
-#TODO Remove Nestle?
-#TODO join genetic likelihood with the other one
 class DriverMC:
     """
         This class is the manager and wrapper between all
@@ -670,7 +666,7 @@ class DriverMC:
                                         selection_method,mut_prob))
         ti = time.time()
 
-        M = SimpleGenetic(self.logLikeGenetic, self.dims, self.bounds,
+        M = SimpleGenetic(self.logLike, self.dims, self.bounds,
                           n_individuals=n_individuals,
                           n_generations=n_generations,
                           prob_mut=mut_prob, method_selection=selection_method,
@@ -693,7 +689,7 @@ class DriverMC:
 ##---------------------- logLike and prior Transform function ----------------------
 ##---------------------- for nested samplers ----------------------
 
-    def logLike(self, values, *v):
+    def logLike(self, values):
         """
         If the sampler used isn't the MCMC of MCMCAnalyzer then, we need to set
         other types of likelihoods and priors objects. This method allows that. It is a
@@ -739,26 +735,6 @@ class DriverMC:
                 priors.append(theta[c]*(bound[1]-bound[0])+bound[0])
                 # At this moment, np.array(priors) has shape (dims,)
         return np.array(priors)
-
-
-###########loglike for genetic
-    def logLikeGenetic(self, *v):
-        values = []
-        for i, element in enumerate(v):
-            values.append(element)
-        assert len(self.pars_info) == len(values)
-        for pars, val in zip(self.pars_info, values):
-            pars.setValue(val)
-
-        self.T.updateParams(self.pars_info)
-        self.L.setTheory(self.T)
-        if (self.L.name() == "Composite"):
-            cloglikes = self.L.compositeLogLikes_wprior()
-            loglike = cloglikes.sum()
-        else:
-            loglike = self.L.loglike_wprior()
-        return loglike
-
 
 ############# for emcee: logPosterior and logPrior
     def logPosterior(self, theta):
