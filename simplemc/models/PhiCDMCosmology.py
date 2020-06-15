@@ -7,7 +7,7 @@ from scipy.integrate import odeint
 from scipy.optimize import newton
 from simplemc.cosmo.paramDefs import phialp_par, philam_par, phimu_par, \
                       phibeta_par, Ok_par
-
+import sys
 
 class PhiCosmology(LCDMCosmology):
     def __init__(self, varyalpha=False, varybeta=False, varyilam=False,\
@@ -131,8 +131,8 @@ class PhiCosmology(LCDMCosmology):
 
         Ophi_prime  = -3*Ophi*(1+ wphi + 2*Pi/3.)
         Ok_prime    = -3*Ok*(1 - 1./3. + 2*Pi/3.)
-        wphi_prime  = -(1-wphi)*(3*(1+wphi)+self.eps*lam*term)
-        lam_prime   = self.eps*lam**2*(Mgamma -1)*term
+        wphi_prime  = -(1-wphi)*(3*(1+wphi) - self.eps*lam*term)
+        lam_prime   = -self.eps*lam**2*(Mgamma -1)*term
         hub_prime   = hub*Pi
 
         return [wphi_prime, Ophi_prime, lam_prime, Ok_prime, hub_prime]
@@ -166,7 +166,7 @@ class PhiCosmology(LCDMCosmology):
 
 
         #we'll use the sign of lambda to describe either quint or phant
-        #ini_lam=-ini_lam
+        ini_lam=-ini_lam
         self.eps = np.sign(ini_lam)
         ini_lam  =np.abs(ini_lam)
         self.ini_wphi = -1 + 1.0e-4*self.eps

@@ -113,7 +113,7 @@ for i in np.arange(min, max, step):
     elif model=='pow':      beta, mu, ilam = 0, i, 0.75
     elif model=='exp_pow2': beta, mu, alpha, ilam = i, 0, 2, 0.15
     elif model== 'pow_exp': beta, mu, alpha, ilam = -i, -1, 1, -0.75
-    elif model== 'exp_pow_a':beta, mu, alpha, ilam = 1.2, 0, i, 0.75
+    elif model== 'exp_pow_a':beta, mu, alpha, ilam = -1.2, 0, i, -0.45
     elif model== 'cosh':    beta, mu, alpha, ilam = 1, 'st', i, -1.5
     #elif model== 'pow2_exp2':beta, mu, alpha, ilam = -i, 2, 2, 0.75
 
@@ -133,7 +133,7 @@ if not(model=='exp'):
         elif model=='pow':      beta, mu, ilam = 0, -i, -0.75
         elif model=='exp_pow2': beta, mu, alpha, ilam = -i, 0, 2, -0.50
         elif model== 'pow_exp': beta, mu, alpha, ilam = -i, 1, 1, 0.75
-        elif model== 'exp_pow_a':beta, mu, alpha, ilam = 0.8, 0, i, 0.75
+        elif model== 'exp_pow_a':beta, mu, alpha, ilam = -0.8, 0, i, -0.75
         elif model== 'cosh':     beta, mu, alpha, ilam = 1, 'st', i, 1.5
         T= PhiCosmology(beta=beta, mu=mu, alpha=alpha, ilam= ilam, curv=0)
 
