@@ -8,13 +8,13 @@ from datetime import datetime
 
 
 class Population:
-    def __init__(self, n_individuals, n_variables, limits_inf=None,
-                 limits_sup=None, verbose=False):
+    def __init__(self, n_individuals, n_variables, lower_lims=None,
+                 upper_lims=None):
 
         self.n_individuals = n_individuals
         self.n_variables = n_variables
-        self.limits_inf = limits_inf
-        self.limits_sup = limits_sup
+        self.lower_lims = lower_lims
+        self.upper_lims = upper_lims
         self.individuals = []
         self.optimized = False
         self.iter_optimization = None
@@ -32,49 +32,19 @@ class Population:
         self.value_variables_optimal = None
         self.function_value_optimal = None
 
-        if self.limits_inf is not None \
-        and not isinstance(self.limits_inf,np.ndarray):
-            self.limits_inf = np.array(self.limits_inf)
+        if self.lower_lims is not None \
+        and not isinstance(self.lower_lims,np.ndarray):
+            self.lower_lims = np.array(self.lower_lims)
 
-        if self.limits_sup is not None and not isinstance(self.limits_sup,np.ndarray):
-            self.limits_sup = np.array(self.limits_sup)
+        if self.upper_lims is not None and not isinstance(self.upper_lims,np.ndarray):
+            self.upper_lims = np.array(self.upper_lims)
 
         for i in np.arange(n_individuals):
             individual_i = Individual(
                             n_variables = self.n_variables,
-                            limits_inf = self.limits_inf,
-                            limits_sup = self.limits_sup,
-                            verbose     = verbose)
+                            lower_lims = self.lower_lims,
+                            upper_lims = self.upper_lims)
             self.individuals.append(individual_i)
-
-        # if verbose:
-        #     print("----------------")
-        #     print("Population created")
-        #     print("----------------")
-        #     print("Number of individuals: {}".format(self.n_individuals))
-        #     print("lower limits: {}".format(np.array2string(self.limits_inf)))
-        #     print("Upper limits: {}".format(np.array2string(self.limits_sup)))
-
-    # def __repr__(self):
-    #     """
-    #     Info for print population object
-    #     """
-    #     text = ("============================ \n  Population \n",
-    #              "============================ \n Num of individuals: ",
-    #              "{} \n lower limits: {}",
-    #              "\n upper limits: {} \n Optimizated: {}",
-    #              "\n Iterations of optimization (generations): {} ",
-    #              "\n \n Information of best individual: {} \n",
-    #              " ----------------------------",
-    #              "\n Variables values {} \n",
-    #              "Fitness: {} \n \n results after optimization: \n",
-    #              " -------------------------- \n",
-    #              "value optimal de variables: {} \n",
-    #              "value optimal function target: {} \n Optimal fitness : {} ").format(
-    #                 self.n_individuals, self.limits_inf, self.limits_sup, self.optimized, self.iter_optimization, self.best_value_variables, self.best_fitness, self.value_variables_optimal,
-    #                 self.function_value_optimal, self.fitness_optimal)
-    #
-    #     return(text)
 
     def show_individuals(self, n=None):
         if n is None:
@@ -86,12 +56,11 @@ class Population:
             print(self.individuals[i])
         return(None)
 
-    def evaluar_population(self, target_function, optimization, verbose=False):
+    def evaluar_population(self, target_function, optimization):
         for i in np.arange(self.n_individuals):
             self.individuals[i].calculate_fitness(
                 target_function = target_function,
-                optimization     = optimization,
-                verbose          = verbose
+                optimization     = optimization
             )
 
         self.best_individual = copy.deepcopy(self.individuals[0])
@@ -102,16 +71,9 @@ class Population:
         self.best_fitness = self.best_individual.fitness
         self.best_value_variables = self.best_individual.value_variables
         self.best_function_value = self.best_individual.function_value
-        
-        # if verbose:
-        #     print("------------------")
-        #     print("population evaluated")
-        #     print("------------------")
-        #     print("best fitness: " + str(self.best_fitness))
-        #     print("value of the function target: {}".format(self.best_function_value))
-        #     print("best value of variables: {}".format(self.best_value_variables))
 
-    def cross_individuals(self, parental_1, parental_2, verbose=False):
+
+    def cross_individuals(self, parental_1, parental_2):
 
         if parental_1 not in np.arange(self.n_individuals):
             raise Exception(
@@ -148,27 +110,22 @@ class Population:
 
         offspring = copy.deepcopy(offspring)
 
-        if verbose:
-            print("---------------")
-            print("Offspring created")
-            print("---------------")
-            print("value variables: {}".format(offspring.value_variables))
 
         return(offspring)
     
     def select_individual(self, n, return_indexs=True,
-                              method_selection="tournament", verbose=False):
+                              method_selection="tournament"):
 
-        if method_selection not in ["ruleta", "rank", "tournament"]:
+        if method_selection not in ["roulette", "rank", "tournament"]:
             raise Exception(
-                "Selection method should be ruleta, rank o tournament"
+                "Selection method should be roulette, rank o tournament"
                 )
 
         array_fitness = np.repeat(None, self.n_individuals)
         for i in np.arange(self.n_individuals):
             array_fitness[i] = copy.copy(self.individuals[i].fitness)
         
-        if method_selection == "ruleta":
+        if method_selection == "roulette":
             probabilidad_selection = array_fitness / np.sum(array_fitness)
             ind_selected = np.random.choice(
                                     a       = np.arange(self.n_individuals),
@@ -234,9 +191,7 @@ class Population:
                                elitism=0.1, prob_mut=0.01,
                                distribution="uniform",
                                media_distribution=1, sd_distribution=1,
-                               min_distribution=-1, max_distribution=1,
-                               verbose=False, verbose_selection=False,
-                               verbose_cross=False, verbose_mutation=False):
+                               min_distribution=-1, max_distribution=1):
 
         news_individuals = []
 
@@ -256,23 +211,17 @@ class Population:
             index_parents = self.select_individual(
                                     n                = 2,
                                     return_indexs   = True,
-                                    method_selection = method_selection,
-                                    verbose          = verbose_selection
-                                 )
+                                    method_selection = method_selection)
             
             offspring = self.cross_individuals(
                             parental_1=index_parents[0],
-                            parental_2=index_parents[1],
-                            verbose=verbose_cross
-                           )
+                            parental_2=index_parents[1])
             
             offspring.mutate(
                 prob_mut=prob_mut,
                 distribution=distribution,
                 min_distribution=min_distribution,
-                max_distribution=max_distribution,
-                verbose=verbose_mutation
-            )
+                max_distribution=max_distribution)
 
             news_individuals = news_individuals + [offspring]
 
@@ -289,10 +238,7 @@ class Population:
                   distribution="uniform", media_distribution=1,
                   sd_distribution=1, min_distribution=-1, max_distribution=1,
                   stopping_early=False, rounds_stopping=3,
-                  tolerance_stopping=0.1, verbose=False,
-                  verbose_new_generation=False,
-                  verbose_selection=False, verbose_cross=False,
-                  verbose_mutation=False, verbose_evaluacion=False, outputname="geneticOutput"):
+                  tolerance_stopping=0.1, outputname="geneticOutput"):
 
 
         if stopping_early and (rounds_stopping is None or tolerance_stopping is None):
@@ -307,9 +253,7 @@ class Population:
 
             self.evaluar_population(
                 target_function=target_function,
-                optimization=optimization,
-                verbose=verbose_evaluacion
-                )
+                optimization=optimization)
 
             self.historical_individuals.append(copy.deepcopy(self.individuals))
             self.historical_best_fitness.append(copy.deepcopy(self.best_fitness))
@@ -343,12 +287,7 @@ class Population:
                 method_selection=method_selection,
                 elitism=elitism,
                 prob_mut=prob_mut,
-                distribution=distribution,
-                verbose=verbose_new_generation,
-                verbose_selection=verbose_selection,
-                verbose_cross=verbose_cross,
-                verbose_mutation=verbose_mutation
-                )
+                distribution=distribution)
 
         f.close()
         end = time.time()

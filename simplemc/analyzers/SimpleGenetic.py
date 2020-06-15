@@ -3,7 +3,7 @@ from .Population import Population
 
 class SimpleGenetic:
     def __init__(self, target_function, n_variables, limits, n_individuals=50,
-                verbose=False, optimization="maximize",
+                optimization="maximize",
                 n_generations=250, method_selection="tournament", elitism=0.01,
                 prob_mut=0.1, distribution="uniform", media_distribution=1,
                 sd_distribution=1, min_distribution=-1, max_distribution=1,
@@ -14,12 +14,12 @@ class SimpleGenetic:
         # These limits are a list where every input is the limit of a param
         limits = limits
 
-        self.limits_inf = []
-        self.limits_sup = []
+        self.lower_lims = []
+        self.upper_lims = []
 
         for limit in limits:
-            self.limits_inf.append(limit[0])
-            self.limits_sup.append(limit[1])
+            self.lower_lims.append(limit[0])
+            self.upper_lims.append(limit[1])
 
         self.n_individuals = n_individuals
         self.n_variables = n_variables
@@ -37,7 +37,6 @@ class SimpleGenetic:
         self.rounds_stopping = rounds_stopping
         self.sd_distribution = sd_distribution
         self.tolerance_stopping  = tolerance_stopping
-        self.verbose = verbose
         self.outputname = outputname
 
         self.optimize()
@@ -45,9 +44,8 @@ class SimpleGenetic:
     def optimize(self):
         population = Population(n_individuals=self.n_individuals,
                 n_variables=self.n_variables,
-                limits_inf=self.limits_inf,
-                limits_sup=self.limits_sup,
-                verbose=self.verbose)
+                lower_lims=self.lower_lims,
+                upper_lims=self.upper_lims)
 
         o = population.optimize(target_function=self.target_function,
                             optimization=self.optimization,
@@ -62,5 +60,5 @@ class SimpleGenetic:
                             max_distribution=self.max_distribution,
                             stopping_early=self.stopping_early,
                             rounds_stopping=self.rounds_stopping,
-                            verbose=self.verbose, outputname=self.outputname)
+                            outputname=self.outputname)
         return o
