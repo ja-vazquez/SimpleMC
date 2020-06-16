@@ -25,13 +25,14 @@ class AnisotropicCosmology(LCDMCosmology):
 
         """
 
-        self.varybd  =varybd
-        self.varyOsig=varyOsig
-
+        self.varybd   = varybd
+        self.varyOsig = varyOsig
 
         self.bd    = bd_par.value
         self.Osig  = Osig_par.value
         LCDMCosmology.__init__(self)
+
+
 
     ## my free parameters. We add Ok on top of LCDM ones (we inherit LCDM)
     def freeParameters(self):
