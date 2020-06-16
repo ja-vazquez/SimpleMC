@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-from simplemc.tools.Data_plots import Data_plots
+from simplemc.plots.Data_plots import Data_plots
 from simplemc.runbase import ParseModel
 import matplotlib.pyplot as plt
 import matplotlib.ticker

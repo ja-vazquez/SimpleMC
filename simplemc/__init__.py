@@ -33,4 +33,4 @@ from . import analyzers
 from . import likelihoods
 from . import models
 from . import tools
-from . import attick
+from . import plots

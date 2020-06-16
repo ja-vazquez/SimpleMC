@@ -1,6 +1,6 @@
 
 
-from simplemc.tools.Plot_elipses import plot_elipses
+from simplemc.plots.Plot_elipses import plot_elipses
 from simplemc.cosmo.Derivedparam import AllDerived
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
