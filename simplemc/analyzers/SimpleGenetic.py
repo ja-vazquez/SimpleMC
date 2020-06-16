@@ -36,11 +36,11 @@ class SimpleGenetic:
             Default: "tournament"
 
         elitism : float
-            Value of elitism.
-            Default: 0.01.
+            Value of elitism in [0, 1].
+            Default: 0.001.
 
         prob_mut : float
-            Probability of mutation.
+            Probability of mutation in [0, 1].
             Default: 0.4
 
         distribution : str
@@ -83,7 +83,7 @@ class SimpleGenetic:
         optimization = kwargs.pop("optimization", "maximize")
         n_generations = kwargs.pop("n_generations", 250)
         method_selection = kwargs.pop("method_selection", "tournament")
-        elitism = kwargs.pop("elitism", 0.01)
+        elitism = kwargs.pop("elitism", 0.001)
         prob_mut = kwargs.pop("prob_mut", 0.4)
         distribution = kwargs.pop("distribution", "uniform")
         media_distribution = kwargs.pop("media_distribution", 1)
