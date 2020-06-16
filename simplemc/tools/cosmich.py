@@ -5,10 +5,10 @@
 #
 
 import sys
-import matplotlib.pyplot as plt
 import scipy as sp
 from glob import glob
 import numpy.fft as fft
+import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter1d
 from scipy.ndimage.filters import gaussian_filter
 
@@ -41,6 +41,22 @@ def myloadtxt(fname, cols=None):
 class cosmochain:
     def __init__(self, root, nchains='auto', skip_=None, temp=1.0, \
                        balance=True, weightfunc=None, kirkby=False):
+        """
+        Class to analize chains.
+        Parameters
+        ----------
+        root
+        nchains
+        skip_
+        temp
+        balance
+        weightfunc
+        kirkby
+
+        Returns
+        -------
+
+        """
 
         if (balance and ("PLA" in root or "neffch" in root or "Decay" in root)):
             balance = False
@@ -70,14 +86,14 @@ class cosmochain:
                 except:
                     sys.exit("exit: neither params nor paramnames included")
 
-        self.paramnames = [n.split()[0] for n in lines]
-        self.latexnames = [' '.join(n.split()[1:]) for n in lines]
+        self.paramnames = [line.split()[0] for line in lines]
+        self.latexnames = [' '.join(line.split()[1:]) for line in lines]
         self.lname      = dict(zip(self.paramnames, self.latexnames))
 
         self.parcol = {}
-        for i, n in enumerate(self.paramnames):
-            print(i, n)
-            self.parcol[n] = i+2
+        for i, name in enumerate(self.paramnames):
+            print(i, name)
+            self.parcol[name] = i+2
         print("Got ", len(self.paramnames), "parameters.")
 
 

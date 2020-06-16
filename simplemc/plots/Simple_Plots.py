@@ -1,4 +1,4 @@
-from .cosmich import cosmochain
+from simplemc.tools.cosmich import cosmochain
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 import numpy as np

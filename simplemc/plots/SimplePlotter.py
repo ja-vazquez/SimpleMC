@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import sys
-from simplemc.tools.Simple_Plots import Simple_plots
+from simplemc.plots.Simple_Plots import Simple_plots
 import matplotlib.pyplot as plt
 import numpy as np
 import webbrowser
