@@ -1,6 +1,8 @@
-from .Population import Population
+from simplemc.analyzers.Population import Population
 from simplemc import logger
 import sys
+
+
 
 class SimpleGenetic:
     def __init__(self, target_function, n_variables, bounds, **kwargs):
@@ -123,6 +125,8 @@ class SimpleGenetic:
         self.sd_distribution = sd_distribution
         self.tolerance_stopping  = tolerance_stopping
         self.outputname = outputname
+
+
 
     def optimize(self):
         """

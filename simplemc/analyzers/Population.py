@@ -3,7 +3,6 @@ import numpy as np
 import copy
 import pandas as pd
 import sys
-from datetime import datetime
 from simplemc import logger
 
 
@@ -63,6 +62,8 @@ class Population:
                 upper_bounds=self.upper_bounds)
             self.individuals.append(individual_i)
 
+
+
     def eval_population(self, target_function, optimization):
         """
 
@@ -93,6 +94,8 @@ class Population:
         self.best_fitness = self.best_individual.fitness
         self.best_value_variables = self.best_individual.value_variables
         self.best_function_value = self.best_individual.function_value
+
+
 
     def cross_individuals(self, parental_1, parental_2):
         """
@@ -142,6 +145,8 @@ class Population:
         offspring = copy.deepcopy(offspring)
 
         return (offspring)
+
+
 
     def select_individual(self, n, return_indexs=True,
                           method_selection="tournament"):
@@ -230,6 +235,8 @@ class Population:
                     [copy.deepcopy(self.individuals[i]) for i in ind_selected]
                 )
 
+
+
     def create_new_generation(self, method_selection="tournament",
                               elitism=0.1, prob_mut=0.01,
                               distribution="uniform",
@@ -275,6 +282,8 @@ class Population:
         self.best_function_value = None
 
         # New generation created! Known number of new individuals.
+
+
 
     def optimize(self, target_function, optimization, n_generations=50,
                  method_selection="tournament", elitism=0.1, prob_mut=0.01,
