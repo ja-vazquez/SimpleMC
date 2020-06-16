@@ -1,6 +1,6 @@
 
 
-from .BaseLikelihood import BaseLikelihood
+from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 from scipy import constants
 import scipy.linalg as la
 import scipy as sp
