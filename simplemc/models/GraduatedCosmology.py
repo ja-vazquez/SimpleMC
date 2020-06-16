@@ -1,21 +1,39 @@
-## This is CDM cosmology with w, wa and Ok
+
 
 
 import numpy as np
-from .LCDMCosmology import LCDMCosmology
+from simplemc.models.LCDMCosmology import LCDMCosmology
+from simplemc.cosmo.paramDefs import Ok_par, ggama_par, glambda_par
+
+#Graduated dark energy: Observational hints of a spontaneous sign
+# switch in the cosmological constant
+#https://arxiv.org/abs/1912.08751
 
 class GraduatedCosmology(LCDMCosmology):
     def __init__(self, varyggama=True, varyglambda=False, varyOk=False):
-        ## two parameters: Om and h
+        """
+        Introduces the graduated dark energy (gDE) characterised by a minimal dynamical
+        deviation from the null inertial mass density of the Lambda
+        Parameters
+        ----------
+        varyggama
+        varyglambda
+        varyOk
 
-        self.varyggama=varyggama
-        self.varyglambda=varyglambda
-        self.varyOk=varyOk
+        Returns
+        -------
 
-        self.Ok=Ok_par.value   
-        self.ggama=ggama_par.value
-        self.glambda=glambda_par.value
+        """
+
+        self.varyggama   = varyggama
+        self.varyglambda = varyglambda
+        self.varyOk      = varyOk
+
+        self.Ok      = Ok_par.value
+        self.ggama   = ggama_par.value
+        self.glambda = glambda_par.value
         LCDMCosmology.__init__(self)
+
 
     ## my free parameters. We add Ok on top of LCDM ones (we inherit LCDM)
     def freeParameters(self):
@@ -41,6 +59,7 @@ class GraduatedCosmology(LCDMCosmology):
                 if (abs(self.Ok)>1.0):
                    return False
         return True
+
 
     ## this is relative hsquared as a function of a
     ## i.e. H(z)^2/H(z=0)^2
