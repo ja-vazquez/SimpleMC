@@ -1,20 +1,35 @@
-## This is CDM cosmology with w, wa and Ok
 
 
 import math as N
-from LCDMCosmology import *
+from simplemc.models.LCDMCosmology import LCDMCosmology
+from simplemc.cosmo.paramDefs import *
+
+#Scalar field emulator via anisotropically deformed vacuum energy: Application to dark energy
+#https://arxiv.org/abs/2004.14863
 
 class RestrainedCosmology(LCDMCosmology):
     def __init__(self, varyOk=False, varyweff = True, varywcpl = False):
-        ## two parameters: Om and h
+        """
+        generalization of the usual vacuum energy, called `deformed vacuum energy',
+        which yields anisotropic pressure whilst preserving zero inertial mass density
+        Parameters
+        ----------
+        varyOk
+        varyweff
+        varywcpl
+
+        Returns
+        -------
+
+        """
 
         self.varyweff = varyweff
         self.varywcpl = varywcpl
-        self.varyOk=varyOk
+        self.varyOk   = varyOk
 
-        self.Ok=Ok_par.value
-        self.weff=weff_par.value
-        self.wcpl=wcpl_par.value
+        self.Ok   = Ok_par.value
+        self.weff = weff_par.value
+        self.wcpl = wcpl_par.value
         LCDMCosmology.__init__(self)
 
     ## my free parameters. We add Ok on top of LCDM ones (we inherit LCDM)

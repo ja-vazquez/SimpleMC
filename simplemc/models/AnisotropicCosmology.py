@@ -1,20 +1,38 @@
-## This is CDM cosmology with w, wa and Ok
 
 
-import math as N
-from LCDMCosmology import *
+from simplemc.models.LCDMCosmology import LCDMCosmology
+from simplemc.cosmo.paramDefs import bd_par, Osig_par
+
+#TODO still need to be tested
+
+#Anisotropic massive Brans-Dicke gravity extension of the standard LCDM model
+# https://arxiv.org/abs/1903.06679
 
 class AnisotropicCosmology(LCDMCosmology):
     def __init__(self, varybd=True, varyOsig=True):
-        ## two parameters: Om and h
+        """
+         Anisotropic massive Brans-Dicke (BD) gravity extension of the standard
+         LCDM model, wherein the extension is characterized by two additional degrees
+         of freedom; the BD parameter, w, and the present day density parameter
+         corresponding to the shear scalar, Omega_sigma,0
+        Parameters
+        ----------
+        varybd
+        varyOsig
 
-        self.varybd  =varybd
-        self.varyOsig=varyOsig
+        Returns
+        -------
 
+        """
+
+        self.varybd   = varybd
+        self.varyOsig = varyOsig
 
         self.bd    = bd_par.value
         self.Osig  = Osig_par.value
         LCDMCosmology.__init__(self)
+
+
 
     ## my free parameters. We add Ok on top of LCDM ones (we inherit LCDM)
     def freeParameters(self):
@@ -67,13 +85,13 @@ class AnisotropicCosmology(LCDMCosmology):
     def RHSquared_a(self,a):
         z     = 1./a - 1.0
 
-	bd_model = False
-	if bd_model:
-		H = self.Omrad/a**4 + self.Ocb/a**3  + self.Ode_fz(z) + self.Osigma(z)
-	else:
-		sigma = 4.0E-21
-		H = self.Omrad/a**4 + self.Ocb/a**3 + sigma/a**6 + (1-self.Omrad-self.Ocb-sigma)
-	
+        bd_model = False
+        if bd_model:
+            H = self.Omrad/a**4 + self.Ocb/a**3  + self.Ode_fz(z) + self.Osigma(z)
+        else:
+            sigma = 4.0E-21
+            H = self.Omrad/a**4 + self.Ocb/a**3 + sigma/a**6 + (1-self.Omrad-self.Ocb-sigma)
+
         return H
 
 

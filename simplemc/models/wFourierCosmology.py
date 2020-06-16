@@ -3,18 +3,36 @@
 # 12.Oct. 2018
 
 import math as N
-from .LCDMCosmology import LCDMCosmology
-from   scipy      import interpolate, integrate
+from simplemc.models.LCDMCosmology import LCDMCosmology
+from simplemc.cosmo.paramDefs import *
+from scipy import interpolate, integrate
 import numpy as np
 import scipy as sci
 from scipy import special
 import matplotlib.pyplot as plt
 
+#Fourier-series expansion of the dark-energy equation of state
+#https://arxiv.org/abs/1901.08679
 
 class wFourierCosmology(LCDMCosmology):
     def __init__(self, varya0=False, varya1=True, varyb1=True, varya2=True, \
                        varyb2=True, varyOk=False):
-        ## two parameters: Om and h
+        """
+        A general description for the dark-energy equation-of-state w(z) in
+        the form of Fourier series.
+        Parameters
+        ----------
+        varya0
+        varya1
+        varyb1
+        varya2
+        varyb2
+        varyOk
+
+        Returns
+        -------
+
+        """
 
         self.varya0 = varya0
         self.varya1 = varya1

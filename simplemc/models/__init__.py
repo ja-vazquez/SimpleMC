@@ -1,4 +1,4 @@
-# from .AnisotropicCosmology import AnisotropicCosmology
+from .AnisotropicCosmology import AnisotropicCosmology
 from .BinnedWCosmology import BinnedWCosmology
 from .CompressPantheon import CompressPantheon
 from .DecayLCDMCosmology import DecayLCDMCosmology
@@ -7,13 +7,13 @@ from .EarlyDECosmology import EarlyDECosmology
 from .EarlyPhiCosmology import EarlyPhiCosmology
 from .GenericModel import GenericModel
 from .GraduatedCosmology import GraduatedCosmology
-# from .IBEGCosmology import IBEGCosmology
+from .IBEGCosmology import IBEGCosmology
 from .JordiCDMCosmology import JordiCDMCosmology
 from .LCDMCosmology import LCDMCosmology
 from .LogTCosmology import LogTCosmology
 from .oLCDMCosmology import oLCDMCosmology
 from .owa0CDMCosmology import owa0CDMCosmology
-# from .OzcosCosmology import OzcosCosmology
+from .OzcosCosmology import OzcosCosmology
 from .PhiCDMCosmology import PhiCosmology
 from .PolyCDMCosmology import PolyCDMCosmology
 from .QuintomCosmology import QuintomCosmology

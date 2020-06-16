@@ -9,8 +9,6 @@ import scipy as sp
 import sys
 
 
-#TODO add errors on derived
-
 try:
     import numdifftools as nd
 except:
