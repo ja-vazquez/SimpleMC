@@ -1,13 +1,13 @@
 #!/usr/bin/env python
-import sys
-from simplemc.tools.Simple_Plots import Simple_plots
-from simplemc.tools.Plot_elipses import plot_elipses
+
+from simplemc.plots.Simple_Plots import Simple_plots
+from simplemc.plots.Plot_elipses import plot_elipses
 import matplotlib.pyplot as plt
 import numpy as np
-
+import sys
 
 dir_name   = 'simplemc/chains/'
-roots      = ['LCDM_phy_HD+SN_mcmc']
+roots      = ['LCDM_phy_HD_mcmc']
 params_1D  = ['h', 'Om']
 params_2D  = [['h', 'Om']]
 labels     = ['HD+SN']

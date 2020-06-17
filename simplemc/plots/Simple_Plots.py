@@ -1,18 +1,9 @@
 from simplemc.tools.cosmich import cosmochain
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
-import numpy as np
-import sys
 
-# rcParams.update({'backend': 'pdf',
-#                'axes.labelsize': 15,
-#                'text.fontsize': 15,
-#                'xtick.labelsize': 15,
-#                'ytick.labelsize': 15,
-#                'legend.fontsize': 10,
-#                'lines.markersize': 6,
-#                'font.size': 20,
-#                'text.usetex': True})
+
+
 
 class Simple_plots(cosmochain):
     name = 'jav'
