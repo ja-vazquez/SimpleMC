@@ -11,6 +11,7 @@ from .base import Predictor
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.callbacks import EarlyStopping
+import tensorflow as tf
 
 
 class KerasNetInterpolation(Predictor):
@@ -32,10 +33,13 @@ class KerasNetInterpolation(Predictor):
 
     """
     # IGV: ntrain is 80% (split) of multinest sampling points as in arXiv:1110.2997
-    def __init__(self, params, logL, split=0.8, numNeurons=200, epochs=300, model=None):
+    def __init__(self, params, logL, split=0.8, numNeurons=200, epochs=300, model=None,
+                 savedmodelpath=None):
         """Construct predictor from training data."""
         super(KerasNetInterpolation, self).__init__(params, logL, split)
-        if model is None:
+        if savedmodel is not None:
+            self.model = tf.keras.models.load_model(savedmodelpath)
+        elif model is None:
             self.numNeurons = numNeurons
             self.model = self._default_architecture()
         else:

@@ -350,6 +350,8 @@ class DriverMC:
                 epochs = self.config.getint('neural', 'epochs', fallback=300)
                 ntrain = self.config.getint('neural', 'ntrain', fallback=nlivepoints)
                 learner = self.config.get('neural', 'learner', fallback='keras')
+                savedmodelpath = self.config.get('neural', 'savedmodelpath', fallback=None)
+
         else:
             self.engine = kwargs.pop('engine',    'dynesty')
             dynamic     = kwargs.pop('dynamic',    False)
@@ -369,7 +371,7 @@ class DriverMC:
             ntrain = kwargs.pop('ntrain', nlivepoints)
             learner = kwargs.pop('learner', 'keras')
             model = kwargs.pop('model', None)
-
+            savedmodelpath = kwargs.pop('savedmodelpath', None)
 
             if kwargs:
                 logger.critical('Unexpected **kwargs for nested sampler: {}'.format(kwargs))
@@ -400,11 +402,12 @@ class DriverMC:
         if neuralNetwork:
             logger.info("\tUsing neural network.")
             from simplemc.analyzers.pybambi.bambi import loglike_thumper
-            # kerasmodel = None
-            self.logLike = loglike_thumper(self.logLike, learner=learner,
-                                           ntrain=ntrain, nDims=self.dims,
-                                           split=split, numNeurons=numNeurons,
-                                           epochs=epochs, model=model)
+            # self.logLike =
+            loglike_thumper(self.logLike, self.priorTransform, self.dims,
+                            learner=learner, ntrain=ntrain,
+                            split=split, numNeurons=numNeurons,
+                            epochs=epochs, model=model,
+                            savedmodelpath=savedmodelpath)
 
         if dynamic:
             logger.info("\nUsing dynamic nested sampling...")
