@@ -32,11 +32,11 @@ class KerasNetInterpolation(Predictor):
 
     """
     # IGV: ntrain is 80% (split) of multinest sampling points as in arXiv:1110.2997
-    def __init__(self, params, logL, split=0.8, model=None):
+    def __init__(self, params, logL, split=0.8, numNeurons=200, epochs=300, model=None):
         """Construct predictor from training data."""
         super(KerasNetInterpolation, self).__init__(params, logL, split)
-
         if model is None:
+            self.numNeurons = numNeurons
             self.model = self._default_architecture()
         else:
             self.model = model
@@ -50,15 +50,12 @@ class KerasNetInterpolation(Predictor):
                                       self.logL_training,
                                       validation_data=(self.params_testing,
                                                        self.logL_testing),
-                                      epochs=300,
+                                      epochs=epochs,
                                       callbacks=callbacks)
 
     def _default_architecture(self):
         # Create model
         model = Sequential()
-
-        # Number of neurons in each hidden layer, could make this configurable?
-        numNeurons = 200
 
         # Get number of input parameters
         # Note: if params contains extra quantities (ndim+others),
@@ -70,9 +67,9 @@ class KerasNetInterpolation(Predictor):
         # Note: in a Dense layer, all nodes in the previous later connect
         # to the nodes in the current layer
 
-        model.add(Dense(numNeurons, activation='relu', input_shape=(n_cols,)))
-        model.add(Dense(numNeurons, activation='relu'))
-        model.add(Dense(numNeurons, activation='relu'))
+        model.add(Dense(self.numNeurons, activation='relu', input_shape=(n_cols,)))
+        model.add(Dense(self.numNeurons, activation='relu'))
+        model.add(Dense(self.numNeurons, activation='relu'))
         model.add(Dense(1))
 
         # Now compile the model

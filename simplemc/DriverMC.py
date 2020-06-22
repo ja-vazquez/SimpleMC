@@ -346,7 +346,10 @@ class DriverMC:
 
             if neuralNetwork:
                 split      = self.config.getfloat('neural', 'split', fallback=0.8)
-                numNeurons = self.config.getint(  'neural', 'numNeurons', fallback=100)
+                numNeurons = self.config.getint('neural', 'numNeurons', fallback=200)
+                epochs = self.config.getint('neural', 'epochs', fallback=300)
+                ntrain = self.config.getint('neural', 'ntrain', fallback=nlivepoints)
+                learner = self.config.get('neural', 'learner', fallback='keras')
         else:
             self.engine = kwargs.pop('engine',    'dynesty')
             dynamic     = kwargs.pop('dynamic',    False)
@@ -362,6 +365,9 @@ class DriverMC:
             # For neural networks
             split = kwargs.pop('split', 0.8)
             numNeurons = kwargs.pop('numNeurons', 100)
+            epochs = kwargs.pop('epochs', 100)
+            ntrain = kwargs.pop('ntrain', nlivepoints)
+            learner = kwargs.pop('learner', 'keras')
 
 
             if kwargs:
@@ -392,12 +398,12 @@ class DriverMC:
         ti = time.time()
         if neuralNetwork:
             logger.info("\tUsing neural network.")
-            #from bambi import run_pyBAMBI
             from simplemc.analyzers.pybambi.bambi import loglike_thumper
-            learner = 'keras'
             # kerasmodel = None
-            self.logLike = loglike_thumper(self.logLike, learner=learner, \
-                                             ntrain=nlivepoints, nDims=self.dims)
+            self.logLike = loglike_thumper(self.logLike, learner=learner,\
+                                           ntrain=ntrain, nDims=self.dims,
+                                           split=split, numNeurons=numNeurons,
+                                           epochs=epochs)
 
         if dynamic:
             logger.info("\nUsing dynamic nested sampling...")

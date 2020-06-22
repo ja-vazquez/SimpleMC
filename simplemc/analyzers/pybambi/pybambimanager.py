@@ -7,7 +7,6 @@ Date: Feb 2019
 import numpy as np
 from .kerasnet import KerasNetInterpolation
 from .nearestneighbour import NearestNeighbourInterpolation
-#
 import keras.models
 
 
@@ -26,8 +25,9 @@ class BambiManager(object):
     """
 
     def __init__(self, loglikelihood, learner, proxy_tolerance,
-                 failure_tolerance, ntrain):
+                 failure_tolerance, ntrain, split=0.8, numNeurons=200, epochs=300):
         """Construct bambi object."""
+
         self.proxy_tolerance = proxy_tolerance
         self._loglikelihood = loglikelihood
         self._learner = learner
@@ -36,11 +36,16 @@ class BambiManager(object):
         self._ntrain = ntrain
         self._proxy_trained = False
         self.old_learners = []
+        self.split = split
+        self.numNeurons = numNeurons
+        self.epochs = epochs
 
     def make_learner(self, params, loglikes):
         """Construct a Predictor."""
         if self._learner == 'keras':
-            return KerasNetInterpolation(params, loglikes)
+            return KerasNetInterpolation(params, loglikes,
+                                         split=self.split, numNeurons=self.numNeurons,
+                                         epochs=self.epochs)
         elif self._learner == 'nearestneighbour':
             return NearestNeighbourInterpolation(params, loglikes)
         elif issubclass(type(self._learner), keras.models.Model):
