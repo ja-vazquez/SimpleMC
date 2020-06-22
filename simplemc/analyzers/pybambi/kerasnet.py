@@ -8,12 +8,10 @@ Date: December 2018
 """
 import numpy
 from .base import Predictor
-#from neuralnetworks.base import Predictor
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.callbacks import EarlyStopping
-#IGV: Se agrega la siguiente
-from keras.layers.normalization import BatchNormalization
+
 
 class KerasNetInterpolation(Predictor):
     """Keras neural net interpolation.
@@ -33,7 +31,7 @@ class KerasNetInterpolation(Predictor):
         shape (ntrain,)
 
     """
-    #IGV: ntrain is 80% (split) of multinest sampling points as in arXiv:1110.2997
+    # IGV: ntrain is 80% (split) of multinest sampling points as in arXiv:1110.2997
     def __init__(self, params, logL, split=0.8, model=None):
         """Construct predictor from training data."""
         super(KerasNetInterpolation, self).__init__(params, logL, split)
@@ -54,8 +52,6 @@ class KerasNetInterpolation(Predictor):
                                                        self.logL_testing),
                                       epochs=300,
                                       callbacks=callbacks)
-
-####################### This is the original _default_architecture. Uncomment for recovery
 
     def _default_architecture(self):
         # Create model
@@ -84,66 +80,6 @@ class KerasNetInterpolation(Predictor):
         model.compile(optimizer='adam', loss='mean_squared_error')
 
         return model
- 
-####################### This is the end of the original _default_architecture
-
-############IGV: begin modifications of _default_architecture
-#    def _default_architecture(self):
-        # Create model
-#        model = Sequential()
-
-        # Number of neurons in each hidden layer, could make this configurable?
-#        numNeurons = 200
-
-        # Get number of input parameters
-        # Note: if params contains extra quantities (ndim+others),
-        # we need to change this
-#        n_cols = self.params_training.shape[1]
-
-        # Add model layers, note choice of activation function (relu)
-        # We will use 3 hidden layers and an output layer
-        # Note: in a Dense layer, all nodes in the previous later connect
-        # to the nodes in the current layer
-
-#        model.add(Dense(numNeurons, input_shape=(n_cols,), init=uniform))
-        #model.add(BatchNormalization())
-        #model.add(Activation('relu'))
-        #model.add(Dropout(0.5))
-
-        #IGV: we can think of this chunk as the hidden layer    
-        #model.add(Dense(numNeurons, init='uniform'))
-        #model.add(BatchNormalization())
-        #model.add(Activation('relu'))
-        #model.add(Dropout(0.5))
-
-        #model.add(Dense(numNeurons, init='uniform'))     
-        #model.add(BatchNormalization())
-        #model.add(Activation('relu'))
-        #model.add(Dropout(0.5))
-
-        #model.add(Dense(1))
-
-
-        #IGV: The next 4 lines are the original layers
-#        model.add(Dense(numNeurons, activation='relu', input_shape=(n_cols,)))
-#        model.add(Dense(numNeurons, activation='relu'))
-#        model.add(Dense(numNeurons, activation='relu'))
-#        model.add(Dense(1))
-
-        # Now compile the model
-        # Need to choose training optimiser, and the loss function
-        #IGV:
-        #sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
-        #model.compile(loss='mean_squared_error', optimizer=sgd)
-
-        # Original:
-#        model.compile(optimizer='adam', loss='mean_squared_error')
-
-#        return model
-
-############IGV: end modifications of _default_architecture
-
-
 
     def __call__(self, x):
         """Calculate proxy loglikelihood.
