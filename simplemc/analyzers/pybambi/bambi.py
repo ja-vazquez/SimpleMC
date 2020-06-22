@@ -58,6 +58,7 @@ def loglike_thumper(loglikelihood, nDims, **kwargs):
     split = kwargs.pop('split', 0.8)
     numNeurons = kwargs.pop('numNeurons', 200)
     epochs = kwargs.pop('epochs', 0.8)
+    model = kwargs.pop('model', None)
 
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
@@ -65,7 +66,7 @@ def loglike_thumper(loglikelihood, nDims, **kwargs):
     # Set up the global manager of the BAMBI session.
     thumper = BambiManager(loglikelihood, learner, proxy_tolerance,
                            failure_tolerance, ntrain, split=split,
-                           numNeurons=numNeurons, epochs=epochs)
+                           numNeurons=numNeurons, epochs=epochs, model=model)
 
     return thumper.loglikelihood
 

@@ -25,7 +25,8 @@ class BambiManager(object):
     """
 
     def __init__(self, loglikelihood, learner, proxy_tolerance,
-                 failure_tolerance, ntrain, split=0.8, numNeurons=200, epochs=300):
+                 failure_tolerance, ntrain, split=0.8, numNeurons=200, epochs=300,
+                 model=None):
         """Construct bambi object."""
 
         self.proxy_tolerance = proxy_tolerance
@@ -39,13 +40,14 @@ class BambiManager(object):
         self.split = split
         self.numNeurons = numNeurons
         self.epochs = epochs
+        self.model = model
 
     def make_learner(self, params, loglikes):
         """Construct a Predictor."""
         if self._learner == 'keras':
             return KerasNetInterpolation(params, loglikes,
                                          split=self.split, numNeurons=self.numNeurons,
-                                         epochs=self.epochs)
+                                         epochs=self.epochs, model=self.model)
         elif self._learner == 'nearestneighbour':
             return NearestNeighbourInterpolation(params, loglikes)
         elif issubclass(type(self._learner), keras.models.Model):

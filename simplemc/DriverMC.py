@@ -368,6 +368,7 @@ class DriverMC:
             epochs = kwargs.pop('epochs', 100)
             ntrain = kwargs.pop('ntrain', nlivepoints)
             learner = kwargs.pop('learner', 'keras')
+            model = kwargs.pop('model', None)
 
 
             if kwargs:
@@ -400,10 +401,10 @@ class DriverMC:
             logger.info("\tUsing neural network.")
             from simplemc.analyzers.pybambi.bambi import loglike_thumper
             # kerasmodel = None
-            self.logLike = loglike_thumper(self.logLike, learner=learner,\
+            self.logLike = loglike_thumper(self.logLike, learner=learner,
                                            ntrain=ntrain, nDims=self.dims,
                                            split=split, numNeurons=numNeurons,
-                                           epochs=epochs)
+                                           epochs=epochs, model=model)
 
         if dynamic:
             logger.info("\nUsing dynamic nested sampling...")
