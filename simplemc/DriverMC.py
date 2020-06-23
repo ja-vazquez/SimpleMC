@@ -350,6 +350,7 @@ class DriverMC:
                 epochs = self.config.getint('neural', 'epochs', fallback=300)
                 ntrain = self.config.getint('neural', 'ntrain', fallback=nlivepoints)
                 learner = self.config.get('neural', 'learner', fallback='keras')
+                model  = self.config.get( 'model', 'model',   fallback=None)
                 savedmodelpath = self.config.get('neural', 'savedmodelpath', fallback=None)
 
         else:
