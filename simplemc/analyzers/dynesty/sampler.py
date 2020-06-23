@@ -1017,13 +1017,6 @@ class Sampler(object):
             If not provided, the default :meth:`results.print_fn` is used.
 
         """
-
-        # if print_func is None:
-        #     print_func = print_fn
-
-        # Add remaining live points to samples.
-        # pbar, print_func = self._get_print_func(print_func, print_progress)
-        # try:
         ncall = self.ncall
         it = self.it - 1
         for i, results in enumerate(self.add_live_points()):
@@ -1038,7 +1031,8 @@ class Sampler(object):
             # Print progress.
             if print_progress:
                 sys.stdout.write("it: {} | ncall: {} | "
-                      "logz: {} | loglstar: {}".format(i+1, ncall, logz, loglstar))
+                      "logz: {} | dlogz: {:.4f} | loglstar: {}".format(i+1, ncall, logz,
+                                                                       delta_logz, loglstar))
                 sys.stdout.flush()
                 #print_func(results, it, ncall, add_live_it=i+1, dlogz=0.01)
         # finally:
