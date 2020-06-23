@@ -11,16 +11,18 @@ import sys
 from .base import Predictor
 
 try:
+    import tensorflow as tf
+except ImportError:
+    sys.exit("You need to install tensorflow")
+
+try:
     from keras.models import Sequential
     from keras.layers import Dense
     from keras.callbacks import EarlyStopping
 except ImportError:
     sys.exit("You need to install keras")
 
-try:
-    import tensorflow as tf
-except ImportError:
-    sys.exit("You need to install tensorflow")
+
 
 
 
