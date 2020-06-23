@@ -408,7 +408,7 @@ class DriverMC:
                             learner=learner, ntrain=ntrain,
                             split=split, numNeurons=numNeurons,
                             epochs=epochs, model=model,
-                            savedmodelpath=savedmodelpath)
+                            savedmodelpath=savedmodelpath, simpleLike=self.L)
 
         if dynamic:
             logger.info("\nUsing dynamic nested sampling...")

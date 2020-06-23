@@ -7,8 +7,7 @@ Modified for SimpleMC use by I Gomez-Vargas (2020)
 """
 import os
 from .pybambimanager import BambiManager
-import dynesty
-#from simplemc.analyzers.dynesty import dynesty
+from simplemc.analyzers.dynesty import dynesty
 
 def loglike_thumper(loglikelihood, prior, nDims, **kwargs):
     """loglike_thumper.
@@ -75,7 +74,7 @@ def loglike_thumper(loglikelihood, prior, nDims, **kwargs):
     sampler = dynesty.NestedSampler(thumper.loglikelihood, prior, ndim=nDims,
                                     bound='multi', sample='unif', nlive=nlive)
 
-    sampler.run_nested(dlogz=0.5)
+    sampler.run_nested(dlogz=0.5, simpleLike=simpleLike)
 
 #    return thumper.loglikelihood
 
