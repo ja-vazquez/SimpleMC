@@ -837,7 +837,7 @@ class Sampler(object):
     def run_nested(self, maxiter=None, maxcall=None, dlogz=None,
                    logl_max=np.inf, n_effective=None,
                    add_live=True, print_progress=True,
-                   print_func=None, save_bounds=True,
+                   save_bounds=True,
                    addDerived=False,
                    outputname="outputDynesty",
                    simpleLike=None):
@@ -936,11 +936,10 @@ class Sampler(object):
 
             # Print progress.
             if print_progress:
-                i = self.it - 1
                 weights = np.exp(results[5])
                 vstarstr = str(results[2]).lstrip('[').rstrip(']')
                 sys.stdout.write("\rit: {} | ncall: {} | logz: {:.4f} | "
-                      "dlogz: {:.4f} | loglstar: {:.4f} | point {}".format(i, ncall, logz, delta_logz, loglstar, vstarstr))
+                      "dlogz: {:.4f} | loglstar: {:.4f} | point {}".format(it+1, ncall, logz, delta_logz, loglstar, vstarstr))
                 sys.stdout.flush()
                 # exp(logwt - loglstar)
                 if addDerived:
@@ -966,7 +965,6 @@ class Sampler(object):
         f = open(self.outputname + '.txt', "+a")
         # Add remaining live points to samples.
         if add_live:
-            it = self.it - 1
             for i, results in enumerate(self.add_live_points()):
                 (worst, ustar, vstar, loglstar, logvol, logwt,
                  logz, logzvar, h, nc, worst_it, boundidx, bounditer,
@@ -999,6 +997,7 @@ class Sampler(object):
                 f.write("{}\n".format(rowstr))
 
             f.close()
+            self.it = it+1
 
     def add_final_live(self, print_progress=True):
         """
@@ -1031,7 +1030,7 @@ class Sampler(object):
             # Print progress.
             if print_progress:
                 sys.stdout.write("\rit: {} | ncall: {} | "
-                      "logz: {} | dlogz: {:.4f} | loglstar: {}".format(i+1, ncall, logz,
+                      "logz: {} | dlogz: {:.4f} | loglstar: {}".format(self.it+i+1, ncall, logz,
                                                                        delta_logz, loglstar))
                 sys.stdout.flush()
 
