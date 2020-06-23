@@ -1000,7 +1000,7 @@ class Sampler(object):
 
             f.close()
 
-    def add_final_live(self, print_progress=True, print_func=None):
+    def add_final_live(self, print_progress=True):
         """
         **A wrapper that executes the loop adding the final live points.**
         Adds the final set of live points to the pre-existing sequence of
@@ -1030,7 +1030,7 @@ class Sampler(object):
 
             # Print progress.
             if print_progress:
-                sys.stdout.write("it: {} | ncall: {} | "
+                sys.stdout.write("\rit: {} | ncall: {} | "
                       "logz: {} | dlogz: {:.4f} | loglstar: {}".format(i+1, ncall, logz,
                                                                        delta_logz, loglstar))
                 sys.stdout.flush()
