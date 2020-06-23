@@ -1018,7 +1018,7 @@ class Sampler(object):
 
         """
         ncall = self.ncall
-        it = self.it - 1
+        sys.stdout.write("Adding final live points\n")
         for i, results in enumerate(self.add_live_points()):
             (worst, ustar, vstar, loglstar, logvol, logwt,
              logz, logzvar, h, nc, worst_it, boundidx, bounditer,
@@ -1034,10 +1034,6 @@ class Sampler(object):
                       "logz: {} | dlogz: {:.4f} | loglstar: {}".format(i+1, ncall, logz,
                                                                        delta_logz, loglstar))
                 sys.stdout.flush()
-                #print_func(results, it, ncall, add_live_it=i+1, dlogz=0.01)
-        # finally:
-        #     if pbar is not None:
-        #         pbar.close()
 
     def getLikes(self):
         if (self.composite):
