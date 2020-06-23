@@ -834,16 +834,6 @@ class Sampler(object):
                    logz, logzvar, h, nc, worst_it, boundidx, bounditer,
                    self.eff, delta_logz)
 
-    # def _get_print_func(self, print_func, print_progress):
-    #     pbar = None
-    #     if print_func is None:
-    #         if tqdm is None or not print_progress:
-    #             print_func = print_fn
-    #         else:
-    #             pbar = tqdm.tqdm()
-    #             print_func = partial(print_fn, pbar=pbar)
-    #     return pbar, print_func
-
     def run_nested(self, maxiter=None, maxcall=None, dlogz=None,
                    logl_max=np.inf, n_effective=None,
                    add_live=True, print_progress=True,
@@ -925,8 +915,6 @@ class Sampler(object):
                 dlogz = 0.01
 
         # Run the main nested sampling loop.
-        # pbar, print_func = self._get_print_func(print_func, print_progress)
-        # try:
         ncall = self.ncall
         f = open(self.outputname + '.txt', 'w+')
         for it, results in enumerate(self.sample(maxiter=maxiter,
@@ -949,8 +937,6 @@ class Sampler(object):
             # Print progress.
             if print_progress:
                 i = self.it - 1
-                # print_func(results, i, ncall, dlogz=dlogz,
-                #            logl_max=logl_max)
                 weights = np.exp(results[5])
                 vstarstr = str(results[2]).lstrip('[').rstrip(']')
                 sys.stdout.write("\rit: {} | ncall: {} | logz: {:.4f} | "
@@ -981,7 +967,6 @@ class Sampler(object):
         # Add remaining live points to samples.
         if add_live:
             it = self.it - 1
-            #-- f2 = open(outputname + '_live.txt', 'w+')
             for i, results in enumerate(self.add_live_points()):
                 (worst, ustar, vstar, loglstar, logvol, logwt,
                  logz, logzvar, h, nc, worst_it, boundidx, bounditer,
