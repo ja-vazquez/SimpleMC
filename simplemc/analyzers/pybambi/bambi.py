@@ -7,9 +7,8 @@ Modified for SimpleMC use by I Gomez-Vargas (2020)
 """
 import os
 from .pybambimanager import BambiManager
-from simplemc.analyzers.dynesty import dynesty
 
-def loglike_thumper(loglikelihood, prior, nDims, **kwargs):
+def loglike_thumper(loglikelihood, nDims, **kwargs):
     """loglike_thumper.
 
     Parameters
@@ -60,7 +59,6 @@ def loglike_thumper(loglikelihood, prior, nDims, **kwargs):
     epochs = kwargs.pop('epochs', 0.8)
     model = kwargs.pop('model', None)
     savedmodelpath = kwargs.pop('savedmodelpath', None)
-    simpleLike = kwargs.pop('simpleLike', None)
 
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
@@ -71,12 +69,7 @@ def loglike_thumper(loglikelihood, prior, nDims, **kwargs):
                            numNeurons=numNeurons, epochs=epochs, model=model,
                            savedmodelpath=savedmodelpath)
 
-    sampler = dynesty.NestedSampler(thumper.loglikelihood, prior, ndim=nDims,
-                                    bound='multi', sample='unif', nlive=nlive)
-
-    sampler.run_nested(dlogz=0.5, simpleLike=simpleLike)
-
-#    return thumper.loglikelihood
+    return thumper.loglikelihood
 
     
 

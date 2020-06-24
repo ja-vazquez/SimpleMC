@@ -403,17 +403,18 @@ class DriverMC:
         if neuralNetwork:
             logger.info("\tUsing neural network.")
             from simplemc.analyzers.pybambi.bambi import loglike_thumper
-            # self.logLike =
-            loglike_thumper(self.logLike, self.priorTransform, self.dims,
+
+            self.logLike = loglike_thumper(self.logLike, self.dims,
                             learner=learner, ntrain=ntrain,
                             split=split, numNeurons=numNeurons,
                             epochs=epochs, model=model,
-                            savedmodelpath=savedmodelpath, simpleLike=self.L)
+                            savedmodelpath=savedmodelpath)
 
         if dynamic:
             logger.info("\nUsing dynamic nested sampling...")
             sampler = DynamicNestedSampler(self.logLike, self.priorTransform,
-                      self.dims, bound=nestedType, pool=pool, queue_size=nprocess)
+                                           self.dims, bound=nestedType, pool=pool,
+                                           queue_size=nprocess)
 
             sampler.run_nested(nlive_init=nlivepoints, dlogz_init=0.05, nlive_batch=100,
                             maxiter_init=10000, maxiter_batch=1000, maxbatch=10,
