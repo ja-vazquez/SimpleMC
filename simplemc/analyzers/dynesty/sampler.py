@@ -834,7 +834,7 @@ class Sampler(object):
             self.it += 1
 
             # trying bambi
-            if self.it > 50:
+            if self.bambi_dumper:
                 v_for_net = np.array(self.saved_v)
                 likes_for_net = np.array(self.saved_logl)
                 self.dumper(self.live_v, self.live_logl,
@@ -906,7 +906,7 @@ class Sampler(object):
             the live points internally. Default is *True*.
 
         """
-        self.dumper = dumper
+        self.bambi_dumper = dumper
 
         self.like = simpleLike
         self.derived = addDerived
