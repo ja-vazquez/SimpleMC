@@ -53,7 +53,8 @@ def bambi(loglikelihood, nDims, **kwargs):
     # Process kwargs
     nlive = kwargs.pop('nlive', nDims*25)
     learner = kwargs.pop('learner', 'keras')
-    proxy_tolerance = kwargs.pop('proxy_tolerance', 0.01)
+    # Original 0.01 proxy_tolerance
+    proxy_tolerance = kwargs.pop('proxy_tolerance', 0.1)
     failure_tolerance = kwargs.pop('failure_tolerance', 0.5)
     ntrain = kwargs.pop('ntrain', nlive)
     # ntrain = kwargs.pop('ntrain', 100)
@@ -62,6 +63,8 @@ def bambi(loglikelihood, nDims, **kwargs):
     epochs = kwargs.pop('epochs', 0.8)
     model = kwargs.pop('model', None)
     savedmodelpath = kwargs.pop('savedmodelpath', None)
+    it_to_start_net = kwargs.pop('it_to_start_net', 1000)
+    updInt = kwargs.pop('updInt', 500)
 
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
@@ -69,7 +72,8 @@ def bambi(loglikelihood, nDims, **kwargs):
     thumper = BambiManager(loglikelihood, learner, proxy_tolerance,
                            failure_tolerance, ntrain, split=split,
                            numNeurons=numNeurons, epochs=epochs, model=model,
-                           savedmodelpath=savedmodelpath)
+                           savedmodelpath=savedmodelpath, it_to_start_net=it_to_start_net,
+                           updInt=updInt)
 
     return thumper
 

@@ -352,6 +352,8 @@ class DriverMC:
                 learner = self.config.get('neural', 'learner', fallback='keras')
                 model  = self.config.get( 'model', 'model',   fallback=None)
                 savedmodelpath = self.config.get('neural', 'savedmodelpath', fallback=None)
+                it_to_start_net = self.config.getint('neural', 'it_to_start_net', fallback=1000)
+                updInt = self.config.getint('neural', 'updInt', fallback=500)
 
         else:
             self.engine = kwargs.pop('engine',    'dynesty')
@@ -373,6 +375,8 @@ class DriverMC:
             learner = kwargs.pop('learner', 'keras')
             model = kwargs.pop('model', None)
             savedmodelpath = kwargs.pop('savedmodelpath', None)
+            it_to_start_net = kwargs.pop('it_to_start_net', 1000)
+            updInt = kwargs.pop('updInt', 500)
 
             if kwargs:
                 logger.critical('Unexpected **kwargs for nested sampler: {}'.format(kwargs))
@@ -408,7 +412,9 @@ class DriverMC:
                             learner=learner, ntrain=ntrain,
                             split=split, numNeurons=numNeurons,
                             epochs=epochs, model=model,
-                            savedmodelpath=savedmodelpath)
+                            savedmodelpath=savedmodelpath,
+                            it_to_start_net=it_to_start_net,
+                            updInt=updInt)
 
             self.logLike = thumper.loglikelihood
             dumper =thumper.dumper
