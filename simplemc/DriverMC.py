@@ -354,6 +354,7 @@ class DriverMC:
                 savedmodelpath = self.config.get('neural', 'savedmodelpath', fallback=None)
                 it_to_start_net = self.config.getint('neural', 'it_to_start_net', fallback=1000)
                 updInt = self.config.getint('neural', 'updInt', fallback=500)
+                proxy_tolerance = self.config.getfloat('neural', 'proxy_tolerance', fallback=0.01)
 
         else:
             self.engine = kwargs.pop('engine',    'dynesty')
@@ -377,6 +378,7 @@ class DriverMC:
             savedmodelpath = kwargs.pop('savedmodelpath', None)
             it_to_start_net = kwargs.pop('it_to_start_net', 1000)
             updInt = kwargs.pop('updInt', 500)
+            proxy_tolerance = kwargs.pop('proxy_tolerance', 0.01)
 
             if kwargs:
                 logger.critical('Unexpected **kwargs for nested sampler: {}'.format(kwargs))
@@ -414,7 +416,7 @@ class DriverMC:
                             epochs=epochs, model=model,
                             savedmodelpath=savedmodelpath,
                             it_to_start_net=it_to_start_net,
-                            updInt=updInt)
+                            updInt=updInt, proxy_tolerance=proxy_tolerance)
 
             self.logLike = thumper.loglikelihood
             dumper =thumper.dumper

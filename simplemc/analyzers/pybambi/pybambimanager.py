@@ -81,9 +81,9 @@ class BambiManager(object):
                                         loglikes[:self._ntrain])
 
         if self._proxy_trained:
-            print("Using trained proxy")
+            print("\rUsing trained proxy ")
         else:
-            print("Unable to use proxy")
+            print("\rUnable to use proxy ")
 
     def loglikelihood(self, params):
         """Bambi Proxy wrapper for original loglikelihood."""
