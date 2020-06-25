@@ -403,12 +403,13 @@ class DriverMC:
         if neuralNetwork:
             logger.info("\tUsing neural network.")
             from simplemc.analyzers.pybambi.bambi import loglike_thumper
-
-            self.logLike = loglike_thumper(self.logLike, self.dims,
+            # self.logLike =
+            loglike_thumper(self.logLike, self.priorTransform, self.dims,
                             learner=learner, ntrain=ntrain,
                             split=split, numNeurons=numNeurons,
                             epochs=epochs, model=model,
-                            savedmodelpath=savedmodelpath)
+                            savedmodelpath=savedmodelpath, simpleLike=self.L)
+            sys.exit(1)
 
         if dynamic:
             logger.info("\nUsing dynamic nested sampling...")

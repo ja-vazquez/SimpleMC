@@ -82,6 +82,7 @@ class Predictor(object):
 
         """
         inRange = True
+        print("min L: {} , max L: {}".format(self._minLogL, self._maxLogL))
         if loglikelihood > self._maxLogL + self.uncertainty() \
                 or loglikelihood < self._minLogL - self.uncertainty():
             inRange = False
