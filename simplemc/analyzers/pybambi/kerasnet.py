@@ -5,24 +5,22 @@ This implements a Keras Sequential model (a deep MLP)
 Author: Martin White (martin.white@adelaide.edu.au)
 Date: December 2018
 
+Modified for SimpleMC use by I Gomez-Vargas (igomezv0701@alumno.ipn.mx)
+Date: June 2020
 """
 import numpy
 import sys
 from .base import Predictor
-
+# try:
+#     from keras.models import Sequential
+#     from keras.layers import Dense
+#     from keras.callbacks import EarlyStopping
+# except:
+#     sys.exit("You need to install keras")
 try:
     import tensorflow as tf
-except ImportError:
+except:
     sys.exit("You need to install tensorflow")
-
-try:
-    from keras.models import Sequential
-    from keras.layers import Dense
-    from keras.callbacks import EarlyStopping
-except ImportError:
-    sys.exit("You need to install keras")
-
-
 
 
 
@@ -50,7 +48,7 @@ class KerasNetInterpolation(Predictor):
                  savedmodelpath=None):
         """Construct predictor from training data."""
         super(KerasNetInterpolation, self).__init__(params, logL, split)
-        if savedmodel is not None:
+        if savedmodelpath is not None:
             self.model = tf.keras.models.load_model(savedmodelpath)
         elif model is None:
             self.numNeurons = numNeurons
@@ -58,7 +56,7 @@ class KerasNetInterpolation(Predictor):
         else:
             self.model = model
 
-        callbacks = [EarlyStopping(monitor='val_loss', mode='min',
+        callbacks = [tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min',
                                    min_delta=0.001,
                                    patience=10,
                                    restore_best_weights=True)]
@@ -72,25 +70,34 @@ class KerasNetInterpolation(Predictor):
 
     def _default_architecture(self):
         # Create model
-        model = Sequential()
+        # model = Sequential()
 
         # Get number of input parameters
         # Note: if params contains extra quantities (ndim+others),
         # we need to change this
+
         n_cols = self.params_training.shape[1]
+        print("n_cols", n_cols)
 
         # Add model layers, note choice of activation function (relu)
         # We will use 3 hidden layers and an output layer
         # Note: in a Dense layer, all nodes in the previous later connect
         # to the nodes in the current layer
 
-        model.add(Dense(self.numNeurons, activation='relu', input_shape=(n_cols,)))
-        model.add(Dense(self.numNeurons, activation='relu'))
-        model.add(Dense(self.numNeurons, activation='relu'))
-        model.add(Dense(1))
+        # model.add(Dense(self.numNeurons, activation='relu', input_shape=(n_cols,)))
+        # model.add(Dense(self.numNeurons, activation='relu'))
+        # model.add(Dense(self.numNeurons, activation='relu'))
+        # model.add(Dense(1))
 
         # Now compile the model
         # Need to choose training optimiser, and the loss function
+        # model.compile(optimizer='adam', loss='mean_squared_error')
+        model = tf.keras.models.Sequential([
+            tf.keras.layers.Dense(self.numNeurons, activation='relu', input_shape=(n_cols,)),
+            tf.keras.layers.Dense(self.numNeurons, activation='relu'),
+            tf.keras.layers.Dense(self.numNeurons, activation='relu'),
+            tf.keras.layers.Dense(1)
+        ])
         model.compile(optimizer='adam', loss='mean_squared_error')
 
         return model

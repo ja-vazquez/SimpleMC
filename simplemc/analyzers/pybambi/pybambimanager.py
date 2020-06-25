@@ -2,12 +2,18 @@
 
 Author: Pat Scott (p.scott@imperial.ac.uk)
 Date: Feb 2019
+
+Modified for SimpleMC use by I Gomez-Vargas (igomezv0701@alumno.ipn.mx)
+Date: June 2020
 """
 
 import numpy as np
-from .kerasnet import KerasNetInterpolation
-from .nearestneighbour import NearestNeighbourInterpolation
-import keras.models
+from simplemc.analyzers.pybambi.kerasnet import KerasNetInterpolation
+# import keras.models
+try:
+    import tensorflow as tf
+except:
+    sys.exit("You need to install tensorflow")
 
 
 class BambiManager(object):
@@ -42,6 +48,7 @@ class BambiManager(object):
         self.epochs = epochs
         self.model = model
         self.savedmodelpath = savedmodelpath
+        self.dumpercount = 0
 
     def make_learner(self, params, loglikes):
         """Construct a Predictor."""
@@ -52,19 +59,21 @@ class BambiManager(object):
                                          savedmodelpath=self.savedmodelpath)
         elif self._learner == 'nearestneighbour':
             return NearestNeighbourInterpolation(params, loglikes)
-        elif issubclass(type(self._learner), keras.models.Model):
+        elif issubclass(type(self._learner), tf.keras.models.Model):
             return KerasNetInterpolation(params, loglikes, model=self._learner)
         else:
             raise NotImplementedError('learner %s is not implemented.'
                                       % self._learner)
 
     def dumper(self, live_params, live_loglks, dead_params, dead_loglks):
-        """Respond to signal from nested sampler."""
+        self.dumpercount += 1
+        # print("Respond to signal from nested sampler.")
         if not self._proxy_trained:
             params = np.concatenate((live_params, dead_params))
             loglikes = np.concatenate((live_loglks, dead_loglks))
             self.train_new_learner(params[:self._ntrain, :],
-                                   loglikes[:self._ntrain])
+                                    loglikes[:self._ntrain])
+
         if self._proxy_trained:
             print("Using trained proxy")
         else:
