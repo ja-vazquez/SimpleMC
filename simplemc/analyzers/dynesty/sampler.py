@@ -5,6 +5,8 @@
 The base `Sampler` class containing various helpful functions. All other
 samplers inherit this class either explicitly or implicitly.
 
+Modified for SimpleMC use by I Gomez-Vargas (igomezv0701@alumno.ipn.mx)
+Date: June 2020
 """
 from simplemc.cosmo.Derivedparam import AllDerived
 from six.moves import range
@@ -84,6 +86,7 @@ class Sampler(object):
                  queue_size, pool, use_pool):
 
         # distributions
+        self.loglikelihood_control = loglikelihood
         self.loglikelihood = loglikelihood
         self.prior_transform = prior_transform
         self.npdim = npdim
@@ -350,7 +353,7 @@ class Sampler(object):
         else:
             # Propose ("evolve") a new live point using the default `map`
             # function.
-            self.queue = list(map(evolve_point, args))
+            self.queue = list(map(evolve_point, (args)))
 
     def _get_point_value(self, loglstar):
         """Grab the first live point proposal in the queue."""
@@ -776,6 +779,7 @@ class Sampler(object):
             # `logl > loglstar` using the bounding distribution and sampling
             # method from our sampler.
             u, v, logl, nc = self._new_point(loglstar_new, logvol)
+
             ncall += nc
             self.ncall += nc
             self.since_update += nc
@@ -829,6 +833,13 @@ class Sampler(object):
             # Increment total number of iterations.
             self.it += 1
 
+            # trying bambi
+            if self.it > 50:
+                v_for_net = np.array(self.saved_v)
+                likes_for_net = np.array(self.saved_logl)
+                self.dumper(self.live_v, self.live_logl,
+                             v_for_net, likes_for_net)
+
             # Return dead point and ancillary quantities.
             yield (worst, ustar, vstar, loglstar, logvol, logwt,
                    logz, logzvar, h, nc, worst_it, boundidx, bounditer,
@@ -840,7 +851,7 @@ class Sampler(object):
                    save_bounds=True,
                    addDerived=False,
                    outputname="outputDynesty",
-                   simpleLike=None):
+                   simpleLike=None, dumper=None):
         """
         **A wrapper that executes the main nested sampling loop.**
         Iteratively replace the worst live point with a sample drawn
@@ -895,6 +906,8 @@ class Sampler(object):
             the live points internally. Default is *True*.
 
         """
+        self.dumper = dumper
+
         self.like = simpleLike
         self.derived = addDerived
         self.outputname = outputname
@@ -928,6 +941,8 @@ class Sampler(object):
             (worst, ustar, vstar, loglstar, logvol, logwt,
              logz, logzvar, h, nc, worst_it, boundidx, bounditer,
              eff, delta_logz) = results
+
+
             ncall += nc
             if delta_logz > 1e6:
                 delta_logz = np.inf
