@@ -69,6 +69,8 @@ class BambiManager(object):
         self.dumpercount += 1
         # print("Respond to signal from nested sampler.")
         if not self._proxy_trained:
+            dead_params = np.array(dead_params)
+            dead_loglks = np.array(dead_loglks)
             params = np.concatenate((live_params, dead_params))
             loglikes = np.concatenate((live_loglks, dead_loglks))
             self.train_new_learner(params[:self._ntrain, :],
