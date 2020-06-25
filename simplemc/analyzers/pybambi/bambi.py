@@ -15,7 +15,7 @@ nprocess = 2
 
 pool = mp.Pool(processes=nprocess)
 
-def loglike_thumper(loglikelihood, prior, nDims, **kwargs):
+def bambi(loglikelihood, nDims, **kwargs):
     """loglike_thumper.
 
     Parameters
@@ -58,17 +58,15 @@ def loglike_thumper(loglikelihood, prior, nDims, **kwargs):
     # Process kwargs
     nlive = kwargs.pop('nlive', nDims*25)
     learner = kwargs.pop('learner', 'keras')
-    #proxy_tolerance = kwargs.pop('proxy_tolerance', 0.01)
-    proxy_tolerance = kwargs.pop('proxy_tolerance', 10.0)
+    proxy_tolerance = kwargs.pop('proxy_tolerance', 0.01)
     failure_tolerance = kwargs.pop('failure_tolerance', 0.5)
-    # ntrain = kwargs.pop('ntrain', nlive)
-    ntrain = kwargs.pop('ntrain', 100)
+    ntrain = kwargs.pop('ntrain', nlive)
+    # ntrain = kwargs.pop('ntrain', 100)
     split = kwargs.pop('split', 0.8)
     numNeurons = kwargs.pop('numNeurons', 200)
     epochs = kwargs.pop('epochs', 0.8)
     model = kwargs.pop('model', None)
     savedmodelpath = kwargs.pop('savedmodelpath', None)
-    simpleLike = kwargs.pop('simpleLike', None)
 
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
@@ -78,10 +76,7 @@ def loglike_thumper(loglikelihood, prior, nDims, **kwargs):
                            numNeurons=numNeurons, epochs=epochs, model=model,
                            savedmodelpath=savedmodelpath)
 
-    s = dynesty.NestedSampler(thumper.loglikelihood, prior, nDims,
-                  bound='multi', sample='unif', nlive=nlive)
-
-    s.run_nested(dlogz=0.01, simpleLike=simpleLike, dumper=thumper.dumper)
+    return thumper
 
 
 

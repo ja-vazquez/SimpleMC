@@ -402,14 +402,18 @@ class DriverMC:
         ti = time.time()
         if neuralNetwork:
             logger.info("\tUsing neural network.")
-            from simplemc.analyzers.pybambi.bambi import loglike_thumper
+            from simplemc.analyzers.pybambi.bambi import bambi
             # self.logLike =
-            loglike_thumper(self.logLike, self.priorTransform, self.dims,
+            thumper = bambi(self.logLike, self.dims,
                             learner=learner, ntrain=ntrain,
                             split=split, numNeurons=numNeurons,
                             epochs=epochs, model=model,
-                            savedmodelpath=savedmodelpath, simpleLike=self.L)
-            sys.exit(1)
+                            savedmodelpath=savedmodelpath)
+
+            self.logLike = thumper.loglikelihood
+            dumper =thumper.dumper
+        else:
+            dumper = None
 
         if dynamic:
             logger.info("\nUsing dynamic nested sampling...")
@@ -428,7 +432,7 @@ class DriverMC:
                         bound=nestedType, sample = 'unif', nlive = nlivepoints,
                         pool = pool, queue_size=nprocess)
             sampler.run_nested(dlogz=accuracy, outputname=self.outputpath,
-                               addDerived=self.addDerived, simpleLike=self.L)
+                               addDerived=self.addDerived, simpleLike=self.L, dumper=dumper)
             M = sampler.results
 
 
