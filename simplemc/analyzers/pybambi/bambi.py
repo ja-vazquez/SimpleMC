@@ -11,10 +11,6 @@ from .pybambimanager import BambiManager
 from simplemc.analyzers.dynesty import dynesty
 import multiprocessing as mp
 
-nprocess = 2
-
-pool = mp.Pool(processes=nprocess)
-
 def bambi(loglikelihood, nDims, **kwargs):
     """loglike_thumper.
 
