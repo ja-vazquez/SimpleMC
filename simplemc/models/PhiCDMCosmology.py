@@ -145,7 +145,7 @@ class PhiCosmology(LCDMCosmology):
             if self.beta == 0:                  #cosh
                 ini_lam = -self.alpha*np.tanh(self.alpha*self.ilam)
             elif self.beta == -1:
-                ini_lam = -self.alpha/np.tanh(0.5*self.alpha/self.ilam)
+                ini_lam = -self.alpha/np.tanh(0.5*self.alpha*self.ilam)
             elif self.beta == 1:
                 ini_lam = self.alpha*np.arctan(0.5*self.alpha*self.ilam)
             else: sys.exit('wrong potential')
