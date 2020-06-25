@@ -77,7 +77,6 @@ class KerasNetInterpolation(Predictor):
         # we need to change this
 
         n_cols = self.params_training.shape[1]
-        print("n_cols", n_cols)
 
         # Add model layers, note choice of activation function (relu)
         # We will use 3 hidden layers and an output layer
