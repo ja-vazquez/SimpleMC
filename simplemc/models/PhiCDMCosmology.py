@@ -109,8 +109,10 @@ class PhiCosmology(LCDMCosmology):
                     elif self.alpha== 2: #exp_pow2
                         return 1+ 2*self.beta/lam**2
                     else:           #'exp_pow_a'
-                        fac = self.alpha*(self.alpha-1)*self.beta/lam**2
-                        return 1- fac*(-lam/(self.alpha*self.beta))**((self.alpha-2)/(self.alpha-1))
+                        #fac = self.alpha*(self.alpha-1)*self.beta/lam**2
+                        #return 1- fac*(-lam/(self.alpha*self.beta))**((self.alpha-2)/(self.alpha-1))
+                        fac = (self.alpha-1)/(self.alpha*self.beta)
+                        return 1+ fac*(-lam/(self.alpha*self.beta))**(self.alpha/(1-self.alpha))
                 elif self.mu==2 and self.alpha==2:   #pow2_exp_pow2
                     fac= lam*np.sqrt(lam**2-16*self.beta)
                     return 1 + (4*self.beta/lam**2)*(-16*self.beta-lam**2+fac)/(-16*self.beta-2*lam**2+2*fac)
@@ -141,32 +143,32 @@ class PhiCosmology(LCDMCosmology):
     def solver(self, ini_Ophi):
         if type(self.mu) == type('st'):
             if self.beta == 0:                  #cosh
-                ini_lam = self.alpha*np.tanh(self.alpha*self.ilam)
+                ini_lam = -self.alpha*np.tanh(self.alpha*self.ilam)
             elif self.beta == -1:
-                ini_lam = self.alpha/np.tanh(0.5*self.alpha/self.ilam)
+                ini_lam = -self.alpha/np.tanh(0.5*self.alpha/self.ilam)
             elif self.beta == 1:
-                ini_lam = -self.alpha*np.arctan(0.5*self.alpha*self.ilam)
+                ini_lam = self.alpha*np.arctan(0.5*self.alpha*self.ilam)
             else: sys.exit('wrong potential')
         else:
             if self.beta==0:                        #pow
-                ini_lam= self.mu*self.ilam
+                ini_lam= -self.mu*self.ilam
             else:
                 if self.mu == 0:
                     if self.alpha== 1:              #exp
-                        ini_lam= self.beta
+                        ini_lam= -self.beta
                     elif self.alpha== 2:            #exp_pow2
-                        ini_lam= 2*self.beta*self.ilam
+                        ini_lam= -2*self.beta*self.ilam
                     else:                           #'exp_pow_a'
-                        ini_lam= self.alpha*self.beta*self.ilam #**(self.alpha-1)
+                        ini_lam= -self.alpha*self.beta*self.ilam**(self.alpha-1)
                 elif self.mu==2 and self.alpha==2:   #pow2_exp_pow2
-                        ini_lam= self.ilam #2*(self.ilam + self.beta/self.ilam)
+                        ini_lam= -self.ilam #2*(self.ilam + self.beta/self.ilam)
                 else:                               #pow_exp
                     if self.alpha == 1:
-                        ini_lam= self.mu*self.ilam + self.beta
+                        ini_lam= -(self.mu*self.ilam + self.beta)
 
 
         #we'll use the sign of lambda to describe either quint or phant
-        ini_lam=-ini_lam
+        #ini_lam=-ini_lam
         self.eps = np.sign(ini_lam)
         ini_lam  =np.abs(ini_lam)
         self.ini_wphi = -1 + 1.0e-4*self.eps
@@ -198,13 +200,14 @@ class PhiCosmology(LCDMCosmology):
             x_vec = self.solver(Ophi0).T
             self.do = 1
             self.hub_SF   = interp1d(self.lna, x_vec[4])
+            #useful only for plotting purposes
             #self.hub_SF_z = self.logatoz(x_vec[3])
             self.w_eos    = interp1d(self.lna, x_vec[0])
-            self.Ophi    = interp1d(self.lna, x_vec[1])
-            self.Oka      = interp1d(self.lna, x_vec[3])
+            #self.Ophi    = interp1d(self.lna, x_vec[1])
+            #self.Oka      = interp1d(self.lna, x_vec[3])
         except RuntimeError:
             self.do = 2
-            self.w_eos    = interp1d(self.lna, -1+np.zeros(len(self.lna)))
+            #self.w_eos    = interp1d(self.lna, -1+np.zeros(len(self.lna)))
 
 
 
