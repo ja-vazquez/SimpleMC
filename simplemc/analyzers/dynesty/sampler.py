@@ -952,7 +952,7 @@ class Sampler(object):
                 weights = np.exp(results[5])
                 vstarstr = str(results[2]).lstrip('[').rstrip(']')
                 sys.stdout.write("\rit: {} | ncall: {} | eff: {:.3f} | logz: {:.4f} | "
-                      "dlogz: {:.4f} | loglstar: {:.4f} | point {} | accuracy".format(it, ncall, eff, logz, delta_logz, loglstar, vstarstr))
+                      "dlogz: {:.4f} | loglstar: {:.4f} | point {}".format(it, ncall, eff, logz, delta_logz, loglstar, vstarstr))
                 sys.stdout.flush()
                 # exp(logwt - loglstar)
                 if addDerived:
