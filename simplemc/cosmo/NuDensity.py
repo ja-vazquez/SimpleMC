@@ -11,46 +11,64 @@ import scipy as sp
 
 
 class NuIntegral:
+    """
+    This module calculates the predictions for the evolution
+    of neutrino energy densities.
+    Here, we compute the integral I(r).
+    Initialiazes the \nu factor in \rho_nu (self.interpolator)
+    """
     def __init__(self):
-        """
-
-        This module calculates the predictions for the evolution
-        of neutrino energy densities.
-
-        Returns
-        -------
-        this computes the integral
-        """
-
         print("Initalizing nu density look up table...", end=' ')
-        rat = 10**(sp.arange(-4, 5, 0.1))
+        rat  = 10**(sp.arange(-4, 5, 0.1))
         intg = []
         for r in rat:
-            # min below is to supress the stupid overlow warning
+            # <in below is to supress the stupid overlow warning.
             res = quad(lambda x: sp.sqrt(x**2 + r**2) /
                        (sp.exp(min(x, 400)) + 1.0)*x**2, 0, 1000)
             intg.append(res[0]/(1+r))
         intg = sp.array(intg)
-        intg *= 7/8./intg[0]  # the right normalization
+
+        # The right normalization.
+        intg *= 7/8./intg[0]
 
         self.interpolator = interp1d(sp.log(rat), intg)
-        # type this into maple
+        # Type this into maple:
         # evalf(45*Zeta(3)/(2*Pi^4));  0.2776566337
         self.int_infty = 45*zeta(3)/(2*ct.pi**4)
         print("Done")  # self.int_infty,intg[-1]*(1+r)/r
 
 
     def SevenEights(self, mnuOT):
+        """
+        Given the \nu mass, returns the integral on the energy
+        density of neutrinos.
+
+        Parameters
+        ----------
+        mnuOT: float
+            Sum of the neutrino masses.
+
+        Returns
+        -------
+            The integral given the sum of neutrino masses.
+            For massless neutrinosI(0)=78.
+
+        """
+        # Massless neutrinos.
         if (mnuOT < 1e-4):
             return 7/8.
+        # I don't think this ever matters.
         elif (mnuOT > 1e4):
-            return self.int_infty*mnuOT  # I don't think this ever matters
+            return self.int_infty*mnuOT
+        # Return the integral for a given mass.
         else:
             return self.interpolator(sp.log(mnuOT))*(1+mnuOT)
 
 
 class ZeroNuDensity:
-    #Fake class that returns zeros if want to disable this
+    """
+    Fake class that returns zeros if want to disable neutrino contributions.
+    """
     def __init__(self):
         return
 
@@ -59,22 +77,32 @@ class ZeroNuDensity:
 
 
 class NuDensity:
+    """
+    Compute Density parameter for neutrinos.
+
+    Parameters
+    ----------
+    TCMB: float
+        Temperature of the CMB.
+
+    Nnu: float, optional
+        Families of neutrinos.
+        Default value is 'Neff=3.046'.
+
+    mnu: float, optional
+        Sum of the neutrino masses.
+        Default value is 'mnu=0.06'.
+
+    degenerate: bool, optional
+        Combinations of massive neutrinos.
+
+    fact: float, optional
+        The ration contribution: omrad_fac   = 4.48130979e-7
+
+    """
     I = NuIntegral()
 
     def __init__(self, TCMB, Nnu=3.046, mnu=0.06, degenerate=False, fact=None):
-        """
-        Compute Density parameter for neutrinos
-        Parameters
-        ----------
-        TCMB: Temperature of the CMB
-        Nnu: Families of neutrinos
-        mnu: Sum of the mass
-        degenerate: Combinations of massive neutrinos
-
-        Returns
-        -------
-
-        """
         # self.I=NuIntegral()
         # one neutrino species
         self.mnu_ = mnu
