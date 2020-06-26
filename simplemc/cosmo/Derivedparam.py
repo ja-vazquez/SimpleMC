@@ -124,6 +124,7 @@ class Derivedparam:
 
     Ltxname: string, optional
         Provide the Latex name, useful for plotting.
+        Default is None, and in this case uses the 'name' string.
 
     Example
     -------

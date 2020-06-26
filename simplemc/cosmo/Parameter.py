@@ -15,12 +15,15 @@ class Parameter:
 
     err: float, optional
         Estimated error, in mcmc will be the step.
+        Default is 0, but better to write any positive number.
 
     bounds: list of 2, optional
         Priors. (minimum value, maximum value).
+        Default is None, but computed as '(value-5*err, value+5*err)'.
 
     Ltxname: string, optional
-        Latex name, use mainly for plotting
+        Latex name, use mainly for plotting.
+        Default is None, and in this case uses the 'name' string.
 
 
     Example
