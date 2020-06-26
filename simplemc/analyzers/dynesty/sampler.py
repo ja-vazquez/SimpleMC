@@ -834,11 +834,9 @@ class Sampler(object):
             self.it += 1
 
             # trying bambi
-            if self.it > 50:
-                v_for_net = np.array(self.saved_v)
-                likes_for_net = np.array(self.saved_logl)
-                self.dumper(self.live_v, self.live_logl,
-                             v_for_net, likes_for_net)
+            if self.bambi_dumper:
+                self.bambi_dumper(self.live_v, self.live_logl,
+                                  self.saved_v, self.saved_logl)
 
             # Return dead point and ancillary quantities.
             yield (worst, ustar, vstar, loglstar, logvol, logwt,
@@ -906,7 +904,7 @@ class Sampler(object):
             the live points internally. Default is *True*.
 
         """
-        self.dumper = dumper
+        self.bambi_dumper = dumper
 
         self.like = simpleLike
         self.derived = addDerived

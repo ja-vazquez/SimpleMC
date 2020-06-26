@@ -32,7 +32,7 @@ class BambiManager(object):
 
     def __init__(self, loglikelihood, learner, proxy_tolerance,
                  failure_tolerance, ntrain, split=0.8, numNeurons=200, epochs=300,
-                 model=None, savedmodelpath=None):
+                 model=None, savedmodelpath=None, it_to_start_net=1000, updInt=500):
         """Construct bambi object."""
 
         self.proxy_tolerance = proxy_tolerance
@@ -49,6 +49,8 @@ class BambiManager(object):
         self.model = model
         self.savedmodelpath = savedmodelpath
         self.dumpercount = 0
+        self.it_to_start_net = it_to_start_net
+        self.updInt = updInt
 
     def make_learner(self, params, loglikes):
         """Construct a Predictor."""
@@ -68,16 +70,20 @@ class BambiManager(object):
     def dumper(self, live_params, live_loglks, dead_params, dead_loglks):
         self.dumpercount += 1
         # print("Respond to signal from nested sampler.")
-        if not self._proxy_trained:
-            params = np.concatenate((live_params, dead_params))
-            loglikes = np.concatenate((live_loglks, dead_loglks))
-            self.train_new_learner(params[:self._ntrain, :],
-                                    loglikes[:self._ntrain])
+        if not self._proxy_trained and self.dumpercount >= self.it_to_start_net:
+            mod_it_after_net = (self.dumpercount - self.it_to_start_net)%self.updInt
+            if self.dumpercount == self.it_to_start_net or mod_it_after_net == 0:
+                dead_params = np.array(dead_params)
+                dead_loglks = np.array(dead_loglks)
+                params = np.concatenate((live_params, dead_params))
+                loglikes = np.concatenate((live_loglks, dead_loglks))
+                self.train_new_learner(params[:self._ntrain, :],
+                                        loglikes[:self._ntrain])
 
         if self._proxy_trained:
-            print("Using trained proxy")
+            print("\rUsing trained proxy ")
         else:
-            print("Unable to use proxy")
+            print("\rUnable to use proxy ")
 
     def loglikelihood(self, params):
         """Bambi Proxy wrapper for original loglikelihood."""

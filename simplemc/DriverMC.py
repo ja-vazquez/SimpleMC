@@ -352,6 +352,9 @@ class DriverMC:
                 learner = self.config.get('neural', 'learner', fallback='keras')
                 model  = self.config.get( 'model', 'model',   fallback=None)
                 savedmodelpath = self.config.get('neural', 'savedmodelpath', fallback=None)
+                it_to_start_net = self.config.getint('neural', 'it_to_start_net', fallback=1000)
+                updInt = self.config.getint('neural', 'updInt', fallback=500)
+                proxy_tolerance = self.config.getfloat('neural', 'proxy_tolerance', fallback=0.01)
 
         else:
             self.engine = kwargs.pop('engine',    'dynesty')
@@ -373,6 +376,9 @@ class DriverMC:
             learner = kwargs.pop('learner', 'keras')
             model = kwargs.pop('model', None)
             savedmodelpath = kwargs.pop('savedmodelpath', None)
+            it_to_start_net = kwargs.pop('it_to_start_net', 1000)
+            updInt = kwargs.pop('updInt', 500)
+            proxy_tolerance = kwargs.pop('proxy_tolerance', 0.01)
 
             if kwargs:
                 logger.critical('Unexpected **kwargs for nested sampler: {}'.format(kwargs))
@@ -402,14 +408,20 @@ class DriverMC:
         ti = time.time()
         if neuralNetwork:
             logger.info("\tUsing neural network.")
-            from simplemc.analyzers.pybambi.bambi import loglike_thumper
+            from simplemc.analyzers.pybambi.bambi import bambi
             # self.logLike =
-            loglike_thumper(self.logLike, self.priorTransform, self.dims,
+            thumper = bambi(self.logLike, self.dims,
                             learner=learner, ntrain=ntrain,
                             split=split, numNeurons=numNeurons,
                             epochs=epochs, model=model,
-                            savedmodelpath=savedmodelpath, simpleLike=self.L)
-            sys.exit(1)
+                            savedmodelpath=savedmodelpath,
+                            it_to_start_net=it_to_start_net,
+                            updInt=updInt, proxy_tolerance=proxy_tolerance)
+
+            self.logLike = thumper.loglikelihood
+            dumper =thumper.dumper
+        else:
+            dumper = None
 
         if dynamic:
             logger.info("\nUsing dynamic nested sampling...")
@@ -428,7 +440,7 @@ class DriverMC:
                         bound=nestedType, sample = 'unif', nlive = nlivepoints,
                         pool = pool, queue_size=nprocess)
             sampler.run_nested(dlogz=accuracy, outputname=self.outputpath,
-                               addDerived=self.addDerived, simpleLike=self.L)
+                               addDerived=self.addDerived, simpleLike=self.L, dumper=dumper)
             M = sampler.results
 
 
