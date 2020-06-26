@@ -1,31 +1,48 @@
 
 class Parameter:
+    """
+    A simple class for dealing with Parameter.
+    Parameter has a name, a value, an error and some bounds
+    Names are also latex names.
+
+    Parameters
+    ----------
+    name : string
+        Name to identify the parameter.
+
+    value : float
+        Default value. In mcmc will be the stating value.
+
+    err: float, optional
+        Estimated error, in mcmc will be the step.
+
+    bounds: list of 2, optional
+        Priors. (minimum value, maximum value).
+
+    Ltxname: string, optional
+        Latex name, use mainly for plotting
+
+
+    Example
+    -------
+    The hubble parameter
+    h_par    = Parameter('h', 0.6821,  0.05,   (0.4, 1.0),    'h')
+    """
+
     def __init__(self, name, value, err=0.0, bounds=None, Ltxname=None):
-        """
-        Simple class for dealing with Parameter.
-        Parameter has a name, a value, an error and some bounds
-        Names are also latex names.
 
-        Parameters
-        ----------
-        name: parameter name
-        value: default value
-        err: estimated error, in mcmc will be the step
-        bounds: priors
-        Ltxname: Latex name, use mainly for plotting
-
-        Returns
-        -------
-
-        """
+        # Initialize name and Latex name
         self.name = name
         if Ltxname:
             self.Ltxname = Ltxname
         else:
             self.Ltxname = name
         self.value = value
-        # this is the estimate of error
+
+        # Initialize the estimated of error
         self.error = err
+
+        # Initialize the priors
         if bounds == None:
             self.bounds = (value-5*err, value+5*err)
         else:
