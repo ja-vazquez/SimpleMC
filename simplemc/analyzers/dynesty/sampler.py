@@ -951,8 +951,8 @@ class Sampler(object):
             if print_progress:
                 weights = np.exp(results[5])
                 vstarstr = str(results[2]).lstrip('[').rstrip(']')
-                sys.stdout.write("\rit: {} | ncall: {} | logz: {:.4f} | "
-                      "dlogz: {:.4f} | loglstar: {:.4f} | point {}".format(it+1, ncall, logz, delta_logz, loglstar, vstarstr))
+                sys.stdout.write("\rit: {} | ncall: {} | eff: {} | logz: {:.4f} | "
+                      "dlogz: {:.4f} | loglstar: {:.4f} | point {} | accuracy".format(it, ncall, eff, logz, delta_logz, loglstar, vstarstr))
                 sys.stdout.flush()
                 # exp(logwt - loglstar)
                 if addDerived:
@@ -1042,8 +1042,8 @@ class Sampler(object):
 
             # Print progress.
             if print_progress:
-                sys.stdout.write("\rit: {} | ncall: {} | "
-                      "logz: {} | dlogz: {:.4f} | loglstar: {}".format(self.it+i+1, ncall, logz,
+                sys.stdout.write("\rit: {} | ncall: {} | eff: {} |"
+                      "logz: {} | dlogz: {:.4f} | loglstar: {}".format(self.it+i, ncall, eff, logz,
                                                                        delta_logz, loglstar))
                 sys.stdout.flush()
 
