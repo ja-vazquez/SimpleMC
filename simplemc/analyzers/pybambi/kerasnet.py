@@ -10,22 +10,14 @@ Date: June 2020
 """
 import numpy
 import sys
-from .base import Predictor
-# try:
-#     from keras.models import Sequential
-#     from keras.layers import Dense
-#     from keras.callbacks import EarlyStopping
-# except:
-#     sys.exit("You need to install keras")
+
 try:
     import tensorflow as tf
 except:
     sys.exit("You need to install tensorflow")
 
 
-
-
-class KerasNetInterpolation(Predictor):
+class KerasNetInterpolation:
     """Keras neural net interpolation.
 
     Returns the loglikelihood from a Keras neural net-based interpolator
@@ -46,8 +38,29 @@ class KerasNetInterpolation(Predictor):
     # IGV: ntrain is 80% (split) of multinest sampling points as in arXiv:1110.2997
     def __init__(self, params, logL, split=0.8, numNeurons=200, epochs=300, model=None,
                  savedmodelpath=None):
-        """Construct predictor from training data."""
-        super(KerasNetInterpolation, self).__init__(params, logL, split)
+        params = numpy.array(params)
+        logL = numpy.array(logL)
+
+        if len(params) != len(logL):
+            raise ValueError("input and target must be the same length")
+        elif params.ndim != 2:
+            raise ValueError("input must be two-dimensional")
+        elif logL.ndim != 1:
+            raise ValueError("target must be one-dimensional")
+
+        nparams = len(params)
+        randomize = numpy.random.permutation(nparams)
+        params = params[randomize]
+        logL = logL[randomize]
+
+        self._maxLogL = numpy.max(logL)
+        self._minLogL = numpy.min(logL)
+        self._lastLogL = logL[-1]
+        ntrain = int(split * nparams)
+        indx = [ntrain]
+        self.params_training, self.params_testing = numpy.split(params, indx)
+        self.logL_training, self.logL_testing = numpy.split(logL, indx)
+
         if savedmodelpath is not None:
             self.model = tf.keras.models.load_model(savedmodelpath)
         elif model is None:
@@ -65,36 +78,17 @@ class KerasNetInterpolation(Predictor):
                                       self.logL_training,
                                       validation_data=(self.params_testing,
                                                        self.logL_testing),
-                                      epochs=epochs,
+                                      epochs=epochs, batch_size=32,
                                       callbacks=callbacks)
 
     def _default_architecture(self):
-        # Create model
-        # model = Sequential()
-
-        # Get number of input parameters
-        # Note: if params contains extra quantities (ndim+others),
-        # we need to change this
 
         n_cols = self.params_training.shape[1]
 
-        # Add model layers, note choice of activation function (relu)
-        # We will use 3 hidden layers and an output layer
-        # Note: in a Dense layer, all nodes in the previous later connect
-        # to the nodes in the current layer
-
-        # model.add(Dense(self.numNeurons, activation='relu', input_shape=(n_cols,)))
-        # model.add(Dense(self.numNeurons, activation='relu'))
-        # model.add(Dense(self.numNeurons, activation='relu'))
-        # model.add(Dense(1))
-
-        # Now compile the model
-        # Need to choose training optimiser, and the loss function
-        # model.compile(optimizer='adam', loss='mean_squared_error')
         model = tf.keras.models.Sequential([
             tf.keras.layers.Dense(self.numNeurons, activation='relu', input_shape=(n_cols,)),
             tf.keras.layers.Dense(self.numNeurons, activation='relu'),
-            tf.keras.layers.Dense(self.numNeurons, activation='relu'),
+            #tf.keras.layers.Dense(self.numNeurons, activation='relu'),
             tf.keras.layers.Dense(1)
         ])
         model.compile(optimizer='adam', loss='mean_squared_error')
@@ -123,3 +117,22 @@ class KerasNetInterpolation(Predictor):
         test_loss = numpy.sqrt(self.history.history['val_loss'])
 
         return numpy.squeeze(test_loss.min())
+
+    def valid(self, loglikelihood):
+        """Check validity of proxy.
+
+        Checks to see if the supplied log likelihood value is within the
+        current range of likelihoods, including the uncertainty
+
+        Parameters
+        ----------
+        loglikelihood:
+            Value of the log likelihood that needs checking
+
+        """
+        inRange = True
+        print("like neural", loglikelihood)
+        if loglikelihood > self._maxLogL + self.uncertainty() \
+                or loglikelihood < self._minLogL - self.uncertainty():
+            inRange = False
+        return inRange

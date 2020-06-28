@@ -9,7 +9,7 @@ Date: June 2020
 
 import numpy as np
 from simplemc.analyzers.pybambi.kerasnet import KerasNetInterpolation
-# import keras.models
+
 try:
     import tensorflow as tf
 except:
@@ -51,6 +51,7 @@ class BambiManager(object):
         self.dumpercount = 0
         self.it_to_start_net = it_to_start_net
         self.updInt = updInt
+        self.likecalls = 0
 
     def make_learner(self, params, loglikes):
         """Construct a Predictor."""
@@ -59,8 +60,6 @@ class BambiManager(object):
                                          split=self.split, numNeurons=self.numNeurons,
                                          epochs=self.epochs, model=self.model,
                                          savedmodelpath=self.savedmodelpath)
-        elif self._learner == 'nearestneighbour':
-            return NearestNeighbourInterpolation(params, loglikes)
         elif issubclass(type(self._learner), tf.keras.models.Model):
             return KerasNetInterpolation(params, loglikes, model=self._learner)
         else:
@@ -69,7 +68,7 @@ class BambiManager(object):
 
     def dumper(self, live_params, live_loglks, dead_params, dead_loglks):
         self.dumpercount += 1
-        # print("Respond to signal from nested sampler.")
+        print("\ndumper count", self.dumpercount)
         if not self._proxy_trained and self.dumpercount >= self.it_to_start_net:
             mod_it_after_net = (self.dumpercount - self.it_to_start_net)%self.updInt
             if self.dumpercount == self.it_to_start_net or mod_it_after_net == 0:
@@ -81,22 +80,26 @@ class BambiManager(object):
                                         loglikes[:self._ntrain])
 
         if self._proxy_trained:
-            print("\rUsing trained proxy ")
+            print("\nUsing trained proxy ")
         else:
-            print("\rUnable to use proxy ")
+            print("\nUnable to use proxy ")
 
     def loglikelihood(self, params):
         """Bambi Proxy wrapper for original loglikelihood."""
         # Short circuit to the full likelihood if proxy not yet fully trained
+        self.likecalls += 1
         if not self._proxy_trained:
             return self._loglikelihood(params)
 
         # Call the learner
         candidate_loglikelihood = self._current_learner(params)
+        print("\n neural like:", candidate_loglikelihood)
+
 
         # If the learner can be trusted, use its estimate,
         # otherwise use the original like and update the failure status
         if self._current_learner.valid(candidate_loglikelihood):
+            print("\n valid neural loglike")
             return candidate_loglikelihood
         else:
             self._rolling_failure_fraction = (1.0 + (self._ntrain - 1.0) *
@@ -104,6 +107,7 @@ class BambiManager(object):
                                               ) / self._ntrain
             if self._rolling_failure_fraction > self._failure_tolerance:
                 self._proxy_trained = False
+            print("\n invalid neural loglike->use usual like fn")
             return self._loglikelihood(params)
 
     def train_new_learner(self, params, loglikes):
@@ -114,7 +118,7 @@ class BambiManager(object):
             pass
         self._current_learner = self.make_learner(params, loglikes)
         sigma = self._current_learner.uncertainty()
-        print("Current uncertainty in network log-likelihood predictions: %s"
+        print("\nCurrent uncertainty in network log-likelihood predictions: %s"
               % sigma)
         if sigma < self._proxy_tolerance:
             self._proxy_trained = True
