@@ -14,7 +14,7 @@ from simplemc.cosmo.Parameter import Parameter
 # Parameters are value, variation, bounds.
 Om_par   = Parameter("Om",   0.3038,  0.05,    (0.05, 0.5),   "\Omega_m")
 Obh2_par = Parameter("Obh2", 0.02234, 0.001, (0.02, 0.025), "\Omega_{b}h^2")
-h_par    = Parameter("h",    0.6821,  0.05,   (0.4, 1.0),    "h")
+h_par    = Parameter("h",    0.6821,  0.05,   (0.4, 0.9),    "h")
 
 mnu_par  = Parameter("mnu",  0.06,    0.1,    (0, 1.0),      "\Sigma m_{\\nu}")
 Nnu_par  = Parameter("Nnu",  3.046,   0.5,    (3.046, 5.046),"N_{\\rm eff}")
@@ -129,7 +129,7 @@ b2_par = Parameter("b2", 0.0, 0.1, (-1.5, 1.5), "b_2")
 
 # Anisotropic dark energy.
 bd_par     = Parameter("bd", 2.0, 0.5, (0, 4), "\omega")
-Osig_par   = Parameter("Osig", -9., 1.0, (-12, 0), "\Omega_{\sigma}")
+Osig_par   = Parameter("Osig", -9., 0.5, (-12, 0), "\Omega_{\sigma}")
 
 # Cosine Parameterisation for deceleration parameter.
 nk_par = Parameter("nk", 0.0, 0.1, (-1, 1), "n")
@@ -142,7 +142,7 @@ glambda_par   = Parameter("glambda", -6, 0.2, (-10, 0), "\lambda")
 # Phi Cosmology, e-Scalar field.
 phialp_par  = Parameter("phialp",   1.0, 0.1,  (-3, 3.), "\\alpha")
 philam_par  = Parameter("philam",   0.5, 0.01, (-2.0, 2.0), "\\lambda_i")
-phibeta_par = Parameter("phibeta",  0.0, 0.05, (-3.0, 3.0), "\\beta")
+phibeta_par = Parameter("phibeta",  0.1, 0.05, (-3.0, 3.0), "\\beta")
 phimu_par   = Parameter("phimu",    1.0, 0.05, (-4.0, 4.0), "\\mu")
 
 # IBEG Cosmology Parameters, bose-einstein.
