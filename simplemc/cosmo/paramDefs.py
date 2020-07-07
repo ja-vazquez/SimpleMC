@@ -136,8 +136,8 @@ nk_par = Parameter("nk", 0.0, 0.1, (-1, 1), "n")
 kk_par = Parameter("kk", 1.5, 0.1, (0.01, 3.14), "k")
 
 # Graduated DE.
-ggama_par     = Parameter("ggama", -0.04, 0.003, (-0.1, 0.0), "\gamma")
-glambda_par   = Parameter("glambda", -6, 0.2, (-10, 0), "\lambda")
+ggama_par     = Parameter("ggama", -0.0, 0.003, (-0.5, 0.5), "\gamma")
+glambda_par   = Parameter("glambda", 0, 0.2, (-10, 0), "\lambda")
 
 # Phi Cosmology, e-Scalar field.
 phialp_par  = Parameter("phialp",   1.0, 0.1,  (-3, 3.), "\\alpha")

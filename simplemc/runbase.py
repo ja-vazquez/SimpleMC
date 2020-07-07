@@ -15,6 +15,7 @@ from .models import EarlyDECosmology
 from .models import SlowRDECosmology
 from .models import DGPCDMCosmology
 from .models import AnisotropicCosmology
+from .models import GraduatedCosmology
 from .models import RotationCurves
 
 #Non-parametric functions
@@ -155,6 +156,8 @@ def ParseModel(model, **kwargs):
         T = CompressPantheon()
     elif model == 'DGP':
         T = DGPCDMCosmology()
+    elif model == 'Grad_Ok':
+        T = GraduatedCosmology(varyOk=True)
     elif model == "Rotation":
         T = RotationCurves()
     elif model == 'custom':
