@@ -1,0 +1,1165 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>simplemc.DriverMC &mdash; SimpleMC 2.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> SimpleMC
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data.html"><strong>Data</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plotters.html"><strong>Plotters</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../API.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SimpleMC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>simplemc.DriverMC</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for simplemc.DriverMC</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">.analyzers</span> <span class="kn">import</span> <span class="n">MaxLikeAnalyzer</span>
+<span class="kn">from</span> <span class="nn">.analyzers</span> <span class="kn">import</span> <span class="n">SimpleGenetic</span>
+<span class="kn">from</span> <span class="nn">.analyzers</span> <span class="kn">import</span> <span class="n">MCMCAnalyzer</span>
+<span class="kn">from</span> <span class="nn">simplemc.analyzers.MCMCsimple</span> <span class="kn">import</span> <span class="n">MCMCsimple</span>
+<span class="kn">from</span> <span class="nn">.analyzers</span> <span class="kn">import</span> <span class="n">DynamicNestedSampler</span><span class="p">,</span> <span class="n">NestedSampler</span>
+<span class="kn">from</span> <span class="nn">.cosmo.Derivedparam</span> <span class="kn">import</span> <span class="n">AllDerived</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">ParseDataset</span><span class="p">,</span> <span class="n">ParseModel</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">PostProcessing</span>
+<span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">ndtri</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+<span class="kn">from</span> <span class="nn">simplemc</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+
+<div class="viewcode-block" id="DriverMC"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC">[docs]</a><span class="k">class</span> <span class="nc">DriverMC</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This class is the manager and wrapper between all</span>
+<span class="sd">        the analyzers and the pertinent functions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iniFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read the input parameters or ini file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        iniFile: ini file</span>
+<span class="sd">            Text file with ini extension that contains all the settings</span>
+<span class="sd">            to SimpleMC. If use this option the following kwargs not are necessary.</span>
+
+<span class="sd">        chainsdir : str</span>
+<span class="sd">            Directory for the outputs.</span>
+<span class="sd">        model : str</span>
+<span class="sd">            Choose the model {LCDOM, LCDMasslessnu, nuLCDM, NeffLCDM, noradLCDM, nuoLCDM, nuwLCDM, oLCDM, wCDM, waCDM, owCDM,&quot;\</span>
+<span class="sd">            owaCDM, JordiCDM, WeirdCDM, TLight, StepCDM, Spline, PolyCDM, fPolyCDM, Decay, Decay01, Decay05,&quot;\</span>
+<span class="sd">            EarlyDE, EarlyDE_rd_DE, SlowRDE}</span>
+
+<span class="sd">        prefact :str</span>
+<span class="sd">            {phy, pre}</span>
+
+<span class="sd">        vary8 : bool</span>
+<span class="sd">            Default False</span>
+
+<span class="sd">        datasets str:</span>
+<span class="sd">            Default HD (Hubble distance, i. e. Cosmic Chronometers).</span>
+<span class="sd">            You can combine HD+SN+BBAO+Planck+UnionSN+...</span>
+
+<span class="sd">        analyzername : str</span>
+<span class="sd">            The name of the analyzer. It can be a sampler: {mcmc, nested, emcee}</span>
+<span class="sd">            or a optimizer: {maxlike, genetic}</span>
+
+<span class="sd">        addDerived : bool</span>
+<span class="sd">            True generates at the flight some derived parameters (such as</span>
+<span class="sd">            Omega_Lambda or Universe Age, and save them in the output text file.</span>
+
+<span class="sd">        custom_parameters : list</span>
+<span class="sd">            List of Parameter instances.</span>
+
+<span class="sd">        custom_function : method</span>
+<span class="sd">            Custom method that reads a parameter list and a vector x, unzip the list,</span>
+<span class="sd">            and return a f(x) in terms of the parameters.</span>
+
+<span class="sd">        path_to_data : str</span>
+<span class="sd">            path of a dataset text file.</span>
+
+<span class="sd">        path_to_cov : str</span>
+<span class="sd">            path of a covariance matrix text file.</span>
+
+<span class="sd">        fn : str</span>
+<span class="sd">            Type of function to use in the likelihood due a custom data {&quot;generic&quot;, &quot;hz&quot;, ...}.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">iniFile</span> <span class="o">=</span> <span class="n">iniFile</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iniFile</span><span class="p">:</span>    <span class="bp">self</span><span class="o">.</span><span class="n">iniReader</span><span class="p">(</span><span class="n">iniFile</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chainsdir</span>    <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;chainsdir&#39;</span><span class="p">,</span> <span class="s1">&#39;simplemc/chains&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span>        <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span>   <span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prefact</span>      <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;prefact&#39;</span><span class="p">,</span> <span class="s1">&#39;phy&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">varys8</span>       <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;varys8&#39;</span><span class="p">,</span>  <span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>     <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;datasets&#39;</span><span class="p">,</span><span class="s1">&#39;HD&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;analyzername&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addDerived</span>   <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;addDerived&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+
+            <span class="c1">## Next two are for custom model</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">custom_parameters</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;custom_parameters&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">custom_function</span>   <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;custom_function&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="c1">## Following two are for custom data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path_to_data</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;path_to_data&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path_to_cov</span>  <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;path_to_cov&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fn</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;fn&quot;</span><span class="p">,</span> <span class="s2">&quot;generic&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chainsdir</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chainsdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chainsdir</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Your chains directory does not exist. Create a new one and try again.&quot;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;Unexpected **kwargs for DriverMC: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kwargs</span><span class="p">))</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;You can skip writing any option and SimpleMC will use the default value.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;DriverMC **kwargs are:</span><span class="se">\n\t</span><span class="s1">model</span><span class="se">\n\t</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;datasets</span><span class="se">\n\t</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;analyzername {&quot;nested&quot;, &quot;mcmc&quot;, &quot;maxlike&quot;, &quot;emcee&quot; , &quot;genetic&quot;} Default: mcmc&#39;</span>
+                            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">chainsdir Default: SimpleMC_chains</span><span class="se">\n\t</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+
+        <span class="c1">#Initialize the Theory &amp; Datasets</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">ParseModel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">custom_parameters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">custom_parameters</span><span class="p">,</span>
+                                   <span class="n">custom_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">custom_function</span><span class="p">)</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">ParseDataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">,</span> <span class="n">path_to_data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_data</span><span class="p">,</span>
+                                        <span class="n">path_to_cov</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_cov</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefact</span> <span class="o">==</span> <span class="s2">&quot;pre&quot;</span><span class="p">:</span>  <span class="n">T</span><span class="o">.</span><span class="n">setVaryPrefactor</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">varys8</span>  <span class="o">==</span> <span class="s2">&quot;True&quot;</span><span class="p">:</span> <span class="n">T</span><span class="o">.</span><span class="n">setVarys8</span><span class="p">()</span>
+        <span class="n">T</span><span class="o">.</span><span class="n">printFreeParameters</span><span class="p">()</span>
+
+        <span class="c1">#set the likelihood for a model</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">setTheory</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="n">T</span><span class="p">,</span> <span class="n">L</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pars_info</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">.</span><span class="n">freeParameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span>     <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">bounds</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars_info</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">means</span>      <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">value</span>  <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars_info</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paramsList</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span>   <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars_info</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dims</span>       <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paramsList</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span>     <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefact</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chainsdir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+
+
+
+<div class="viewcode-block" id="DriverMC.executer"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.executer">[docs]</a>    <span class="k">def</span> <span class="nf">executer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is a wrapper of the runners of the analyzer in order to make</span>
+<span class="sd">        easier the execution, mainly if is through an ini file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        All the parameters of the methods:</span>
+
+<span class="sd">            - mcmcRunner</span>
+<span class="sd">            - nestedRunner</span>
+<span class="sd">            - emceeRunner</span>
+<span class="sd">            - geneticRunner</span>
+<span class="sd">            - maxlikeRunner</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="o">==</span> <span class="s1">&#39;mcmc&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mcmcRunner</span><span class="p">(</span><span class="n">iniFile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">iniFile</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="o">==</span> <span class="s1">&#39;nested&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nestedRunner</span><span class="p">(</span><span class="n">iniFile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">iniFile</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="o">==</span> <span class="s1">&#39;emcee&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">emceeRunner</span><span class="p">(</span><span class="n">iniFile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">iniFile</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="o">==</span> <span class="s1">&#39;maxlike&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">maxLikeRunner</span><span class="p">(</span><span class="n">iniFile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">iniFile</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="o">==</span> <span class="s1">&#39;genetic&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">geneticRunner</span><span class="p">(</span><span class="n">iniFile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">iniFile</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: Sampler/Analyzer name invalid&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span><span class="p">))</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<span class="c1">##----------------------Initialization ------------------------</span>
+
+<div class="viewcode-block" id="DriverMC.iniReader"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.iniReader">[docs]</a>    <span class="k">def</span> <span class="nf">iniReader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iniFile</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It reads the ini file through configparser.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        iniFile : file .ini</span>
+<span class="sd">            Text file with settings</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">configparser</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">iniFile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chainsdir</span>    <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>        <span class="s1">&#39;custom&#39;</span><span class="p">,</span> <span class="s1">&#39;chainsdir&#39;</span><span class="p">,</span>\
+                                         <span class="n">fallback</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;simplemc/chains&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span>        <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>        <span class="s1">&#39;custom&#39;</span><span class="p">,</span> <span class="s1">&#39;model&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefact</span>      <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>        <span class="s1">&#39;custom&#39;</span><span class="p">,</span> <span class="s1">&#39;prefact&#39;</span><span class="p">,</span>      <span class="n">fallback</span><span class="o">=</span><span class="s1">&#39;phy&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>     <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>        <span class="s1">&#39;custom&#39;</span><span class="p">,</span> <span class="s1">&#39;datasets&#39;</span><span class="p">,</span>     <span class="n">fallback</span><span class="o">=</span><span class="s1">&#39;HD&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>        <span class="s1">&#39;custom&#39;</span><span class="p">,</span> <span class="s1">&#39;analyzername&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">varys8</span>       <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span> <span class="s1">&#39;custom&#39;</span><span class="p">,</span> <span class="s1">&#39;varys8&#39;</span><span class="p">,</span>       <span class="n">fallback</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addDerived</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span> <span class="s1">&#39;custom&#39;</span><span class="p">,</span> <span class="s1">&#39;addDerived&#39;</span><span class="p">,</span>   <span class="n">fallback</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">custom_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>   <span class="s1">&#39;custom&#39;</span><span class="p">,</span> <span class="s1">&#39;custom_parameters&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">custom_function</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>   <span class="s1">&#39;custom&#39;</span><span class="p">,</span> <span class="s1">&#39;custom_function&#39;</span><span class="p">,</span>   <span class="n">fallback</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="c1">## Following two are for custom data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_to_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>        <span class="s1">&#39;custom&#39;</span><span class="p">,</span> <span class="s1">&#39;path_to_data&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_to_cov</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>        <span class="s1">&#39;custom&#39;</span><span class="p">,</span> <span class="s1">&#39;path_to_cov&#39;</span><span class="p">,</span>  <span class="n">fallback</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;custom&#39;</span><span class="p">,</span> <span class="s1">&#39;path_to_cov&#39;</span><span class="p">,</span>  <span class="n">fallback</span><span class="o">=</span><span class="s2">&quot;generic&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+
+<span class="c1">##======== ======== ======== Samplers ======== ======== ========</span>
+
+
+<span class="c1">##---------------------- MCMC ----------------------</span>
+
+<div class="viewcode-block" id="DriverMC.mcmcRunner"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.mcmcRunner">[docs]</a>    <span class="k">def</span> <span class="nf">mcmcRunner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iniFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method calls MCMCAnalyzer.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ------------</span>
+<span class="sd">        nsamp : int</span>
+<span class="sd">            Number of mcmc steps.</span>
+
+<span class="sd">        skip : int</span>
+<span class="sd">            Burn-in.</span>
+
+<span class="sd">        temp : float</span>
+<span class="sd">            Temperature for the weights.</span>
+
+<span class="sd">        chainno : int</span>
+<span class="sd">            Number of chains in parallel.</span>
+
+<span class="sd">        GRstop : float</span>
+<span class="sd">            Gelman Rubin criteria for stopping (0, 0.1].</span>
+
+<span class="sd">        evidence : bool</span>
+<span class="sd">            True if after the mcmc chain was generated,</span>
+<span class="sd">            estimates bayesian evidence throug MCEvidence (arXiv:1704.03472).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">iniFile</span><span class="p">:</span>
+            <span class="n">nsamp</span>    <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span>      <span class="s1">&#39;mcmc&#39;</span><span class="p">,</span> <span class="s1">&#39;nsamp&#39;</span><span class="p">,</span>   <span class="n">fallback</span><span class="o">=</span><span class="mi">50000</span><span class="p">)</span>
+            <span class="n">skip</span>     <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span>      <span class="s1">&#39;mcmc&#39;</span><span class="p">,</span> <span class="s1">&#39;skip&#39;</span><span class="p">,</span>    <span class="n">fallback</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+            <span class="c1">## temperature at which to sample, weights get readjusted on the fly</span>
+            <span class="n">temp</span>     <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getfloat</span><span class="p">(</span>    <span class="s1">&#39;mcmc&#39;</span><span class="p">,</span> <span class="s1">&#39;temp&#39;</span><span class="p">,</span>    <span class="n">fallback</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">chainno</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span>      <span class="s1">&#39;mcmc&#39;</span><span class="p">,</span> <span class="s1">&#39;chainno&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">GRstop</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getfloat</span><span class="p">(</span>    <span class="s1">&#39;mcmc&#39;</span><span class="p">,</span> <span class="s1">&#39;GRstop&#39;</span><span class="p">,</span>  <span class="n">fallback</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+            <span class="n">checkGR</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getfloat</span><span class="p">(</span>    <span class="s1">&#39;mcmc&#39;</span><span class="p">,</span> <span class="s1">&#39;checkGR&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+            <span class="n">evidence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span>  <span class="s1">&#39;mcmc&#39;</span><span class="p">,</span> <span class="s1">&#39;evidence&#39;</span><span class="p">,</span><span class="n">fallback</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">neuralNetwork</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span><span class="s1">&#39;mcmc&#39;</span><span class="p">,</span> <span class="s1">&#39;neuralNetwork&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nsamp</span>    <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;nsamp&#39;</span><span class="p">,</span> <span class="mi">50000</span><span class="p">)</span>
+            <span class="n">skip</span>     <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;skip&#39;</span><span class="p">,</span>  <span class="mi">300</span><span class="p">)</span>
+            <span class="n">temp</span>     <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;temp&#39;</span><span class="p">,</span>  <span class="mi">2</span><span class="p">)</span>
+            <span class="n">chainno</span>  <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;chainno&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">GRstop</span>   <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;GRstop&#39;</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+            <span class="n">checkGR</span>  <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;checkGR&#39;</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+            <span class="n">evidence</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;evidence&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">neuralNetwork</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;neuralNetwork&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;Unexpected **kwargs for MCMC: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kwargs</span><span class="p">))</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;You can skip writing any option and SimpleMC will use default values.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;MCMC executer kwargs are:</span><span class="se">\n\t</span><span class="s1">nsamp (int) Default: 50000</span><span class="se">\n\t</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;skip (int) Default 300</span><span class="se">\n\t</span><span class="s1">temp (float) Default: 2.0&#39;</span>
+                            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">chainno (int) Default: 1</span><span class="se">\n\t</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;evidence (bool) Default: False&#39;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="c1">#raise TypeError(&#39;Unexpected **kwargs: {}&#39;.format(kwargs))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">nsamp: </span><span class="si">{}</span><span class="se">\n\t</span><span class="s2">skip: </span><span class="si">{}</span><span class="se">\n\t</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;temp: </span><span class="si">{}</span><span class="se">\n\t</span><span class="s2">chain num: </span><span class="si">{}</span><span class="se">\n\t</span><span class="s2">evidence: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">nsamp</span><span class="p">,</span> <span class="n">skip</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">chainno</span><span class="p">,</span> <span class="n">evidence</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="o">=</span> <span class="s1">&#39;mcmc&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span><span class="p">)</span>
+        <span class="c1">#Check whether the file already exists</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputChecker</span><span class="p">()</span>
+        <span class="n">ti</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">neuralNetwork</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">simplemc.analyzers.pybambi.bambi</span> <span class="kn">import</span> <span class="n">bambi</span>
+            <span class="c1"># self.logLike =</span>
+            <span class="n">thumper</span> <span class="o">=</span> <span class="n">bambi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logLike</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">logLike</span> <span class="o">=</span> <span class="n">thumper</span><span class="o">.</span><span class="n">loglikelihood</span>
+            <span class="n">dumper</span> <span class="o">=</span> <span class="n">thumper</span><span class="o">.</span><span class="n">dumper</span>
+            <span class="n">M</span> <span class="o">=</span> <span class="n">MCMCsimple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logLike</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">nsamp</span><span class="o">=</span><span class="n">nsamp</span><span class="p">,</span> <span class="n">temp</span> <span class="o">=</span> <span class="n">temp</span><span class="p">,</span>
+                           <span class="n">chain_num</span><span class="o">=</span><span class="n">chainno</span><span class="p">,</span> <span class="n">addDerived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">addDerived</span><span class="p">,</span> <span class="n">GRstop</span><span class="o">=</span><span class="n">GRstop</span><span class="p">,</span> <span class="n">checkGR</span><span class="o">=</span><span class="n">checkGR</span><span class="p">,</span>
+                           <span class="n">dumper</span><span class="o">=</span><span class="n">dumper</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Main process</span>
+            <span class="n">M</span> <span class="o">=</span> <span class="n">MCMCAnalyzer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="n">skip</span><span class="p">,</span> <span class="n">nsamp</span><span class="o">=</span><span class="n">nsamp</span><span class="p">,</span> <span class="n">temp</span> <span class="o">=</span> <span class="n">temp</span><span class="p">,</span>
+                            <span class="n">chain_num</span><span class="o">=</span><span class="n">chainno</span><span class="p">,</span> <span class="n">addDerived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">addDerived</span><span class="p">,</span> <span class="n">GRstop</span><span class="o">=</span><span class="n">GRstop</span><span class="p">,</span> <span class="n">checkGR</span><span class="o">=</span><span class="n">checkGR</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ttime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">ti</span>
+
+        <span class="c1">#Compute Bayesian Evidence</span>
+        <span class="k">if</span> <span class="n">evidence</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">MCEvidence</span> <span class="kn">import</span> <span class="n">MCEvidence</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Aproximating bayesian evidence with MCEvidence (arXiv:1704.03472)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">MLE</span> <span class="o">=</span> <span class="n">MCEvidence</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span> <span class="p">)</span><span class="o">.</span><span class="n">evidence</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mcmc&#39;</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="s2">&quot;Evidence with MCEvidence : </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">MLE</span><span class="p">),</span> <span class="n">strresult</span><span class="p">]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="c1">#writeSummary(self.chainsdir, outputname, ttime)</span>
+                <span class="c1"># print(&quot;Warning!&quot;)</span>
+                <span class="c1"># print(&quot;MCEvidence could not calculate the Bayesian evidence [very small weights]\n&quot;)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;MCEvidence could not calculate the Bayesian evidence [very small weights]&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mcmc&#39;</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="s2">&quot;Maxlike: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">M</span><span class="o">.</span><span class="n">maxloglike</span><span class="p">)]</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<span class="c1">##---------------------- Nested ----------------------</span>
+
+<div class="viewcode-block" id="DriverMC.nestedRunner"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.nestedRunner">[docs]</a>    <span class="k">def</span> <span class="nf">nestedRunner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iniFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method calls Dynesty samplers.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ___________</span>
+<span class="sd">        engine : str</span>
+<span class="sd">            Use dynesty or nestle library</span>
+
+<span class="sd">        dynamic : bool</span>
+<span class="sd">            Default `False`</span>
+
+<span class="sd">        neuralNetwork : bool</span>
+<span class="sd">            If True use a pybambi neural network.</span>
+<span class="sd">            Default: False.</span>
+
+<span class="sd">        nestedType : str</span>
+<span class="sd">            {single, multi, balls, cubes}</span>
+
+<span class="sd">        nlivepoints : int</span>
+<span class="sd">            Number of live points.</span>
+
+<span class="sd">        accuracy : float</span>
+<span class="sd">            Stopping criteria in terms of logz.</span>
+
+<span class="sd">        nproc : int</span>
+<span class="sd">            Number of processors to parallelize.</span>
+<span class="sd">            Use 1 or 0 if you don&#39;t want parallelise.</span>
+
+<span class="sd">        priortype : str</span>
+<span class="sd">            Gaussian or uniform prior {&#39;g&#39;, &#39;u&#39;}.</span>
+
+<span class="sd">        nsigma : float</span>
+<span class="sd">            Sigma for gaussian priors.</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">iniFile</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>          <span class="s1">&#39;nested&#39;</span><span class="p">,</span> <span class="s1">&#39;engine&#39;</span><span class="p">,</span>       <span class="n">fallback</span><span class="o">=</span><span class="s1">&#39;dynesty&#39;</span><span class="p">)</span>
+            <span class="n">dynamic</span>     <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span>   <span class="s1">&#39;nested&#39;</span><span class="p">,</span> <span class="s1">&#39;dynamic&#39;</span><span class="p">,</span>      <span class="n">fallback</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">neuralNetwork</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span> <span class="s1">&#39;nested&#39;</span><span class="p">,</span> <span class="s1">&#39;neuralNetwork&#39;</span><span class="p">,</span><span class="n">fallback</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">nestedType</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>          <span class="s1">&#39;nested&#39;</span><span class="p">,</span> <span class="s1">&#39;nestedType&#39;</span><span class="p">,</span>   <span class="n">fallback</span><span class="o">=</span><span class="s1">&#39;multi&#39;</span><span class="p">)</span>
+            <span class="n">nlivepoints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span>       <span class="s1">&#39;nested&#39;</span><span class="p">,</span> <span class="s1">&#39;nlivepoints&#39;</span><span class="p">,</span>  <span class="n">fallback</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
+            <span class="n">accuracy</span>    <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getfloat</span><span class="p">(</span>     <span class="s1">&#39;nested&#39;</span><span class="p">,</span> <span class="s1">&#39;accuracy&#39;</span><span class="p">,</span>     <span class="n">fallback</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+            <span class="n">nproc</span>       <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span>       <span class="s1">&#39;nested&#39;</span><span class="p">,</span> <span class="s1">&#39;nproc&#39;</span><span class="p">,</span>        <span class="n">fallback</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">priortype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;nested&#39;</span><span class="p">,</span> <span class="s1">&#39;priortype&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">)</span>
+            <span class="c1">#nsigma is the default value for sigma in gaussian priors</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nsigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;nested&#39;</span><span class="p">,</span> <span class="s1">&#39;sigma&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">neuralNetwork</span><span class="p">:</span>
+                <span class="n">split</span>      <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getfloat</span><span class="p">(</span><span class="s1">&#39;neural&#39;</span><span class="p">,</span> <span class="s1">&#39;split&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+                <span class="n">numNeurons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span><span class="s1">&#39;neural&#39;</span><span class="p">,</span> <span class="s1">&#39;numNeurons&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+                <span class="n">epochs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span><span class="s1">&#39;neural&#39;</span><span class="p">,</span> <span class="s1">&#39;epochs&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+                <span class="n">ntrain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span><span class="s1">&#39;neural&#39;</span><span class="p">,</span> <span class="s1">&#39;ntrain&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="n">nlivepoints</span><span class="p">)</span>
+                <span class="n">learner</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;neural&#39;</span><span class="p">,</span> <span class="s1">&#39;learner&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="s1">&#39;keras&#39;</span><span class="p">)</span>
+                <span class="n">model</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="s1">&#39;model&#39;</span><span class="p">,</span>   <span class="n">fallback</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+                <span class="n">savedmodelpath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;neural&#39;</span><span class="p">,</span> <span class="s1">&#39;savedmodelpath&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+                <span class="n">it_to_start_net</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span><span class="s1">&#39;neural&#39;</span><span class="p">,</span> <span class="s1">&#39;it_to_start_net&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+                <span class="n">updInt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span><span class="s1">&#39;neural&#39;</span><span class="p">,</span> <span class="s1">&#39;updInt&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+                <span class="n">proxy_tolerance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getfloat</span><span class="p">(</span><span class="s1">&#39;neural&#39;</span><span class="p">,</span> <span class="s1">&#39;proxy_tolerance&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;engine&#39;</span><span class="p">,</span>    <span class="s1">&#39;dynesty&#39;</span><span class="p">)</span>
+            <span class="n">dynamic</span>     <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;dynamic&#39;</span><span class="p">,</span>    <span class="kc">False</span><span class="p">)</span>
+            <span class="n">neuralNetwork</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;neuralNetwork&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">nestedType</span>  <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;nestedType&#39;</span><span class="p">,</span> <span class="s1">&#39;multi&#39;</span><span class="p">)</span>
+            <span class="n">nlivepoints</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;nlivepoints&#39;</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
+            <span class="n">accuracy</span>    <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;accuracy&#39;</span><span class="p">,</span>    <span class="mf">0.01</span><span class="p">)</span>
+            <span class="n">nproc</span>       <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;nproc&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">priortype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;priortype&#39;</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nsigma</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;sigma&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+            <span class="c1"># For neural networks</span>
+            <span class="n">split</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;split&#39;</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">)</span>
+            <span class="n">numNeurons</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;numNeurons&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+            <span class="n">epochs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;epochs&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+            <span class="n">ntrain</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;ntrain&#39;</span><span class="p">,</span> <span class="n">nlivepoints</span><span class="p">)</span>
+            <span class="n">learner</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;learner&#39;</span><span class="p">,</span> <span class="s1">&#39;keras&#39;</span><span class="p">)</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">savedmodelpath</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;savedmodelpath&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">it_to_start_net</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;it_to_start_net&#39;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+            <span class="n">updInt</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;updInt&#39;</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+            <span class="n">proxy_tolerance</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;proxy_tolerance&#39;</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;Unexpected **kwargs for nested sampler: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kwargs</span><span class="p">))</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;You can skip writing any option and SimpleMC will use the default value.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;Nested executer options are:</span><span class="se">\n\t</span><span class="s1">nlivepoints (int) Default: 1024</span><span class="se">\n\t</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;accuracy (float) Default: 0.01</span><span class="se">\n\t</span><span class="s1">priortype ({&quot;u&quot;, &quot;g&quot;}) Default: &quot;u&quot;</span><span class="se">\n\t</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;nestedType {&quot;multi&quot;, &quot;single&quot;, &quot;balls&quot;, &quot;cubes&quot;} Default: &quot;multi&quot;</span><span class="se">\n\t</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;neuralNetwork (bool) Default: True</span><span class="se">\n\t</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;dynamic (bool) Default: False</span><span class="se">\n\t</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;addDerived (bool) Default: True</span><span class="se">\n\t</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;engine {&quot;dynesty&quot;, &quot;nestle&quot;} Default: &quot;dynesty&quot;&#39;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1">#stored output files</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="o">=</span> <span class="s1">&#39;nested&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">,</span> <span class="n">nestedType</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">neuralNetwork</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_ANN&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputChecker</span><span class="p">()</span>
+
+        <span class="c1">#paralel run</span>
+        <span class="n">pool</span><span class="p">,</span> <span class="n">nprocess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mppool</span><span class="p">(</span><span class="n">nproc</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">nlivepoints: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">accuracy: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">nested type: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">engine: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nlivepoints</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">nestedType</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">))</span>
+
+        <span class="n">ti</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">neuralNetwork</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Using neural network.&quot;</span><span class="p">)</span>
+            <span class="kn">from</span> <span class="nn">simplemc.analyzers.pybambi.bambi</span> <span class="kn">import</span> <span class="n">bambi</span>
+            <span class="c1"># self.logLike =</span>
+            <span class="n">thumper</span> <span class="o">=</span> <span class="n">bambi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logLike</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span>
+                            <span class="n">learner</span><span class="o">=</span><span class="n">learner</span><span class="p">,</span> <span class="n">ntrain</span><span class="o">=</span><span class="n">ntrain</span><span class="p">,</span>
+                            <span class="n">split</span><span class="o">=</span><span class="n">split</span><span class="p">,</span> <span class="n">numNeurons</span><span class="o">=</span><span class="n">numNeurons</span><span class="p">,</span>
+                            <span class="n">epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                            <span class="n">savedmodelpath</span><span class="o">=</span><span class="n">savedmodelpath</span><span class="p">,</span>
+                            <span class="n">it_to_start_net</span><span class="o">=</span><span class="n">it_to_start_net</span><span class="p">,</span>
+                            <span class="n">updInt</span><span class="o">=</span><span class="n">updInt</span><span class="p">,</span> <span class="n">proxy_tolerance</span><span class="o">=</span><span class="n">proxy_tolerance</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">logLike</span> <span class="o">=</span> <span class="n">thumper</span><span class="o">.</span><span class="n">loglikelihood</span>
+            <span class="n">dumper</span> <span class="o">=</span> <span class="n">thumper</span><span class="o">.</span><span class="n">dumper</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dumper</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">dynamic</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Using dynamic nested sampling...&quot;</span><span class="p">)</span>
+            <span class="n">sampler</span> <span class="o">=</span> <span class="n">DynamicNestedSampler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logLike</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">priorTransform</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">nestedType</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">,</span>
+                                           <span class="n">queue_size</span><span class="o">=</span><span class="n">nprocess</span><span class="p">)</span>
+
+            <span class="n">sampler</span><span class="o">.</span><span class="n">run_nested</span><span class="p">(</span><span class="n">nlive_init</span><span class="o">=</span><span class="n">nlivepoints</span><span class="p">,</span> <span class="n">dlogz_init</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">nlive_batch</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                            <span class="n">maxiter_init</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">maxiter_batch</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">maxbatch</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                            <span class="n">outputname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">,</span> <span class="n">addDerived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">addDerived</span><span class="p">,</span> <span class="n">simpleLike</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
+            <span class="n">M</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">results</span>
+
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">==</span> <span class="s1">&#39;dynesty&#39;</span><span class="p">:</span>
+            <span class="n">sampler</span> <span class="o">=</span> <span class="n">NestedSampler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logLike</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">priorTransform</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span>
+                        <span class="n">bound</span><span class="o">=</span><span class="n">nestedType</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="s1">&#39;unif&#39;</span><span class="p">,</span> <span class="n">nlive</span> <span class="o">=</span> <span class="n">nlivepoints</span><span class="p">,</span>
+                        <span class="n">pool</span> <span class="o">=</span> <span class="n">pool</span><span class="p">,</span> <span class="n">queue_size</span><span class="o">=</span><span class="n">nprocess</span><span class="p">)</span>
+            <span class="n">sampler</span><span class="o">.</span><span class="n">run_nested</span><span class="p">(</span><span class="n">dlogz</span><span class="o">=</span><span class="n">accuracy</span><span class="p">,</span> <span class="n">outputname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">,</span>
+                               <span class="n">addDerived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">addDerived</span><span class="p">,</span> <span class="n">simpleLike</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">,</span> <span class="n">dumper</span><span class="o">=</span><span class="n">dumper</span><span class="p">)</span>
+            <span class="n">M</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">results</span>
+
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">==</span> <span class="s1">&#39;nestle&#39;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">nestle</span>
+                <span class="n">M</span> <span class="o">=</span> <span class="n">nestle</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logLike</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">priorTransform</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">nestedType</span><span class="p">,</span>
+                <span class="n">npoints</span><span class="o">=</span><span class="n">nlivepoints</span><span class="p">,</span> <span class="n">dlogz</span><span class="o">=</span><span class="n">accuracy</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">nestle</span><span class="o">.</span><span class="n">print_progress</span><span class="p">,</span>
+                <span class="n">pool</span> <span class="o">=</span> <span class="n">pool</span><span class="p">,</span> <span class="n">queue_size</span> <span class="o">=</span> <span class="n">nprocess</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: Please install nestle module&quot;</span>
+                         <span class="s2">&quot;or use dynesty engine&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;wrong selection&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ttime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">ti</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;nested&#39;</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">M</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span> <span class="s1">&#39;nested :</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nestedType</span><span class="p">),</span>
+                       <span class="s1">&#39;dynamic : </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dynamic</span><span class="p">),</span> <span class="s1">&#39;ANN :</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">neuralNetwork</span><span class="p">),</span>
+                       <span class="s1">&#39;engine: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<span class="c1">##---------------------- EMCEE ----------------------</span>
+
+<div class="viewcode-block" id="DriverMC.emceeRunner"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.emceeRunner">[docs]</a>    <span class="k">def</span> <span class="nf">emceeRunner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iniFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method calls the emcee library to use ensamble sampler.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        walkers : int</span>
+<span class="sd">            Number of walkers or ensambles.</span>
+
+<span class="sd">        nsamp : int</span>
+<span class="sd">            Number of mcmc steps for each walker.</span>
+
+<span class="sd">        burnin : int</span>
+<span class="sd">            skip steps.</span>
+
+<span class="sd">        nproc : int</span>
+<span class="sd">            Number of processors in order to parallelise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">iniFile</span><span class="p">:</span>
+            <span class="n">walkers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span><span class="s1">&#39;emcee&#39;</span><span class="p">,</span> <span class="s1">&#39;walkers&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">nsamp</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span><span class="s1">&#39;emcee&#39;</span><span class="p">,</span> <span class="s1">&#39;nsamp&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+            <span class="n">burnin</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span><span class="s1">&#39;emcee&#39;</span><span class="p">,</span> <span class="s1">&#39;burnin&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">nproc</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span><span class="s1">&#39;emcee&#39;</span><span class="p">,</span> <span class="s1">&#39;nproc&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">walkers</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;walkers&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">nsamp</span>   <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;nsamp&#39;</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+            <span class="n">burnin</span>  <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;burnin&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">nproc</span>   <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;nproc&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;Unexpected **kwargs for emcee sampler: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kwargs</span><span class="p">))</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;You can skip writing any option and SimpleMC will use the default value.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;Emcee executer options are:&#39;</span>
+                            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">walkers (int) Default: 30</span><span class="se">\n\t</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;nsamp (int) Default: 20000</span><span class="se">\n\t</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;burnin (int) Default: 0</span><span class="se">\n\t</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;nproc (int) Default: 1&#39;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">walkers: </span><span class="si">{}</span><span class="se">\n\t</span><span class="s2">nsamp: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">burnin: </span><span class="si">{}</span><span class="se">\n\t</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;nproc: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">walkers</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">,</span> <span class="n">burnin</span><span class="p">,</span> <span class="n">nproc</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="o">=</span> <span class="s1">&#39;emcee&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_walkers&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span><span class="p">,</span> <span class="n">walkers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputChecker</span><span class="p">()</span>
+        <span class="n">pool</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mppool</span><span class="p">(</span><span class="n">nproc</span><span class="p">)</span>
+        <span class="c1"># initial_state = None</span>
+        <span class="n">ini</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">bound</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">:</span>
+            <span class="n">ini</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">bound</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bound</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">walkers</span><span class="p">))</span>
+        <span class="n">inisamples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ini</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="c1"># initial samples</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">emcee</span>
+            <span class="n">ti</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">sampler</span> <span class="o">=</span> <span class="n">emcee</span><span class="o">.</span><span class="n">EnsembleSampler</span><span class="p">(</span><span class="n">walkers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">logPosterior</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
+            <span class="c1">#testing</span>
+            <span class="n">sampler</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">initial_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">means</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">thin_by</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+            <span class="c1"># pass the initial samples and total number of samples required</span>
+            <span class="n">sampler</span><span class="o">.</span><span class="n">run_mcmc</span><span class="p">(</span><span class="n">inisamples</span><span class="p">,</span> <span class="n">nsamp</span> <span class="o">+</span> <span class="n">burnin</span><span class="p">,</span>
+                             <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ttime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">ti</span>
+        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: Please install this module&quot;</span>
+                     <span class="s2">&quot;or try using other sampler&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">burnin</span> <span class="o">=</span> <span class="n">burnin</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;emcee&#39;</span><span class="p">,</span> <span class="n">sampler</span><span class="p">,</span> <span class="s1">&#39;walkers : </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">walkers</span><span class="p">),</span> <span class="s1">&#39;samples: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nsamp</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<span class="c1">##======== ======== ======== Optimizers ======== ======== ========</span>
+
+
+<span class="c1">##---------------------- MaxLikeAnalizer ----------------------</span>
+
+<div class="viewcode-block" id="DriverMC.maxLikeRunner"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.maxLikeRunner">[docs]</a>    <span class="k">def</span> <span class="nf">maxLikeRunner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iniFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It calls MaxLikeAnalyzer class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        withErrors : bool</span>
+
+<span class="sd">        plot_par1 : bool</span>
+
+<span class="sd">        plot_par2 : bool</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="o">=</span> <span class="s1">&#39;maxlike&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">_optimization&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputChecker</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">iniFile</span><span class="p">:</span>
+            <span class="n">withErrors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span><span class="s1">&#39;maxlike&#39;</span><span class="p">,</span> <span class="s1">&#39;withErrors&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">showplot</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span><span class="s1">&#39;maxlike&#39;</span><span class="p">,</span> <span class="s1">&#39;showplot&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">plot_par1</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;maxlike&#39;</span><span class="p">,</span> <span class="s1">&#39;plot_par1&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">plot_par2</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;maxlike&#39;</span><span class="p">,</span> <span class="s1">&#39;plot_par2&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">showderived</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span><span class="s1">&#39;maxlike&#39;</span><span class="p">,</span> <span class="s1">&#39;showderived&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">withErrors</span>  <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;withErrors&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">showplot</span>    <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;showplot&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">plot_par1</span>   <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;plot_par1&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">plot_par2</span>   <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;plot_par2&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">showderived</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;showderived&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;Unexpected **kwargs for MaxLike: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kwargs</span><span class="p">))</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;You can skip writing any option and SimpleMC will use the default value.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;MaxLikeAnalyzer executer options are:&#39;</span>
+                            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">withErrors (bool) Default: False&#39;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">ti</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">MaxLikeAnalyzer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">withErrors</span><span class="o">=</span><span class="n">withErrors</span><span class="p">,</span> <span class="n">showderived</span><span class="o">=</span><span class="n">showderived</span><span class="p">,</span>\
+                            <span class="n">showplot</span><span class="o">=</span><span class="n">showplot</span><span class="p">,</span> <span class="n">param1</span><span class="o">=</span><span class="n">plot_par1</span><span class="p">,</span> <span class="n">param2</span><span class="o">=</span><span class="n">plot_par2</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">printParameters</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ttime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">ti</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;maxlike&#39;</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">params</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<span class="c1">##---------------------- Genetic Algorithms ----------------------</span>
+
+
+<div class="viewcode-block" id="DriverMC.geneticRunner"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.geneticRunner">[docs]</a>    <span class="k">def</span> <span class="nf">geneticRunner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iniFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It calls SimpleGenetic class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        n_individuals : int</span>
+<span class="sd">            Number of individuals.</span>
+
+<span class="sd">        n_generations : int</span>
+<span class="sd">            Number of generations.</span>
+
+<span class="sd">        selection_method : str</span>
+<span class="sd">            Selection method {tournament, roulette, rank}</span>
+
+<span class="sd">        mut_prob : float</span>
+<span class="sd">            Probability of mutation.</span>
+
+<span class="sd">        distribution : str</span>
+<span class="sd">            {&quot;uniform&quot;, &quot;gaussian&quot;, &quot;random&quot;}</span>
+<span class="sd">            Default: uniform</span>
+
+<span class="sd">        media_distribution : float</span>
+<span class="sd">            Media value for gaussian distributions</span>
+
+<span class="sd">        sd_distribution : float</span>
+<span class="sd">            Standard deviation for gaussian distributions</span>
+<span class="sd">            Default: 1.0</span>
+
+<span class="sd">        min_distribution : float</span>
+<span class="sd">            Minimum value for uniform distributions</span>
+<span class="sd">            Default: -1.0</span>
+
+<span class="sd">        max_distribution : float</span>
+<span class="sd">            Maximum value for uniform distributions</span>
+<span class="sd">            Default: 1.0</span>
+
+<span class="sd">        stopping_early : bool</span>
+<span class="sd">            It needs a not None value for &quot;rounds_stopping&quot; and &quot;tolerance_stopping&quot;.</span>
+<span class="sd">            Default: True</span>
+
+<span class="sd">        rounds_stopping : int</span>
+<span class="sd">            Rounds to consider to stopping early with the tolerance_stopping value.</span>
+<span class="sd">            Default : 100</span>
+
+<span class="sd">        tolerance_stopping : float</span>
+<span class="sd">            Value to stopping early criteria. This value is the difference between the</span>
+<span class="sd">            best fit for the latest rounds_stopping generations.</span>
+<span class="sd">            Default : 0.01</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="o">=</span> <span class="s1">&#39;genetic&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">_optimization&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputChecker</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">iniFile</span><span class="p">:</span>
+            <span class="n">n_individuals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span><span class="s1">&#39;genetic&#39;</span><span class="p">,</span> <span class="s1">&#39;n_individuals&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+            <span class="n">n_generations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span><span class="s1">&#39;genetic&#39;</span><span class="p">,</span> <span class="s1">&#39;n_generations&#39;</span> <span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+            <span class="n">selection_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;genetic&#39;</span><span class="p">,</span> <span class="s1">&#39;selection_method&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="s1">&#39;tournament&#39;</span><span class="p">)</span>
+            <span class="n">mut_prob</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getfloat</span><span class="p">(</span><span class="s1">&#39;genetic&#39;</span><span class="p">,</span> <span class="s1">&#39;mut_prob&#39;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+            <span class="n">distribution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;distribution&quot;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">)</span>
+            <span class="n">media_distribution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getfloat</span><span class="p">(</span><span class="s2">&quot;media_distribution&quot;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="n">sd_distribution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getfloat</span><span class="p">(</span><span class="s2">&quot;sd_distribution&quot;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="n">min_distribution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getfloat</span><span class="p">(</span><span class="s2">&quot;min_distribution&quot;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="n">max_distribution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getfloat</span><span class="p">(</span><span class="s2">&quot;max_distribution&quot;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="n">stopping_early</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span><span class="s2">&quot;stopping_early&quot;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">rounds_stopping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span><span class="s2">&quot;rounds_stopping&quot;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+            <span class="n">tolerance_stopping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getfloat</span><span class="p">(</span><span class="s2">&quot;tolerance_stopping&quot;</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">n_individuals</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;n_individuals&#39;</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+            <span class="n">n_generations</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;n_generations&#39;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+            <span class="n">selection_method</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;selection_method&#39;</span><span class="p">,</span> <span class="s1">&#39;tournament&#39;</span><span class="p">)</span>
+            <span class="n">mut_prob</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;mut_prob&#39;</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">)</span>
+            <span class="n">distribution</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;distribution&quot;</span><span class="p">,</span> <span class="s2">&quot;uniform&quot;</span><span class="p">)</span>
+            <span class="n">media_distribution</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;media_distribution&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">sd_distribution</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;sd_distribution&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">min_distribution</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;min_distribution&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">max_distribution</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;max_distribution&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">stopping_early</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;stopping_early&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="n">rounds_stopping</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;rounds_stopping&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+            <span class="n">tolerance_stopping</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;tolerance_stopping&quot;</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;Unexpected **kwargs for genetic optimizer: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kwargs</span><span class="p">))</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;You can skip writing any option and SimpleMC will use the default value.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;genetic executer options are:&#39;</span>
+                            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">n_individuals (int) Default: 400</span><span class="se">\n\t</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;n_generations (int) Default: 1000</span><span class="se">\n\t</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;selection_method {&quot;tournament&quot;,&quot;rank&quot;,&quot;roulette&quot;} Default: &quot;tournament&quot;&#39;</span>
+                            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">mut_prob (float) Default: 0.4&#39;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">n_individuals: </span><span class="si">{}</span><span class="se">\n\t</span><span class="s2">n_generations: </span><span class="si">{}</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">selection method: </span><span class="si">{}</span><span class="se">\n\t</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;mut prob: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_individuals</span><span class="p">,</span> <span class="n">n_generations</span><span class="p">,</span>
+                                        <span class="n">selection_method</span><span class="p">,</span><span class="n">mut_prob</span><span class="p">))</span>
+        <span class="n">ti</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="n">M</span> <span class="o">=</span> <span class="n">SimpleGenetic</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logLike</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span>
+                          <span class="n">n_individuals</span><span class="o">=</span><span class="n">n_individuals</span><span class="p">,</span>
+                          <span class="n">n_generations</span><span class="o">=</span><span class="n">n_generations</span><span class="p">,</span>
+                          <span class="n">prob_mut</span><span class="o">=</span><span class="n">mut_prob</span><span class="p">,</span> <span class="n">method_selection</span><span class="o">=</span><span class="n">selection_method</span><span class="p">,</span>
+                          <span class="n">distribution</span><span class="o">=</span><span class="n">distribution</span><span class="p">,</span>
+                          <span class="n">media_distribution</span><span class="o">=</span><span class="n">media_distribution</span><span class="p">,</span>
+                          <span class="n">sd_distribution</span><span class="o">=</span><span class="n">sd_distribution</span><span class="p">,</span>
+                          <span class="n">min_distribution</span><span class="o">=</span><span class="n">min_distribution</span><span class="p">,</span>
+                          <span class="n">max_distribution</span><span class="o">=</span><span class="n">max_distribution</span><span class="p">,</span>
+                          <span class="n">stopping_early</span><span class="o">=</span><span class="n">stopping_early</span><span class="p">,</span>
+                          <span class="n">rounds_stopping</span><span class="o">=</span><span class="n">rounds_stopping</span><span class="p">,</span>
+                          <span class="n">tolerance_stopping</span><span class="o">=</span><span class="n">tolerance_stopping</span><span class="p">,</span>
+                          <span class="n">outputname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">)</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ttime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">ti</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;genetic&#39;</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">result</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<span class="c1">##---------------------- logLike and prior Transform function ----------------------</span>
+<span class="c1">##---------------------- for nested samplers ----------------------</span>
+
+<div class="viewcode-block" id="DriverMC.logLike"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.logLike">[docs]</a>    <span class="k">def</span> <span class="nf">logLike</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If the sampler used isn&#39;t the MCMC of MCMCAnalyzer then, we need to set</span>
+<span class="sd">        other types of likelihoods and priors objects. This method allows that. It is a</span>
+<span class="sd">        likelihood defined for an external samplers and is used</span>
+<span class="sd">        as parameter of the sampler run function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+
+<span class="sd">        values : n-dim vector</span>
+<span class="sd">            implicit values, they are generated by the sampler.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pars_info</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">pars</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pars_info</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+            <span class="n">pars</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">updateParams</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pars_info</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">.</span><span class="n">setTheory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">.</span><span class="n">name</span><span class="p">()</span><span class="o">==</span><span class="s2">&quot;Composite&quot;</span><span class="p">):</span>
+            <span class="n">cloglikes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">.</span><span class="n">compositeLogLikes_wprior</span><span class="p">()</span>
+            <span class="n">loglike</span><span class="o">=</span><span class="n">cloglikes</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">loglike</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">.</span><span class="n">loglike_wprior</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">loglike</span></div>
+
+
+    <span class="c1">#priorsTransform</span>
+<div class="viewcode-block" id="DriverMC.priorTransform"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.priorTransform">[docs]</a>    <span class="k">def</span> <span class="nf">priorTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theta</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Prior Transform for gaussian and flat priors&quot;&quot;&quot;</span>
+        <span class="n">priors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsigma</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">priortype</span> <span class="o">==</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">bound</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">):</span>
+                <span class="n">mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">means</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+                <span class="n">sigma</span> <span class="o">=</span> <span class="p">(</span><span class="n">bound</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">bound</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="n">n</span>
+                <span class="n">priors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mu</span><span class="o">+</span><span class="n">sigma</span><span class="o">*</span><span class="p">(</span><span class="n">ndtri</span><span class="p">(</span><span class="n">theta</span><span class="p">[</span><span class="n">c</span><span class="p">])))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">bound</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">):</span>
+               <span class="c1"># When theta 0-&gt; append bound[0], if theta 1-&gt; append bound[1]</span>
+                <span class="n">priors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">theta</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">bound</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">bound</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="n">bound</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="c1"># At this moment, np.array(priors) has shape (dims,)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">priors</span><span class="p">)</span></div>
+
+<span class="c1">############# for emcee: logPosterior and logPrior</span>
+<div class="viewcode-block" id="DriverMC.logPosterior"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.logPosterior">[docs]</a>    <span class="k">def</span> <span class="nf">logPosterior</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theta</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The natural logarithm of the joint posterior.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ------------</span>
+<span class="sd">        theta : tuple</span>
+<span class="sd">            A sample containing individual parameter values</span>
+
+<span class="sd">        data : list</span>
+<span class="sd">            The set of data/observations</span>
+
+<span class="sd">        sigma : float</span>
+<span class="sd">            The standard deviation of the data points</span>
+
+<span class="sd">        x : list</span>
+<span class="sd">            The abscissa values at which the data/model is defined</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">lp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logPrior</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>  <span class="c1"># get the prior</span>
+
+        <span class="c1"># if the prior is not finite return a probability of zero (log probability of -inf)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">lp</span><span class="p">):</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+        <span class="c1"># return the likeihood times the prior (log likelihood plus the log prior)</span>
+        <span class="k">return</span> <span class="n">lp</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">logLike</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DriverMC.logPrior"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.logPrior">[docs]</a>    <span class="k">def</span> <span class="nf">logPrior</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theta</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The natural logarithm of the prior probability.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">            theta : tuple</span>
+<span class="sd">                A sample containing individual parameter values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># set prior to 1 (log prior to 0) if in the range and zero (-inf) outside the range</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">bound</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">bound</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">theta</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">bound</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">flag</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">flag</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">flag</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span></div>
+
+
+
+
+<span class="c1">###############################Post-processing############################################</span>
+<div class="viewcode-block" id="DriverMC.outputChecker"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.outputChecker">[docs]</a>    <span class="k">def</span> <span class="nf">outputChecker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method check if the name of the outputfile exists, if it already exists creates a</span>
+<span class="sd">        new one with extension _new in its name.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="o">+</span><span class="s2">&quot;.txt&quot;</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> file already exists, </span><span class="si">{0}</span><span class="s2">_new was created&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_new&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">flag</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">,</span> <span class="n">i</span><span class="p">)):</span>
+                    <span class="n">flag</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">flag</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2"> file already exists, </span><span class="si">{0}</span><span class="s2">_new was created&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_new&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paramFiles</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="DriverMC.paramFiles"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.paramFiles">[docs]</a>    <span class="k">def</span> <span class="nf">paramFiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method writes the .paramnames file with theirs LaTeX names.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+
+<span class="sd">        T : model</span>
+<span class="sd">            T is result of ParseModel(model)</span>
+<span class="sd">        L : likelihood</span>
+<span class="sd">            L is result of ParseDataset(datasets)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cpars</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">.</span><span class="n">freeParameters</span><span class="p">()</span>
+        <span class="n">parfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span> <span class="o">+</span> <span class="s2">&quot;.paramnames&quot;</span>
+        <span class="n">fpar</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">parfile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">cpars</span><span class="p">:</span>
+            <span class="n">fpar</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">p</span><span class="o">.</span><span class="n">Ltxname</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">addDerived</span><span class="p">:</span>
+            <span class="n">AD</span> <span class="o">=</span> <span class="n">AllDerived</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">pd</span> <span class="ow">in</span> <span class="n">AD</span><span class="o">.</span><span class="n">list</span><span class="p">:</span>
+                <span class="n">fpar</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">pd</span><span class="o">.</span><span class="n">Ltxname</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="o">==</span> <span class="s1">&#39;mcmc&#39;</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="o">==</span> <span class="s1">&#39;nested&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="o">==</span><span class="s1">&#39;dynesty&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Composite&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sublikenames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">.</span><span class="n">compositeNames</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sublikenames</span><span class="p">:</span>
+                    <span class="n">fpar</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_like </span><span class="se">\t\t\t</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">fpar</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;theory_prior </span><span class="se">\t\t\t</span><span class="s2"> None </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DriverMC.postprocess"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.postprocess">[docs]</a>    <span class="k">def</span> <span class="nf">postprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">summary</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stats</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">addtxt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It calls the PostProcessing class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">         summary : bool</span>
+<span class="sd">            True for save summary.</span>
+
+<span class="sd">         addtxt : list</span>
+<span class="sd">            A list with strings to save with the summary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">addtxt</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">addtxt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="o">==</span> <span class="s1">&#39;nested&#39;</span><span class="p">:</span>
+            <span class="n">pp</span> <span class="o">=</span> <span class="n">PostProcessing</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">paramsList</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">,</span>
+                <span class="n">engine</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">,</span> <span class="n">addDerived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">addDerived</span><span class="p">,</span> <span class="n">loglike</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">==</span> <span class="s1">&#39;nestle&#39;</span><span class="p">:</span>
+                <span class="n">pp</span><span class="o">.</span><span class="n">saveNestedChain</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="o">==</span> <span class="s1">&#39;emcee&#39;</span><span class="p">:</span>
+            <span class="n">pp</span> <span class="o">=</span> <span class="n">PostProcessing</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">paramsList</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">,</span>
+                                <span class="n">skip</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">burnin</span><span class="p">,</span> <span class="n">addDerived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">addDerived</span><span class="p">,</span> <span class="n">loglike</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
+            <span class="n">pp</span><span class="o">.</span><span class="n">saveEmceeSamples</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pp</span> <span class="o">=</span> <span class="n">PostProcessing</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">paramsList</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">summary</span><span class="p">:</span>
+            <span class="n">pp</span><span class="o">.</span><span class="n">writeSummary</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ttime</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DriverMC.plot"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple connection with the plotters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        show : bool</span>
+<span class="sd">            Default False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">.tools.SimplePlotter</span> <span class="kn">import</span> <span class="n">SimplePlotter</span>
+        <span class="n">figure</span> <span class="o">=</span> <span class="n">SimplePlotter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chainsdir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">paramsList</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="o">==</span> <span class="s2">&quot;genetic&quot;</span><span class="p">:</span>
+            <span class="n">figure</span><span class="o">.</span><span class="n">simplex_vs_y</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;iterations&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;best fitness&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">figure</span></div>
+
+<span class="c1"># ### pool from multiprocessing</span>
+
+<div class="viewcode-block" id="DriverMC.mppool"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.mppool">[docs]</a>    <span class="k">def</span> <span class="nf">mppool</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nproc</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It creates a multiprocessing objet to parallelise nested and emcee samplers.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ------------</span>
+<span class="sd">         nproc : int</span>
+<span class="sd">            number of processors to use.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ---------</span>
+<span class="sd">        pool : multiprocessing.Pool</span>
+<span class="sd">            object</span>
+
+<span class="sd">        nproc : int</span>
+<span class="sd">            Number of processes</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">nproc</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ncores</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+            <span class="n">nprocess</span> <span class="o">=</span> <span class="n">ncores</span><span class="o">//</span><span class="mi">2</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using  </span><span class="si">{}</span><span class="s2"> processors of </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nprocess</span><span class="p">,</span> <span class="n">ncores</span><span class="p">))</span>
+            <span class="n">pool</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">nprocess</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">nproc</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using 1 processor&quot;</span><span class="p">)</span>
+            <span class="n">nprocess</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">pool</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nprocess</span> <span class="o">=</span> <span class="n">nproc</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using </span><span class="si">{}</span><span class="s2"> processors.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nprocess</span><span class="p">))</span>
+            <span class="n">pool</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">nprocess</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">pool</span><span class="p">,</span> <span class="n">nprocess</span></div></div>
+
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, A Slosar, JA Vazquez, I Gomez-Vargas
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

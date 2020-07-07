@@ -1,0 +1,1855 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>API &mdash; SimpleMC 2.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Plotters" href="plotters.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> SimpleMC
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data.html"><strong>Data</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotters.html"><strong>Plotters</strong></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-simplemc.DriverMC">Top-Level Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-simplemc.analyzers.MCMCAnalyzer">Analyzers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-simplemc.likelihoods.BaseLikelihood">Likelihoods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-simplemc.models.LCDMCosmology">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-simplemc.cosmo.BaseCosmology">Cosmo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plots">Plots</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SimpleMC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>API</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/API.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="api">
+<h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<p>This page details the methods and classes provided by the <code class="docutils literal notranslate"><span class="pre">simplemc</span></code> module.</p>
+<div class="section" id="module-simplemc.DriverMC">
+<span id="top-level-interface"></span><h2>Top-Level Interface<a class="headerlink" href="#module-simplemc.DriverMC" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="simplemc.DriverMC.DriverMC">
+<em class="property">class </em><code class="descclassname">simplemc.DriverMC.</code><code class="descname">DriverMC</code><span class="sig-paren">(</span><em>iniFile=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class is the manager and wrapper between all
+the analyzers and the pertinent functions.</p>
+<p>Read the input parameters or ini file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>iniFile</strong> (<em>ini file</em>) – Text file with ini extension that contains all the settings
+to SimpleMC. If use this option the following kwargs not are necessary.</li>
+<li><strong>chainsdir</strong> (<em>str</em>) – Directory for the outputs.</li>
+<li><strong>model</strong> (<em>str</em>) – Choose the model {LCDOM, LCDMasslessnu, nuLCDM, NeffLCDM, noradLCDM, nuoLCDM, nuwLCDM, oLCDM, wCDM, waCDM, owCDM,”            owaCDM, JordiCDM, WeirdCDM, TLight, StepCDM, Spline, PolyCDM, fPolyCDM, Decay, Decay01, Decay05,”            EarlyDE, EarlyDE_rd_DE, SlowRDE}</li>
+<li><strong>prefact</strong> (<em>str</em>) – {phy, pre}</li>
+<li><strong>vary8</strong> (<em>bool</em>) – Default False</li>
+<li><strong>str</strong> (<em>datasets</em>) – Default HD (Hubble distance, i. e. Cosmic Chronometers).
+You can combine HD+SN+BBAO+Planck+UnionSN+…</li>
+<li><strong>analyzername</strong> (<em>str</em>) – The name of the analyzer. It can be a sampler: {mcmc, nested, emcee}
+or a optimizer: {maxlike, genetic}</li>
+<li><strong>addDerived</strong> (<em>bool</em>) – True generates at the flight some derived parameters (such as
+Omega_Lambda or Universe Age, and save them in the output text file.</li>
+<li><strong>custom_parameters</strong> (<em>list</em>) – List of Parameter instances.</li>
+<li><strong>custom_function</strong> (<em>method</em>) – Custom method that reads a parameter list and a vector x, unzip the list,
+and return a f(x) in terms of the parameters.</li>
+<li><strong>path_to_data</strong> (<em>str</em>) – path of a dataset text file.</li>
+<li><strong>path_to_cov</strong> (<em>str</em>) – path of a covariance matrix text file.</li>
+<li><strong>fn</strong> (<em>str</em>) – Type of function to use in the likelihood due a custom data {“generic”, “hz”, …}.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="simplemc.DriverMC.DriverMC.emceeRunner">
+<code class="descname">emceeRunner</code><span class="sig-paren">(</span><em>iniFile=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.emceeRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.emceeRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method calls the emcee library to use ensamble sampler.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>walkers</strong> (<em>int</em>) – Number of walkers or ensambles.</li>
+<li><strong>nsamp</strong> (<em>int</em>) – Number of mcmc steps for each walker.</li>
+<li><strong>burnin</strong> (<em>int</em>) – skip steps.</li>
+<li><strong>nproc</strong> (<em>int</em>) – Number of processors in order to parallelise.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.DriverMC.DriverMC.executer">
+<code class="descname">executer</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.executer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.executer" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a wrapper of the runners of the analyzer in order to make
+easier the execution, mainly if is through an ini file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>the parameters of the methods</strong> (<em>All</em>) – <ul class="simple">
+<li>mcmcRunner</li>
+<li>nestedRunner</li>
+<li>emceeRunner</li>
+<li>geneticRunner</li>
+<li>maxlikeRunner</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.DriverMC.DriverMC.geneticRunner">
+<code class="descname">geneticRunner</code><span class="sig-paren">(</span><em>iniFile=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.geneticRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.geneticRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>It calls SimpleGenetic class.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>n_individuals</strong> (<em>int</em>) – Number of individuals.</li>
+<li><strong>n_generations</strong> (<em>int</em>) – Number of generations.</li>
+<li><strong>selection_method</strong> (<em>str</em>) – Selection method {tournament, roulette, rank}</li>
+<li><strong>mut_prob</strong> (<em>float</em>) – Probability of mutation.</li>
+<li><strong>distribution</strong> (<em>str</em>) – {“uniform”, “gaussian”, “random”}
+Default: uniform</li>
+<li><strong>media_distribution</strong> (<em>float</em>) – Media value for gaussian distributions</li>
+<li><strong>sd_distribution</strong> (<em>float</em>) – Standard deviation for gaussian distributions
+Default: 1.0</li>
+<li><strong>min_distribution</strong> (<em>float</em>) – Minimum value for uniform distributions
+Default: -1.0</li>
+<li><strong>max_distribution</strong> (<em>float</em>) – Maximum value for uniform distributions
+Default: 1.0</li>
+<li><strong>stopping_early</strong> (<em>bool</em>) – It needs a not None value for “rounds_stopping” and “tolerance_stopping”.
+Default: True</li>
+<li><strong>rounds_stopping</strong> (<em>int</em>) – Rounds to consider to stopping early with the tolerance_stopping value.
+Default : 100</li>
+<li><strong>tolerance_stopping</strong> (<em>float</em>) – Value to stopping early criteria. This value is the difference between the
+best fit for the latest rounds_stopping generations.
+Default : 0.01</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.DriverMC.DriverMC.iniReader">
+<code class="descname">iniReader</code><span class="sig-paren">(</span><em>iniFile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.iniReader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.iniReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>It reads the ini file through configparser.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>iniFile</strong> (<em>file .ini</em>) – Text file with settings</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.DriverMC.DriverMC.logLike">
+<code class="descname">logLike</code><span class="sig-paren">(</span><em>values</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.logLike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.logLike" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the sampler used isn’t the MCMC of MCMCAnalyzer then, we need to set
+other types of likelihoods and priors objects. This method allows that. It is a
+likelihood defined for an external samplers and is used
+as parameter of the sampler run function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>values</strong> (<em>n-dim vector</em>) – implicit values, they are generated by the sampler.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.DriverMC.DriverMC.logPosterior">
+<code class="descname">logPosterior</code><span class="sig-paren">(</span><em>theta</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.logPosterior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.logPosterior" title="Permalink to this definition">¶</a></dt>
+<dd><p>The natural logarithm of the joint posterior.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>theta</strong> (<em>tuple</em>) – A sample containing individual parameter values</li>
+<li><strong>data</strong> (<em>list</em>) – The set of data/observations</li>
+<li><strong>sigma</strong> (<em>float</em>) – The standard deviation of the data points</li>
+<li><strong>x</strong> (<em>list</em>) – The abscissa values at which the data/model is defined</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.DriverMC.DriverMC.logPrior">
+<code class="descname">logPrior</code><span class="sig-paren">(</span><em>theta</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.logPrior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.logPrior" title="Permalink to this definition">¶</a></dt>
+<dd><p>The natural logarithm of the prior probability.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>theta</strong> (<em>tuple</em>) – A sample containing individual parameter values</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.DriverMC.DriverMC.maxLikeRunner">
+<code class="descname">maxLikeRunner</code><span class="sig-paren">(</span><em>iniFile=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.maxLikeRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.maxLikeRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>It calls MaxLikeAnalyzer class.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>withErrors</strong> (<em>bool</em>) – </li>
+<li><strong>plot_par1</strong> (<em>bool</em>) – </li>
+<li><strong>plot_par2</strong> (<em>bool</em>) – </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.DriverMC.DriverMC.mcmcRunner">
+<code class="descname">mcmcRunner</code><span class="sig-paren">(</span><em>iniFile=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.mcmcRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.mcmcRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method calls MCMCAnalyzer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>nsamp</strong> (<em>int</em>) – Number of mcmc steps.</li>
+<li><strong>skip</strong> (<em>int</em>) – Burn-in.</li>
+<li><strong>temp</strong> (<em>float</em>) – Temperature for the weights.</li>
+<li><strong>chainno</strong> (<em>int</em>) – Number of chains in parallel.</li>
+<li><strong>GRstop</strong> (<em>float</em>) – Gelman Rubin criteria for stopping (0, 0.1].</li>
+<li><strong>evidence</strong> (<em>bool</em>) – True if after the mcmc chain was generated,
+estimates bayesian evidence throug MCEvidence (arXiv:1704.03472).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.DriverMC.DriverMC.mppool">
+<code class="descname">mppool</code><span class="sig-paren">(</span><em>nproc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.mppool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.mppool" title="Permalink to this definition">¶</a></dt>
+<dd><p>It creates a multiprocessing objet to parallelise nested and emcee samplers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nproc</strong> (<em>int</em>) – number of processors to use.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<li><strong>pool</strong> (<em>multiprocessing.Pool</em>) – object</li>
+<li><strong>nproc</strong> (<em>int</em>) – Number of processes</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.DriverMC.DriverMC.nestedRunner">
+<code class="descname">nestedRunner</code><span class="sig-paren">(</span><em>iniFile=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.nestedRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.nestedRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method calls Dynesty samplers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>engine</strong> (<em>str</em>) – Use dynesty or nestle library</li>
+<li><strong>dynamic</strong> (<em>bool</em>) – Default <cite>False</cite></li>
+<li><strong>neuralNetwork</strong> (<em>bool</em>) – If True use a pybambi neural network.
+Default: False.</li>
+<li><strong>nestedType</strong> (<em>str</em>) – {single, multi, balls, cubes}</li>
+<li><strong>nlivepoints</strong> (<em>int</em>) – Number of live points.</li>
+<li><strong>accuracy</strong> (<em>float</em>) – Stopping criteria in terms of logz.</li>
+<li><strong>nproc</strong> (<em>int</em>) – Number of processors to parallelize.
+Use 1 or 0 if you don’t want parallelise.</li>
+<li><strong>priortype</strong> (<em>str</em>) – Gaussian or uniform prior {‘g’, ‘u’}.</li>
+<li><strong>nsigma</strong> (<em>float</em>) – Sigma for gaussian priors.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.DriverMC.DriverMC.outputChecker">
+<code class="descname">outputChecker</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.outputChecker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.outputChecker" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method check if the name of the outputfile exists, if it already exists creates a
+new one with extension _new in its name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.DriverMC.DriverMC.paramFiles">
+<code class="descname">paramFiles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.paramFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.paramFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method writes the .paramnames file with theirs LaTeX names.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>T</strong> (<em>model</em>) – T is result of ParseModel(model)</li>
+<li><strong>L</strong> (<em>likelihood</em>) – L is result of ParseDataset(datasets)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.DriverMC.DriverMC.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>show=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple connection with the plotters.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>show</strong> (<em>bool</em>) – Default False</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.DriverMC.DriverMC.postprocess">
+<code class="descname">postprocess</code><span class="sig-paren">(</span><em>summary=True</em>, <em>stats=False</em>, <em>addtxt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.postprocess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.postprocess" title="Permalink to this definition">¶</a></dt>
+<dd><p>It calls the PostProcessing class.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>summary</strong> (<em>bool</em>) – True for save summary.</li>
+<li><strong>addtxt</strong> (<em>list</em>) – A list with strings to save with the summary.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.DriverMC.DriverMC.priorTransform">
+<code class="descname">priorTransform</code><span class="sig-paren">(</span><em>theta</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.priorTransform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.priorTransform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prior Transform for gaussian and flat priors</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-simplemc.CosmoCalc"></span><dl class="class">
+<dt id="simplemc.CosmoCalc.CosmoCalc">
+<em class="property">class </em><code class="descclassname">simplemc.CosmoCalc.</code><code class="descname">CosmoCalc</code><span class="sig-paren">(</span><em>model</em>, <em>funct=None</em>, <em>param=None</em>, <em>minparam=None</em>, <em>maxparam=None</em>, <em>nsteps=3</em>, <em>savepdf=False</em>, <em>zmax=3</em>, <em>plot_data=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/CosmoCalc.html#CosmoCalc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.CosmoCalc.CosmoCalc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Cosmological calculator to plot the basic functions</p>
+<dl class="method">
+<dt id="simplemc.CosmoCalc.CosmoCalc.Age">
+<code class="descname">Age</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/CosmoCalc.html#CosmoCalc.Age"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.CosmoCalc.CosmoCalc.Age" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.CosmoCalc.CosmoCalc.DVOverrd">
+<code class="descname">DVOverrd</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/CosmoCalc.html#CosmoCalc.DVOverrd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.CosmoCalc.CosmoCalc.DVOverrd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.CosmoCalc.CosmoCalc.DaOverrd">
+<code class="descname">DaOverrd</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/CosmoCalc.html#CosmoCalc.DaOverrd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.CosmoCalc.CosmoCalc.DaOverrd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.CosmoCalc.CosmoCalc.HIOverrd">
+<code class="descname">HIOverrd</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/CosmoCalc.html#CosmoCalc.HIOverrd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.CosmoCalc.CosmoCalc.HIOverrd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.CosmoCalc.CosmoCalc.HubInvOverz">
+<code class="descname">HubInvOverz</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/CosmoCalc.html#CosmoCalc.HubInvOverz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.CosmoCalc.CosmoCalc.HubInvOverz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.CosmoCalc.CosmoCalc.Hubble">
+<code class="descname">Hubble</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/CosmoCalc.html#CosmoCalc.Hubble"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.CosmoCalc.CosmoCalc.Hubble" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.CosmoCalc.CosmoCalc.SNIa">
+<code class="descname">SNIa</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/CosmoCalc.html#CosmoCalc.SNIa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.CosmoCalc.CosmoCalc.SNIa" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.CosmoCalc.CosmoCalc.fixer">
+<code class="descname">fixer</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/CosmoCalc.html#CosmoCalc.fixer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.CosmoCalc.CosmoCalc.fixer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.CosmoCalc.CosmoCalc.fs8">
+<code class="descname">fs8</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/CosmoCalc.html#CosmoCalc.fs8"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.CosmoCalc.CosmoCalc.fs8" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.CosmoCalc.CosmoCalc.plot_vars">
+<code class="descname">plot_vars</code><span class="sig-paren">(</span><em>y</em>, <em>ylabel=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/CosmoCalc.html#CosmoCalc.plot_vars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.CosmoCalc.CosmoCalc.plot_vars" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.CosmoCalc.CosmoCalc.run_plot">
+<code class="descname">run_plot</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/CosmoCalc.html#CosmoCalc.run_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.CosmoCalc.CosmoCalc.run_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.CosmoCalc.CosmoCalc.selec_data">
+<code class="descname">selec_data</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/CosmoCalc.html#CosmoCalc.selec_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.CosmoCalc.CosmoCalc.selec_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-simplemc.PostProcessing"></span><p>This module processes the samples from a nested sampler and prints, saves chains in a text file
+and creates a param file.</p>
+<dl class="class">
+<dt id="simplemc.PostProcessing.PostProcessing">
+<em class="property">class </em><code class="descclassname">simplemc.PostProcessing.</code><code class="descname">PostProcessing</code><span class="sig-paren">(</span><em>list_result</em>, <em>paramList</em>, <em>filename</em>, <em>skip=0.1</em>, <em>engine=None</em>, <em>addDerived=True</em>, <em>loglike=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/PostProcessing.html#PostProcessing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.PostProcessing.PostProcessing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>In this class we…</p>
+<dl class="method">
+<dt id="simplemc.PostProcessing.PostProcessing.cleanf">
+<code class="descname">cleanf</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/PostProcessing.html#PostProcessing.cleanf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.PostProcessing.PostProcessing.cleanf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.PostProcessing.PostProcessing.getdistAnalyzer">
+<code class="descname">getdistAnalyzer</code><span class="sig-paren">(</span><em>cov=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/PostProcessing.html#PostProcessing.getdistAnalyzer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.PostProcessing.PostProcessing.getdistAnalyzer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.PostProcessing.PostProcessing.saveEmceeSamples">
+<code class="descname">saveEmceeSamples</code><span class="sig-paren">(</span><em>thin=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/PostProcessing.html#PostProcessing.saveEmceeSamples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.PostProcessing.PostProcessing.saveEmceeSamples" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.PostProcessing.PostProcessing.saveNestedChain">
+<code class="descname">saveNestedChain</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/PostProcessing.html#PostProcessing.saveNestedChain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.PostProcessing.PostProcessing.saveNestedChain" title="Permalink to this definition">¶</a></dt>
+<dd><p>This generates an output Simple(cosmo)MC style for dynesty Samplers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.PostProcessing.PostProcessing.writeSummary">
+<code class="descname">writeSummary</code><span class="sig-paren">(</span><em>time</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/PostProcessing.html#PostProcessing.writeSummary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.PostProcessing.PostProcessing.writeSummary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-simplemc.runbase"></span><dl class="function">
+<dt id="simplemc.runbase.ParseDataset">
+<code class="descclassname">simplemc.runbase.</code><code class="descname">ParseDataset</code><span class="sig-paren">(</span><em>datasets</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/runbase.html#ParseDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.runbase.ParseDataset" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>datasets</strong> – name of datasets, i.e. BBAO</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">object - likelihood</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="simplemc.runbase.ParseModel">
+<code class="descclassname">simplemc.runbase.</code><code class="descname">ParseModel</code><span class="sig-paren">(</span><em>model</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/runbase.html#ParseModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.runbase.ParseModel" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>model</strong> – name of the model, i.e. LCDM</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>object - info/calculations based on this model</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">i.e. d_L, d_A, d_H</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-simplemc.analyzers.MCMCAnalyzer">
+<span id="analyzers"></span><h2>Analyzers<a class="headerlink" href="#module-simplemc.analyzers.MCMCAnalyzer" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer">
+<em class="property">class </em><code class="descclassname">simplemc.analyzers.MCMCAnalyzer.</code><code class="descname">MCMCAnalyzer</code><span class="sig-paren">(</span><em>like</em>, <em>outfile</em>, <em>skip=5000</em>, <em>nsamp=100000</em>, <em>temp=1.0</em>, <em>cov=None</em>, <em>chain_num=None</em>, <em>addDerived=False</em>, <em>GRstop=0.01</em>, <em>checkGR=500</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/MCMCAnalyzer.html#MCMCAnalyzer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>MCMC sampler (Metropolis-Hastings).
+This is the MCMC module. It spits out chains that are compatible with CosmoM
+it calculates cov matrix during burn-in.
+optional temperature makes it sample at a higher temperature but note that
+this guy, as opposed to cosmomc, reweights the weights on the fly.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>like</strong> (<em>Likelihood object</em>) – Object of a Likelihood class.</li>
+<li><strong>outfile</strong> (<em>str</em>) – Output file.</li>
+<li><strong>skip</strong> (<em>int</em>) – Burn-in.</li>
+<li><strong>nsamp</strong> (<em>int</em>) – Number of mcmc samples.</li>
+<li><strong>temp</strong> (<em>float</em>) – Temperature</li>
+<li><strong>cov</strong> (<em>numpy.array</em>) – Covariance matrix. Default: None.</li>
+<li><strong>addDerived</strong> (<em>bool</em>) – In order to ad derived parameters such as age of the universe and Omega_{Lambda}</li>
+<li><strong>GRstop</strong> (<em>float</em>) – Gelman-Rubin criteria</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.GRDRun">
+<code class="descname">GRDRun</code><span class="sig-paren">(</span><em>chains</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/MCMCAnalyzer.html#MCMCAnalyzer.GRDRun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.GRDRun" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a implementation of the Gelman Rubin diagnostic.
+If the number of chains is 1, then this method divides it in two
+and does the diagnostic for convergence.
+:param chains:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.GetProposal">
+<code class="descname">GetProposal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/MCMCAnalyzer.html#MCMCAnalyzer.GetProposal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.GetProposal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generation of proposal point in mcmc</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.ProcessAccepted">
+<code class="descname">ProcessAccepted</code><span class="sig-paren">(</span><em>ppars</em>, <em>ploglike</em>, <em>ploglikes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/MCMCAnalyzer.html#MCMCAnalyzer.ProcessAccepted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.ProcessAccepted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.RunChain">
+<code class="descname">RunChain</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/MCMCAnalyzer.html#MCMCAnalyzer.RunChain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.RunChain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.closeFiles">
+<code class="descname">closeFiles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/MCMCAnalyzer.html#MCMCAnalyzer.closeFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.closeFiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.draw_pcov">
+<code class="descname">draw_pcov</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/MCMCAnalyzer.html#MCMCAnalyzer.draw_pcov"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.draw_pcov" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.getLikes">
+<code class="descname">getLikes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/MCMCAnalyzer.html#MCMCAnalyzer.getLikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.getLikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get loglikelihoods values from the used data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.init_pcov">
+<code class="descname">init_pcov</code><span class="sig-paren">(</span><em>mat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/MCMCAnalyzer.html#MCMCAnalyzer.init_pcov"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.init_pcov" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.openFiles">
+<code class="descname">openFiles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/MCMCAnalyzer.html#MCMCAnalyzer.openFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.openFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the files to save the samples and maxlike.
+Also add the Dervided Parameters if addDerived option is True.</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-simplemc.analyzers.MaxLikeAnalyzer"></span><dl class="class">
+<dt id="simplemc.analyzers.MaxLikeAnalyzer.MaxLikeAnalyzer">
+<em class="property">class </em><code class="descclassname">simplemc.analyzers.MaxLikeAnalyzer.</code><code class="descname">MaxLikeAnalyzer</code><span class="sig-paren">(</span><em>like</em>, <em>model</em>, <em>withErrors=False</em>, <em>showderived=False</em>, <em>showplot=False</em>, <em>param1=False</em>, <em>param2=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/MaxLikeAnalyzer.html#MaxLikeAnalyzer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.MaxLikeAnalyzer.MaxLikeAnalyzer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is an analyzer that takes a Likelihood function
+and then tries to maximize it and get the errors from the
+second derivative matrix. It kinda works, but not very well.
+:param like:
+:param model:
+:param withErrors:
+:param param1:
+:param param2:</p>
+<dl class="method">
+<dt id="simplemc.analyzers.MaxLikeAnalyzer.MaxLikeAnalyzer.negloglike">
+<code class="descname">negloglike</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/MaxLikeAnalyzer.html#MaxLikeAnalyzer.negloglike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.MaxLikeAnalyzer.MaxLikeAnalyzer.negloglike" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.analyzers.MaxLikeAnalyzer.MaxLikeAnalyzer.result">
+<code class="descname">result</code><span class="sig-paren">(</span><em>loglike</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/MaxLikeAnalyzer.html#MaxLikeAnalyzer.result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.MaxLikeAnalyzer.MaxLikeAnalyzer.result" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-simplemc.analyzers.SimpleGenetic"></span><dl class="class">
+<dt id="simplemc.analyzers.SimpleGenetic.SimpleGenetic">
+<em class="property">class </em><code class="descclassname">simplemc.analyzers.SimpleGenetic.</code><code class="descname">SimpleGenetic</code><span class="sig-paren">(</span><em>target_function</em>, <em>n_variables</em>, <em>bounds</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/SimpleGenetic.html#SimpleGenetic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.SimpleGenetic.SimpleGenetic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>SimpleGenetic use the optimization method from Population class and execute it.
+This script are a modified version of:</p>
+<p># <a class="reference external" href="https://www.cienciadedatos.net/documentos/py01_optimizacion_ga">https://www.cienciadedatos.net/documentos/py01_optimizacion_ga</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>target_function</strong> (<em>method</em>) – Usually the likelihood function.</li>
+<li><strong>n_variables</strong> (<em>int</em>) – Number of variables or free parameters</li>
+<li><strong>bounds</strong> (<em>list</em>) – List with upper and lower bounds for each free parameter</li>
+<li><strong>n_individuals</strong> (<em>int</em>) – Number of initial individuals</li>
+<li><strong>optimization</strong> (<em>str</em>) – Options {“maximize”, “minimize”}. Default is “maximize”</li>
+<li><strong>n_generations</strong> (<em>int</em>) – Number of generations to evolve the original population</li>
+<li><strong>method_selection</strong> (<em>str</em>) – Type of selection method {“tournament”, “rank”, “roulette”}.
+Default: “tournament”</li>
+<li><strong>elitism</strong> (<em>float</em>) – Value of elitism in [0, 1].
+Default: 0.001.</li>
+<li><strong>prob_mut</strong> (<em>float</em>) – Probability of mutation in [0, 1].
+Default: 0.4</li>
+<li><strong>distribution</strong> (<em>str</em>) – <dl class="docutils">
+<dt>{“uniform”, “gaussian”, “random”}</dt>
+<dd>Default: uniform</dd>
+<dt>media_distribution <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd>Media value for gaussian distributions</dd>
+</dl>
+</li>
+<li><strong>sd_distribution</strong> (<em>float</em>) – Standard deviation for gaussian distributions
+Default: 1.0</li>
+<li><strong>min_distribution</strong> (<em>float</em>) – Minimum value for uniform distributions
+Default: -1.0</li>
+<li><strong>max_distribution</strong> (<em>float</em>) – Maximum value for uniform distributions
+Default: 1.0</li>
+<li><strong>stopping_early</strong> (<em>bool</em>) – It needs a not None value for “rounds_stopping” and “tolerance_stopping”.
+Default: True</li>
+<li><strong>rounds_stopping</strong> (<em>int</em>) – Rounds to consider to stopping early with the tolerance_stopping value.
+Default : 100</li>
+<li><strong>tolerance_stopping</strong> (<em>float</em>) – Value to stopping early criteria. This value is the difference between the
+best fit for the latest rounds_stopping generations.
+Default : 0.01</li>
+<li><strong>outputname</strong> (<em>str</em>) – Name for the output text file.
+Default: “geneticOutput”</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="simplemc.analyzers.SimpleGenetic.SimpleGenetic.optimize">
+<code class="descname">optimize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/SimpleGenetic.html#SimpleGenetic.optimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.SimpleGenetic.SimpleGenetic.optimize" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>This method generates a Population and then optimize it.</p>
+<p>‘Number of generations: {}</p>
+</div></blockquote>
+<dl class="docutils">
+<dt>‘</dt>
+<dd>‘Optimal value of variables: {}</dd>
+</dl>
+<dl class="docutils">
+<dt>‘</dt>
+<dd><dl class="first last docutils">
+<dt>‘Target function value: {}’.format(iterations, optimalvalues,</dt>
+<dd>target_function_val)</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-simplemc.analyzers.Population"></span><dl class="class">
+<dt id="simplemc.analyzers.Population.Population">
+<em class="property">class </em><code class="descclassname">simplemc.analyzers.Population.</code><code class="descname">Population</code><span class="sig-paren">(</span><em>n_individuals</em>, <em>n_variables</em>, <em>lower_bounds=None</em>, <em>upper_bounds=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/Population.html#Population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.Population.Population" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>It creates several objects of the Individual class and generates a Population.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>n_individuals</strong> (<em>int</em>) – Number of initial individuals</li>
+<li><strong>n_variables</strong> (<em>int</em>) – Number of variables or free parameters</li>
+<li><strong>lower_bounds</strong> (<em>list</em>) – List with the lower bounds for each free parameter.</li>
+<li><strong>upper_bounds</strong> (<em>list</em>) – List with the upper bounds for each free parameter.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="simplemc.analyzers.Population.Population.create_new_generation">
+<code class="descname">create_new_generation</code><span class="sig-paren">(</span><em>method_selection='tournament'</em>, <em>elitism=0.1</em>, <em>prob_mut=0.01</em>, <em>distribution='uniform'</em>, <em>media_distribution=1</em>, <em>sd_distribution=1</em>, <em>min_distribution=-1</em>, <em>max_distribution=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/Population.html#Population.create_new_generation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.Population.Population.create_new_generation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.analyzers.Population.Population.cross_individuals">
+<code class="descname">cross_individuals</code><span class="sig-paren">(</span><em>parental_1</em>, <em>parental_2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/Population.html#Population.cross_individuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.Population.Population.cross_individuals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to cross two differents individuals
+:param parental_1:
+:param parental_2:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.analyzers.Population.Population.eval_population">
+<code class="descname">eval_population</code><span class="sig-paren">(</span><em>target_function</em>, <em>optimization</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/Population.html#Population.eval_population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.Population.Population.eval_population" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>target_function</strong> (<em>method</em>) – Function to optimize. Usually (in simplemc context) the likelihood.</li>
+<li><strong>optimization</strong> (<em>str</em>) – {“maximize”, “minimize}
+Default: maximize</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.analyzers.Population.Population.optimize">
+<code class="descname">optimize</code><span class="sig-paren">(</span><em>target_function</em>, <em>optimization</em>, <em>n_generations=50</em>, <em>method_selection='tournament'</em>, <em>elitism=0.1</em>, <em>prob_mut=0.01</em>, <em>distribution='uniform'</em>, <em>media_distribution=1</em>, <em>sd_distribution=1</em>, <em>min_distribution=-1</em>, <em>max_distribution=1</em>, <em>stopping_early=False</em>, <em>rounds_stopping=3</em>, <em>tolerance_stopping=0.1</em>, <em>outputname='geneticOutput'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/Population.html#Population.optimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.Population.Population.optimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the crucial method of the genetic modules.
+Within it, a target function is optimized.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>target_function</strong> (<em>method</em>) – Usually the likelihood function.</li>
+<li><strong>optimization</strong> (<em>str</em>) – Options {“maximize”, “minimize”}. Default is “maximize”</li>
+<li><strong>n_generations</strong> (<em>int</em>) – Number of generations to evolve the original population</li>
+<li><strong>method_selection</strong> (<em>str</em>) – Type of selection method {“tournament”, “rank”, “roulette”}.
+Default: “tournament”</li>
+<li><strong>elitism</strong> (<em>float</em>) – Value of elitism.
+Default: 0.01.</li>
+<li><strong>prob_mut</strong> (<em>float</em>) – Probability of mutation.
+Default: 0.4</li>
+<li><strong>distribution</strong> (<em>str</em>) – {“uniform”, “gaussian”, “random”}
+Default: uniform</li>
+<li><strong>media_distribution</strong> (<em>float</em>) – Media value for gaussian distributions</li>
+<li><strong>sd_distribution</strong> (<em>float</em>) – Standard deviation for gaussian distributions
+Default: 1.0</li>
+<li><strong>min_distribution</strong> (<em>float</em>) – Minimum value for uniform distributions
+Default: -1.0</li>
+<li><strong>max_distribution</strong> (<em>float</em>) – Maximum value for uniform distributions
+Default: 1.0</li>
+<li><strong>stopping_early</strong> (<em>bool</em>) – It needs a not None value for “rounds_stopping” and “tolerance_stopping”.
+Default: True</li>
+<li><strong>rounds_stopping</strong> (<em>int</em>) – Rounds to consider to stopping early with the tolerance_stopping value.</li>
+<li><strong>tolerance_stopping</strong> (<em>float</em>) – Value to stopping early criteria. This value is the difference between the
+best fit for the latest rounds_stopping generations.</li>
+<li><strong>outputname</strong> (<em>str</em>) – Name for the output text file.
+Default: “geneticOutput”</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.analyzers.Population.Population.select_individual">
+<code class="descname">select_individual</code><span class="sig-paren">(</span><em>n</em>, <em>return_indexs=True</em>, <em>method_selection='tournament'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/Population.html#Population.select_individual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.Population.Population.select_individual" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method selects an individual given a selection method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>n</strong> (<em>int</em>) – </li>
+<li><strong>return_indexs</strong> (<em>bool</em>) – </li>
+<li><strong>method_selection</strong> (<em>str</em>) – </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-simplemc.analyzers.Individual"></span><dl class="class">
+<dt id="simplemc.analyzers.Individual.Individual">
+<em class="property">class </em><code class="descclassname">simplemc.analyzers.Individual.</code><code class="descname">Individual</code><span class="sig-paren">(</span><em>n_variables</em>, <em>lower_bounds=None</em>, <em>upper_bounds=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/Individual.html#Individual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.Individual.Individual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class generates the individuals within the bounds of the parameter space.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>n_variables</strong> (<em>int</em>) – Number of variables or free parameters</li>
+<li><strong>lower_bounds</strong> (<em>list</em>) – List with the lower bounds for each free parameter.</li>
+<li><strong>upper_bounds</strong> (<em>list</em>) – List with the upper bounds for each free parameter.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="simplemc.analyzers.Individual.Individual.calculate_fitness">
+<code class="descname">calculate_fitness</code><span class="sig-paren">(</span><em>target_function</em>, <em>optimization</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/Individual.html#Individual.calculate_fitness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.Individual.Individual.calculate_fitness" title="Permalink to this definition">¶</a></dt>
+<dd><p>It calculates the fitness function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>target_function</strong> (<em>method</em>) – Function to optimize. Usually (in simplemc context) the likelihood.</li>
+<li><strong>optimization</strong> (<em>str</em>) – {“maximize”, “minimize}
+Default: maximize</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.analyzers.Individual.Individual.mutate">
+<code class="descname">mutate</code><span class="sig-paren">(</span><em>prob_mut=0.04</em>, <em>distribution='uniform'</em>, <em>media_distribution=1.0</em>, <em>sd_distribution=1.0</em>, <em>min_distribution=-1.0</em>, <em>max_distribution=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/Individual.html#Individual.mutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.Individual.Individual.mutate" title="Permalink to this definition">¶</a></dt>
+<dd><p>This mutates the individuals.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>prob_mut</strong> (<em>float</em>) – Default: 0.04</li>
+<li><strong>distribution</strong> (<em>str</em>) – {“uniform”, “gaussian”, “random”}
+Default: “uniform”</li>
+<li><strong>media_distribution</strong> (<em>float</em>) – Media value for gaussian distributions</li>
+<li><strong>sd_distribution</strong> (<em>float</em>) – Standard deviation for gaussian distributions
+Default: 1.0</li>
+<li><strong>min_distribution</strong> (<em>float</em>) – Minimum value for uniform distributions
+Default: -1.0</li>
+<li><strong>max_distribution</strong> (<em>float</em>) – Maximum value for uniform distributions
+Default: 1.0</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-simplemc.likelihoods.BaseLikelihood">
+<span id="likelihoods"></span><h2>Likelihoods<a class="headerlink" href="#module-simplemc.likelihoods.BaseLikelihood" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="simplemc.likelihoods.BaseLikelihood.BaseLikelihood">
+<em class="property">class </em><code class="descclassname">simplemc.likelihoods.BaseLikelihood.</code><code class="descname">BaseLikelihood</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/BaseLikelihood.html#BaseLikelihood"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.BaseLikelihood.BaseLikelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is the base likelihood object. Base for all other likelihoods.</p>
+<dl class="method">
+<dt id="simplemc.likelihoods.BaseLikelihood.BaseLikelihood.freeParameters">
+<code class="descname">freeParameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/BaseLikelihood.html#BaseLikelihood.freeParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.BaseLikelihood.BaseLikelihood.freeParameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.likelihoods.BaseLikelihood.BaseLikelihood.loglike">
+<code class="descname">loglike</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/BaseLikelihood.html#BaseLikelihood.loglike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.BaseLikelihood.BaseLikelihood.loglike" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.likelihoods.BaseLikelihood.BaseLikelihood.loglike_wprior">
+<code class="descname">loglike_wprior</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/BaseLikelihood.html#BaseLikelihood.loglike_wprior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.BaseLikelihood.BaseLikelihood.loglike_wprior" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.likelihoods.BaseLikelihood.BaseLikelihood.name">
+<code class="descname">name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/BaseLikelihood.html#BaseLikelihood.name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.BaseLikelihood.BaseLikelihood.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.likelihoods.BaseLikelihood.BaseLikelihood.setTheory">
+<code class="descname">setTheory</code><span class="sig-paren">(</span><em>theory</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/BaseLikelihood.html#BaseLikelihood.setTheory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.BaseLikelihood.BaseLikelihood.setTheory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.likelihoods.BaseLikelihood.BaseLikelihood.theory">
+<code class="descname">theory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/BaseLikelihood.html#BaseLikelihood.theory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.BaseLikelihood.BaseLikelihood.theory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.likelihoods.BaseLikelihood.BaseLikelihood.theory_loglike_prior">
+<code class="descname">theory_loglike_prior</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/BaseLikelihood.html#BaseLikelihood.theory_loglike_prior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.BaseLikelihood.BaseLikelihood.theory_loglike_prior" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.likelihoods.BaseLikelihood.BaseLikelihood.updateParams">
+<code class="descname">updateParams</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/BaseLikelihood.html#BaseLikelihood.updateParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.BaseLikelihood.BaseLikelihood.updateParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-simplemc.likelihoods.LikelihoodMultiplier"></span><dl class="function">
+<dt id="simplemc.likelihoods.LikelihoodMultiplier.LikelihoodMultiplier">
+<code class="descclassname">simplemc.likelihoods.LikelihoodMultiplier.</code><code class="descname">LikelihoodMultiplier</code><span class="sig-paren">(</span><em>LikeInstance</em>, <em>mult</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/LikelihoodMultiplier.html#LikelihoodMultiplier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.LikelihoodMultiplier.LikelihoodMultiplier" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a helper class that takes a likelihood
+and just multiplies loglike with some value to simulate
+better or shittier data.</p>
+<p>You have to give python a credit for how effortlessly
+one can hack classes!!
+:param LikeInstance:
+:param mult:</p>
+</dd></dl>
+
+<span class="target" id="module-simplemc.likelihoods.CompositeLikelihood"></span><dl class="class">
+<dt id="simplemc.likelihoods.CompositeLikelihood.CompositeLikelihood">
+<em class="property">class </em><code class="descclassname">simplemc.likelihoods.CompositeLikelihood.</code><code class="descname">CompositeLikelihood</code><span class="sig-paren">(</span><em>llist=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/CompositeLikelihood.html#CompositeLikelihood"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.CompositeLikelihood.CompositeLikelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simplemc.likelihoods.BaseLikelihood.BaseLikelihood" title="simplemc.likelihoods.BaseLikelihood.BaseLikelihood"><code class="xref py py-class docutils literal notranslate"><span class="pre">simplemc.likelihoods.BaseLikelihood.BaseLikelihood</span></code></a></p>
+<p>This thing takes likelihoods and cooks one
+which is a composite of many.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>llist</strong> – </td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="simplemc.likelihoods.CompositeLikelihood.CompositeLikelihood.addLikelihood">
+<code class="descname">addLikelihood</code><span class="sig-paren">(</span><em>like</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/CompositeLikelihood.html#CompositeLikelihood.addLikelihood"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.CompositeLikelihood.CompositeLikelihood.addLikelihood" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.likelihoods.CompositeLikelihood.CompositeLikelihood.addLikelihoods">
+<code class="descname">addLikelihoods</code><span class="sig-paren">(</span><em>likes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/CompositeLikelihood.html#CompositeLikelihood.addLikelihoods"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.CompositeLikelihood.CompositeLikelihood.addLikelihoods" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.likelihoods.CompositeLikelihood.CompositeLikelihood.compositeLogLikes">
+<code class="descname">compositeLogLikes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/CompositeLikelihood.html#CompositeLikelihood.compositeLogLikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.CompositeLikelihood.CompositeLikelihood.compositeLogLikes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.likelihoods.CompositeLikelihood.CompositeLikelihood.compositeLogLikes_wprior">
+<code class="descname">compositeLogLikes_wprior</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/CompositeLikelihood.html#CompositeLikelihood.compositeLogLikes_wprior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.CompositeLikelihood.CompositeLikelihood.compositeLogLikes_wprior" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.likelihoods.CompositeLikelihood.CompositeLikelihood.compositeNames">
+<code class="descname">compositeNames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/CompositeLikelihood.html#CompositeLikelihood.compositeNames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.CompositeLikelihood.CompositeLikelihood.compositeNames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.likelihoods.CompositeLikelihood.CompositeLikelihood.loglike">
+<code class="descname">loglike</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/CompositeLikelihood.html#CompositeLikelihood.loglike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.CompositeLikelihood.CompositeLikelihood.loglike" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.likelihoods.CompositeLikelihood.CompositeLikelihood.setTheory">
+<code class="descname">setTheory</code><span class="sig-paren">(</span><em>theory</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/CompositeLikelihood.html#CompositeLikelihood.setTheory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.CompositeLikelihood.CompositeLikelihood.setTheory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-simplemc.likelihoods.SimpleLikelihood"></span><dl class="class">
+<dt id="simplemc.likelihoods.SimpleLikelihood.GenericLikelihood">
+<em class="property">class </em><code class="descclassname">simplemc.likelihoods.SimpleLikelihood.</code><code class="descname">GenericLikelihood</code><span class="sig-paren">(</span><em>path_to_data</em>, <em>path_to_cov</em>, <em>fn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/SimpleLikelihood.html#GenericLikelihood"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.SimpleLikelihood.GenericLikelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simplemc.likelihoods.SimpleLikelihood.SimpleLikelihood" title="simplemc.likelihoods.SimpleLikelihood.SimpleLikelihood"><code class="xref py py-class docutils literal notranslate"><span class="pre">simplemc.likelihoods.SimpleLikelihood.SimpleLikelihood</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="simplemc.likelihoods.SimpleLikelihood.SimpleLikelihood">
+<em class="property">class </em><code class="descclassname">simplemc.likelihoods.SimpleLikelihood.</code><code class="descname">SimpleLikelihood</code><span class="sig-paren">(</span><em>name</em>, <em>values_filename</em>, <em>cov_filename</em>, <em>fn='generic'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/SimpleLikelihood.html#SimpleLikelihood"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.SimpleLikelihood.SimpleLikelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simplemc.likelihoods.BaseLikelihood.BaseLikelihood" title="simplemc.likelihoods.BaseLikelihood.BaseLikelihood"><code class="xref py py-class docutils literal notranslate"><span class="pre">simplemc.likelihoods.BaseLikelihood.BaseLikelihood</span></code></a></p>
+<dl class="method">
+<dt id="simplemc.likelihoods.SimpleLikelihood.SimpleLikelihood.loglike">
+<code class="descname">loglike</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/SimpleLikelihood.html#SimpleLikelihood.loglike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.SimpleLikelihood.SimpleLikelihood.loglike" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="simplemc.likelihoods.SimpleLikelihood.StraightLine">
+<em class="property">class </em><code class="descclassname">simplemc.likelihoods.SimpleLikelihood.</code><code class="descname">StraightLine</code><a class="reference internal" href="_modules/simplemc/likelihoods/SimpleLikelihood.html#StraightLine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.SimpleLikelihood.StraightLine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simplemc.likelihoods.SimpleLikelihood.SimpleLikelihood" title="simplemc.likelihoods.SimpleLikelihood.SimpleLikelihood"><code class="xref py py-class docutils literal notranslate"><span class="pre">simplemc.likelihoods.SimpleLikelihood.SimpleLikelihood</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-simplemc.models.LCDMCosmology">
+<span id="models"></span><h2>Models<a class="headerlink" href="#module-simplemc.models.LCDMCosmology" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="simplemc.models.LCDMCosmology.LCDMCosmology">
+<em class="property">class </em><code class="descclassname">simplemc.models.LCDMCosmology.</code><code class="descname">LCDMCosmology</code><span class="sig-paren">(</span><em>Obh2=0.02234</em>, <em>Om=0.3038</em>, <em>h=0.6821</em>, <em>mnu=0.06</em>, <em>Nnu=3.046</em>, <em>degenerate_nu=False</em>, <em>disable_radiation=False</em>, <em>fixOm=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/LCDMCosmology.html#LCDMCosmology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.LCDMCosmology.LCDMCosmology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simplemc.cosmo.BaseCosmology.BaseCosmology" title="simplemc.cosmo.BaseCosmology.BaseCosmology"><code class="xref py py-class docutils literal notranslate"><span class="pre">simplemc.cosmo.BaseCosmology.BaseCosmology</span></code></a>, <a class="reference internal" href="#simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos" title="simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos"><code class="xref py py-class docutils literal notranslate"><span class="pre">simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos</span></code></a></p>
+<p>This is LCDM cosmology
+I didn’t intend it that way, but it is used as a base class
+for most other cosmologies, mostly because it treats Neutrinos and Radiation
+hassle.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>Obh2</strong> – </li>
+<li><strong>Om</strong> – </li>
+<li><strong>h</strong> – </li>
+<li><strong>mnu</strong> – </li>
+<li><strong>Nnu</strong> – </li>
+<li><strong>degenerate_nu</strong> – </li>
+<li><strong>disable_radiation</strong> – </li>
+<li><strong>fixOm</strong> – </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="simplemc.models.LCDMCosmology.LCDMCosmology.CMBSimpleVec">
+<code class="descname">CMBSimpleVec</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/LCDMCosmology.html#LCDMCosmology.CMBSimpleVec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.LCDMCosmology.LCDMCosmology.CMBSimpleVec" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.models.LCDMCosmology.LCDMCosmology.RHSquared_a">
+<code class="descname">RHSquared_a</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/LCDMCosmology.html#LCDMCosmology.RHSquared_a"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.LCDMCosmology.LCDMCosmology.RHSquared_a" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.models.LCDMCosmology.LCDMCosmology.WangWangVec">
+<code class="descname">WangWangVec</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/LCDMCosmology.html#LCDMCosmology.WangWangVec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.LCDMCosmology.LCDMCosmology.WangWangVec" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.models.LCDMCosmology.LCDMCosmology.freeParameters">
+<code class="descname">freeParameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/LCDMCosmology.html#LCDMCosmology.freeParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.LCDMCosmology.LCDMCosmology.freeParameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.models.LCDMCosmology.LCDMCosmology.prior_loglike">
+<code class="descname">prior_loglike</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/LCDMCosmology.html#LCDMCosmology.prior_loglike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.LCDMCosmology.LCDMCosmology.prior_loglike" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="simplemc.models.LCDMCosmology.LCDMCosmology.rd_approx">
+<code class="descname">rd_approx</code><em class="property"> = 'Cuesta'</em><a class="headerlink" href="#simplemc.models.LCDMCosmology.LCDMCosmology.rd_approx" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.models.LCDMCosmology.LCDMCosmology.setNoObh2prior">
+<code class="descname">setNoObh2prior</code><span class="sig-paren">(</span><em>val=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/LCDMCosmology.html#LCDMCosmology.setNoObh2prior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.LCDMCosmology.LCDMCosmology.setNoObh2prior" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.models.LCDMCosmology.LCDMCosmology.updateParams">
+<code class="descname">updateParams</code><span class="sig-paren">(</span><em>pars</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/LCDMCosmology.html#LCDMCosmology.updateParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.LCDMCosmology.LCDMCosmology.updateParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-simplemc.models.SimpleCosmoModel"></span><dl class="class">
+<dt id="simplemc.models.SimpleCosmoModel.SimpleCosmoModel">
+<em class="property">class </em><code class="descclassname">simplemc.models.SimpleCosmoModel.</code><code class="descname">SimpleCosmoModel</code><a class="reference internal" href="_modules/simplemc/models/SimpleCosmoModel.html#SimpleCosmoModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.SimpleCosmoModel.SimpleCosmoModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simplemc.models.LCDMCosmology.LCDMCosmology" title="simplemc.models.LCDMCosmology.LCDMCosmology"><code class="xref py py-class docutils literal notranslate"><span class="pre">simplemc.models.LCDMCosmology.LCDMCosmology</span></code></a></p>
+<dl class="method">
+<dt id="simplemc.models.SimpleCosmoModel.SimpleCosmoModel.RHSquared_a">
+<code class="descname">RHSquared_a</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/SimpleCosmoModel.html#SimpleCosmoModel.RHSquared_a"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.SimpleCosmoModel.SimpleCosmoModel.RHSquared_a" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.models.SimpleCosmoModel.SimpleCosmoModel.freeParameters">
+<code class="descname">freeParameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/SimpleCosmoModel.html#SimpleCosmoModel.freeParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.SimpleCosmoModel.SimpleCosmoModel.freeParameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.models.SimpleCosmoModel.SimpleCosmoModel.updateParams">
+<code class="descname">updateParams</code><span class="sig-paren">(</span><em>pars</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/SimpleCosmoModel.html#SimpleCosmoModel.updateParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.SimpleCosmoModel.SimpleCosmoModel.updateParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-simplemc.models.SimpleModel"></span><dl class="class">
+<dt id="simplemc.models.SimpleModel.SimpleModel">
+<em class="property">class </em><code class="descclassname">simplemc.models.SimpleModel.</code><code class="descname">SimpleModel</code><span class="sig-paren">(</span><em>parameters</em>, <em>function</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/SimpleModel.html#SimpleModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.SimpleModel.SimpleModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>parameters</strong> – List of Parameter class objects</li>
+<li><strong>function</strong> – <p>This function recivies a vector in the parameter space
+and returns its evaluation in the function.
+.. rubric:: Example</p>
+<dl class="docutils">
+<dt>def straight_line(parameters, x):</dt>
+<dd>m, b = parameters
+return m*x +b</dd>
+</dl>
+</li>
+<li><strong>cosmological</strong> – boolean value. If True, then the LCDMCosmology
+class will be the base of the model.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="simplemc.models.SimpleModel.SimpleModel.freeParameters">
+<code class="descname">freeParameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/SimpleModel.html#SimpleModel.freeParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.SimpleModel.SimpleModel.freeParameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.models.SimpleModel.SimpleModel.genericModel">
+<code class="descname">genericModel</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/SimpleModel.html#SimpleModel.genericModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.SimpleModel.SimpleModel.genericModel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.models.SimpleModel.SimpleModel.printFreeParameters">
+<code class="descname">printFreeParameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/SimpleModel.html#SimpleModel.printFreeParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.SimpleModel.SimpleModel.printFreeParameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.models.SimpleModel.SimpleModel.printParameters">
+<code class="descname">printParameters</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/SimpleModel.html#SimpleModel.printParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.SimpleModel.SimpleModel.printParameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.models.SimpleModel.SimpleModel.prior_loglike">
+<code class="descname">prior_loglike</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/SimpleModel.html#SimpleModel.prior_loglike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.SimpleModel.SimpleModel.prior_loglike" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.models.SimpleModel.SimpleModel.updateParams">
+<code class="descname">updateParams</code><span class="sig-paren">(</span><em>pars</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/SimpleModel.html#SimpleModel.updateParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.SimpleModel.SimpleModel.updateParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-simplemc.cosmo.BaseCosmology">
+<span id="cosmo"></span><h2>Cosmo<a class="headerlink" href="#module-simplemc.cosmo.BaseCosmology" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology">
+<em class="property">class </em><code class="descclassname">simplemc.cosmo.BaseCosmology.</code><code class="descname">BaseCosmology</code><span class="sig-paren">(</span><em>h=0.6821</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base Cosmology class doesn’t know about your
+parameterization of the equation of state or densities or anything.
+However, it does know about Hubble’s constant at z=0 OR the prefactor
+c/(H0*rd) which should be fit for in the case of “rd agnostic” fits.
+That is why you should let it declare those parameters based on its settings</p>
+<p>However, to get the angular diameter distance you need to pass it
+its Curvature parameter (Omega_k basically), so you need to update it.</p>
+<p>Also to use fs8 dataset you need to add s8 parameter
+:param h:</p>
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.Age">
+<code class="descname">Age</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.Age"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.Age" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.DVOverrd">
+<code class="descname">DVOverrd</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.DVOverrd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.DVOverrd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.DaOverrd">
+<code class="descname">DaOverrd</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.DaOverrd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.DaOverrd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.Da_z">
+<code class="descname">Da_z</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.Da_z"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.Da_z" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.DistIntegrand_a">
+<code class="descname">DistIntegrand_a</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.DistIntegrand_a"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.DistIntegrand_a" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.GrowthIntegrand_a">
+<code class="descname">GrowthIntegrand_a</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.GrowthIntegrand_a"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.GrowthIntegrand_a" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.HIOverrd">
+<code class="descname">HIOverrd</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.HIOverrd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.HIOverrd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.Hinv_z">
+<code class="descname">Hinv_z</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.Hinv_z"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.Hinv_z" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.RHSquared_a">
+<code class="descname">RHSquared_a</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.RHSquared_a"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.RHSquared_a" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.c_">
+<code class="descname">c_</code><em class="property"> = 299792.458</em><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.c_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.compuAge">
+<code class="descname">compuAge</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.compuAge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.compuAge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.distance_modulus">
+<code class="descname">distance_modulus</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.distance_modulus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.distance_modulus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.freeParameters">
+<code class="descname">freeParameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.freeParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.freeParameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.fs8">
+<code class="descname">fs8</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.fs8"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.fs8" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.growth">
+<code class="descname">growth</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.growth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.growth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.prefactor">
+<code class="descname">prefactor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.prefactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.prefactor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.printFreeParameters">
+<code class="descname">printFreeParameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.printFreeParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.printFreeParameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.printParameters">
+<code class="descname">printParameters</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.printParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.printParameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.prior_loglike">
+<code class="descname">prior_loglike</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.prior_loglike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.prior_loglike" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.setCurvature">
+<code class="descname">setCurvature</code><span class="sig-paren">(</span><em>R</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.setCurvature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.setCurvature" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.setPrefactor">
+<code class="descname">setPrefactor</code><span class="sig-paren">(</span><em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.setPrefactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.setPrefactor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.setVaryPrefactor">
+<code class="descname">setVaryPrefactor</code><span class="sig-paren">(</span><em>T=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.setVaryPrefactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.setVaryPrefactor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.setVarys8">
+<code class="descname">setVarys8</code><span class="sig-paren">(</span><em>T=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.setVarys8"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.setVarys8" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.setrd">
+<code class="descname">setrd</code><span class="sig-paren">(</span><em>rd</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.setrd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.setrd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology.updateParams">
+<code class="descname">updateParams</code><span class="sig-paren">(</span><em>pars</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology.updateParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology.updateParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-simplemc.cosmo.Parameter"></span><dl class="class">
+<dt id="simplemc.cosmo.Parameter.Parameter">
+<em class="property">class </em><code class="descclassname">simplemc.cosmo.Parameter.</code><code class="descname">Parameter</code><span class="sig-paren">(</span><em>name</em>, <em>value</em>, <em>err=0.0</em>, <em>bounds=None</em>, <em>Ltxname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/Parameter.html#Parameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.Parameter.Parameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A simple class for dealing with Parameter.
+Parameter has a name, a value, an error and some bounds
+Names are also latex names.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>string</em>) – Name to identify the parameter.</li>
+<li><strong>value</strong> (<em>float</em>) – Default value. In mcmc will be the stating value.</li>
+<li><strong>err</strong> (<em>float</em><em>, </em><em>optional</em>) – Estimated error, in mcmc will be the step.
+Default is 0, but better to write any positive number.</li>
+<li><strong>bounds</strong> (<em>list of 2</em><em>, </em><em>optional</em>) – Priors. (minimum value, maximum value).
+Default is None, but computed as ‘(value-5*err, value+5*err)’.</li>
+<li><strong>Ltxname</strong> (<em>string</em><em>, </em><em>optional</em>) – Latex name, use mainly for plotting.
+Default is None, and in this case uses the ‘name’ string.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<p>The hubble parameter
+h_par    = Parameter(‘h’, 0.6821,  0.05,   (0.4, 1.0),    ‘h’)</p>
+<dl class="method">
+<dt id="simplemc.cosmo.Parameter.Parameter.sameParam">
+<code class="descname">sameParam</code><span class="sig-paren">(</span><em>param2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/Parameter.html#Parameter.sameParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.Parameter.Parameter.sameParam" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.Parameter.Parameter.setBounds">
+<code class="descname">setBounds</code><span class="sig-paren">(</span><em>low</em>, <em>high</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/Parameter.html#Parameter.setBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.Parameter.Parameter.setBounds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.Parameter.Parameter.setError">
+<code class="descname">setError</code><span class="sig-paren">(</span><em>err</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/Parameter.html#Parameter.setError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.Parameter.Parameter.setError" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.Parameter.Parameter.setLatexName">
+<code class="descname">setLatexName</code><span class="sig-paren">(</span><em>Ltx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/Parameter.html#Parameter.setLatexName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.Parameter.Parameter.setLatexName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.Parameter.Parameter.setValue">
+<code class="descname">setValue</code><span class="sig-paren">(</span><em>val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/Parameter.html#Parameter.setValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.Parameter.Parameter.setValue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-simplemc.cosmo.RadiationAndNeutrinos"></span><dl class="class">
+<dt id="simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos">
+<em class="property">class </em><code class="descclassname">simplemc.cosmo.RadiationAndNeutrinos.</code><code class="descname">RadiationAndNeutrinos</code><span class="sig-paren">(</span><em>mnu=0.06</em>, <em>Nnu=3.046</em>, <em>varyMnu=False</em>, <em>varyNnu=False</em>, <em>degenerate=False</em>, <em>disable=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/RadiationAndNeutrinos.html#RadiationAndNeutrinos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for neutrinos, Mnu and Nnu
+:param mnu:
+:type mnu: standard value for the mass of neutrinos
+:param Nnu:
+:type Nnu: standard value for the number of families
+:param varyMnu:
+:type varyMnu: Whether varying mass for neutrinos
+:param varyNnu:
+:type varyNnu: Whether varying families for neutrinos
+:param degenerate:
+:param disable:
+:type disable: set radiation to zero</p>
+<dl class="method">
+<dt id="simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.Nnu">
+<code class="descname">Nnu</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/RadiationAndNeutrinos.html#RadiationAndNeutrinos.Nnu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.Nnu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.freeParameters">
+<code class="descname">freeParameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/RadiationAndNeutrinos.html#RadiationAndNeutrinos.freeParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.freeParameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.mnu">
+<code class="descname">mnu</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/RadiationAndNeutrinos.html#RadiationAndNeutrinos.mnu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.mnu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.omrad_fac">
+<code class="descname">omrad_fac</code><em class="property"> = 4.48130979e-07</em><a class="headerlink" href="#simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.omrad_fac" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.omrad_pref_">
+<code class="descname">omrad_pref_</code><em class="property"> = 2.4728041043596488e-05</em><a class="headerlink" href="#simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.omrad_pref_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.setMnu">
+<code class="descname">setMnu</code><span class="sig-paren">(</span><em>mnu</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/RadiationAndNeutrinos.html#RadiationAndNeutrinos.setMnu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.setMnu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.setNnu">
+<code class="descname">setNnu</code><span class="sig-paren">(</span><em>mnu</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/RadiationAndNeutrinos.html#RadiationAndNeutrinos.setNnu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.setNnu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.setVaryMnu">
+<code class="descname">setVaryMnu</code><span class="sig-paren">(</span><em>T=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/RadiationAndNeutrinos.html#RadiationAndNeutrinos.setVaryMnu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.setVaryMnu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.setVaryNnu">
+<code class="descname">setVaryNnu</code><span class="sig-paren">(</span><em>T=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/RadiationAndNeutrinos.html#RadiationAndNeutrinos.setVaryNnu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.setVaryNnu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.updateParams">
+<code class="descname">updateParams</code><span class="sig-paren">(</span><em>pars</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/RadiationAndNeutrinos.html#RadiationAndNeutrinos.updateParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos.updateParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-simplemc.cosmo.NuDensity"></span><dl class="class">
+<dt id="simplemc.cosmo.NuDensity.NuDensity">
+<em class="property">class </em><code class="descclassname">simplemc.cosmo.NuDensity.</code><code class="descname">NuDensity</code><span class="sig-paren">(</span><em>TCMB</em>, <em>Nnu=3.046</em>, <em>mnu=0.06</em>, <em>degenerate=False</em>, <em>fact=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/NuDensity.html#NuDensity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.NuDensity.NuDensity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Compute Density parameter for neutrinos.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>TCMB</strong> (<em>float</em>) – Temperature of the CMB.</li>
+<li><strong>Nnu</strong> (<em>float</em><em>, </em><em>optional</em>) – Families of neutrinos.
+Default value is ‘Neff=3.046’.</li>
+<li><strong>mnu</strong> (<em>float</em><em>, </em><em>optional</em>) – Sum of the neutrino masses.
+Default value is ‘mnu=0.06’.</li>
+<li><strong>degenerate</strong> (<em>bool</em><em>, </em><em>optional</em>) – Combinations of massive neutrinos.</li>
+<li><strong>fact</strong> (<em>float</em><em>, </em><em>optional</em>) – The ration contribution: omrad_fac   = 4.48130979e-7</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="simplemc.cosmo.NuDensity.NuDensity.I">
+<code class="descname">I</code><em class="property"> = &lt;simplemc.cosmo.NuDensity.NuIntegral object&gt;</em><a class="headerlink" href="#simplemc.cosmo.NuDensity.NuDensity.I" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.NuDensity.NuDensity.rho">
+<code class="descname">rho</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/NuDensity.html#NuDensity.rho"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.NuDensity.NuDensity.rho" title="Permalink to this definition">¶</a></dt>
+<dd><p>Neutrinos density
+:param a:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<li><em>This returns the density at a normalized so that</em></li>
+<li><em>we get nuh2 at a=0</em></li>
+<li><em>(1 eV) / (Boltzmann constant * 1 kelvin) = 11 604.5193</em></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.NuDensity.NuDensity.setMnu">
+<code class="descname">setMnu</code><span class="sig-paren">(</span><em>mnu</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/NuDensity.html#NuDensity.setMnu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.NuDensity.NuDensity.setMnu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.NuDensity.NuDensity.setNnu">
+<code class="descname">setNnu</code><span class="sig-paren">(</span><em>Nnu</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/NuDensity.html#NuDensity.setNnu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.NuDensity.NuDensity.setNnu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.NuDensity.NuDensity.set_mnuone_">
+<code class="descname">set_mnuone_</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/NuDensity.html#NuDensity.set_mnuone_"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.NuDensity.NuDensity.set_mnuone_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="simplemc.cosmo.NuDensity.NuIntegral">
+<em class="property">class </em><code class="descclassname">simplemc.cosmo.NuDensity.</code><code class="descname">NuIntegral</code><a class="reference internal" href="_modules/simplemc/cosmo/NuDensity.html#NuIntegral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.NuDensity.NuIntegral" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<blockquote>
+<div>This module calculates the predictions for the evolution
+of neutrino energy densities.
+Here, we compute the integral I(r).
+Initialiazes the</div></blockquote>
+<p>u factor in
+ho_nu (self.interpolator)</p>
+<dl class="method">
+<dt id="simplemc.cosmo.NuDensity.NuIntegral.SevenEights">
+<code class="descname">SevenEights</code><span class="sig-paren">(</span><em>mnuOT</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/NuDensity.html#NuIntegral.SevenEights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.NuDensity.NuIntegral.SevenEights" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Given the</div></blockquote>
+<dl class="docutils">
+<dt>u mass, returns the integral on the energy</dt>
+<dd><p class="first">density of neutrinos.</p>
+<dl class="docutils">
+<dt>mnuOT: float</dt>
+<dd>Sum of the neutrino masses.</dd>
+</dl>
+<blockquote class="last">
+<div>The integral given the sum of neutrino masses.
+For massless neutrinosI(0)=78.</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="simplemc.cosmo.NuDensity.ZeroNuDensity">
+<em class="property">class </em><code class="descclassname">simplemc.cosmo.NuDensity.</code><code class="descname">ZeroNuDensity</code><a class="reference internal" href="_modules/simplemc/cosmo/NuDensity.html#ZeroNuDensity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.NuDensity.ZeroNuDensity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Fake class that returns zeros if want to disable neutrino contributions.</p>
+<dl class="method">
+<dt id="simplemc.cosmo.NuDensity.ZeroNuDensity.rho">
+<code class="descname">rho</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/NuDensity.html#ZeroNuDensity.rho"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.NuDensity.ZeroNuDensity.rho" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-simplemc.cosmo.paramDefs"></span><span class="target" id="module-simplemc.cosmo.Derivedparam"></span><dl class="class">
+<dt id="simplemc.cosmo.Derivedparam.AllDerived">
+<em class="property">class </em><code class="descclassname">simplemc.cosmo.Derivedparam.</code><code class="descname">AllDerived</code><a class="reference internal" href="_modules/simplemc/cosmo/Derivedparam.html#AllDerived"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.Derivedparam.AllDerived" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Given base parameters, return a list of some Derived ones.</p>
+<dl class="method">
+<dt id="simplemc.cosmo.Derivedparam.AllDerived.Omh2">
+<code class="descname">Omh2</code><span class="sig-paren">(</span><em>z1</em>, <em>z2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/Derivedparam.html#AllDerived.Omh2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.Derivedparam.AllDerived.Omh2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the Omh2 diagnostic at two redshifts
+to test deviations from the LCDM model.
+For LCDM the value is a constant for any combination
+of redshifts.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>z1</strong> (<em>float</em>) – Redshift z1 to compute the diagnotic.</li>
+<li><strong>z2</strong> (<em>float</em>) – Redshift z2 to compute the diagnotic.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>Obh2</strong> – Obh2 dianotic: see [arXiv:1406.2209].</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.Derivedparam.AllDerived.computeDerived">
+<code class="descname">computeDerived</code><span class="sig-paren">(</span><em>parname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/Derivedparam.html#AllDerived.computeDerived"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.Derivedparam.AllDerived.computeDerived" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize and compute Derived parameters in
+terms of the base ones.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.Derivedparam.AllDerived.listDerived">
+<code class="descname">listDerived</code><span class="sig-paren">(</span><em>like</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/Derivedparam.html#AllDerived.listDerived"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.Derivedparam.AllDerived.listDerived" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given the free parameters compute derived ones.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>like</strong> (<em>object</em>) – object defined in BaseLikelihood, that contains
+free-parameters and theory.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>list</strong> – List with values from derived parameters.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="simplemc.cosmo.Derivedparam.Derivedparam">
+<em class="property">class </em><code class="descclassname">simplemc.cosmo.Derivedparam.</code><code class="descname">Derivedparam</code><span class="sig-paren">(</span><em>name</em>, <em>value</em>, <em>Ltxname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/Derivedparam.html#Derivedparam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.Derivedparam.Derivedparam" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Auxiliary class, based on Parameter class.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>string</em>) – Parameter name.</li>
+<li><strong>value</strong> (<em>float</em>) – Initialize the value, and use a function to update it.</li>
+<li><strong>Ltxname</strong> (<em>string</em><em>, </em><em>optional</em>) – Provide the Latex name, useful for plotting.
+Default is None, and in this case uses the ‘name’ string.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<p>Hubble parameter
+self.H0   = Derivedparam(‘H0’,  function, ‘H_0*’)</p>
+<dl class="method">
+<dt id="simplemc.cosmo.Derivedparam.Derivedparam.setLatexName">
+<code class="descname">setLatexName</code><span class="sig-paren">(</span><em>Ltx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/Derivedparam.html#Derivedparam.setLatexName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.Derivedparam.Derivedparam.setLatexName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simplemc.cosmo.Derivedparam.Derivedparam.setValue">
+<code class="descname">setValue</code><span class="sig-paren">(</span><em>val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/Derivedparam.html#Derivedparam.setValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.Derivedparam.Derivedparam.setValue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-simplemc.cosmo.cosmoApprox"></span><dl class="function">
+<dt id="simplemc.cosmo.cosmoApprox.rd_EH_approx">
+<code class="descclassname">simplemc.cosmo.cosmoApprox.</code><code class="descname">rd_EH_approx</code><span class="sig-paren">(</span><em>obh2</em>, <em>ocbh2</em>, <em>onuh2</em>, <em>Nnu</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/cosmoApprox.html#rd_EH_approx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.cosmoApprox.rd_EH_approx" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="simplemc.cosmo.cosmoApprox.rd_anderson_approx">
+<code class="descclassname">simplemc.cosmo.cosmoApprox.</code><code class="descname">rd_anderson_approx</code><span class="sig-paren">(</span><em>obh2</em>, <em>ocbh2</em>, <em>onuh2</em>, <em>Nnu</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/cosmoApprox.html#rd_anderson_approx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.cosmoApprox.rd_anderson_approx" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="simplemc.cosmo.cosmoApprox.rd_cuesta_Nnu_approx">
+<code class="descclassname">simplemc.cosmo.cosmoApprox.</code><code class="descname">rd_cuesta_Nnu_approx</code><span class="sig-paren">(</span><em>obh2</em>, <em>ocbh2</em>, <em>onuh2</em>, <em>Nnu</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/cosmoApprox.html#rd_cuesta_Nnu_approx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.cosmoApprox.rd_cuesta_Nnu_approx" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="simplemc.cosmo.cosmoApprox.rd_cuesta_approx">
+<code class="descclassname">simplemc.cosmo.cosmoApprox.</code><code class="descname">rd_cuesta_approx</code><span class="sig-paren">(</span><em>obh2</em>, <em>ocbh2</em>, <em>onuh2</em>, <em>Nnu</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/cosmoApprox.html#rd_cuesta_approx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.cosmoApprox.rd_cuesta_approx" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="simplemc.cosmo.cosmoApprox.soundhorizon_eh">
+<code class="descclassname">simplemc.cosmo.cosmoApprox.</code><code class="descname">soundhorizon_eh</code><span class="sig-paren">(</span><em>self</em>, <em>wm</em>, <em>wb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/cosmoApprox.html#soundhorizon_eh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.cosmoApprox.soundhorizon_eh" title="Permalink to this definition">¶</a></dt>
+<dd><p>soundhorizon_eh(self,wm,wb):
+A fit to the sound horizon, in Mpc, from Eistenstein &amp; Hu (1998;
+ApJ, 496, 605), Eqs. 2-6.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simplemc.cosmo.cosmoApprox.soundhorizon_star">
+<code class="descclassname">simplemc.cosmo.cosmoApprox.</code><code class="descname">soundhorizon_star</code><span class="sig-paren">(</span><em>self</em>, <em>wm</em>, <em>wb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/cosmoApprox.html#soundhorizon_star"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.cosmoApprox.soundhorizon_star" title="Permalink to this definition">¶</a></dt>
+<dd><p>soundhorizon_star(self,wm,wb):
+A fit to the sound horizon, in Mpc, from Eistenstein &amp; Hu (1998;
+ApJ, 496, 605), Eqs. 2-6, except using z_lastscattering not zdrag.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simplemc.cosmo.cosmoApprox.z_drag">
+<code class="descclassname">simplemc.cosmo.cosmoApprox.</code><code class="descname">z_drag</code><span class="sig-paren">(</span><em>self</em>, <em>wm</em>, <em>wb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/cosmoApprox.html#z_drag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.cosmoApprox.z_drag" title="Permalink to this definition">¶</a></dt>
+<dd><p>z_drag(self,wm,wb):
+Returns z_drag.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simplemc.cosmo.cosmoApprox.z_lastscattering">
+<code class="descclassname">simplemc.cosmo.cosmoApprox.</code><code class="descname">z_lastscattering</code><span class="sig-paren">(</span><em>self</em>, <em>wm</em>, <em>wb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/cosmoApprox.html#z_lastscattering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.cosmoApprox.z_lastscattering" title="Permalink to this definition">¶</a></dt>
+<dd><p>z_lastscattering(self,wm,wb):
+Returns z_LS from Hu &amp; White, DampingTail paper.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="plots">
+<h2>Plots<a class="headerlink" href="#plots" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="plotters.html" class="btn btn-neutral float-left" title="Plotters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, A Slosar, JA Vazquez, I Gomez-Vargas
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

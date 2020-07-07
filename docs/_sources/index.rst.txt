@@ -1,0 +1,103 @@
+.. SimpleMC documentation master file, created by
+   sphinx-quickstart on Wed Jun 10 01:18:16 2020.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+====================================================
+Welcome to SimpleMC's documentation! 
+====================================================
+
+
+
+This is the documentation for SuperMC a cosmological package for parameter estimation and model comparison.
+
+
+Get SimpleMC
+--------------
+
+* You can download the source code from the `GitHub code repository <https://github.com/ja-vazquez/SimpleMC>`_.
+
+   .. code-block:: bash
+
+      git clone https://github.com/ja-vazquez/SimpleMC.git
+
+* See the `requirements <intro.html#requirements>`_ .
+* Or first steps in `Quickstart <intro.html#quick-start>`_.
+
+
+
+We have gathered great previous codes made by others and put them to work together in the cosmological context. In particular, we use the following codes:
+
+   * `SimpleMC <https://github.com/ja-vazquez/april>`_ written by Anže Slosar and Jose Vazquez. This is the previous version of this code.  
+   * `Dynesty <dynesty.readthedocs.io/>`_ developed by Josh Speagle. This contains Ellipsoidal Nested Sampling, Multinest, cubic bounds and ball bounds for nested sampling.
+   * `MCEvidence <https://github.com/yabebalFantaye/MCEvidence>`_ by Yabebal Fantaye. This code allows us to estimate bayesian evidence since the chains produced by a Metropolis-Hastings. 
+   * `pyBambi <https://pybambi.readthedocs.io/en/latest/>`_ by Will Handley . We use a modified version of this code to provide a link between tensorflow neural nets and dynesty samplers. 
+   * `Corner <https://corner.readthedocs.io/en/latest/index.html>`_ by Daniel Foreman-Mackey. This library is for create smooth corner plots. 
+   * `Getdist <https://getdist.readthedocs.io>`_ by Antony Lewis. A package for analysing and plotting Monte Carlo (or other) samples
+   * `fgivenx <https://fgivenx.readthedocs.io>`_ by Will Handley. A python package for plotting posteriors of functions. 
+  
+
+
+
+Citing SimpleMC
+-----------------
+
+   * Vazquez, JA., Gómez-Vargas, I., & Slosar, A. (2020). SimpleMC: A package for cosmological parameter estimation and model comparison.
+
+If you consider it pertinent, please also cite:
+
+   * For dynesty:
+      * `Speagle, J. S. (2020). dynesty: a dynamic nested sampling package for estimating Bayesian posteriors and evidences. Monthly Notices of the Royal Astronomical Society, 493(3), 3132-3158. <https://arxiv.org/pdf/1904.02180.pdf>`_
+
+   * For Ellipsoidal Nested Sampling (snest):
+
+      * `Mukherjee, P., Parkinson, D., & Liddle, A. R. (2006). A nested sampling algorithm for cosmological model selection. The Astrophysical Journal Letters, 638(2), L51.  <https://iopscience.iop.org/article/10.1086/501068/metal>`_
+
+   * For Multinest (mnest):
+
+      * `Feroz, F., Hobson, M. P., & Bridges, M. (2009). MultiNest: an efficient and robust Bayesian inference tool for cosmology and particle physics. Monthly Notices of the Royal Astronomical Society, 398(4), 1601-1614. <https://academic.oup.com/mnras/article/398/4/1601/981502>`_
+
+   * For Artificial Neural Networks in nested sampling (bambi):
+
+      * `Graff, P., Feroz, F., Hobson, M. P., & Lasenby, A. (2012). BAMBI: blind accelerated multimodal Bayesian inference. Monthly Notices of the Royal Astronomical Society, 421(1), 169-180. <https://academic.oup.com/mnras/article/421/1/169/989639>`_
+
+   * For MCEvidence:
+      
+      * `Heavens, A., Fantaye, Y., Mootoovaloo, A., Eggers, H., Hosenie, Z., Kroon, S., & Sellentin, E. (2017). Marginal Likelihoods from Monte Carlo Markov Chains. arXiv preprint arXiv:1704.03472. <https://arxiv.org/abs/1704.03472>`_
+
+   * If use Corner plots: 
+
+      * `Foreman-Mackey, D. (2016). corner: Scatterplot matrices in Python. The Journal of Open Source Software, 1. <https://joss.theoj.org/papers/10.21105/joss.00024#>`_
+
+   * If use Getdist:
+    
+      * `Lewis, A. (2019). GetDist: a Python package for analysing Monte Carlo samples. arXiv preprint arXiv:1910.13970. <https://arxiv.org/abs/1910.13970>`_
+
+   * If use fgivenx:
+      
+      * `Handley, W. (2019). fgivenx: a Python package for functional posterior plotting. arXiv preprint arXiv:1908.01711. <https://arxiv.org/pdf/1908.01711.pdf>`_
+
+
+
+Documentation:
+---------------
+
+.. toctree::
+   :maxdepth: 2
+
+   intro
+
+   examples
+      
+   data
+
+   plotters
+
+   API
+
+Indices and tables
+-------------------
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

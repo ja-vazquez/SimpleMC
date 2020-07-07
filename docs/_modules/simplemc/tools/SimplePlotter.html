@@ -1,0 +1,543 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>simplemc.tools.SimplePlotter &mdash; SimpleMC 2.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> SimpleMC
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html"><strong>Data</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plotters.html"><strong>Plotters</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../API.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimpleMC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>simplemc.tools.SimplePlotter</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for simplemc.tools.SimplePlotter</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">simplemc.tools.Simple_Plots</span> <span class="kn">import</span> <span class="n">Simple_plots</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">webbrowser</span>
+
+<div class="viewcode-block" id="SimplePlotter"><a class="viewcode-back" href="../../../API.html#simplemc.tools.SimplePlotter.SimplePlotter">[docs]</a><span class="k">class</span> <span class="nc">SimplePlotter</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chainsdir</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">listpars</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This class calls the other plotter modules and external libraries to plot.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        chainsdir : str</span>
+<span class="sd">            Directory of files</span>
+
+<span class="sd">        path : str</span>
+<span class="sd">            The full path to the output file to plot</span>
+
+<span class="sd">        listpars : list</span>
+<span class="sd">            List of parameters</span>
+
+<span class="sd">        show : bool</span>
+<span class="sd">            True if you want to display the figure at the end.</span>
+
+<span class="sd">        weights : numpy array</span>
+<span class="sd">            Weights of the samples. Default is None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chainsdir</span> <span class="o">=</span> <span class="n">chainsdir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chainsdir</span><span class="p">),</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">listpars</span> <span class="o">=</span> <span class="n">listpars</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">listpars</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show</span> <span class="o">=</span> <span class="n">show</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span>
+
+
+
+<div class="viewcode-block" id="SimplePlotter.simpleGetdist"><a class="viewcode-back" href="../../../API.html#simplemc.tools.SimplePlotter.SimplePlotter.simpleGetdist">[docs]</a>    <span class="k">def</span> <span class="nf">simpleGetdist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wrapper to Getdist.</span>
+<span class="sd">        Lewis (2019)</span>
+<span class="sd">        arXiv:1910.13970v1 [astro-ph.IM]</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        smooth2d : float</span>
+<span class="sd">            Default 0.3</span>
+
+<span class="sd">        smooth1d : float</span>
+<span class="sd">            Default 0.3</span>
+
+<span class="sd">        burnin : float</span>
+<span class="sd">            Default: 0.2</span>
+
+<span class="sd">        colors : list</span>
+<span class="sd">            List of colors. Default [&#39;red&#39;, &#39;blue&#39;, &#39;black&#39;, &#39;green&#39;, &#39;yellow&#39;, &#39;purple&#39;, &#39;gray&#39;]</span>
+
+<span class="sd">        legend_labels : list</span>
+<span class="sd">            List with the legends of the labels.</span>
+
+<span class="sd">        filled : bool</span>
+<span class="sd">            Filled with solid color the contour plots.</span>
+
+<span class="sd">        normalized : bool</span>
+
+<span class="sd">        shaded : bool</span>
+
+<span class="sd">        label : list</span>
+
+<span class="sd">        roots : list</span>
+<span class="sd">            List of roots of the outputfile names with the mcmc chains.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">getdist</span> <span class="kn">import</span> <span class="n">plots</span><span class="p">,</span> <span class="n">MCSamples</span><span class="p">,</span> <span class="n">chains</span>
+        <span class="n">smooth2d</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;smooth2d&quot;</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
+        <span class="n">smooth1d</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;smooth1d&quot;</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
+        <span class="n">burnin</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;burnin&quot;</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">)</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;colors&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="s1">&#39;yellow&#39;</span><span class="p">,</span> <span class="s1">&#39;purple&#39;</span><span class="p">,</span> <span class="s1">&#39;gray&#39;</span><span class="p">])</span>
+        <span class="n">legend_labels</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;legend_labels&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">filled</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;filled&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">normalized</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;normalized&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">shaded</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;shaded&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">roots</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;roots&#39;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">])</span>
+
+        <span class="n">g</span> <span class="o">=</span> <span class="n">plots</span><span class="o">.</span><span class="n">getSinglePlotter</span><span class="p">(</span><span class="n">chain_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chainsdir</span><span class="p">,</span> <span class="n">width_inch</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                                   <span class="n">ratio</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                                   <span class="n">analysis_settings</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;smooth_scale_2D&#39;</span><span class="p">:</span> <span class="n">smooth2d</span><span class="p">,</span>
+                                                      <span class="s1">&#39;smooth_scale_1D&#39;</span><span class="p">:</span> <span class="n">smooth1d</span><span class="p">,</span>
+                                                      <span class="s1">&#39;ignore_rows&#39;</span><span class="p">:</span> <span class="n">burnin</span><span class="p">})</span>
+
+        <span class="n">g</span><span class="o">.</span><span class="n">triangle_plot</span><span class="p">(</span><span class="n">roots</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">listpars</span><span class="p">,</span>
+                        <span class="n">diag1d_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;colors&#39;</span><span class="p">:</span><span class="n">colors</span><span class="p">},</span>
+                        <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+                        <span class="n">legend_labels</span><span class="o">=</span><span class="n">legend_labels</span><span class="p">,</span>
+                        <span class="n">filled</span><span class="o">=</span><span class="n">filled</span><span class="p">,</span>
+                        <span class="n">normalized</span><span class="o">=</span><span class="n">normalized</span><span class="p">,</span> <span class="n">shaded</span><span class="o">=</span><span class="n">shaded</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_getdist.png&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saveFig</span><span class="p">(</span><span class="n">label</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SimplePlotter.simpleCorner"><a class="viewcode-back" href="../../../API.html#simplemc.tools.SimplePlotter.SimplePlotter.simpleCorner">[docs]</a>    <span class="k">def</span> <span class="nf">simpleCorner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wrapper to the corner library.</span>
+<span class="sd">        Corner method.</span>
+<span class="sd">        Daniel Foreman-Mackey (2016)</span>
+<span class="sd">        doi = {10.21105/joss.00024},</span>
+<span class="sd">        url = {https://doi.org/10.21105/joss.00024},</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        color : str</span>
+<span class="sd">            Color of the plots</span>
+
+<span class="sd">        show_titles : bool</span>
+<span class="sd">            Default True</span>
+
+<span class="sd">        fill_contours : book</span>
+<span class="sd">            Default True</span>
+
+<span class="sd">        bins : int</span>
+<span class="sd">            Number of bins to the plots</span>
+
+<span class="sd">        smooth1d : bool</span>
+<span class="sd">            Default True</span>
+
+<span class="sd">        smooth : bool</span>
+<span class="sd">            Default True</span>
+
+<span class="sd">        plot_contours : bool</span>
+<span class="sd">            Default True</span>
+
+<span class="sd">        plot_density : bool</span>
+<span class="sd">            Default True</span>
+
+<span class="sd">        truths : list</span>
+<span class="sd">            List of true values</span>
+
+<span class="sd">        label : str</span>
+<span class="sd">            Some text</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">corner</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">)</span>
+        <span class="n">show_titles</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;show_titles&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">fill_contours</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;fill_contours&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">bins</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;bins&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+        <span class="n">smooth1d</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;smooth1d&quot;</span> <span class="p">,</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">smooth</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;smooth&quot;</span> <span class="p">,</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">plot_contours</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;plot_contours&quot;</span><span class="p">,</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">plot_density</span> <span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;plot_density&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">truths</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;truths&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">readFile</span><span class="p">()</span>
+        <span class="n">figure</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">latexnames</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">],</span>
+                               <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                               <span class="n">quantiles</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">],</span> <span class="n">show_titles</span><span class="o">=</span><span class="n">show_titles</span><span class="p">,</span> <span class="n">title_fmt</span><span class="o">=</span><span class="s1">&#39;.4f&#39;</span><span class="p">,</span>
+                               <span class="n">smooth1d</span><span class="o">=</span><span class="n">smooth1d</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="n">smooth</span><span class="p">,</span> <span class="n">fill_contours</span><span class="o">=</span><span class="n">fill_contours</span><span class="p">,</span>
+                               <span class="n">plot_contours</span><span class="o">=</span><span class="n">plot_contours</span><span class="p">,</span> <span class="n">plot_density</span><span class="o">=</span><span class="n">plot_density</span><span class="p">,</span>
+                               <span class="n">truths</span><span class="o">=</span><span class="n">truths</span><span class="p">,</span> <span class="n">truth_color</span><span class="o">=</span><span class="s1">&#39;#4682b4&#39;</span><span class="p">,</span> <span class="n">title_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontsize&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_corner.png&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saveFig</span><span class="p">(</span><span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimplePlotter.simpleFgivenx"><a class="viewcode-back" href="../../../API.html#simplemc.tools.SimplePlotter.SimplePlotter.simpleFgivenx">[docs]</a>    <span class="k">def</span> <span class="nf">simpleFgivenx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wrapper to the Fgivenx library:</span>
+<span class="sd">        Cite:</span>
+<span class="sd">        Handley, (2018). https://doi.org/10.21105/joss.00849</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        params : list</span>
+<span class="sd">            List of parameters. Default [&#39;Om&#39;, &#39;h&#39;]</span>
+<span class="sd">            This raise an error if the model is not cosmological.</span>
+
+<span class="sd">        z : numpy linespace</span>
+
+<span class="sd">        func : method</span>
+<span class="sd">            The function to plot given the posterior samples.</span>
+<span class="sd">            Default H(z)</span>
+
+<span class="sd">        labels : list</span>
+<span class="sd">            List of labels.</span>
+<span class="sd">            Default [&#39;z&#39;, &#39;H(z)&#39;]</span>
+
+<span class="sd">        interval : list</span>
+<span class="sd">            Default [0, 4]</span>
+
+<span class="sd">        colors : plt.get_cmap</span>
+<span class="sd">            Default plt.get_cmap(&#39;Greens&#39;)</span>
+
+<span class="sd">        linewidths : float</span>
+<span class="sd">            Default 0.8</span>
+
+<span class="sd">        file_root : str</span>
+<span class="sd">            Path to the text file of the posterior chain</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">fgivenx</span> <span class="kn">import</span> <span class="n">plot_contours</span><span class="p">,</span> <span class="n">samples_from_getdist_chains</span>
+
+        <span class="n">params</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Om&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">])</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+        <span class="n">func</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;func&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Hzfunc</span><span class="p">)</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;labels&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;H(z)&#39;</span><span class="p">])</span>
+        <span class="n">interval</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;interval&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;colors&quot;</span><span class="p">,</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s1">&#39;Greens&#39;</span><span class="p">))</span>
+        <span class="n">linewidths</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;line_widths&quot;</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">)</span>
+        <span class="n">file_root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">samples</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">samples_from_getdist_chains</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">file_root</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">samples</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">samples_from_getdist_chains</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">file_root</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="c1"># z = np.logspace(-4, 1, 100)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">interval</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">interval</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">cbar</span> <span class="o">=</span> <span class="n">plot_contours</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
+                             <span class="n">contour_line_levels</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="n">linewidths</span><span class="o">=</span><span class="n">linewidths</span><span class="p">,</span>
+                             <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
+        <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">cbar</span><span class="p">,</span> <span class="n">ticks</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+        <span class="c1">#cbar.set_ticklabels([&#39;&#39;, r&#39;$1\sigma$&#39;, r&#39;$2\sigma$&#39;, r&#39;$3\sigma$&#39;])</span>
+        <span class="n">cbar</span><span class="o">.</span><span class="n">set_ticklabels</span><span class="p">([</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;$1\sigma$&#39;</span><span class="p">,</span> <span class="s1">&#39;$2\sigma$&#39;</span><span class="p">])</span>
+        <span class="c1"># plt.xscale(&#39;log&#39;)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">labels</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$</span><span class="si">%s</span><span class="s1">$&#39;</span> <span class="o">%</span> <span class="n">labels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$</span><span class="si">%s</span><span class="s1">$&#39;</span> <span class="o">%</span> <span class="n">labels</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_fgivenx.png&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saveFig</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SimplePlotter.simplePlot"><a class="viewcode-back" href="../../../API.html#simplemc.tools.SimplePlotter.SimplePlotter.simplePlot">[docs]</a>    <span class="k">def</span> <span class="nf">simplePlot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plots for mcmc chains.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        type : str</span>
+<span class="sd">            Options &#39;triangle&#39;, &#39;1d&#39;, &#39;2d&#39;</span>
+
+<span class="sd">        roots : list</span>
+<span class="sd">            List of roots names</span>
+
+<span class="sd">        colors : list</span>
+<span class="sd">            List of colors</span>
+
+<span class="sd">        pars1d : list</span>
+<span class="sd">            Only for &quot;1d&quot; type.</span>
+<span class="sd">            Default [&#39;Om&#39;, &#39;h&#39;]</span>
+
+<span class="sd">        smooth1d : float</span>
+<span class="sd">            Only for &quot;1d&quot; type.</span>
+<span class="sd">            Default 2.</span>
+
+<span class="sd">        normpeak1d : bool</span>
+<span class="sd">            Only for &quot;1d&quot; type.</span>
+<span class="sd">            Default True.</span>
+
+<span class="sd">        pars2d : List of lists</span>
+<span class="sd">            Only for &quot;2d&quot; type.</span>
+<span class="sd">            Default [[&#39;Om&#39;, &#39;h&#39;]]</span>
+
+<span class="sd">        pbest2d : bool</span>
+<span class="sd">            Only for &quot;2d&quot; type.</span>
+<span class="sd">            Default True</span>
+
+<span class="sd">        solid2d : bool</span>
+<span class="sd">            Only for &quot;2d&quot; type.</span>
+<span class="sd">            Default True.</span>
+
+<span class="sd">        parstriangle : list</span>
+<span class="sd">            Only for &quot;triangle&quot; type.</span>
+<span class="sd">            Default [&#39;Om&#39;, &#39;Obh2&#39;, &#39;h&#39;]</span>
+
+<span class="sd">        colortriangle : str</span>
+<span class="sd">            Only for &quot;triangle&quot; type.</span>
+<span class="sd">            Default &quot;green&quot;.</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">simplemc.tools.Simple_Plots</span> <span class="kn">import</span> <span class="n">Simple_plots</span>
+        <span class="nb">type</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;triangle&#39;</span><span class="p">)</span>
+        <span class="n">roots</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;roots&#39;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">])</span>
+
+        <span class="c1"># parlist is a par for 2d</span>
+        <span class="c1"># list of paramnames for triangle</span>
+        <span class="c1"># one or more for 1d</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">])</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;colors&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="s1">&#39;orange&#39;</span><span class="p">])</span>
+        <span class="c1">#1d</span>
+        <span class="n">pars1d</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;pars1d&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Om&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">])</span>
+        <span class="n">smooth1d</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;smooth1d&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">normpeak1d</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;normpeak1d&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="c1">#2d</span>
+        <span class="n">pars2d</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;pars2d&#39;</span><span class="p">,</span> <span class="p">[[</span><span class="s1">&#39;Om&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">]])</span>
+        <span class="n">pbest2d</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;pbest2d&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">solid2d</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;solid2d&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="c1">#triangle</span>
+        <span class="n">parstriangle</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;parstriangle&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Om&#39;</span><span class="p">,</span> <span class="s1">&#39;Obh2&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">])</span>
+        <span class="n">colortriangle</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;colortriangle&quot;</span><span class="p">,</span> <span class="s2">&quot;blue&quot;</span><span class="p">)</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">Simple_plots</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chainsdir</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">roots</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s2">&quot;triangle&quot;</span> <span class="ow">or</span> <span class="nb">type</span> <span class="o">==</span> <span class="s2">&quot;tri&quot;</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">triangle</span><span class="p">(</span><span class="n">parstriangle</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colortriangle</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s2">&quot;1D&quot;</span> <span class="ow">or</span> <span class="nb">type</span> <span class="o">==</span> <span class="s2">&quot;1d&quot;</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">Plots1D</span><span class="p">(</span><span class="n">pars1d</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="n">smooth1d</span><span class="p">,</span> <span class="n">normpeak</span><span class="o">=</span><span class="n">normpeak1d</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s2">&quot;2D&quot;</span> <span class="ow">or</span> <span class="nb">type</span> <span class="o">==</span> <span class="s2">&quot;2d&quot;</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">Plots2D</span><span class="p">(</span><span class="n">pars2d</span><span class="p">,</span> <span class="n">pbest</span><span class="o">=</span><span class="n">pbest2d</span><span class="p">,</span> <span class="n">solid</span><span class="o">=</span><span class="n">solid2d</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Invalid option&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_simple.png&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saveFig</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SimplePlotter.readFile"><a class="viewcode-back" href="../../../API.html#simplemc.tools.SimplePlotter.SimplePlotter.readFile">[docs]</a>    <span class="k">def</span> <span class="nf">readFile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         This method reads the samples and the .param file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">labelsfile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.paramnames&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">latexnames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paramnames</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">labelsfile</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">latexnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;$&#39;</span> <span class="o">+</span> <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t\t\t</span><span class="s1">&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;$&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">paramnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t\t\t</span><span class="s1">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+
+        <span class="n">labelsfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">npchain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="o">+</span><span class="s1">&#39;.txt&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">npchain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">+</span> <span class="s1">&#39;_1.txt&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">samples</span> <span class="o">=</span> <span class="n">npchain</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="SimplePlotter.saveFig"><a class="viewcode-back" href="../../../API.html#simplemc.tools.SimplePlotter.SimplePlotter.saveFig">[docs]</a>    <span class="k">def</span> <span class="nf">saveFig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">transAxes</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">show</span><span class="p">:</span>
+            <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimplePlotter.Hzfunc"><a class="viewcode-back" href="../../../API.html#simplemc.tools.SimplePlotter.SimplePlotter.Hzfunc">[docs]</a>    <span class="k">def</span> <span class="nf">Hzfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">theta1</span><span class="p">):</span>
+        <span class="n">Omega_m</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">theta1</span>
+        <span class="n">Hz</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="p">(</span><span class="n">Omega_m</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">z</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">Omega_m</span><span class="p">))</span> <span class="o">**</span> <span class="mf">0.5</span>
+        <span class="k">return</span> <span class="n">Hz</span></div></div>
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, A Slosar, JA Vazquez, I Gomez-Vargas
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

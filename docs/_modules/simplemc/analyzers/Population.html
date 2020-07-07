@@ -1,0 +1,630 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>simplemc.analyzers.Population &mdash; SimpleMC 2.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> SimpleMC
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html"><strong>Data</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plotters.html"><strong>Plotters</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../API.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimpleMC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>simplemc.analyzers.Population</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for simplemc.analyzers.Population</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">.Individual</span> <span class="kn">import</span> <span class="n">Individual</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">simplemc</span> <span class="kn">import</span> <span class="n">logger</span>
+
+
+<div class="viewcode-block" id="Population"><a class="viewcode-back" href="../../../API.html#simplemc.analyzers.Population.Population">[docs]</a><span class="k">class</span> <span class="nc">Population</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_individuals</span><span class="p">,</span> <span class="n">n_variables</span><span class="p">,</span> <span class="n">lower_bounds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">upper_bounds</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It creates several objects of the Individual class and generates a Population.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n_individuals : int</span>
+<span class="sd">            Number of initial individuals</span>
+
+<span class="sd">        n_variables : int</span>
+<span class="sd">            Number of variables or free parameters</span>
+
+<span class="sd">        lower_bounds : list</span>
+<span class="sd">            List with the lower bounds for each free parameter.</span>
+
+<span class="sd">        upper_bounds : list</span>
+<span class="sd">            List with the upper bounds for each free parameter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_individuals</span> <span class="o">=</span> <span class="n">n_individuals</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_variables</span> <span class="o">=</span> <span class="n">n_variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lower_bounds</span> <span class="o">=</span> <span class="n">lower_bounds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upper_bounds</span> <span class="o">=</span> <span class="n">upper_bounds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">individuals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimized</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iter_optimization</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_individual</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_function_value</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_value_variables</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">historical_individuals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">historical_best_value_variables</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">historical_best_fitness</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">historical_best_function_value</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">difference_abs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results_df</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitness_optimal</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_variables_optimal</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">function_value_optimal</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower_bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> \
+                <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lower_bounds</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lower_bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lower_bounds</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upper_bounds</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">upper_bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upper_bounds</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_individuals</span><span class="p">):</span>
+            <span class="n">individual_i</span> <span class="o">=</span> <span class="n">Individual</span><span class="p">(</span>
+                <span class="n">n_variables</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_variables</span><span class="p">,</span>
+                <span class="n">lower_bounds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lower_bounds</span><span class="p">,</span>
+                <span class="n">upper_bounds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">upper_bounds</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">individual_i</span><span class="p">)</span>
+
+
+
+<div class="viewcode-block" id="Population.eval_population"><a class="viewcode-back" href="../../../API.html#simplemc.analyzers.Population.Population.eval_population">[docs]</a>    <span class="k">def</span> <span class="nf">eval_population</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_function</span><span class="p">,</span> <span class="n">optimization</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        target_function : method</span>
+<span class="sd">            Function to optimize. Usually (in simplemc context) the likelihood.</span>
+
+<span class="sd">        optimization : str</span>
+<span class="sd">            {&quot;maximize&quot;, &quot;minimize}</span>
+<span class="sd">            Default: maximize</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_individuals</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">calculate_fitness</span><span class="p">(</span>
+                <span class="n">target_function</span><span class="o">=</span><span class="n">target_function</span><span class="p">,</span>
+                <span class="n">optimization</span><span class="o">=</span><span class="n">optimization</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_individual</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_individuals</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">fitness</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_individual</span><span class="o">.</span><span class="n">fitness</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">best_individual</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_individual</span><span class="o">.</span><span class="n">fitness</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_value_variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_individual</span><span class="o">.</span><span class="n">value_variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_function_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_individual</span><span class="o">.</span><span class="n">function_value</span></div>
+
+
+
+<div class="viewcode-block" id="Population.cross_individuals"><a class="viewcode-back" href="../../../API.html#simplemc.analyzers.Population.Population.cross_individuals">[docs]</a>    <span class="k">def</span> <span class="nf">cross_individuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parental_1</span><span class="p">,</span> <span class="n">parental_2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to cross two differents individuals</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        parental_1</span>
+<span class="sd">        parental_2</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">parental_1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_individuals</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;index of parental_1 should be between 0 and &quot;</span>
+                <span class="s2">&quot;the number of individuals of the population.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">parental_2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_individuals</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;index of parental_2 should be between 0 and &quot;</span>
+                <span class="s2">&quot;the number of individuals of the population.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">parental_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">[</span><span class="n">parental_1</span><span class="p">]</span>
+        <span class="n">parental_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">[</span><span class="n">parental_2</span><span class="p">]</span>
+
+        <span class="n">offspring</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">parental_1</span><span class="p">)</span>
+        <span class="n">offspring</span><span class="o">.</span><span class="n">value_variables</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">offspring</span><span class="o">.</span><span class="n">n_variables</span><span class="p">)</span>
+        <span class="n">offspring</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">inheritance_parent_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+            <span class="n">a</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+            <span class="n">size</span><span class="o">=</span><span class="n">offspring</span><span class="o">.</span><span class="n">n_variables</span><span class="p">,</span>
+            <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+            <span class="n">replace</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="n">inheritance_parent_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">inheritance_parent_1</span><span class="p">)</span>
+
+        <span class="n">offspring</span><span class="o">.</span><span class="n">value_variables</span><span class="p">[</span><span class="n">inheritance_parent_1</span><span class="p">]</span> \
+            <span class="o">=</span> <span class="n">parental_1</span><span class="o">.</span><span class="n">value_variables</span><span class="p">[</span><span class="n">inheritance_parent_1</span><span class="p">]</span>
+
+        <span class="n">offspring</span><span class="o">.</span><span class="n">value_variables</span><span class="p">[</span><span class="n">inheritance_parent_2</span><span class="p">]</span> \
+            <span class="o">=</span> <span class="n">parental_2</span><span class="o">.</span><span class="n">value_variables</span><span class="p">[</span><span class="n">inheritance_parent_2</span><span class="p">]</span>
+
+        <span class="n">offspring</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">offspring</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">offspring</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Population.select_individual"><a class="viewcode-back" href="../../../API.html#simplemc.analyzers.Population.Population.select_individual">[docs]</a>    <span class="k">def</span> <span class="nf">select_individual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">return_indexs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">method_selection</span><span class="o">=</span><span class="s2">&quot;tournament&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method selects an individual given a selection method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n : int</span>
+<span class="sd">        return_indexs : bool</span>
+<span class="sd">        method_selection : str</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">method_selection</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;roulette&quot;</span><span class="p">,</span> <span class="s2">&quot;rank&quot;</span><span class="p">,</span> <span class="s2">&quot;tournament&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;Selection method should be roulette, rank o tournament&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">array_fitness</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_individuals</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_individuals</span><span class="p">):</span>
+            <span class="n">array_fitness</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">fitness</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">method_selection</span> <span class="o">==</span> <span class="s2">&quot;roulette&quot;</span><span class="p">:</span>
+            <span class="n">selection_probability</span> <span class="o">=</span> <span class="n">array_fitness</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">array_fitness</span><span class="p">)</span>
+            <span class="n">ind_selected</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_individuals</span><span class="p">),</span>
+                <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
+                <span class="n">p</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">selection_probability</span><span class="p">),</span>
+                <span class="n">replace</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">method_selection</span> <span class="o">==</span> <span class="s2">&quot;rank&quot;</span><span class="p">:</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">array_fitness</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">ranks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">order</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">selection_probability</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">ranks</span>
+            <span class="n">selection_probability</span> <span class="o">=</span> <span class="n">selection_probability</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">selection_probability</span><span class="p">)</span>
+            <span class="n">ind_selected</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_individuals</span><span class="p">),</span>
+                <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
+                <span class="n">p</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">selection_probability</span><span class="p">),</span>
+                <span class="n">replace</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">method_selection</span> <span class="o">==</span> <span class="s2">&quot;tournament&quot;</span><span class="p">:</span>
+            <span class="n">ind_selected</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="c1"># Random selection of a pair of Individuals</span>
+                <span class="n">candidates_a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                    <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_individuals</span><span class="p">),</span>
+                    <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="n">replace</span><span class="o">=</span><span class="kc">False</span>
+                <span class="p">)</span>
+                <span class="n">candidates_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                    <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_individuals</span><span class="p">),</span>
+                    <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="n">replace</span><span class="o">=</span><span class="kc">False</span>
+                <span class="p">)</span>
+                <span class="c1"># Selection of best fitness of each pair.</span>
+                <span class="k">if</span> <span class="n">array_fitness</span><span class="p">[</span><span class="n">candidates_a</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">&gt;</span> <span class="n">array_fitness</span><span class="p">[</span><span class="n">candidates_a</span><span class="p">[</span><span class="mi">1</span><span class="p">]]:</span>
+                    <span class="n">winner_a</span> <span class="o">=</span> <span class="n">candidates_a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">winner_a</span> <span class="o">=</span> <span class="n">candidates_a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">array_fitness</span><span class="p">[</span><span class="n">candidates_b</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">&gt;</span> <span class="n">array_fitness</span><span class="p">[</span><span class="n">candidates_b</span><span class="p">[</span><span class="mi">1</span><span class="p">]]:</span>
+                    <span class="n">winner_b</span> <span class="o">=</span> <span class="n">candidates_b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">winner_b</span> <span class="o">=</span> <span class="n">candidates_b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="c1"># For each couple, comparison of winners</span>
+                <span class="k">if</span> <span class="n">array_fitness</span><span class="p">[</span><span class="n">winner_a</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">array_fitness</span><span class="p">[</span><span class="n">winner_b</span><span class="p">]:</span>
+                    <span class="n">ind_final</span> <span class="o">=</span> <span class="n">winner_a</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ind_final</span> <span class="o">=</span> <span class="n">winner_b</span>
+
+                <span class="n">ind_selected</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ind_final</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">return_indexs</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">ind_selected</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">ind_selected</span><span class="p">)]))</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span>
+                    <span class="p">[</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ind_selected</span><span class="p">]</span>
+                <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Population.create_new_generation"><a class="viewcode-back" href="../../../API.html#simplemc.analyzers.Population.Population.create_new_generation">[docs]</a>    <span class="k">def</span> <span class="nf">create_new_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method_selection</span><span class="o">=</span><span class="s2">&quot;tournament&quot;</span><span class="p">,</span>
+                              <span class="n">elitism</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">prob_mut</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+                              <span class="n">distribution</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">,</span>
+                              <span class="n">media_distribution</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sd_distribution</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                              <span class="n">min_distribution</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_distribution</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+
+        <span class="n">news_individuals</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">elitism</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">n_elitism</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_individuals</span> <span class="o">*</span> <span class="n">elitism</span><span class="p">))</span>
+            <span class="n">array_fitness</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_individuals</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_individuals</span><span class="p">):</span>
+                <span class="n">array_fitness</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">fitness</span><span class="p">)</span>
+            <span class="n">rank</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">array_fitness</span><span class="p">))</span>
+            <span class="n">elite</span> <span class="o">=</span> <span class="p">[</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">rank</span><span class="p">[:</span><span class="n">n_elitism</span><span class="p">]]</span>
+            <span class="n">news_individuals</span> <span class="o">=</span> <span class="n">news_individuals</span> <span class="o">+</span> <span class="n">elite</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">n_elitism</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_individuals</span> <span class="o">-</span> <span class="n">n_elitism</span><span class="p">):</span>
+            <span class="c1"># select parents</span>
+            <span class="n">index_parents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_individual</span><span class="p">(</span>
+                <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">return_indexs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">method_selection</span><span class="o">=</span><span class="n">method_selection</span><span class="p">)</span>
+
+            <span class="n">offspring</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cross_individuals</span><span class="p">(</span>
+                <span class="n">parental_1</span><span class="o">=</span><span class="n">index_parents</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">parental_2</span><span class="o">=</span><span class="n">index_parents</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="n">offspring</span><span class="o">.</span><span class="n">mutate</span><span class="p">(</span>
+                <span class="n">prob_mut</span><span class="o">=</span><span class="n">prob_mut</span><span class="p">,</span>
+                <span class="n">distribution</span><span class="o">=</span><span class="n">distribution</span><span class="p">,</span>
+                <span class="n">min_distribution</span><span class="o">=</span><span class="n">min_distribution</span><span class="p">,</span>
+                <span class="n">max_distribution</span><span class="o">=</span><span class="n">max_distribution</span><span class="p">)</span>
+
+            <span class="n">news_individuals</span> <span class="o">=</span> <span class="n">news_individuals</span> <span class="o">+</span> <span class="p">[</span><span class="n">offspring</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">individuals</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">news_individuals</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_individual</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_value_variables</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_function_value</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+        <span class="c1"># New generation created! Known number of new individuals.</span>
+
+
+
+<div class="viewcode-block" id="Population.optimize"><a class="viewcode-back" href="../../../API.html#simplemc.analyzers.Population.Population.optimize">[docs]</a>    <span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_function</span><span class="p">,</span> <span class="n">optimization</span><span class="p">,</span> <span class="n">n_generations</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                 <span class="n">method_selection</span><span class="o">=</span><span class="s2">&quot;tournament&quot;</span><span class="p">,</span> <span class="n">elitism</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">prob_mut</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+                 <span class="n">distribution</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">,</span> <span class="n">media_distribution</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="n">sd_distribution</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">min_distribution</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_distribution</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="n">stopping_early</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rounds_stopping</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                 <span class="n">tolerance_stopping</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">outputname</span><span class="o">=</span><span class="s2">&quot;geneticOutput&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is the crucial method of the genetic modules.</span>
+<span class="sd">        Within it, a target function is optimized.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        target_function : method</span>
+<span class="sd">            Usually the likelihood function.</span>
+
+<span class="sd">        optimization : str</span>
+<span class="sd">            Options {&quot;maximize&quot;, &quot;minimize&quot;}. Default is &quot;maximize&quot;</span>
+
+<span class="sd">        n_generations : int</span>
+<span class="sd">            Number of generations to evolve the original population</span>
+
+<span class="sd">        method_selection : str</span>
+<span class="sd">            Type of selection method {&quot;tournament&quot;, &quot;rank&quot;, &quot;roulette&quot;}.</span>
+<span class="sd">            Default: &quot;tournament&quot;</span>
+
+<span class="sd">        elitism : float</span>
+<span class="sd">            Value of elitism.</span>
+<span class="sd">            Default: 0.01.</span>
+
+<span class="sd">        prob_mut : float</span>
+<span class="sd">            Probability of mutation.</span>
+<span class="sd">            Default: 0.4</span>
+
+<span class="sd">        distribution : str</span>
+<span class="sd">            {&quot;uniform&quot;, &quot;gaussian&quot;, &quot;random&quot;}</span>
+<span class="sd">            Default: uniform</span>
+
+<span class="sd">        media_distribution : float</span>
+<span class="sd">            Media value for gaussian distributions</span>
+
+<span class="sd">        sd_distribution : float</span>
+<span class="sd">            Standard deviation for gaussian distributions</span>
+<span class="sd">            Default: 1.0</span>
+
+<span class="sd">        min_distribution : float</span>
+<span class="sd">            Minimum value for uniform distributions</span>
+<span class="sd">            Default: -1.0</span>
+
+<span class="sd">        max_distribution : float</span>
+<span class="sd">            Maximum value for uniform distributions</span>
+<span class="sd">            Default: 1.0</span>
+
+<span class="sd">        stopping_early : bool</span>
+<span class="sd">            It needs a not None value for &quot;rounds_stopping&quot; and &quot;tolerance_stopping&quot;.</span>
+<span class="sd">            Default: True</span>
+
+<span class="sd">        rounds_stopping : int</span>
+<span class="sd">            Rounds to consider to stopping early with the tolerance_stopping value.</span>
+
+<span class="sd">        tolerance_stopping : float</span>
+<span class="sd">            Value to stopping early criteria. This value is the difference between the</span>
+<span class="sd">            best fit for the latest rounds_stopping generations.</span>
+
+<span class="sd">        outputname : str</span>
+<span class="sd">            Name for the output text file.</span>
+<span class="sd">            Default: &quot;geneticOutput&quot;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">stopping_early</span> <span class="ow">and</span> <span class="p">(</span><span class="n">rounds_stopping</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">tolerance_stopping</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;To activate Stopping early it is necessary to indicate a&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;value of rounds_stopping and tolerance_stopping.&quot;</span><span class="p">)</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">outputname</span><span class="p">),</span> <span class="s2">&quot;+w&quot;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;# Generation, best_fitness</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_generations</span><span class="p">):</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">eval_population</span><span class="p">(</span>
+                <span class="n">target_function</span><span class="o">=</span><span class="n">target_function</span><span class="p">,</span>
+                <span class="n">optimization</span><span class="o">=</span><span class="n">optimization</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">historical_individuals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">historical_best_fitness</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">historical_best_value_variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_value_variables</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">historical_best_function_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_function_value</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">difference_abs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">difference</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">historical_best_fitness</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> \
+                                 <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">historical_best_fitness</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">difference_abs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">difference</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span><span class="p">))</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r</span><span class="si">{}</span><span class="s2">it | best fitness: </span><span class="si">{:.4f}</span><span class="s2"> | best individual: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span><span class="p">,</span>
+                                                                                          <span class="bp">self</span><span class="o">.</span><span class="n">best_value_variables</span><span class="p">))</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">stopping_early</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">rounds_stopping</span><span class="p">:</span>
+                <span class="n">latest_n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">difference_abs</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">rounds_stopping</span><span class="p">):])</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">latest_n</span> <span class="o">&lt;</span> <span class="n">tolerance_stopping</span><span class="p">):</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Algorithm stopped in the </span><span class="si">{}</span><span class="s2"> generation&quot;</span>
+                          <span class="s2">&quot;for lack of absolute minimum change of </span><span class="si">{}</span><span class="s2">&quot;</span>
+                          <span class="s2">&quot;while </span><span class="si">{}</span><span class="s2"> consecutive generations&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">tolerance_stopping</span><span class="p">,</span>
+                                                                    <span class="n">rounds_stopping</span><span class="p">))</span>
+
+                    <span class="k">break</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_new_generation</span><span class="p">(</span>
+                <span class="n">method_selection</span><span class="o">=</span><span class="n">method_selection</span><span class="p">,</span>
+                <span class="n">elitism</span><span class="o">=</span><span class="n">elitism</span><span class="p">,</span>
+                <span class="n">prob_mut</span><span class="o">=</span><span class="n">prob_mut</span><span class="p">,</span>
+                <span class="n">distribution</span><span class="o">=</span><span class="n">distribution</span><span class="p">)</span>
+
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimized</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iter_optimization</span> <span class="o">=</span> <span class="n">i</span>
+
+        <span class="n">index_value_optimal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">historical_best_fitness</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitness_optimal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">historical_best_fitness</span><span class="p">[</span><span class="n">index_value_optimal</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">function_value_optimal</span> <span class="o">=</span> <span class="bp">self</span> \
+            <span class="o">.</span><span class="n">historical_best_function_value</span><span class="p">[</span><span class="n">index_value_optimal</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_variables_optimal</span> <span class="o">=</span> <span class="bp">self</span> \
+            <span class="o">.</span><span class="n">historical_best_value_variables</span><span class="p">[</span><span class="n">index_value_optimal</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">results_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;best_fitness&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">historical_best_fitness</span><span class="p">,</span>
+                <span class="s2">&quot;best_function_value&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">historical_best_fitness</span><span class="p">,</span>
+                <span class="s2">&quot;best_value_variables&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">historical_best_value_variables</span><span class="p">,</span>
+                <span class="s2">&quot;difference_abs&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">difference_abs</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results_df</span><span class="p">[</span><span class="s2">&quot;generation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results_df</span><span class="o">.</span><span class="n">index</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Summary</span><span class="se">\n</span><span class="s2">------</span><span class="se">\n</span><span class="s2">Number of generations: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;Optimal value of variables: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;Target function value: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iter_optimization</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                                                         <span class="bp">self</span><span class="o">.</span><span class="n">value_variables_optimal</span><span class="p">,</span>
+                                                         <span class="bp">self</span><span class="o">.</span><span class="n">function_value_optimal</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;Number of generations: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;Optimal value of variables: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;Target function value: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iter_optimization</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                                                     <span class="bp">self</span><span class="o">.</span><span class="n">value_variables_optimal</span><span class="p">,</span>
+                                                     <span class="bp">self</span><span class="o">.</span><span class="n">function_value_optimal</span><span class="p">)]</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, A Slosar, JA Vazquez, I Gomez-Vargas
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
