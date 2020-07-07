@@ -14,6 +14,7 @@ from .models import DecayLCDMCosmology
 from .models import EarlyDECosmology
 from .models import SlowRDECosmology
 from .models import DGPCDMCosmology
+from .models import AnisotropicCosmology
 from .models import RotationCurves
 
 #Non-parametric functions
@@ -84,6 +85,11 @@ def ParseModel(model, **kwargs):
         LCDMCosmology.rd_approx = "CuestaNeff"
         T = LCDMCosmology()
         T.setVaryNnu()
+    elif model == "NumuLCDM":
+        LCDMCosmology.rd_approx = "CuestaNeff"
+        T = LCDMCosmology()
+        T.setVaryNnu()
+        T.setVaryMnu()
     elif model == "noradLCDM":
         T = LCDMCosmology(disable_radiation=True)
     elif model == "oLCDM":
@@ -136,6 +142,11 @@ def ParseModel(model, **kwargs):
         T = EarlyDECosmology(varyw=False)
     elif model == "SlowRDE":
         T = SlowRDECosmology(varyOk=False)
+    elif model == "Anisotropic":
+        T = AnisotropicCosmology(varybd=False)
+        LCDMCosmology.rd_approx = "CuestaNeff"
+        T.setVaryNnu()
+        T.setVaryMnu()
     elif model == "Binned":
         T = BinnedWCosmology()
     elif model == 'generic':
