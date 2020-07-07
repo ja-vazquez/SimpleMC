@@ -24,11 +24,11 @@ class PhiCosmology(LCDMCosmology):
         self.varybeta    = varybeta
         self.varyalpha   = varyalpha
 
-        self.Ok     = curv
+        self.Ok     = Ok_par.value #curv
         self.alpha  = alpha
-        self.beta   = beta
+        self.beta   = phibeta_par.value #beta
         self.mu     = mu
-        self.ilam   = ilam
+        self.ilam   = philam_par.value #ilam
         self.eps    = eps
 
         self.lna   = np.linspace(-6, 0, 500)
@@ -145,9 +145,9 @@ class PhiCosmology(LCDMCosmology):
             if self.beta == 0:                  #cosh
                 ini_lam = -self.alpha*np.tanh(self.alpha*self.ilam)
             elif self.beta == -1:
-                ini_lam = -self.alpha/np.tanh(0.5*self.alpha*self.ilam)
+                ini_lam = -self.alpha/np.tanh(0.5*self.alpha/self.ilam)
             elif self.beta == 1:
-                ini_lam = self.alpha*np.arctan(0.5*self.alpha*self.ilam)
+                ini_lam = self.alpha*np.tan(0.5*self.alpha*self.ilam)
             else: sys.exit('wrong potential')
         else:
             if self.beta==0:                        #pow
