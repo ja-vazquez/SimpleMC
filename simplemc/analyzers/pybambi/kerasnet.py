@@ -10,6 +10,7 @@ Date: June 2020
 """
 import numpy
 import sys
+sys.setrecursionlimit(10000)
 
 try:
     import tensorflow as tf
@@ -81,6 +82,7 @@ class KerasNetInterpolation:
                                       epochs=epochs, batch_size=32,
                                       callbacks=callbacks)
 
+
     def _default_architecture(self):
 
         n_cols = self.params_training.shape[1]
@@ -88,7 +90,7 @@ class KerasNetInterpolation:
         model = tf.keras.models.Sequential([
             tf.keras.layers.Dense(self.numNeurons, activation='relu', input_shape=(n_cols,)),
             tf.keras.layers.Dense(self.numNeurons, activation='relu'),
-            #tf.keras.layers.Dense(self.numNeurons, activation='relu'),
+            tf.keras.layers.Dense(self.numNeurons, activation='relu'),
             tf.keras.layers.Dense(1)
         ])
         model.compile(optimizer='adam', loss='mean_squared_error')
@@ -131,7 +133,6 @@ class KerasNetInterpolation:
 
         """
         inRange = True
-        print("like neural", loglikelihood)
         if loglikelihood > self._maxLogL + self.uncertainty() \
                 or loglikelihood < self._minLogL - self.uncertainty():
             inRange = False
