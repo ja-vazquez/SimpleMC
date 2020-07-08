@@ -6,7 +6,6 @@ from .cosmo.Derivedparam import AllDerived
 from . import ParseDataset, ParseModel
 from . import PostProcessing
 from scipy.special import ndtri
-import multiprocessing as mp
 from simplemc import logger
 import numpy as np
 import sys, os
@@ -395,7 +394,9 @@ class DriverMC:
         #stored output files
         if self.analyzername is None: self.analyzername = 'nested'
         self.outputpath = '{}_{}_{}_{}'.format(self.outputpath, self.analyzername, self.engine, nestedType)
-        if neuralNetwork: self.outputpath = "{}_ANN".format(self.outputpath)
+        if neuralNetwork:
+            self.outputpath = "{}_ANN".format(self.outputpath)
+            self.neuralNetwork = neuralNetwork
         self.outputChecker()
 
         #paralel run
@@ -938,19 +939,30 @@ class DriverMC:
             Number of processes
 
         """
+        import multiprocessing as mp
+        from multiprocessing.pool import ThreadPool
         if nproc <= 0:
             ncores = mp.cpu_count()
             nprocess = ncores//2
             logger.info("Using  {} processors of {}.".format(nprocess, ncores))
-            pool = mp.Pool(processes=nprocess)
+            if self.analyzername == 'nested':
+                if self.neuralNetwork:
+                    pool = ThreadPool(processes=nprocess)
+            else:
+                pool = mp.Pool(processes=nprocess)
         elif nproc == 1:
             logger.info("Using 1 processor")
             nprocess = None
             pool = None
         else:
             nprocess = nproc
-            logger.info("Using {} processors.".format(nprocess))
-            pool = mp.Pool(processes=nprocess)
+            ncores = mp.cpu_count()
+            logger.info("Using {} processors of {} .".format(nprocess, ncores))
+            if self.analyzername == 'nested':
+                if self.neuralNetwork:
+                    pool = ThreadPool(processes=nprocess)
+            else:
+                pool = mp.Pool(processes=nprocess)
 
         return pool, nprocess
 
