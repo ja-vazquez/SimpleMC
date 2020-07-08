@@ -399,6 +399,7 @@ class DriverMC:
             self.neuralNetwork = neuralNetwork
         self.outputChecker()
 
+        
         #paralel run
         pool, nprocess = self.mppool(nproc)
         logger.info("\n\tnlivepoints: {}\n"
@@ -945,11 +946,11 @@ class DriverMC:
             ncores = mp.cpu_count()
             nprocess = ncores//2
             logger.info("Using  {} processors of {}.".format(nprocess, ncores))
-            if self.analyzername == 'nested':
-                if self.neuralNetwork:
-                    pool = ThreadPool(processes=nprocess)
-            else:
-                pool = mp.Pool(processes=nprocess)
+            #if self.analyzername == 'nested':
+            #    if self.neuralNetwork:
+            #        pool = ThreadPool(processes=nprocess)
+            #else:
+            #    pool = mp.Pool(processes=nprocess)
         elif nproc == 1:
             logger.info("Using 1 processor")
             nprocess = None
@@ -958,12 +959,13 @@ class DriverMC:
             nprocess = nproc
             ncores = mp.cpu_count()
             logger.info("Using {} processors of {} .".format(nprocess, ncores))
-            if self.analyzername == 'nested':
-                if self.neuralNetwork:
-                    pool = ThreadPool(processes=nprocess)
-            else:
-                pool = mp.Pool(processes=nprocess)
-
+            #if self.analyzername == 'nested':
+            #    if self.neuralNetwork:
+            #        pool = ThreadPool(processes=nprocess)
+            #else:
+            #    pool = mp.Pool(processes=nprocess)
+        #should be tested first before any push
+        pool = mp.Pool(processes=nprocess)
         return pool, nprocess
 
 
