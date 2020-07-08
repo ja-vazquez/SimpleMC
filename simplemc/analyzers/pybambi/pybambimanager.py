@@ -69,7 +69,6 @@ class BambiManager(object):
     # def dumper(self, live_params, live_loglks, dead_params, dead_loglks):
     def dumper(self, live_params, live_loglks, dead_params=None, dead_loglks=None):
         self.dumpercount += 1
-        print("\ndumper count", self.dumpercount)
         if not self._proxy_trained and self.dumpercount >= self.it_to_start_net:
             mod_it_after_net = (self.dumpercount - self.it_to_start_net)%self.updInt
             if self.dumpercount == self.it_to_start_net or mod_it_after_net == 0:
@@ -87,9 +86,9 @@ class BambiManager(object):
                                         loglikes[:self._ntrain])
 
         if self._proxy_trained:
-            print("\nUsing trained proxy ")
+            print("\nUsing trained neural network")
         else:
-            print("\nUnable to use proxy ")
+            print("\nUnable to use neural network")
 
     def loglikelihood(self, params):
         """Bambi Proxy wrapper for original loglikelihood."""
