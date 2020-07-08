@@ -101,12 +101,9 @@ class BambiManager(object):
         # Call the learner
         candidate_loglikelihood = self._current_learner(params)
         print("\n neural like:", candidate_loglikelihood)
-
-
         # If the learner can be trusted, use its estimate,
         # otherwise use the original like and update the failure status
         if self._current_learner.valid(candidate_loglikelihood):
-            print("\n valid neural loglike")
             return candidate_loglikelihood
         else:
             self._rolling_failure_fraction = (1.0 + (self._ntrain - 1.0) *
@@ -114,7 +111,6 @@ class BambiManager(object):
                                               ) / self._ntrain
             if self._rolling_failure_fraction > self._failure_tolerance:
                 self._proxy_trained = False
-            print("\n invalid neural loglike->use usual like fn")
             return self._loglikelihood(params)
 
     def train_new_learner(self, params, loglikes):
