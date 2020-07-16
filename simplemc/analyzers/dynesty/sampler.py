@@ -84,7 +84,7 @@ class Sampler(object):
     def __init__(self, loglikelihood, prior_transform, npdim, live_points,
                  update_interval, first_update, rstate,
                  queue_size, pool, use_pool):
-
+        self.usedNeural = False
         # distributions
         self.loglikelihood_control = loglikelihood
         self.loglikelihood = loglikelihood
@@ -112,6 +112,7 @@ class Sampler(object):
             self.M = map
         else:
             self.M = pool.map
+
         self.use_pool = use_pool  # provided flags for when to use the pool
         self.use_pool_ptform = use_pool.get('prior_transform', True)
         self.use_pool_logl = use_pool.get('loglikelihood', True)
@@ -835,8 +836,22 @@ class Sampler(object):
 
             # trying bambi
             if self.bambi_dumper:
-                self.bambi_dumper(self.live_v, self.live_logl,
-                                  self.saved_v, self.saved_logl)
+                if self.pool is not None and self.queue_size > 1:
+                    bambiargs = []
+                    dumper_dict = {'live_v': self.live_v, 'live_logl': self.live_logl,
+                                   'dead_v': self.saved_v, 'dead_logl': self.saved_logl,
+                                   'it': self.it}
+                    bambiargs.append(dumper_dict)
+                    if self.usedNeural == False:
+                        r = self.pool.apply(self.bambi_dumper, bambiargs)
+                    if r:
+                        self.usedNeural = self.neural_valid(logl,
+                                                            np.min(self.live_logl),
+                                                            np.max(self.live_logl))
+                else:
+                    self.bambi_dumper(self.live_v, self.live_logl,
+                                      self.saved_v, self.saved_logl, it=self.it)
+
 
             # Return dead point and ancillary quantities.
             yield (worst, ustar, vstar, loglstar, logvol, logwt,
@@ -1055,3 +1070,10 @@ class Sampler(object):
             cloglikes = []
             cloglike = self.like.loglike_wprior()
         return cloglike, cloglikes
+
+    def neural_valid(self, loglikelihood, minLogL, maxLogL):
+        inRange = True
+        if loglikelihood > maxLogL - 0.001\
+                         or loglikelihood < minLogL - 0.001:
+            inRange = False
+        return inRange
