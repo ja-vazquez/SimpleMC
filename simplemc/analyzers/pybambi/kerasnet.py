@@ -10,10 +10,11 @@ Date: June 2020
 """
 import numpy
 import sys
-sys.setrecursionlimit(10000)
-
+import multiprocessing as mp
+#mp.set_start_method('spawn', force=True)
 try:
     import tensorflow as tf
+
 except:
     sys.exit("You need to install tensorflow")
 
@@ -39,6 +40,7 @@ class KerasNetInterpolation:
     # IGV: ntrain is 80% (split) of multinest sampling points as in arXiv:1110.2997
     def __init__(self, params, logL, split=0.8, numNeurons=200, epochs=300, model=None,
                  savedmodelpath=None):
+
         params = numpy.array(params)
         logL = numpy.array(logL)
 
@@ -56,7 +58,6 @@ class KerasNetInterpolation:
 
         self._maxLogL = numpy.max(logL)
         self._minLogL = numpy.min(logL)
-        self._lastLogL = logL[-1]
         ntrain = int(split * nparams)
         indx = [ntrain]
         self.params_training, self.params_testing = numpy.split(params, indx)
@@ -81,7 +82,6 @@ class KerasNetInterpolation:
                                                        self.logL_testing),
                                       epochs=epochs, batch_size=32,
                                       callbacks=callbacks)
-
 
     def _default_architecture(self):
 
@@ -133,7 +133,9 @@ class KerasNetInterpolation:
 
         """
         inRange = True
-        if loglikelihood > self._maxLogL + self.uncertainty() \
-                or loglikelihood < self._minLogL - self.uncertainty():
+        # if loglikelihood > self._maxLogL + self.uncertainty() \
+        #         or loglikelihood < self._minLogL - self.uncertainty():
+        if loglikelihood > self._maxLogL + 20.\
+                         or loglikelihood < self._minLogL - 20.:
             inRange = False
         return inRange

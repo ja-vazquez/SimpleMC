@@ -9,6 +9,10 @@ Date: June 2020
 
 import numpy as np
 from simplemc.analyzers.pybambi.kerasnet import KerasNetInterpolation
+from simplemc.analyzers.pybambi.torchnet import TorchNetInterpolation
+import sys
+import os
+#sys.setrecursionlimit(100000)
 
 try:
     import tensorflow as tf
@@ -48,15 +52,19 @@ class BambiManager(object):
         self.epochs = epochs
         self.model = model
         self.savedmodelpath = savedmodelpath
-        self.dumpercount = 0
         self.it_to_start_net = it_to_start_net
         self.updInt = updInt
-        self.likecalls = 0
+        self.neural_likecalls = 0
 
     def make_learner(self, params, loglikes):
         """Construct a Predictor."""
         if self._learner == 'keras':
             return KerasNetInterpolation(params, loglikes,
+                                         split=self.split, numNeurons=self.numNeurons,
+                                         epochs=self.epochs, model=self.model,
+                                         savedmodelpath=self.savedmodelpath)
+        elif self._learner == 'torch':
+            return TorchNetInterpolation(params, loglikes,
                                          split=self.split, numNeurons=self.numNeurons,
                                          epochs=self.epochs, model=self.model,
                                          savedmodelpath=self.savedmodelpath)
@@ -67,18 +75,26 @@ class BambiManager(object):
                                       % self._learner)
 
     # def dumper(self, live_params, live_loglks, dead_params, dead_loglks):
-    def dumper(self, live_params, live_loglks, dead_params=None, dead_loglks=None):
-        self.dumpercount += 1
-        if not self._proxy_trained and self.dumpercount >= self.it_to_start_net:
-            mod_it_after_net = (self.dumpercount - self.it_to_start_net)%self.updInt
-            if self.dumpercount == self.it_to_start_net or mod_it_after_net == 0:
+    def dumper(self, live_params, live_loglks=None, dead_params=None, dead_loglks=None, it=0):
+        if live_loglks is None:
+            live_loglks = live_params['live_logl']
+            dead_params = live_params['dead_v']
+            dead_loglks = live_params['dead_logl']
+            counter = live_params['it']
+            live_params = live_params['live_v']
+        else:
+            counter = it
+        # live_params is None for the additional workers of the mp.pool
+        if not self._proxy_trained and counter >= self.it_to_start_net:
+            mod_it_after_net = (counter - self.it_to_start_net)%self.updInt
+            if counter == self.it_to_start_net or mod_it_after_net == 0:
                 if dead_params is not None:
                     dead_params = np.array(dead_params)
                     dead_loglks = np.array(dead_loglks)
                     params = np.concatenate((live_params, dead_params))
                     loglikes = np.concatenate((live_loglks, dead_loglks))
                 else:
-                    # If sampler is not nested
+                    # If sampler is not nested, p. ej. mcmcanalyzer
                     params = live_params
                     loglikes = live_loglks
 
@@ -86,20 +102,22 @@ class BambiManager(object):
                                         loglikes[:self._ntrain])
 
         if self._proxy_trained:
-            print("\nUsing trained neural network")
+            print("\nUsing trained neural network", end=" ")
+            self.neural_likecalls += 1
         else:
-            print("\nUnable to use neural network")
+            print("\nUnable to use neural network", end=" ")
+        print("| Total neural-like calls: {}".format(self.neural_likecalls))
+        return self._proxy_trained
 
     def loglikelihood(self, params):
         """Bambi Proxy wrapper for original loglikelihood."""
         # Short circuit to the full likelihood if proxy not yet fully trained
-        self.likecalls += 1
         if not self._proxy_trained:
             return self._loglikelihood(params)
 
         # Call the learner
         candidate_loglikelihood = self._current_learner(params)
-        print("\n neural like:", candidate_loglikelihood)
+        # print("\n neural like:", candidate_loglikelihood)
         # If the learner can be trusted, use its estimate,
         # otherwise use the original like and update the failure status
         if self._current_learner.valid(candidate_loglikelihood):
