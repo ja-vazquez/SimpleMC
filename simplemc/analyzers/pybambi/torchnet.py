@@ -13,7 +13,8 @@ try:
     from torch.autograd import Variable
     from torch import optim
 except:
-    sys.exit("You need to install torch")
+    print("You need to install torch if want to use torch neural net. \n"
+          "Keras can be used instead.")
 
 class TorchNetInterpolation:
     """Torch neural net interpolation.
