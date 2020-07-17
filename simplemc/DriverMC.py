@@ -420,9 +420,10 @@ class DriverMC:
                             updInt=updInt, proxy_tolerance=proxy_tolerance)
 
             self.logLike = thumper.loglikelihood
-            dumper =thumper.dumper
+            dumper = thumper.dumper
         else:
             dumper = None
+
 
         if dynamic:
             logger.info("\nUsing dynamic nested sampling...")
@@ -439,7 +440,7 @@ class DriverMC:
         elif self.engine == 'dynesty':
             sampler = NestedSampler(self.logLike, self.priorTransform, self.dims,
                         bound=nestedType, sample = 'unif', nlive = nlivepoints,
-                        pool = pool, queue_size=nprocess)
+                        pool = pool, queue_size=nprocess, use_pool={'loglikelihood': False})
             sampler.run_nested(dlogz=accuracy, outputname=self.outputpath,
                                addDerived=self.addDerived, simpleLike=self.L, dumper=dumper)
             M = sampler.results
@@ -955,14 +956,6 @@ class DriverMC:
             logger.info("Using {} processors of {} .".format(nprocess, ncores))
 
         if nprocess != None:
-            if self.analyzername == 'nested':
-                if self.neuralNetwork:
-                    pool = ThreadPool(processes=nprocess)
-                else:
-                    pool = mp.Pool(processes=nprocess)
-            else:
                 pool = mp.Pool(processes=nprocess)
 
         return pool, nprocess
-
-
