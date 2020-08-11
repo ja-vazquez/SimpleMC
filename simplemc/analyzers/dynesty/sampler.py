@@ -922,13 +922,17 @@ class Sampler(object):
         self.bambi_dumper = dumper
 
         self.like = simpleLike
-        self.derived = addDerived
         self.outputname = outputname
-        self.cpars     = self.like.freeParameters()
 
-        if (self.like.name() == "Composite"):
-            self.sublikenames = self.like.compositeNames()
-            self.composite = True
+        if self.like is not None:
+            self.derived = addDerived
+            self.cpars     = self.like.freeParameters()
+
+            if (self.like.name() == "Composite"):
+                self.sublikenames = self.like.compositeNames()
+                self.composite = True
+            else:
+                self.composite = False
         else:
             self.composite = False
 
