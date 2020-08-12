@@ -54,7 +54,6 @@ class BambiManager(object):
         self.savedmodelpath = savedmodelpath
         self.it_to_start_net = it_to_start_net
         self.updInt = updInt
-        self.neural_likecalls = 0
 
     def make_learner(self, params, loglikes):
         """Construct a Predictor."""
@@ -84,7 +83,7 @@ class BambiManager(object):
             live_params = live_params['live_v']
         else:
             counter = it
-        # live_params is None for the additional workers of the mp.pool
+        # live_params is None for the additional wkers of the mp.pool
         if not self._proxy_trained and counter >= self.it_to_start_net:
             mod_it_after_net = (counter - self.it_to_start_net)%self.updInt
             if counter == self.it_to_start_net or mod_it_after_net == 0:
@@ -103,10 +102,9 @@ class BambiManager(object):
 
         if self._proxy_trained:
             print("\nUsing trained neural network", end=" ")
-            self.neural_likecalls += 1
         else:
             print("\nUnable to use neural network", end=" ")
-        print("| Total neural-like calls: {}".format(self.neural_likecalls))
+
         return self._proxy_trained
 
     def loglikelihood(self, params):
