@@ -11,7 +11,7 @@ class SimpleLikelihood (BaseLikelihood):
     def __init__(self, name, values_filename, cov_filename, fn='generic'):
         BaseLikelihood.__init__(self, name)
         # print("Loading ", values_filename)
-        logger.info("Loading ", values_filename)
+        logger.info("Loading {}".format(values_filename))
         data = sp.loadtxt(values_filename)
         self.xx  = data[:,0]
         self.yy  = data[:,1]

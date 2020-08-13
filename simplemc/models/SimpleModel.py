@@ -32,7 +32,7 @@ class SimpleModel:
 
     def printParameters(self, params):
         for p in params:
-            logger.info(p.name, '=', p.value, '+/-', p.error)
+            logger.info('{} = {} +/- {}'.format(p.name, p.value, p.error))
 
     def updateParams(self, pars):
         return True
