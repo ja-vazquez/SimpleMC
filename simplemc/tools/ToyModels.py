@@ -1,18 +1,27 @@
-#!/usr/bin/env python
 import numpy as np
-import time
-from scipy.special import ndtri
 
 class ToyModels:
     def __init__(self, model):
         """
-        model_bounds are lists [infx, supx, infy, supy, infz, supz]
+        This class contains some toy models to test nested samplers
+
+        Parameters
+        ----------
+        model : str
+            {'egg', 'ring', 'gaussian', 'square', 'himmel'}
         """
-        self.ring_bounds  = [-5., 5., -5., 5., 0., 10.]
-        self.gauss_bonds = [-5., 5., -5., 5., 0., 1.]
-        self.egg_bounds = [0., 1., 0., 1., -100., 300.]
-        self.himmel_bounds = [-5., 5., -5., 5., 0., 1.]
-        self.square_bounds = [-5., 5., -5., 5., 0., 1.]
+        # self.bounds contains x and y bounds.
+        if model == 'egg':
+            self.bounds = [[0., 1.], [0., 1.]]
+            self.bounds_z = [-100., 300.]
+            self.loglike = self.eggLoglike
+
+        elif model in ['ring', 'gaussian', 'himmel', 'square']:
+            self.bounds = [[-5., 5.], [-5., 5.]]
+            if model == 'ring':
+                self.bounds_z = [0., 10.]
+            else:
+                self.bounds_z = [0., 1.]
 
     def eggLoglike(self, cube):
         tmax = 5.0 * np.pi
@@ -20,7 +29,7 @@ class ToyModels:
         return (2.0 + np.cos(t[0] / 2.0) * np.cos(t[1] / 2.0)) ** 5.0
 
     def himmelLoglike(self, cube):
-        return -(cube[0] ** 2 + cube[1] - 11) ** 2.0 - (cube[0] + cube[1] ** 2 - 7) ** 2
+        return -(cube[0] ** 2 + cube[1] - parameterlist[0]) ** 2.0 - (cube[0] + cube[1] ** 2 - parameterlist[1]) ** 2
 
     def gaussLoglike(self, x):
         return -((x[0]) ** 2 + (x[1]) ** 2 / 2.0 - 1.0 * x[0] * x[1]) / 2.0
@@ -35,9 +44,11 @@ class ToyModels:
             sq = 0.
         return sq
 
-    def genericPriorTransform(self, cube):
-        return cube * (suppr - infpr) + infpr
-
+    def priorTransform(self, theta):
+        priors = []
+        for c, bound in enumerate(self.bounds):
+            priors.append(theta[c] * (bound[1] - bound[0]) + bound[0])
+        return np.array(priors)
 
 
 
