@@ -57,14 +57,13 @@ def bambi(loglikelihood, nDims, **kwargs):
     proxy_tolerance = kwargs.pop('proxy_tolerance', 0.1)
     failure_tolerance = kwargs.pop('failure_tolerance', 0.5)
     ntrain = kwargs.pop('ntrain', nlive)
-    # ntrain = kwargs.pop('ntrain', 100)
     split = kwargs.pop('split', 0.8)
     numNeurons = kwargs.pop('numNeurons', 200)
-    epochs = kwargs.pop('epochs', 0.8)
+    epochs = kwargs.pop('epochs', 100)
     model = kwargs.pop('model', None)
     savedmodelpath = kwargs.pop('savedmodelpath', None)
-    it_to_start_net = kwargs.pop('it_to_start_net', 1000)
-    updInt = kwargs.pop('updInt', 500)
+    it_to_start_net = kwargs.pop('it_to_start_net', nlive)
+    updInt = kwargs.pop('updInt', nlive)
 
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
