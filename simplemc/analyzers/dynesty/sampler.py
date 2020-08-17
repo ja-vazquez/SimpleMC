@@ -864,7 +864,7 @@ class Sampler(object):
                    save_bounds=True,
                    addDerived=False,
                    outputname="outputDynesty",
-                   simpleLike=None, dumper=None):
+                   simpleLike=None, dumper=None, netError=0.001):
         """
         **A wrapper that executes the main nested sampling loop.**
         Iteratively replace the worst live point with a sample drawn
@@ -920,6 +920,7 @@ class Sampler(object):
 
         """
         self.bambi_dumper = dumper
+        self.netError = netError
 
         self.like = simpleLike
         self.outputname = outputname
@@ -1077,7 +1078,7 @@ class Sampler(object):
 
     def neural_valid(self, loglikelihood, minLogL, maxLogL):
         inRange = True
-        if loglikelihood > maxLogL - 0.001\
-                         or loglikelihood < minLogL - 0.001:
+        if loglikelihood > maxLogL + self.netError\
+                         or loglikelihood < minLogL - self.netError:
             inRange = False
         return inRange
