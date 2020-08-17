@@ -12,24 +12,26 @@ class ToyModels:
         """
         # self.bounds contains x and y bounds.
         if model == 'egg':
-            self.bounds = [[0., 1.], [0., 1.]]
-            self.bounds_z = [-100., 300.]
+            self.bounds = [[0., 10*np.pi], [0., 10*np.pi]]
             self.loglike = self.eggLoglike
 
         elif model in ['ring', 'gaussian', 'himmel', 'square']:
             self.bounds = [[-5., 5.], [-5., 5.]]
             if model == 'ring':
-                self.bounds_z = [0., 10.]
-            else:
-                self.bounds_z = [0., 1.]
+                self.loglike = self.ringLoglike
+            elif model == 'gaussian':
+                self.loglike = self.gaussLoglike
+            elif model == 'himmel':
+                self.loglike = self.himmelLoglike
+            elif model == 'square':
+                self.loglike = self.squareLoglike
 
     def eggLoglike(self, cube):
-        tmax = 5.0 * np.pi
-        t = 2.0 * tmax * cube - tmax
-        return (2.0 + np.cos(t[0] / 2.0) * np.cos(t[1] / 2.0)) ** 5.0
+        x, y = cube
+        return (2+np.cos(x/2.0)*np.cos(y/2.0))**5.0
 
     def himmelLoglike(self, cube):
-        return -(cube[0] ** 2 + cube[1] - parameterlist[0]) ** 2.0 - (cube[0] + cube[1] ** 2 - parameterlist[1]) ** 2
+        return -(cube[0] ** 2 + cube[1] - 11) ** 2.0 - (cube[0] + cube[1] ** 2 - 7) ** 2
 
     def gaussLoglike(self, x):
         return -((x[0]) ** 2 + (x[1]) ** 2 / 2.0 - 1.0 * x[0] * x[1]) / 2.0
