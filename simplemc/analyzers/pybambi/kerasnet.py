@@ -38,7 +38,7 @@ class KerasNetInterpolation:
 
     """
     # IGV: ntrain is 80% (split) of multinest sampling points as in arXiv:1110.2997
-    def __init__(self, params, logL, split=0.8, numNeurons=200, epochs=300, model=None,
+    def __init__(self, params, logL, split=0.8, numNeurons=200, epochs=100, model=None,
                  savedmodelpath=None):
 
         params = numpy.array(params)
@@ -133,9 +133,8 @@ class KerasNetInterpolation:
 
         """
         inRange = True
-        # if loglikelihood > self._maxLogL + self.uncertainty() \
-        #         or loglikelihood < self._minLogL - self.uncertainty():
-        if loglikelihood > self._maxLogL + 20.\
-                         or loglikelihood < self._minLogL - 20.:
+
+        if loglikelihood > self._maxLogL + 2*self.uncertainty() \
+                         or loglikelihood < self._minLogL - 2*self.uncertainty():
             inRange = False
         return inRange
