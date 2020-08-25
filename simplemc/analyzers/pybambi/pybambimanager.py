@@ -101,9 +101,9 @@ class BambiManager(object):
                                         loglikes[:self._ntrain])
 
         if self._proxy_trained:
-            print("\nUsing trained neural network", end=" ")
+            print("\nUsing trained neural network")
         else:
-            print("\nUnable to use neural network", end=" ")
+            print("\nUnable to use neural network")
 
         return self._proxy_trained
 
