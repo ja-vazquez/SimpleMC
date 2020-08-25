@@ -38,7 +38,7 @@ class KerasNetInterpolation:
 
     """
     # IGV: ntrain is 80% (split) of multinest sampling points as in arXiv:1110.2997
-    def __init__(self, params, logL, split=0.8, numNeurons=200, epochs=100, model=None,
+    def __init__(self, params, logL, split=0.8, numNeurons=300, epochs=100, model=None,
                  savedmodelpath=None):
 
         params = numpy.array(params)
@@ -72,8 +72,8 @@ class KerasNetInterpolation:
             self.model = model
 
         callbacks = [tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min',
-                                   min_delta=0.001,
-                                   patience=10,
+                                   min_delta=1e-4,
+                                   patience=5,
                                    restore_best_weights=True)]
 
         self.history = self.model.fit(self.params_training,
@@ -134,7 +134,7 @@ class KerasNetInterpolation:
         """
         inRange = True
 
-        if loglikelihood > self._maxLogL + 2*self.uncertainty() \
-                         or loglikelihood < self._minLogL - 2*self.uncertainty():
+        if loglikelihood > self._maxLogL + 0.0001 \
+                         or loglikelihood < self._minLogL - 0.0001:
             inRange = False
         return inRange
