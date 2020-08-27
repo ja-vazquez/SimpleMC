@@ -834,7 +834,7 @@ class Sampler(object):
             # Increment total number of iterations.
             self.it += 1
 
-            # trying bambi
+            # Using neural network to learn likelihood function
             if self.bambi_dumper:
                 if self.pool is not None and self.queue_size > 1:
                     bambiargs = []
@@ -947,6 +947,7 @@ class Sampler(object):
 
         # Run the main nested sampling loop.
         ncall = self.ncall
+        # Open text file to save samples for SimpleMC
         f = open(self.outputname + '_1.txt', 'w+')
         for it, results in enumerate(self.sample(maxiter=maxiter,
                                                  maxcall=maxcall,
@@ -969,12 +970,13 @@ class Sampler(object):
 
             # Print progress.
             if print_progress:
+                # Writing weights, likes and samples in a text file.
                 weights = np.exp(results[5])
                 vstarstr = str(results[2]).lstrip('[').rstrip(']')
                 sys.stdout.write("\rit: {} | ncall: {} | eff: {:.3f} | logz: {:.4f} | "
                       "dlogz: {:.4f} | loglstar: {:.4f} | point {}".format(it, ncall, eff, logz, delta_logz, loglstar, vstarstr))
                 sys.stdout.flush()
-                # exp(logwt - loglstar)
+
                 if addDerived:
                     self.AD = AllDerived()
                     # simpleLike -> simpleMC loglike object
@@ -1007,9 +1009,10 @@ class Sampler(object):
                 if logz <= -1e6:
                     logz = -np.inf
 
+                # Writing weights, likes and samples in a text file.
                 weights = np.exp(results[5])
-                # weights = np.exp(self.results['logwt'] - self.results['logz'][-1])
                 vstarstr = str(results[2]).lstrip('[').rstrip(']')
+
                 if addDerived:
                     self.AD = AllDerived()
                     # simpleLike -> simpleMC loglike object
