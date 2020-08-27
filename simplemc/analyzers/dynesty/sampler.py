@@ -919,16 +919,16 @@ class Sampler(object):
             the live points internally. Default is *True*.
 
         """
+        # Parameters for the neural network use
         self.bambi_dumper = dumper
         self.netError = netError
 
+        # Set parameters for the simplemc output text file
         self.like = simpleLike
         self.outputname = outputname
-
         if self.like is not None:
             self.derived = addDerived
-            self.cpars     = self.like.freeParameters()
-
+            self.cpars = self.like.freeParameters()
             if (self.like.name() == "Composite"):
                 self.sublikenames = self.like.compositeNames()
                 self.composite = True
@@ -936,7 +936,6 @@ class Sampler(object):
                 self.composite = False
         else:
             self.composite = False
-
 
         # Define our stopping criteria.
         if dlogz is None:
@@ -970,7 +969,7 @@ class Sampler(object):
 
             # Print progress.
             if print_progress:
-                # Writing weights, likes and samples in a text file.
+                # Writing weights, likes and samples in a text file for simplemc output.
                 weights = np.exp(results[5])
                 vstarstr = str(results[2]).lstrip('[').rstrip(']')
                 sys.stdout.write("\rit: {} | ncall: {} | eff: {:.3f} | logz: {:.4f} | "
@@ -1009,7 +1008,7 @@ class Sampler(object):
                 if logz <= -1e6:
                     logz = -np.inf
 
-                # Writing weights, likes and samples in a text file.
+                # Writing weights, likes and samples in a text file for simplemc output.
                 weights = np.exp(results[5])
                 vstarstr = str(results[2]).lstrip('[').rstrip(']')
 
@@ -1082,6 +1081,8 @@ class Sampler(object):
         return cloglike, cloglikes
 
     def neural_valid(self, loglikelihood, minLogL, maxLogL):
+        # This method validates the value predicted via the neural network,
+        # it uses netError as a deviation of minLogL and maxLogL.
         inRange = True
         if loglikelihood > maxLogL + self.netError\
                          or loglikelihood < minLogL - self.netError:
