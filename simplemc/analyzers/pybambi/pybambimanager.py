@@ -80,12 +80,12 @@ class BambiManager(object):
             live_loglks = params['live_logl']
             dead_params = params['dead_v']
             dead_loglks = params['dead_logl']
-            counter = params['it']
+            counter = params['it'] - 3
             live_params = params['live_v']
         else:
             # dynesty isn't running in parallel
             live_params = params
-            counter = it
+            counter = it - 3
 
         if not self._proxy_trained and counter >= self.it_to_start_net:
             mod_it_after_net = (counter - self.it_to_start_net)%self.updInt
