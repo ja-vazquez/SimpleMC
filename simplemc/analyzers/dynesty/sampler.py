@@ -1071,6 +1071,8 @@ class Sampler(object):
                 sys.stdout.flush()
 
     def getLikes(self):
+        # This function is to extract the likelihoods for each observational dataset
+        # used in simplemc and write them in the output text file
         if (self.composite):
             cloglikes = self.like.compositeLogLikes_wprior()
             cloglike = cloglikes.sum()
