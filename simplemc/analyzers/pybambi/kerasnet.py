@@ -10,11 +10,10 @@ Date: June 2020
 """
 import numpy
 import sys
-import multiprocessing as mp
-#mp.set_start_method('spawn', force=True)
+from sklearn.preprocessing import StandardScaler
+
 try:
     import tensorflow as tf
-
 except:
     sys.exit("You need to install tensorflow")
 
@@ -37,8 +36,7 @@ class KerasNetInterpolation:
         shape (ntrain,)
 
     """
-    # IGV: ntrain is 80% (split) of multinest sampling points as in arXiv:1110.2997
-    def __init__(self, params, logL, split=0.8, numNeurons=300, epochs=100, model=None,
+    def __init__(self, params, logL, split=0.8, numNeurons=200, epochs=100, model=None,
                  savedmodelpath=None):
 
         params = numpy.array(params)
@@ -63,6 +61,14 @@ class KerasNetInterpolation:
         self.params_training, self.params_testing = numpy.split(params, indx)
         self.logL_training, self.logL_testing = numpy.split(logL, indx)
 
+        # create scaler
+        scaler = StandardScaler()
+        # fit scaler on data
+        scaler.fit(self.params_training)
+        # apply transform
+        self.params_training = scaler.transform(self.params_training)
+        self.params_testing = scaler.transform(self.params_testing)
+
         if savedmodelpath is not None:
             self.model = tf.keras.models.load_model(savedmodelpath)
         elif model is None:
@@ -73,14 +79,14 @@ class KerasNetInterpolation:
 
         callbacks = [tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min',
                                    min_delta=1e-4,
-                                   patience=5,
+                                   patience=2,
                                    restore_best_weights=True)]
 
         self.history = self.model.fit(self.params_training,
                                       self.logL_training,
                                       validation_data=(self.params_testing,
                                                        self.logL_testing),
-                                      epochs=epochs, batch_size=32,
+                                      epochs=epochs, batch_size=64,
                                       callbacks=callbacks)
 
     def _default_architecture(self):
@@ -134,7 +140,7 @@ class KerasNetInterpolation:
         """
         inRange = True
 
-        if loglikelihood > self._maxLogL + 0.0001 \
-                         or loglikelihood < self._minLogL - 0.0001:
+        if loglikelihood > self._maxLogL + 0.1 \
+                         or loglikelihood < self._minLogL - 0.01:
             inRange = False
         return inRange
