@@ -22,7 +22,7 @@ tm = TM(model=modelname)  # create a ToyModel instance
 priorTransform = tm.priorTransform  # uniform prior transform
 loglike = tm.loglike
 dims = 2
-nlive = 500
+nlive = 1000
 
 # Parallel options
 nworkers = 2
@@ -35,12 +35,13 @@ sampler1 = NestedSampler(loglike, priorTransform, ndim=dims,
                         use_pool={'loglikelihood': False})
 
 ti = time.time()
-sampler1.run_nested(dlogz=100, outputname=modelname+"_dynesty")
+sampler1.run_nested(dlogz=0.01, outputname=modelname+"_dynesty")
 resultnested = sampler1.results
 tfnested = time.time() - ti
 
 # ### CONFIGURE pybambi neural network
-thumper = bambi(loglike, dims, learner='keras', proxy_tolerance=100.0, nlive=nlive, epochs=100)
+thumper = bambi(loglike, dims, learner='keras', proxy_tolerance=100.0, nlive=nlive, epochs=100,
+                ntrain=200, updInt=200)
 neural_logLike = thumper.loglikelihood
 dumper = thumper.dumper
 
