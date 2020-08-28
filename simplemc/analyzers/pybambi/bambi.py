@@ -63,7 +63,8 @@ def bambi(loglikelihood, nDims, **kwargs):
     model = kwargs.pop('model', None)
     savedmodelpath = kwargs.pop('savedmodelpath', None)
     it_to_start_net = kwargs.pop('it_to_start_net', nlive)
-    updInt = kwargs.pop('updInt', nlive)
+    updInt = kwargs.pop('updInt', it_to_start_net)
+
 
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
