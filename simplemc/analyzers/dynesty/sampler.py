@@ -85,6 +85,10 @@ class Sampler(object):
                  update_interval, first_update, rstate,
                  queue_size, pool, use_pool):
         self.usedNeural = False
+        self.neural_counter = 0
+        self.print_txt = "\rit: {} | ncall: {} | eff: {:.3f} | logz: {:.4f} | " \
+                         "dlogz: {:.4f} | loglstar: {:.4f} | point {}"
+
         # distributions
         self.loglikelihood_control = loglikelihood
         self.loglikelihood = loglikelihood
@@ -839,18 +843,18 @@ class Sampler(object):
                 if self.pool is not None and self.queue_size > 1:
                     bambiargs = []
                     dumper_dict = {'live_v': self.live_v, 'live_logl': self.live_logl,
-                                   'dead_v': self.saved_v, 'dead_logl': self.saved_logl,
-                                   'it': self.it}
+                                   'it': self.it, 'dlogz': delta_logz}
                     bambiargs.append(dumper_dict)
                     if self.usedNeural == False:
                         r = self.pool.apply(self.bambi_dumper, bambiargs)
                     if r:
-                        self.usedNeural = self.neural_valid(logl,
-                                                            np.min(self.live_logl),
-                                                            np.max(self.live_logl))
+                        self.usedNeural = self.neural_valid(logl)
                 else:
-                    self.bambi_dumper(self.live_v, self.live_logl,
-                                      self.saved_v, self.saved_logl, it=self.it)
+                    r = self.bambi_dumper(self.live_v, self.live_logl,
+                                          dlogz=delta_logz, it=self.it)
+
+                if r:
+                    self.neural_counter += 1
 
 
             # Return dead point and ancillary quantities.
@@ -922,7 +926,8 @@ class Sampler(object):
         # Parameters for the neural network use
         self.bambi_dumper = dumper
         self.netError = netError
-
+        if self.bambi_dumper:
+            self.print_txt += " | neural_counts: {}"
         # Set parameters for the simplemc output text file
         self.like = simpleLike
         self.outputname = outputname
@@ -972,8 +977,7 @@ class Sampler(object):
                 # Writing weights, likes and samples in a text file for simplemc output.
                 weights = np.exp(results[5])
                 vstarstr = str(results[2]).lstrip('[').rstrip(']')
-                sys.stdout.write("\rit: {} | ncall: {} | eff: {:.3f} | logz: {:.4f} | "
-                      "dlogz: {:.4f} | loglstar: {:.4f} | point {}".format(it, ncall, eff, logz, delta_logz, loglstar, vstarstr))
+                sys.stdout.write(self.print_txt.format(it, ncall, eff, logz, delta_logz, loglstar, vstarstr, self.neural_counter))
                 sys.stdout.flush()
 
                 if addDerived:
@@ -1064,10 +1068,10 @@ class Sampler(object):
 
             # Print progress.
             if print_progress:
-                sys.stdout.write("\rit: {} | ncall: {} | eff: {:.3f} |"
-                      "logz: {} | dlogz: {:.4f} | loglstar: {}".format(self.it+i, ncall, eff, logz,
-                                                                       delta_logz, loglstar))
+                sys.stdout.write(self.print_txt.format(self.it+i, ncall, eff, logz,
+                                                                       delta_logz, loglstar, vstar, self.neural_counter))
                 sys.stdout.flush()
+
 
     def getLikes(self):
         # This function is to extract the likelihoods for each observational dataset
@@ -1080,11 +1084,11 @@ class Sampler(object):
             cloglike = self.like.loglike_wprior()
         return cloglike, cloglikes
 
-    def neural_valid(self, loglikelihood, minLogL, maxLogL):
+    def neural_valid(self, loglikelihood):
         # This method validates the value predicted via the neural network,
         # it uses netError as a deviation of minLogL and maxLogL.
         inRange = True
-        if loglikelihood > maxLogL + 10 * self.netError\
-                or loglikelihood < minLogL - self.netError:
+        if loglikelihood > np.max(self.live_logl) + 10 * self.netError\
+                or loglikelihood < np.min(self.live_logl) - self.netError:
             inRange = False
         return inRange
