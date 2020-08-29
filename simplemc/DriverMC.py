@@ -343,17 +343,17 @@ class DriverMC:
             #nsigma is the default value for sigma in gaussian priors
             self.nsigma = self.config.get('nested', 'sigma', fallback=2)
 
-            if neuralNetwork:
-                split      = self.config.getfloat('neural', 'split', fallback=0.8)
-                numNeurons = self.config.getint('neural', 'numNeurons', fallback=200)
-                epochs = self.config.getint('neural', 'epochs', fallback=300)
-                ntrain = self.config.getint('neural', 'ntrain', fallback=nlivepoints)
-                learner = self.config.get('neural', 'learner', fallback='keras')
-                model  = self.config.get( 'model', 'model',   fallback=None)
-                savedmodelpath = self.config.get('neural', 'savedmodelpath', fallback=None)
-                it_to_start_net = self.config.getint('neural', 'it_to_start_net', fallback=1000)
-                updInt = self.config.getint('neural', 'updInt', fallback=500)
-                proxy_tolerance = self.config.getfloat('neural', 'proxy_tolerance', fallback=0.01)
+            # Neural network settings
+            split      = self.config.getfloat('neural', 'split', fallback=0.8)
+            numNeurons = self.config.getint('neural', 'numNeurons', fallback=200)
+            epochs = self.config.getint('neural', 'epochs', fallback=300)
+            learner = self.config.get('neural', 'learner', fallback='keras')
+            model  = self.config.get( 'model', 'model',   fallback=None)
+            savedmodelpath = self.config.get('neural', 'savedmodelpath', fallback=None)
+            it_to_start_net = self.config.getint('neural', 'it_to_start_net', fallback=None)
+            dlogz_start = self.config.getfloat('neural', 'proxy_tolerance', fallback=10)
+            updInt = self.config.getint('neural', 'updInt', fallback=nlivepoints)
+            proxy_tolerance = self.config.getfloat('neural', 'proxy_tolerance', fallback=0.01)
 
         else:
             self.engine = kwargs.pop('engine',    'dynesty')
@@ -371,12 +371,12 @@ class DriverMC:
             split = kwargs.pop('split', 0.8)
             numNeurons = kwargs.pop('numNeurons', 100)
             epochs = kwargs.pop('epochs', 100)
-            ntrain = kwargs.pop('ntrain', nlivepoints)
             learner = kwargs.pop('learner', 'keras')
             model = kwargs.pop('model', None)
             savedmodelpath = kwargs.pop('savedmodelpath', None)
-            it_to_start_net = kwargs.pop('it_to_start_net', ntrain)
-            updInt = kwargs.pop('updInt', it_to_start_net)
+            it_to_start_net = kwargs.pop('it_to_start_net', None)
+            dlogz_start = kwargs.pop('dlogz_start', 10)
+            updInt = kwargs.pop('updInt', nlivepoints)
             proxy_tolerance = kwargs.pop('proxy_tolerance', 0.01)
 
             if kwargs:
@@ -412,12 +412,13 @@ class DriverMC:
             from simplemc.analyzers.pybambi.bambi import bambi
             # self.logLike =
             thumper = bambi(self.logLike, self.dims,
-                            learner=learner, ntrain=ntrain,
+                            learner=learner,
                             split=split, numNeurons=numNeurons,
                             epochs=epochs, model=model,
                             savedmodelpath=savedmodelpath,
                             it_to_start_net=it_to_start_net,
-                            updInt=updInt, proxy_tolerance=proxy_tolerance)
+                            updInt=updInt, dlogz_start=dlogz_start,
+                            proxy_tolerance=proxy_tolerance)
 
             self.logLike = thumper.loglikelihood
             dumper = thumper.dumper
