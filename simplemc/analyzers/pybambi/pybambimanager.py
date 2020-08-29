@@ -10,13 +10,13 @@ Date: June 2020
 import numpy as np
 from simplemc.analyzers.pybambi.kerasnet import KerasNetInterpolation
 from simplemc.analyzers.pybambi.torchnet import TorchNetInterpolation
+
 import sys
 
 try:
     import tensorflow as tf
 except:
     sys.exit("You need to install tensorflow")
-
 
 class BambiManager(object):
     """Does all the talking for BAMBI.
@@ -25,16 +25,11 @@ class BambiManager(object):
     neural net, and assesses whether or not it can be used for a given
     parameter combination.
 
-    Parameters
-    ----------
-    ntrain: int
-        Number of training points to use
-
     """
 
     def __init__(self, loglikelihood, learner, proxy_tolerance,
-                 failure_tolerance, ntrain, split=0.8, numNeurons=200, epochs=300,
-                 model=None, savedmodelpath=None, it_to_start_net=1000, updInt=500):
+                 failure_tolerance, updInt, split=0.8, numNeurons=200, epochs=300,
+                 model=None, savedmodelpath=None, it_to_start_net=None, dlogz_start=None):
         """Construct bambi object."""
 
         self.proxy_tolerance = proxy_tolerance
@@ -42,7 +37,6 @@ class BambiManager(object):
         self._learner = learner
         self._proxy_tolerance = proxy_tolerance
         self._failure_tolerance = failure_tolerance
-        self._ntrain = ntrain
         self._proxy_trained = False
         self.old_learners = []
         self.split = split
@@ -52,6 +46,7 @@ class BambiManager(object):
         self.savedmodelpath = savedmodelpath
         self.it_to_start_net = it_to_start_net
         self.updInt = updInt
+        self.dlogz_start = dlogz_start
 
     def make_learner(self, params, loglikes):
         """Construct a Predictor."""
@@ -71,32 +66,34 @@ class BambiManager(object):
             raise NotImplementedError('learner %s is not implemented.'
                                       % self._learner)
 
-    def dumper(self, params, live_loglks=None, dead_params=None, dead_loglks=None, it=0):
+    def dumper(self, params, live_loglks=None, dlogz=1e4, it=0):
         """It sends datasets of physical points and likelihoods to neural net"""
         # params is a dictionary if dynesty is running in parallel
         # or the numpy array of the live_params if is running without parallelism.
         if live_loglks is None:
             # if live_loglks is None -> dynesty is running in parallel.
             live_loglks = params['live_logl']
-            dead_params = params['dead_v']
-            dead_loglks = params['dead_logl']
-            counter = params['it'] - 3
             live_params = params['live_v']
+            counter = params['it'] - 3
+            dlogz = params['dlogz']
         else:
             # dynesty isn't running in parallel
             live_params = params
             counter = it - 3
 
-        if not self._proxy_trained and counter >= self.it_to_start_net:
-            mod_it_after_net = (counter - self.it_to_start_net)%self.updInt
-            if counter == self.it_to_start_net or mod_it_after_net == 0:
-                dead_params = np.array(dead_params)
-                dead_loglks = np.array(dead_loglks)
-                params = np.concatenate((live_params, dead_params))
-                loglikes = np.concatenate((live_loglks, dead_loglks))
+        mod = counter % self.updInt
+        if mod == 0:
+            if self.dlogz_start is None and self.it_to_start_net is not None:
+                if not self._proxy_trained and counter >= self.it_to_start_net:
+                    self.train_new_learner(live_params, live_loglks)
+            elif self.dlogz_start is not None and self.it_to_start_net is None:
+                if not self._proxy_trained and dlogz <= self.dlogz_start:
+                  self.train_new_learner(live_params, live_loglks)
+            else:
+                sys.exit("\nPlease choose a criteria to start the neural net training."
+                         "Set dlogz_start and it_to_start_net, one of them with None"
+                         " and the other with a valid values")
 
-                self.train_new_learner(params[:self._ntrain, :],
-                                       loglikes[:self._ntrain])
 
         if self._proxy_trained:
             print("\nUsing trained neural network")
@@ -119,9 +116,9 @@ class BambiManager(object):
         if self._current_learner.valid(candidate_loglikelihood):
             return candidate_loglikelihood
         else:
-            self._rolling_failure_fraction = (1.0 + (self._ntrain - 1.0) *
+            self._rolling_failure_fraction = (1.0 + (self.updInt - 1.0) *
                                               self._rolling_failure_fraction
-                                              ) / self._ntrain
+                                              ) / self.updInt
             if self._rolling_failure_fraction > self._failure_tolerance:
                 self._proxy_trained = False
             return self._loglikelihood(params)

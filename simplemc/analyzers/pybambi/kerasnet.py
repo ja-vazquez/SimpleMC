@@ -36,11 +36,12 @@ class KerasNetInterpolation:
         shape (ntrain,)
 
     """
-    def __init__(self, params, logL, split=0.8, numNeurons=200, epochs=100, model=None,
+    def __init__(self, params, logL, split=0.8, numNeurons=300, epochs=100, model=None,
                  savedmodelpath=None):
 
         params = numpy.array(params)
         logL = numpy.array(logL)
+        batch_size = 16
 
         if len(params) != len(logL):
             raise ValueError("input and target must be the same length")
@@ -78,15 +79,16 @@ class KerasNetInterpolation:
             self.model = model
 
         callbacks = [tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min',
-                                   min_delta=1e-4,
-                                   patience=2,
-                                   restore_best_weights=True)]
+                                   min_delta=0.0,
+                                   patience=5,
+                                   restore_best_weights=True),
+                     tf.keras.callbacks.ReduceLROnPlateau(patience=2)]
 
         self.history = self.model.fit(self.params_training,
                                       self.logL_training,
                                       validation_data=(self.params_testing,
                                                        self.logL_testing),
-                                      epochs=epochs, batch_size=64,
+                                      epochs=epochs, batch_size=batch_size,
                                       callbacks=callbacks)
 
     def _default_architecture(self):
