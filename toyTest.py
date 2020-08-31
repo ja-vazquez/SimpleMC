@@ -22,7 +22,7 @@ tm = TM(model=modelname)  # create a ToyModel instance
 priorTransform = tm.priorTransform  # uniform prior transform
 loglike = tm.loglike
 dims = 2
-nlive = 1000
+nlive = 500
 
 # Parallel options
 nworkers = 2
@@ -41,7 +41,7 @@ tfnested = time.time() - ti
 
 # ### CONFIGURE pybambi neural network
 thumper = bambi(loglike, dims, learner='keras', proxy_tolerance=100.0, nlive=nlive, epochs=100,
-                ntrain=200, updInt=200)
+                updInt=200, dlogz_start=10)
 neural_logLike = thumper.loglikelihood
 dumper = thumper.dumper
 
