@@ -81,24 +81,13 @@ class BambiManager(object):
             live_params = params
             counter = it - 3
 
+        if self.dlogz_start:
+            if dlogz <= self.dlogz_start and counter < self.it_to_start_net:
+                self.it_to_start_net = counter
+
         mod = counter % self.updInt
-        if mod == 0:
-            if self.dlogz_start is None and self.it_to_start_net is not None:
-                if not self._proxy_trained and counter >= self.it_to_start_net:
-                    self.train_new_learner(live_params, live_loglks)
-            elif self.dlogz_start is not None and self.it_to_start_net is None:
-                if not self._proxy_trained and dlogz <= self.dlogz_start:
-                  self.train_new_learner(live_params, live_loglks)
-            else:
-                sys.exit("\nPlease choose a criteria to start the neural net training."
-                         "Set dlogz_start and it_to_start_net, one of them with None"
-                         " and the other with a valid values")
-
-
-        if self._proxy_trained:
-            print("\nUsing trained neural network")
-        else:
-            print("\nUnable to use neural network")
+        if mod == 0 and not self._proxy_trained and counter >= self.it_to_start_net:
+            self.train_new_learner(live_params, live_loglks)
 
         return self._proxy_trained
 
