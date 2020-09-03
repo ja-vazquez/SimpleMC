@@ -374,7 +374,7 @@ class DriverMC:
             learner = kwargs.pop('learner', 'keras')
             model = kwargs.pop('model', None)
             savedmodelpath = kwargs.pop('savedmodelpath', None)
-            it_to_start_net = kwargs.pop('it_to_start_net', None)
+            it_to_start_net = kwargs.pop('it_to_start_net', 10000)
             dlogz_start = kwargs.pop('dlogz_start', 10)
             updInt = kwargs.pop('updInt', nlivepoints)
             proxy_tolerance = kwargs.pop('proxy_tolerance', 0.01)
