@@ -7,10 +7,7 @@ Modified for SimpleMC and dynesty use by I Gomez-Vargas (igomezv0701@alumno.ipn.
 Date: June 2020
 """
 
-import numpy as np
 from simplemc.analyzers.pybambi.kerasnet import KerasNetInterpolation
-from simplemc.analyzers.pybambi.torchnet import TorchNetInterpolation
-
 import sys
 
 try:
@@ -27,14 +24,13 @@ class BambiManager(object):
 
     """
 
-    def __init__(self, loglikelihood, learner, proxy_tolerance,
+    def __init__(self, loglikelihood, proxy_tolerance,
                  failure_tolerance, updInt, split=0.8, numNeurons=200, epochs=300,
                  model=None, savedmodelpath=None, it_to_start_net=None, dlogz_start=None):
         """Construct bambi object."""
 
         self.proxy_tolerance = proxy_tolerance
         self._loglikelihood = loglikelihood
-        self._learner = learner
         self._proxy_tolerance = proxy_tolerance
         self._failure_tolerance = failure_tolerance
         self._proxy_trained = False
@@ -50,21 +46,11 @@ class BambiManager(object):
 
     def make_learner(self, params, loglikes):
         """Construct a Predictor."""
-        if self._learner == 'keras':
-            return KerasNetInterpolation(params, loglikes,
-                                         split=self.split, numNeurons=self.numNeurons,
-                                         epochs=self.epochs, model=self.model,
-                                         savedmodelpath=self.savedmodelpath)
-        elif self._learner == 'torch':
-            return TorchNetInterpolation(params, loglikes,
-                                         split=self.split, numNeurons=self.numNeurons,
-                                         epochs=self.epochs, model=self.model,
-                                         savedmodelpath=self.savedmodelpath)
-        elif issubclass(type(self._learner), tf.keras.models.Model):
-            return KerasNetInterpolation(params, loglikes, model=self._learner)
-        else:
-            raise NotImplementedError('learner %s is not implemented.'
-                                      % self._learner)
+        return KerasNetInterpolation(params, loglikes,
+                             split=self.split, numNeurons=self.numNeurons,
+                             epochs=self.epochs, model=self.model,
+                             savedmodelpath=self.savedmodelpath)
+
 
     def dumper(self, params, live_loglks=None, dlogz=1e4, it=0):
         """It sends datasets of physical points and likelihoods to neural net"""

@@ -52,7 +52,6 @@ def bambi(loglikelihood, nDims, **kwargs):
     """
     # Process kwargs
     nlive = kwargs.pop('nlive', nDims*25)
-    learner = kwargs.pop('learner', 'keras')
     # Original 0.01 proxy_tolerance
     proxy_tolerance = kwargs.pop('proxy_tolerance', 0.1)
     failure_tolerance = kwargs.pop('failure_tolerance', 0.5)
@@ -69,7 +68,7 @@ def bambi(loglikelihood, nDims, **kwargs):
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
     # Set up the global manager of the BAMBI session.
-    thumper = BambiManager(loglikelihood, learner, proxy_tolerance,
+    thumper = BambiManager(loglikelihood, proxy_tolerance,
                            failure_tolerance, updInt, split=split,
                            numNeurons=numNeurons, epochs=epochs, model=model,
                            savedmodelpath=savedmodelpath, it_to_start_net=it_to_start_net,
