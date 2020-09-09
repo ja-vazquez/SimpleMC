@@ -1038,7 +1038,7 @@ class Sampler(object):
             f.close()
             self.it = it+1
         if self.bambi_dumper:
-            fnetout = open("neural_output.txt", 'w+')
+            fnetout = open(outputname+"_neural.txt", 'w+')
             fnetout.write("Likes predicted by neural net: {}".format(self.neural_counter))
             fnetout.close()
 
