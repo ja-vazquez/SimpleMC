@@ -347,7 +347,6 @@ class DriverMC:
             split      = self.config.getfloat('neural', 'split', fallback=0.8)
             numNeurons = self.config.getint('neural', 'numNeurons', fallback=200)
             epochs = self.config.getint('neural', 'epochs', fallback=300)
-            learner = self.config.get('neural', 'learner', fallback='keras')
             model  = self.config.get( 'model', 'model',   fallback=None)
             savedmodelpath = self.config.get('neural', 'savedmodelpath', fallback=None)
             it_to_start_net = self.config.getint('neural', 'it_to_start_net', fallback=None)
@@ -371,7 +370,6 @@ class DriverMC:
             split = kwargs.pop('split', 0.8)
             numNeurons = kwargs.pop('numNeurons', 100)
             epochs = kwargs.pop('epochs', 100)
-            learner = kwargs.pop('learner', 'keras')
             model = kwargs.pop('model', None)
             savedmodelpath = kwargs.pop('savedmodelpath', None)
             it_to_start_net = kwargs.pop('it_to_start_net', 10000)
@@ -412,7 +410,6 @@ class DriverMC:
             from simplemc.analyzers.pybambi.bambi import bambi
             # self.logLike =
             thumper = bambi(self.logLike, self.dims,
-                            learner=learner,
                             split=split, numNeurons=numNeurons,
                             epochs=epochs, model=model,
                             savedmodelpath=savedmodelpath,
