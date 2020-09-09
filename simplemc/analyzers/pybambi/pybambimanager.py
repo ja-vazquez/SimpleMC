@@ -47,9 +47,9 @@ class BambiManager(object):
     def make_learner(self, params, loglikes):
         """Construct a Predictor."""
         return KerasNetInterpolation(params, loglikes,
-                             split=self.split, numNeurons=self.numNeurons,
-                             epochs=self.epochs, model=self.model,
-                             savedmodelpath=self.savedmodelpath)
+                                     split=self.split, numNeurons=self.numNeurons,
+                                     epochs=self.epochs, model=self.model,
+                                     savedmodelpath=self.savedmodelpath)
 
 
     def dumper(self, params, live_loglks=None, dlogz=1e4, it=0):
