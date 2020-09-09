@@ -51,7 +51,6 @@ class BambiManager(object):
                                      epochs=self.epochs, model=self.model,
                                      savedmodelpath=self.savedmodelpath)
 
-
     def dumper(self, params, live_loglks=None, dlogz=1e4, it=0):
         """It sends datasets of physical points and likelihoods to neural net"""
         # params is a dictionary if dynesty is running in parallel
