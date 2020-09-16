@@ -844,18 +844,15 @@ class Sampler(object):
                     bambiargs = []
                     dumper_dict = {'live_v': self.live_v, 'live_logl': self.live_logl,
                                    'it': self.it, 'dlogz': delta_logz}
+
                     bambiargs.append(dumper_dict)
-                    if self.usedNeural == False:
-                        r = self.pool.apply(self.bambi_dumper, bambiargs)
-                    if r:
-                        self.usedNeural = self.neural_valid(logl)
+                    r = self.pool.apply(self.bambi_dumper, bambiargs)
+
                 else:
                     r = self.bambi_dumper(self.live_v, self.live_logl,
                                           dlogz=delta_logz, it=self.it)
-
                 if r:
                     self.neural_counter += 1
-
 
             # Return dead point and ancillary quantities.
             yield (worst, ustar, vstar, loglstar, logvol, logwt,
@@ -1087,12 +1084,3 @@ class Sampler(object):
             cloglikes = []
             cloglike = self.like.loglike_wprior()
         return cloglike, cloglikes
-
-    def neural_valid(self, loglikelihood):
-        # This method validates the value predicted via the neural network,
-        # it uses netError as a deviation of minLogL and maxLogL.
-        inRange = True
-        if loglikelihood > np.max(self.live_logl) + 10 * self.netError\
-                or loglikelihood < np.min(self.live_logl) - self.netError:
-            inRange = False
-        return inRange
