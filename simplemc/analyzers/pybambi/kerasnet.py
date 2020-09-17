@@ -143,6 +143,6 @@ class KerasNetInterpolation:
         inRange = True
 
         if loglikelihood > self._maxLogL + 0.1 \
-                         or loglikelihood < self._minLogL - 0.01:
+                           or loglikelihood < self._minLogL - 0.1:
             inRange = False
         return inRange

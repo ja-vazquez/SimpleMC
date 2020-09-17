@@ -71,7 +71,7 @@ class BambiManager(object):
                 self.it_to_start_net = counter
 
         mod = counter % self.updInt
-        if mod == 0 and not self._proxy_trained and counter >= self.it_to_start_net:
+        if mod == 0 and self._proxy_trained is False and counter >= self.it_to_start_net:
             self.train_new_learner(live_params, live_loglks)
 
         return self._proxy_trained
