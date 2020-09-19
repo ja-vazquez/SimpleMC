@@ -345,15 +345,15 @@ class DriverMC:
 
             # Neural network settings
             split      = self.config.getfloat('neural', 'split', fallback=0.8)
-            numNeurons = self.config.getint('neural', 'numNeurons', fallback=200)
-            epochs = self.config.getint('neural', 'epochs', fallback=300)
+            numNeurons = self.config.getint('neural', 'numNeurons', fallback=100)
+            epochs = self.config.getint('neural', 'epochs', fallback=100)
             model  = self.config.get( 'model', 'model',   fallback=None)
             savedmodelpath = self.config.get('neural', 'savedmodelpath', fallback=None)
             it_to_start_net = self.config.getint('neural', 'it_to_start_net', fallback=None)
-            dlogz_start = self.config.getfloat('neural', 'proxy_tolerance', fallback=10)
+            dlogz_start = self.config.getfloat('neural', 'proxy_tolerance', fallback=5)
             updInt = self.config.getint('neural', 'updInt', fallback=nlivepoints)
-            proxy_tolerance = self.config.getfloat('neural', 'proxy_tolerance', fallback=0.01)
-            failure_tolerance = self.config.getfloat('neural', 'failure_tolerance', fallback=0.2)
+            proxy_tolerance = self.config.getfloat('neural', 'proxy_tolerance', fallback=0.3)
+            failure_tolerance = self.config.getfloat('neural', 'failure_tolerance', fallback=0.5)
 
         else:
             self.engine = kwargs.pop('engine',    'dynesty')
@@ -374,9 +374,9 @@ class DriverMC:
             model = kwargs.pop('model', None)
             savedmodelpath = kwargs.pop('savedmodelpath', None)
             it_to_start_net = kwargs.pop('it_to_start_net', 10000)
-            dlogz_start = kwargs.pop('dlogz_start', 10)
+            dlogz_start = kwargs.pop('dlogz_start', 5)
             updInt = kwargs.pop('updInt', nlivepoints)
-            proxy_tolerance = kwargs.pop('proxy_tolerance', 2.0)
+            proxy_tolerance = kwargs.pop('proxy_tolerance', 0.3)
             failure_tolerance = kwargs.pop('failure_tolerance', 0.5)
 
             if kwargs:
