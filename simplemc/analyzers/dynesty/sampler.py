@@ -86,7 +86,6 @@ class Sampler(object):
                  queue_size, pool, use_pool):
         self.usedNeural = False
         self.neural_counter = 0
-        self.neural_counter_likes = 0
         self.print_txt = "\rit: {} | ncall: {} | eff: {:.3f} | logz: {:.4f} | " \
                          "dlogz: {:.4f} | loglstar: {:.4f} | point {}"
 
@@ -854,7 +853,6 @@ class Sampler(object):
                                           dlogz=delta_logz, it=self.it)
                 if r:
                     self.neural_counter += 1
-                    self.neural_counter_likes += nc
 
             # Return dead point and ancillary quantities.
             yield (worst, ustar, vstar, loglstar, logvol, logwt,
