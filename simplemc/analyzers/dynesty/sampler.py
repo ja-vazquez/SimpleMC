@@ -86,6 +86,7 @@ class Sampler(object):
                  queue_size, pool, use_pool):
         self.usedNeural = False
         self.neural_counter = 0
+        self.neural_counter_likes = 0
         self.print_txt = "\rit: {} | ncall: {} | eff: {:.3f} | logz: {:.4f} | " \
                          "dlogz: {:.4f} | loglstar: {:.4f} | point {}"
 
@@ -853,6 +854,7 @@ class Sampler(object):
                                           dlogz=delta_logz, it=self.it)
                 if r:
                     self.neural_counter += 1
+                    self.neural_counter_likes += nc
 
             # Return dead point and ancillary quantities.
             yield (worst, ustar, vstar, loglstar, logvol, logwt,
@@ -1036,7 +1038,7 @@ class Sampler(object):
             self.it = it+1
         if self.bambi_dumper:
             fnetout = open(outputname+"_neural.txt", 'w+')
-            fnetout.write("Likes predicted by neural net: {}".format(self.neural_counter))
+            fnetout.write("{} {}".format(it, self.neural_counter))
             fnetout.close()
 
     def add_final_live(self, print_progress=True):
