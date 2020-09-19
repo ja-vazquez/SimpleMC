@@ -41,7 +41,7 @@ class KerasNetInterpolation:
 
         params = numpy.array(params)
         logL = numpy.array(logL)
-        batch_size = 16
+        batch_size = 8
 
         if len(params) != len(logL):
             raise ValueError("input and target must be the same length")
