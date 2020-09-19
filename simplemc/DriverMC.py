@@ -350,7 +350,7 @@ class DriverMC:
             model  = self.config.get( 'model', 'model',   fallback=None)
             savedmodelpath = self.config.get('neural', 'savedmodelpath', fallback=None)
             it_to_start_net = self.config.getint('neural', 'it_to_start_net', fallback=None)
-            dlogz_start = self.config.getfloat('neural', 'proxy_tolerance', fallback=5)
+            dlogz_start = self.config.getfloat('neural', 'dlogz_start', fallback=5)
             updInt = self.config.getint('neural', 'updInt', fallback=nlivepoints)
             proxy_tolerance = self.config.getfloat('neural', 'proxy_tolerance', fallback=0.3)
             failure_tolerance = self.config.getfloat('neural', 'failure_tolerance', fallback=0.5)
