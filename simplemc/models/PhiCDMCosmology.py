@@ -24,11 +24,11 @@ class PhiCosmology(LCDMCosmology):
         self.varybeta    = varybeta
         self.varyalpha   = varyalpha
 
-        self.Ok     = Ok_par.value #curv
+        self.Ok     = curv #Ok_par.value
         self.alpha  = alpha
-        self.beta   = phibeta_par.value #beta
-        self.mu     = mu
-        self.ilam   = philam_par.value #ilam
+        self.beta   = beta #phibeta_par.value
+        self.mu     = mu #phimu_par.value
+        self.ilam   = ilam #philam_par.value
         self.eps    = eps
 
         self.lna   = np.linspace(-6, 0, 500)
@@ -171,12 +171,12 @@ class PhiCosmology(LCDMCosmology):
         #ini_lam=-ini_lam
         self.eps = np.sign(ini_lam)
         ini_lam  =np.abs(ini_lam)
-        self.ini_wphi = -1 + 1.0e-4*self.eps
+        ini_wphi = -1 + 1.0e-4*self.eps
 
 
         ini_hub = 100*self.h*self.Om**0.5*np.exp(-1.5*self.lna[0])
         ini_Ok  = self.Ok*np.exp(-2*self.lna[0])/(self.Om**0.5*np.exp(-1.5*self.lna[0]))**2
-        y0      = [self.ini_wphi, 10**(-ini_Ophi), ini_lam, ini_Ok, ini_hub]
+        y0      = [ini_wphi, 10**(-ini_Ophi), ini_lam, ini_Ok, ini_hub]
         y_result = odeint(self.RHS, y0, self.lna, h0=1E-5)
         return y_result
 
