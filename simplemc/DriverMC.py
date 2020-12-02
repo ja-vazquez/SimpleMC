@@ -829,22 +829,13 @@ class DriverMC:
         new one with extension _new in its name.
 
         """
-        while True:
-            if os.path.isfile(self.outputpath+".txt"):
-                logger.info("{0} file already exists, {0}_new was created".format(self.outputpath))
-                self.outputpath = "{}_new".format(self.outputpath)
-            else:
-                break
-        while True:
-            flag = False
-            for i in range(1,10):
-                if os.path.isfile("{}_{}.txt".format(self.outputpath, i)):
-                    flag = True
-            if flag:
+        if os.path.isfile(self.outputpath+".txt"):
+            logger.info("{0} file already exists, {0}_new was created".format(self.outputpath))
+            self.outputpath = "{}_new".format(self.outputpath)
+        for i in range(1,10):
+            if os.path.isfile("{}_{}.txt".format(self.outputpath, i)):
                 logger.info("{0}_{1} file already exists, {0}_new was created".format(self.outputpath, i))
                 self.outputpath = "{}_new".format(self.outputpath)
-            else:
-                break
         self.paramFiles()
 
         return True
