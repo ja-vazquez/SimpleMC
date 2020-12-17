@@ -2,9 +2,8 @@
 
 import scipy as sp
 import numpy as np
-import scipy.constants as cte
 import matplotlib.pyplot as plt
-from scipy.integrate import quad
+
 
 
 # Importamos libreria de algoritmos evolutivos
