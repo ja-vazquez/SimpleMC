@@ -26,20 +26,18 @@ class GA_deap:
         print("Minimizing...", self.vpars, "with bounds", self.bounds)
 
 
-        self.DIMENSIONS = len(self.params)        # number of dimensions
-        self.BOUND_LOW, self.BOUND_UP = 0.0, 1.0  # boundaries for all dimensions
-
-
         # Genetic Algorithm constants:
-        self.POPULATION_SIZE   = 20    # 10-20
+        self.POPULATION_SIZE   = 10    # 10-20
         self.P_CROSSOVER       = 0.7   # probability for crossover
         self.P_MUTATION        = 0.3   # (try also 0.5) probability for mutating an individual
-        self.MAX_GENERATIONS   = 15    # 100- 300
+        self.MAX_GENERATIONS   = 10    # 100- 300
         self.HALL_OF_FAME_SIZE = 1
         self.CROWDING_FACTOR   = 20.0  # crowding factor for crossover and mutation
 
         self.RANDOM_SEED = 42          # set the random seed
 
+        self.DIMENSIONS = len(self.params)        # number of dimensions
+        self.BOUND_LOW, self.BOUND_UP = 0.0, 1.0  # boundaries for all dimensions
 
 
     # helper function for creating random real numbers uniformly distributed within a given range [low, up]
@@ -102,11 +100,13 @@ class GA_deap:
 
         # print info for best solution found:
         best = hof.items[0]
-        print("-- Best Individual = ", best)
         print("-- Best Fitness = ", best.fitness.values[0])
         print("- Best solutions are:")
-        for i in range(self.HALL_OF_FAME_SIZE):
-            print(i, ": ", hof.items[i].fitness.values[0], " -> ", hof.items[i])
+        for i, x in enumerate(best):
+            print("-- Best %s = "%self.params[i].name , self.change_prior(i, x))
+
+        #for i in range(self.HALL_OF_FAME_SIZE):
+        #    print(i, ": ", hof.items[i].fitness.values[0], " -> ", self.old_prior(i, hof.items[i]) )
 
         return population, logbook, hof
 
@@ -147,6 +147,10 @@ class GA_deap:
     def change_prior(self, i, x):
         new_par = self.bounds[i][0] + (self.bounds[i][1] - self.bounds[i][0])*x
         return new_par
+
+    def old_prior(self, i, x):
+        old_par = (x - self.bounds[i][0])/(self.bounds[i][1] - self.bounds[i][0])
+        return old_par
 
 
     def result(self, loglike):
