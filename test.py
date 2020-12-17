@@ -5,7 +5,7 @@ inifile = "baseConfig.ini"
 
 analyzer = DriverMC(iniFile=inifile)
 analyzer.executer()
-analyzer.postprocess()
+#analyzer.postprocess()
 
 
 """ useful for short tests,

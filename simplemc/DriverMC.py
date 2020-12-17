@@ -1,5 +1,6 @@
 from .analyzers import MaxLikeAnalyzer
 from .analyzers import SimpleGenetic
+from .analyzers import GA_deap
 from .analyzers import MCMCAnalyzer
 from .analyzers import DynamicNestedSampler, NestedSampler
 from .cosmo.Derivedparam import AllDerived
@@ -160,6 +161,8 @@ class DriverMC:
             self.maxLikeRunner(iniFile=self.iniFile, **kwargs)
         elif self.analyzername == 'genetic':
             self.geneticRunner(iniFile=self.iniFile, **kwargs)
+        elif self.analyzername == 'ga_deap':
+            self.geneticdeap(iniFile=self.iniFile, **kwargs)
         else:
             sys.exit("{}: Sampler/Analyzer name invalid".format(self.analyzername))
         return True
@@ -716,6 +719,18 @@ class DriverMC:
         return True
 
 
+##----------------------
+
+    def geneticdeap(self, iniFile=None, **kwargs):
+        if self.analyzername is None: self.analyzername = 'ga_deap'
+        self.outputpath = '{}_{}_ga_deap'.format(self.outputpath, self.analyzername)
+        self.outputChecker()
+
+        M = GA_deap(self.L, self.model)
+        result = M.main()
+        self.result = ['genetic', M, result]
+        return True
+
 ##---------------------- logLike and prior Transform function ----------------------
 ##---------------------- for nested samplers ----------------------
 
@@ -832,10 +847,10 @@ class DriverMC:
         if os.path.isfile(self.outputpath+".txt"):
             logger.info("{0} file already exists, {0}_new was created".format(self.outputpath))
             self.outputpath = "{}_new".format(self.outputpath)
-        for i in range(1,10):
-            if os.path.isfile("{}_{}.txt".format(self.outputpath, i)):
-                logger.info("{0}_{1} file already exists, {0}_new was created".format(self.outputpath, i))
-                self.outputpath = "{}_new".format(self.outputpath)
+        #for i in range(1,10):
+        #    if os.path.isfile("{}_{}.txt".format(self.outputpath, i)):
+        #        logger.info("{0}_{1} file already exists, {0}_new was created".format(self.outputpath, i))
+        #        self.outputpath = "{}_new".format(self.outputpath)
         self.paramFiles()
 
         return True

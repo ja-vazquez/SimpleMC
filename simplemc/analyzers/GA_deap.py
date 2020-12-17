@@ -4,13 +4,11 @@ import scipy as sp
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-
 # Importamos libreria de algoritmos evolutivos
 from deap import base, creator, tools, algorithms
 
 # importamos modulo independiente para acoplar a DEAP, adjunto en la carpeta fuente.
-import elitism
+from simplemc.analyzers import elitism
 
 # We import an independent module to implement elitism in the GA.
 import random
@@ -24,11 +22,11 @@ class GA_deap:
         self.params = like.freeParameters()
         self.vpars  = [p.value for p in self.params]
         self.sigma  = sp.array([p.error for p in self.params])
-        bounds = [p.bounds for p in self.params]
-        print("Minimizing...", self.vpars, "with bounds", bounds)
+        self.bounds = [p.bounds for p in self.params]
+        print("Minimizing...", self.vpars, "with bounds", self.bounds)
 
 
-        self.DIMENSIONS = 3                       # number of dimensions
+        self.DIMENSIONS = len(self.params)        # number of dimensions
         self.BOUND_LOW, self.BOUND_UP = 0.0, 1.0  # boundaries for all dimensions
 
 
@@ -100,7 +98,7 @@ class GA_deap:
         # perform the Genetic Algorithm flow with elitism:
         population, logbook = elitism.eaSimpleWithElitism(population, toolbox, cxpb=self.P_CROSSOVER, \
                                         mutpb=self.P_MUTATION, ngen=self.MAX_GENERATIONS, \
-                                        stats=self.stats, halloffame=hof, verbose=True)
+                                        stats=stats, halloffame=hof, verbose=True)
 
         # print info for best solution found:
         best = hof.items[0]
@@ -134,7 +132,8 @@ class GA_deap:
 
     def negloglike(self, x):
         for i, pars in enumerate(self.params):
-            pars.setValue(x[i])
+            new_par = self.change_prior(i, x[i])
+            pars.setValue(new_par)
         self.like.updateParams(self.params)
         loglike = self.like.loglike_wprior()
 
@@ -142,7 +141,12 @@ class GA_deap:
             return self.lastval+10
         else:
             self.lastval = -loglike
-            return -loglike
+            return -loglike,
+
+
+    def change_prior(self, i, x):
+        new_par = self.bounds[i][0] + (self.bounds[i][1] - self.bounds[i][0])*x
+        return new_par
 
 
     def result(self, loglike):
