@@ -5,11 +5,11 @@
 #and MGS paper
 
 import sys
-sys.path = ["Models"] + sys.path
+sys.path = ["models"] + sys.path
 
-from QuintomCosmology import QuintomCosmology
-from LCDMCosmology import LCDMCosmology
-from ParamDefs import *
+from simplemc.models.QuintomCosmology import QuintomCosmology
+#from simplemc.models.LCDMCosmology import LCDMCosmology
+from simplemc.cosmo.paramDefs import *
 import matplotlib.pyplot as plt
 import matplotlib.ticker
 import pylab
@@ -21,7 +21,7 @@ from matplotlib import cm
 
 beta  = 0
 
-#fname = 'Quintessence'
+fname = 'Quintessence'
 #fname = 'Phantom'
 #fname = 'Quintmphi'
 #mphan = 1.2
@@ -33,9 +33,9 @@ beta  = 0
 #fname = 'Quintomcopphan'
 #mphi  = 1.2
 #beta  = 6.0
-fname = 'Quintomcopbeta'
-mphi  = 1.2
-mphan = 0.1
+#fname = 'Quintomcopbeta'
+#mphi  = 1.2
+#mphan = 0.1
 
 
 
@@ -163,10 +163,10 @@ PP = []
 if fname == 'Quintomcopbeta':
     min, max = (4., 8.)
 else:
-    min, max = (0.1, 2.5)
+    min, max = (0.01, 1.5)
 if beta < 0:  min, max = (-4, -1.)
 
-steps    = 2
+steps    = 5
 step     = (max-min)/steps
 
 mymap    = mpl.colors.LinearSegmentedColormap.from_list('mycolors',['red','green'])
@@ -223,6 +223,7 @@ for i in np.arange(min, max, step):
         name = 'Quintom, $m_{\phi}$=%0.1f, $m_{\psi}$=%0.1f'%(mphi, mphan)
         mlabel = '$\\beta$'
 
+    T.tmp()
     y1=[T.w_de(1./(1+z))         for z in zl]
     y2=[T.Hubble_a(1./(1+z))     for z in zl]
     y3=[T.HIOverrd(z)*z/fixer(z) for z in zl]
@@ -248,7 +249,7 @@ for x,w,z in zip(zz, ww, PP):
         b, r = 0, 1-g
         l1, = ax1.plot(x, w , color=(r,g,b)) #, linestyle='-.')
 if (fname == 'Quintessence') or (fname =='Quintomcopphi'): ax1.set_ylabel('$w(z)$', fontsize=20)
-ax1.axhline(y=-1, color='k', linestyle='--')
+ax1.axhline(y=-1.05, color='k', linestyle='--')
 if beta <0 : ax1.set_ylim(-3, 0.)
 
 #ax1.set_xscale('log')
@@ -257,7 +258,7 @@ for x,w,z in zip(zz, hh, PP):
         b, r = 0, 1-g
         l2, = ax2.plot(x, w , color=(r,g,b)) #, linestyle='-.')
 #ax2.plot(zl, x1 , color='k', linestyle='--')
-dataHz = np.loadtxt('data/Hz_all.dat')
+dataHz = np.loadtxt('simplemc/data/Hz_all.dat')
 redshifts, obs, errors = [dataHz[:,i] for i in [0,1,2]]
 ax2.errorbar(redshifts, obs, errors, xerr=None,
                  color='blue', marker='o', ls='None',
