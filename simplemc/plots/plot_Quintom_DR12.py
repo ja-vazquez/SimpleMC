@@ -8,21 +8,19 @@ import sys
 sys.path = ["models"] + sys.path
 
 from simplemc.models.QuintomCosmology import QuintomCosmology
-#from simplemc.models.LCDMCosmology import LCDMCosmology
 from simplemc.cosmo.paramDefs import *
 import matplotlib.pyplot as plt
 import matplotlib.ticker
 import pylab
-import math as N
 import numpy as np
 import matplotlib as mpl
-from matplotlib import cm
+
 
 
 beta  = 0
 
-fname = 'Quintessence'
-#fname = 'Phantom'
+#fname = 'Quintessence'
+fname = 'Phantom'
 #fname = 'Quintmphi'
 #mphan = 1.2
 #fname = 'Quintmphan'
@@ -145,8 +143,8 @@ def color_legend(leg):
 #T=LCDMCosmology(Obh2=0.02225,Om=0.3156,h=0.6727)
 
 
-if fname == 'Quintessence': T = QuintomCosmology(varymquin=True)
-if fname == 'Phantom':      T = QuintomCosmology(varymphan=True)
+if fname == 'Quintessence': T = QuintomCosmology(vary_mquin=True)
+if fname == 'Phantom':      T = QuintomCosmology(vary_mphan=True)
 if fname == 'Quintmphi':  T = QuintomCosmology(varymquin=True, varymphan=True)
 if fname == 'Quintmphan': T = QuintomCosmology(varymquin=False, varymphan=True)
 if fname == 'Quintomcopphi': T = QuintomCosmology(varymquin=True, varybeta=True)
@@ -223,7 +221,7 @@ for i in np.arange(min, max, step):
         name = 'Quintom, $m_{\phi}$=%0.1f, $m_{\psi}$=%0.1f'%(mphi, mphan)
         mlabel = '$\\beta$'
 
-    T.tmp()
+    T.call_functions()
     y1=[T.w_de(1./(1+z))         for z in zl]
     y2=[T.Hubble_a(1./(1+z))     for z in zl]
     y3=[T.HIOverrd(z)*z/fixer(z) for z in zl]

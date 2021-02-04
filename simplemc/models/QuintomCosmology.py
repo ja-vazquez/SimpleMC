@@ -9,101 +9,274 @@ import numpy as np
 
 
 class QuintomCosmology(LCDMCosmology):
-    def __init__(self, vary_mquin=False, vary_mphan=False, vary_iniphi=False, vary_beta=False):
+    def __init__(self, vary_mquin=False, vary_mphan=False, vary_coupling=False):
 
-        """Is better to start the chains at masses equal one, othewise
-        may take much longer"""
+        """
+        It better to start the chains at masses equal one, othewise may take much longer.
+        mphi - mass of Quintessence.
+        mpsi - mass of Phantom.
+        """
 
-        self.vary_mquin  = vary_mquin
-        self.vary_mphan  = vary_mphan
-        self.vary_beta   = vary_beta
-        self.vary_iniphi = vary_iniphi
+        self.vary_mquin = vary_mquin
+        self.vary_mphan = vary_mphan
+        self.vary_coupling = vary_coupling
 
-        self.mquin    = 0 if (vary_mphan and (not vary_mquin)) else mquin_par.value
-        self.mphan    = 0 if (vary_mquin and (not vary_mphan)) else mphan_par.value
-        self.beta     = 0 if (not vary_beta) else beta_par.value
-        self.iniphi   = iniphi_par.value
+        self.mquin = 0 if (vary_mphan and (not vary_mquin)) else mquin_par.value
+        self.mphan = 0 if (vary_mquin and (not vary_mphan)) else mphan_par.value
+        self.coupling = 0 if (not vary_coupling) else coupling_par.value
 
-        self.lna   = np.linspace(-10, 0, 500)
-        self.z     = np.exp(-self.lna) - 1.
         self.zvals = np.linspace(0, 3, 100)
+        self.lna = np.linspace(-10, 0, 500)
+        self.z = np.exp(-self.lna) - 1.
 
-        self.chatty = True
-
-        self.exp_phi = 2.
-        self.exp_psi = 2
-        self.epsilon = 1
+        self.chatty = False
 
         LCDMCosmology.__init__(self, mnu=0)
 
         self.updateParams([])
 
-    ## my free parameters. We add Ok on top of LCDM ones (we inherit LCDM)
+
+
+    # Free parameters. We add Ok on top of LCDM ones (we inherit LCDM).
     def freeParameters(self):
-        l=LCDMCosmology.freeParameters(self)
-        if (self.vary_mquin)  : l.append(mquin_par)
-        if (self.vary_mphan)  : l.append(mphan_par)
-        if (self.vary_beta)   : l.append(beta_par)
-        if (self.vary_iniphi) : l.append(iniphi_par)
+        l = LCDMCosmology.freeParameters(self)
+        if self.vary_mquin:
+            l.append(mquin_par)
+        if self.vary_mphan:
+            l.append(mphan_par)
+        if self.vary_coupling:
+            l.append(coupling_par)
         return l
 
 
-    def updateParams(self,pars):
-        ok=LCDMCosmology.updateParams(self,pars)
+
+    def updateParams(self, pars):
+        ok = LCDMCosmology.updateParams(self, pars)
         if not ok:
             return False
+
         for p in pars:
             if p.name  == "mquin":
-                self.mquin=p.value
-            elif p.name== "mphan":
-                self.mphan=p.value
-            elif p.name== "iniphi":
-                self.iniphi=p.value
-            elif p.name=='beta':
-                self.beta=p.value
+                self.mquin = p.value
+            elif p.name == "mphan":
+                self.mphan = p.value
+            elif p.name == 'beta':
+                self.coupling = p.value
 
-        #Searches initial conditions and computes the Hubble function
+
+        # Searches initial conditions and stores the Hubble function.
         if self.chatty:
             print('-'*10)
-            print ('mphi={}, mphan={}, beta={}, ini={}'.format(self.mquin, self.mphan, self.beta, self.iniphi))
-        self.search_ini()
+            print ('mphi={}, mphan={}, coupling={}'.format(self.mquin, self.mphan, self.coupling))
+
+        # Main method.
+        self.initialize()
 
         return True
 
 
-    def Vtotal(self, x, y, select):
-        """Cuadratic potential and its derivatives wrt phi or psi"""
+    def sf_potential(self, phi, psi, select):
+        """ The quadratic potential.
+        Select:
+            (0) the potential,
+            ('phi') derivative wrt phi,
+            ('psi') derivative wrt psi.
+        """
+
         if select == 0:
-            Vtotal = 0.5*(self.mquin*x)**2  +  0.5*(self.mphan*y)**2 + self.beta*(x*y)**2
+            potential = 0.5*(self.mquin*phi)**2 + 0.5*(self.mphan*psi)**2 + self.coupling*(phi*psi)**2
         elif select == 'phi':
-            Vtotal = self.mquin**2*x + 2*self.beta*x*y**2
+            potential = self.mquin**2*phi + 2*self.coupling*phi*psi**2
         elif select == 'psi':
-            Vtotal = self.mphan**2*y + 2*self.beta*y*x**2
-        return Vtotal
-
-
-    def rhode(self, x_vec):
-        quin, dotquin, phan, dotphan = x_vec
-        Ode = dotquin**2 + dotphan**2 + self.Vtotal(quin, phan, 0)/(3*self.h**2)
-        return Ode
-
-
-    def eos(self, x_vec):
-        quin, dotquin, phan, dotphan = x_vec
-        w1 = dotquin**2 - dotphan**2 - self.Vtotal(quin, phan, 0)/(3*self.h**2)
-        w2 = dotquin**2 - dotphan**2 + self.Vtotal(quin, phan, 0)/(3*self.h**2)
-        return w1/w2
+            potential = self.mphan**2*psi + 2*self.coupling*psi*phi**2
+        return potential
 
 
 
-    def hubble(self, lna, x_vec=None, SF = True):
-        a = np.exp(lna)
-        if SF:
-            Ode = self.rhode(x_vec)
+
+    def sf_rho(self, variables):
+        """ Computes the density for the scalar field. """
+        phi, dot_phi, psi, dot_psi = variables
+        sf_rho = dot_phi**2 - dot_psi**2 + self.sf_potential(phi, psi, 0)/(3*self.h**2)
+        return sf_rho
+
+
+
+    def hubble(self, lna, variables=None, use_sf=True):
+        """
+        Computes the Hubble function for either a scalar-field or cosmological constant.
+
+        Parameters
+        ----------
+        lna : array
+            Interval of scale factor.
+        variables : list , optional
+            Array [phi, dotPhi, psi, dotPhi]. Defaults to ``None`` or LCDM model.
+        use_sf : Boolean , optional
+            Defaults to ``True`` or SFDE model, otherwise use LCDM.
+
+        Returns
+        -------
+        hubble : array
+            The ``hubble`` function value at the range ``lna``.
+
+        """
+        if use_sf:
+            omega_de = self.sf_rho(variables)
         else:
-            Ode = 1.0-self.Om
+            omega_de = 1.0 - self.Om
 
-        return self.h*np.sqrt(self.Ocb/a**3 + self.Omrad/a**4 + Ode)
+        a = np.exp(lna)
+        hubble = self.h*np.sqrt(self.Ocb/a**3 + self.Omrad/a**4 + omega_de)
+        return hubble
+
+
+
+    def right_hand_side(self, variables, lna):
+        """ Right hand side of the dynamical system. """
+
+        factor = np.sqrt(6)*self.h
+
+        # Compute hubble function.
+        hubble  = self.hubble(lna, variables=variables)
+
+        phi, dot_phi, psi, dot_psi = variables
+        # Right hand side of the dynamical system.
+        rhs = [factor*dot_phi/hubble,
+               -3*self.h*dot_phi + self.sf_potential(phi, psi, 'phi')/(factor*hubble),
+               factor*dot_psi/hubble,
+               -3*self.h*dot_psi - self.sf_potential(phi, psi, 'psi')/(factor*hubble)]
+        return rhs
+
+
+    def solve_eqns(self, *y0):
+        """
+        Input initial conditions for [phi, dotPhi, psi, dotPhi] and returns
+        the solution of the Klein-Gordon equations.
+        """
+        solution = odeint(self.right_hand_side, y0, self.lna, h0=1E-10)
+        return solution
+
+
+
+
+    def compute_omega_de(self, ini_guess):
+        """
+        Given an guess for the initial condition of the field
+        return the solution (if any) of the Klein-Gordon equation.
+        """
+
+        # Still figuring out initial conditions for two fields.
+        if self.vary_mquin and (self.mphan == 0) and (self.coupling == 0):
+            phi_ini, psi_ini = 10**ini_guess, 0
+        elif self.vary_mphan and (self.mquin == 0) and (self.coupling == 0):
+            phi_ini, psi_ini = 0, 10**ini_guess
+        else:
+            phi_ini, psi_ini = 10**ini_guess, 10**ini_guess
+
+        # Find the solution for such a guess.
+        solution = self.solve_eqns(phi_ini, 0.0, psi_ini, 0.0)
+
+        # Solution at a=1.
+        sf_rho = self.sf_rho(solution[-1])
+        omega_de = sf_rho*(self.h/self.hubble(self.lna[-1], solution[-1]))**2
+
+        tolerance = (1 - self.Ocb - self.Omrad) - omega_de
+        return solution.T, tolerance
+
+
+
+    def find_initial_phi(self, low_guess=-2, high_guess=3, tolerance=5E-3):
+        """
+        Using the bisection method, searches for the initial condition of the
+        field such that \Omega_DE today is the value given by observations.
+
+        Parameters
+        ----------
+        low_guess : float , optional
+            Minimum value of the field.
+        high_guess : float , optional
+            Maximum value of the field.
+        tolerance : float , optional
+            Tolerance or stopping criteria, abs(Omega_observable - Omega_theory).
+
+        Returns
+        -------
+        mid_guess : float
+            Initial condition for the field: ``mid_guess``.
+
+        solution : list
+            Found solution (if any): ``solution`` which contains [phi, dotPhi, psi, dotPhi].
+
+        """
+
+        mid_guess = 0.5*(low_guess + high_guess)
+
+        while 0.5*(high_guess - low_guess) > tolerance:
+            # Compute the solution for an initial guess.
+            solution, current_tolerance = self.compute_omega_de(mid_guess)
+            low_tolerance = self.compute_omega_de(low_guess)[1]
+
+            if self.chatty:
+                print('-done- phi_0={}, error={}'.format(mid_guess, current_tolerance))
+
+            if np.abs(current_tolerance) < tolerance:
+                return mid_guess, solution
+
+            elif low_tolerance*current_tolerance < 0:
+                high_guess = mid_guess
+            else:
+                low_guess  = mid_guess
+            mid_guess = (low_guess + high_guess)*0.5
+
+        # Check whether rho is constant or nearby.
+        grad = np.abs(np.gradient(self.sf_rho(solution))).max()
+        mid_guess = -1 if grad < 1.0E-2 else 0
+
+        if self.chatty and mid_guess == -1:
+            print('No solution found!, but looks like LCDM', mid_guess, self.mquin, self.mphan)
+        return mid_guess, solution
+
+
+
+    def initialize(self):
+        """
+        Main method that searches the initial conditions and computes [phi, dotPhi, psi, dotPhi]
+        for a given scalar field potential.
+        """
+
+        #It's slower than newton, but finds more solutions
+        self.phi_ini, self.solution = self.find_initial_phi(-3, 3)
+
+        if self.phi_ini == 0:
+            # Solution couldn't be found, then reject that point.
+            hubble = np.zeros(len(self.lna))
+
+        elif self.phi_ini == -1:
+            # Solution couldn't be found, but it is very close to the cosmological constant.
+            hubble = self.hubble(self.lna, use_sf=False)
+
+        else:
+            # Solution found.
+            hubble = self.hubble(self.lna, self.solution)
+
+        self.sf_hubble = interp1d(self.lna, hubble)
+        return True
+
+
+
+    def RHSquared_a(self, a):
+        """ This is relative hsquared as a function of a, i.e. H(z)^2/H(z=0)^2. """
+
+        if (1./a-1 < self.zvals[-1]):
+            hubble = (self.sf_hubble(np.log(a))/self.h)**2.
+        else:
+            hubble = self.hubble(self.lna, use_sf=False)
+        return hubble
+
+
+    #-------------------------
+    # External methods useful for plotting or testing.
 
 
     def logatoz(self, func):
@@ -113,128 +286,28 @@ class QuintomCosmology(LCDMCosmology):
         return np.interp(self.zvals, self.z[::-1], functmp[::-1])
 
 
-
-    def RHS(self, x_vec, lna):
-        factor = np.sqrt(6)*self.h
-        quin, dotquin, phan, dotphan = x_vec
-        hubble  = self.hubble(lna, x_vec)
-        return [factor*dotquin/hubble, -3*self.h*dotquin + self.Vtotal(quin, phan, 'phi')/(factor*hubble),
-                factor*dotphan/hubble, -3*self.h*dotphan - self.Vtotal(quin, phan, 'psi')/(factor*hubble)]
-
-
-
-    def solver(self, quin0, dotquin0, phan_0, dotphan0):
-        y0       = [quin0, dotquin0, phan_0, dotphan0]
-        y_result = odeint(self.RHS, y0, self.lna, h0=1E-10)
-        return y_result
-
-
-
-    def calc_Ode(self, mid):
-        "Select Quintess, Phantom or Quintom"
-        #if (self.varymquin)   and (self.mphan == 0) and (self.beta ==0): quin0, phan0 = mid, 0
-        #elif (self.varymphan) and (self.mquin == 0) and (self.beta ==0): quin0, phan0 = 0, mid
-        #else : quin0, phan0 = mid, mid*self.iniphi
-            #Still figuring out initial conditions for two fields
-        quin0, phan0 = 10**mid, 0
-        sol = self.solver(quin0 , 0.0, phan0, 0.0).T
-
-        quin, dotq, phan, dotp = sol
-        rho =  self.rhode(sol)[-1]
-        Ode = rho*(self.h/self.hubble(0.0, [quin[-1], dotq[-1], phan[-1], dotp[-1]]))**2
-        tol = (1- self.Ocb- self.Omrad) - Ode
-        return sol, tol, Ode
-
-
-    def calc_Ode2(self, phi0):
-        "Select Quintess, Phantom or Quintom"
-        #if (self.varymquin)   and (self.mphan == 0) and (self.beta ==0): quin0, phan0 = mid, 0
-        #elif (self.varymphan) and (self.mquin == 0) and (self.beta ==0): quin0, phan0 = 0, mid
-        #else : quin0, phan0 = mid, mid*self.iniphi
-            #Still figuring out initial conditions for two fields
-
-        quin0, phan0 = 10**phi0, 0
-        sol = self.solver(quin0 , 0.0, phan0, 0.0).T
-
-        quin, dotq, phan, dotp = sol
-        rho = self.rhode(sol)[-1]
-        Ode = rho*(self.h/self.hubble(0.0, [quin[-1], dotq[-1], phan[-1], dotp[-1]]))**2
-        tol = (1- self.Ocb- self.Omrad) - Ode
-        return tol
-
-
-    def bisection(self):
-        "Search for intial condition of phi such that \O_DE today is 0.7"
-        lowphi, highphi = -2, 3 ##initial guess
-        Ttol            = 5E-3
-        mid = (lowphi + highphi)*0.5
-        while (highphi - lowphi )*0.5 > Ttol:
-            sol, tol_mid, Ode = self.calc_Ode(mid)
-            tol_low = self.calc_Ode(lowphi)[1]
-            if(np.abs(tol_mid) < Ttol):
-                  if self.chatty: print('-done-, phi_0={}, error={}'.format(mid, tol_mid))
-                  return mid, sol
-            elif tol_low*tol_mid<0:
-                highphi  = mid
-            else:
-                lowphi   = mid
-            mid = (lowphi + highphi)*0.5
-
-        if self.chatty: print ('No solution found!', mid, self.mquin, self.mphan, Ode)
-        ##Check whether rho is constant or nearby
-        grad = np.abs(np.gradient(self.rhode(sol))).max()
-        mid  = -1 if grad < 1.0E-2 else 0
-        return mid, sol
-
-
-    def search_ini(self):
-        #try:
-        #    phi0 = newton(self.calc_Ode2, 1)
-        #    print('phi0', phi0)
-        #    sol, _,_ = self.calc_Ode(phi0)
-        #except:
-        #    phi0 = 0
-
-        #It's slower than newton, but finds more solutions
-        self.phi0, self.sol = self.bisection()
-
-        if (self.phi0 == 0):
-            if self.chatty: print('mass=', self.mquin, self.mphan, 'sol not found with', self.phi0)
-            self.hub_SF   = interp1d(self.lna, np.zeros(len(self.lna)))
-        elif (self.phi0 == -1):
-            if self.chatty: print ('looks like LCDM', self.mquin, self.mphan)
-            self.hub_SF   = interp1d(self.lna, self.hubble(self.lna, SF=False))
-        else:
-            self.hub_SF   = interp1d(self.lna, self.hubble(self.lna, self.sol))
-        return True
-
-
-    ## this is relative hsquared as a function of a
-    ## i.e. H(z)^2/H(z=0)^2
-    def RHSquared_a(self,a):
-        lna = np.log(a)
-        if (1./a-1 < self.zvals[-1]):
-            hubble = (self.hub_SF(lna)/self.h)**2.
-        else:
-            hubble = self.hubble(self.lna, SF=False)
-        return hubble
-
-
-    #-------------------------
-
     def Hubble_a(self, a):
-        lna = np.log(a)
-        hubble = 100*self.hub_SF(lna)
+        hubble = 100*self.sf_hubble(np.log(a))
         return hubble
 
 
-    def tmp(self):
-        if self.phi0==0:
-            self.w_eos    = interp1d(self.lna, np.zeros(len(self.lna)))
-        elif (self.phi0 == -1):
-            self.w_eos    = interp1d(self.lna, -1*np.ones(len(self.lna)))
+    def sf_eos(self, variables):
+        phi, dot_phi, psi, dot_psi = variables
+        w1 = dot_phi**2 - dot_psi**2 - self.sf_potential(phi, psi, 0)/(3*self.h**2)
+        w2 = dot_phi**2 - dot_psi**2 + self.sf_potential(phi, psi, 0)/(3*self.h**2)
+        return w1/w2
+
+
+    def call_functions(self):
+        if self.phi_ini == 0:
+            w_eos = np.zeros(len(self.lna))
+        elif self.phi_ini == -1:
+            w_eos = -1*np.ones(len(self.lna))
         else:
-            self.w_eos    = interp1d(self.lna, self.eos(self.sol))
+            w_eos = self.sf_eos(self.solution)
+
+        self.w_eos = interp1d(self.lna, w_eos)
+        return True
 
 
 
