@@ -1,155 +1,42 @@
 #!/usr/bin/env python
 
-#Error bars mainly got from  table 3,
-#http://arxiv.org/pdf/1108.2635v1.pdf
-#and MGS paper
-
-import sys
-sys.path = ["models"] + sys.path
-
+from simplemc.plots.plot_Quintom_variables import *
 from simplemc.models.QuintomCosmology import QuintomCosmology
 from simplemc.cosmo.paramDefs import *
 import matplotlib.pyplot as plt
-import matplotlib.ticker
-import pylab
-import numpy as np
 import matplotlib as mpl
-
+import matplotlib.ticker
+import numpy as np
 
 
 beta  = 0
-
-#fname = 'Quintessence'
-fname = 'Phantom'
-#fname = 'Quintmphi'
-#mphan = 1.2
-#fname = 'Quintmphan'
-#mphi  = 1.2
-#fname = 'Quintomcopphi'
-#mphan = 1.2
-#beta  = 4.0
-#fname = 'Quintomcopphan'
-#mphi  = 1.2
-#beta  = 6.0
-#fname = 'Quintomcopbeta'
-#mphi  = 1.2
-#mphan = 0.1
-
-
-
-
-
-addlabel  = False
-addlegend = False
-
-plaw=0.5
-eboss=False
-
-
-params1 = {'backend': 'pdf',
-               'axes.labelsize':  18,
-                #'text.fontsize': 18,
-               'xtick.labelsize': 18,
-               'ytick.labelsize': 18,
-                #'legend.draw_frame': False,
-               'legend.fontsize': 16,
-               'lines.markersize': 6,
-               'font.size': 20,
-               'text.usetex': True}
-pylab.rcParams.update(params1)
-
-
-zLOWZ  = 0.32 
-zCMASS = 0.57
-zLyaA  = 2.34-0.04
-zLyaC  = 2.36+0.04
-
-z6dFGS   = 0.106
-zMGS     = 0.15
-zSDSS1   = 0.2
-zSDSS2   = 0.35
-zWiggleZ1=0.44
-zWiggleZ2= 0.6
-zWiggleZ3= 0.73
-
-z_CMB = 1090.43
-
-zCombBAO1 = 0.38
-zCombBAO2 = 0.51
-zCombBAO3 = 0.61
-
-rd_EHtoCAMB =153.19/149.28
-rd_fid_DR12 = 147.78
-rd_fid_DR7  = 151.84  
-
 zl=np.arange(0, 3, 0.05)
 
-fmt1 = 'o'
-fmt2 = 'o'
-empty1= False
-empty2= False
-alpha= 1.0
+fname = 'Quintessence'
 
+if fname == 'Quintessence':
+    T = QuintomCosmology(vary_mquin=True)
+if fname == 'Phantom':
+    T = QuintomCosmology(vary_mphan=True)
+if fname == 'Quintom_mphi':
+    T = QuintomCosmology(vary_mquin=True, vary_mphan=True)
+    mphan = 1.2
+if fname == 'Quintmphan':
+    T = QuintomCosmology(varymquin=False, varymphan=True)
+    mphi  = 1.2
+if fname == 'Quintomcopphi':
+    T = QuintomCosmology(varymquin=True, varybeta=True)
+    mphan = 1.2
+    beta  = 4.0
+if fname == 'Quintomcopphan':
+    T = QuintomCosmology(varymphan=True, varybeta=True)
+    mphi  = 1.2
+    beta  = 6.0
+if fname == 'Quintomcopbeta':
+    T = QuintomCosmology(varymquin=True, varymphan=True, varybeta=True)
+    mphi  = 1.2
+    mphan = 0.1
 
-def fixer(z):
-    if plaw>0:
-        return z**plaw
-    else:
-        return log(1.+z)
-
-#============Functions -------
-
-
-### Plotting -  Error bars
-def plot_errorbar(z,val, yerr=0, color=0, fmt=0, markersize=0,label=None, empty=True, alpha=1, ax=None):
-    if empty:
-        mfc='white'
-        lw=1
-    else:
-        mfc=color
-        lw=1
-    color = 'black'
-
-    ax.errorbar(z,val/fixer(z), yerr=yerr/fixer(z),
-                color='blue', marker='o', ls='None',
-                elinewidth =2, capsize=3, capthick = 1, alpha=1, markersize=4)
-
-    if addlabel:
-        if label>0:
-            if (mfc=='white'):
-                ax.plot ([],[],fmt,color='black',label=label,markersize=markersize,markerfacecolor=mfc)
-            else:
-                ax.plot ([],[],fmt,color='black',label=label,markersize=markersize)
-
-def ersys(x, y):
-    return np.sqrt(x**2 + y**2)
-
-
-def color_legend(leg):
-        # """Color legend texts based on color of corresponding lines"""
-        for line, txt in zip(leg.get_lines(), leg.get_texts()):
-                txt.set_color(line.get_color())
-
-#-------------------
-
-
-
-#Planck best fit cosmology
-#T2=LCDMCosmology()
-#x1=[67.4*np.sqrt(T2.RHSquared_a(1./(1+z)))     for z in zl]
-#x2=[T2.HIOverrd(z)*z/fixer(z) for z in zl]
-#x3=[T2.DaOverrd(z)/fixer(z)   for z in zl]
-#PLK-15
-#T=LCDMCosmology(Obh2=0.02225,Om=0.3156,h=0.6727)
-
-
-if fname == 'Quintessence': T = QuintomCosmology(vary_mquin=True)
-if fname == 'Phantom':      T = QuintomCosmology(vary_mphan=True)
-if fname == 'Quintmphi':  T = QuintomCosmology(varymquin=True, varymphan=True)
-if fname == 'Quintmphan': T = QuintomCosmology(varymquin=False, varymphan=True)
-if fname == 'Quintomcopphi': T = QuintomCosmology(varymquin=True, varybeta=True)
-if fname == 'Quintomcopphan': T = QuintomCosmology(varymphan=True, varybeta=True)
-if fname == 'Quintomcopbeta': T = QuintomCosmology(varymquin=True, varymphan=True, varybeta=True)
 
 hh = []
 ww = []
@@ -182,6 +69,7 @@ for i in np.arange(min, max, step):
         T.updateParams([mquin_])
         name = fname
         mlabel = '$m_\phi$'
+
     if fname == 'Phantom':
         mphan_.setValue(i)
         T.updateParams([mphan_])
