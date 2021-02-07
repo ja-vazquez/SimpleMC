@@ -17,7 +17,7 @@ except:
 
 class MaxLikeAnalyzer:
     def __init__(self, like, model, compute_errors=False, compute_derived= False,
-                 show_contours=False, param1=None, param2=None):
+                 show_contours=False, plot_param1=None, plot_param2=None):
         """
         This is an analyzer that takes a Likelihood function
         and then tries to maximize it and get the errors from the
@@ -27,8 +27,8 @@ class MaxLikeAnalyzer:
         like
         model
         compute_errors
-        param1
-        param2
+        plot_param1
+        plot_param1
 
         Returns
         -------
@@ -75,9 +75,9 @@ class MaxLikeAnalyzer:
 
         if show_contours and compute_errors:
             param_names = [par.name for par in self.params]
-            if (param1 in param_names) and (param2 in param_names):
-                idx_param1 = param_names.index(param1)
-                idx_param2 = param_names.index(param2)
+            if (plot_param1 in param_names) and (plot_param2 in param_names):
+                idx_param1 = param_names.index(plot_param1)
+                idx_param2 = param_names.index(plot_param2)
             else:
                 sys.exit('\n Not a base parameter, derived-errors still on construction')
 
@@ -94,7 +94,7 @@ class MaxLikeAnalyzer:
         self.like.updateParams(self.params)
         loglike = self.like.loglike_wprior()
 
-        if (sp.isnan(loglike)):
+        if sp.isnan(loglike):
             return self.lastval+10
         else:
             self.lastval = -loglike

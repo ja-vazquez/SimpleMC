@@ -3,20 +3,27 @@
 import scipy as sp
 import numpy as np
 import matplotlib.pyplot as plt
+from simplemc.plots.Plot_elipses import plot_elipses
 
 # Importamos libreria de algoritmos evolutivos
 from deap import base, creator, tools, algorithms
 
-# importamos modulo independiente para acoplar a DEAP, adjunto en la carpeta fuente.
+# We import an independent module to implement elitism in the GA.
 from simplemc.analyzers import elitism
 
-# We import an independent module to implement elitism in the GA.
-import random
+import scipy.linalg as la
 
+import random
+import sys
+
+try:
+    import numdifftools as nd
+except:
+    sys.exit('install numdifftools')
 
 class GA_deap:
     def __init__(self, like, model, plot_fitness=False, compute_errors=False, \
-                 show_contours=False, plot_par1=None, plot_par2=None):
+                 show_contours=False, plot_param1=None, plot_param2=None):
 
         self.like = like
         self.model = model
@@ -27,12 +34,16 @@ class GA_deap:
         print("Minimizing...", self.vpars, "with bounds", self.bounds)
 
         self.plot_fitness = plot_fitness
+        self.compute_errors = compute_errors
+        self.show_contours = show_contours
+        self.plot_param1 = plot_param1
+        self.plot_param2 = plot_param2
 
         # Genetic Algorithm constants:
-        self.POPULATION_SIZE = 50    # 10-20
+        self.POPULATION_SIZE = 20    # 10-20
         self.P_CROSSOVER = 0.7       # probability for crossover
         self.P_MUTATION = 0.3        # (try also 0.5) probability for mutating an individual
-        self.MAX_GENERATIONS = 30    # 100- 300
+        self.MAX_GENERATIONS = 20    # 100- 300
         self.HALL_OF_FAME_SIZE = 1
         self.CROWDING_FACTOR = 20.0  # crowding factor for crossover and mutation
 
@@ -59,22 +70,50 @@ class GA_deap:
         hof = tools.HallOfFame(self.HALL_OF_FAME_SIZE)
 
         # perform the Genetic Algorithm flow with elitism:
-        population, logbook = elitism.eaSimpleWithElitism(population, toolbox, cxpb=self.P_CROSSOVER, \
-                                        mutpb=self.P_MUTATION, ngen=self.MAX_GENERATIONS, \
-                                        stats=stats, halloffame=hof, verbose=True)
+        population, logbook = elitism.eaSimpleWithElitism(population, toolbox, cxpb=self.P_CROSSOVER,\
+                                                          mutpb=self.P_MUTATION, ngen=self.MAX_GENERATIONS,\
+                                                          stats=stats, halloffame=hof, verbose=True)
 
         # print info for best solution found:
         best = hof.items[0]
         print("-- Best Fitness = ", best.fitness.values[0])
         print("- Best solutions are:")
-        for i, x in enumerate(best):
-            print("-- Best %s = "%self.params[i].name , self.change_prior(i, x))
+        best_params = [self.change_prior(i, x) for i, x in enumerate(best)]
+        for i, x in enumerate(best_params):
+            print("-- Best %s = "%self.params[i].name , x)
+
 
         #for i in range(self.HALL_OF_FAME_SIZE):
         #    print(i, ": ", hof.items[i].fitness.values[0], " -> ", self.old_prior(i, hof.items[i]) )
 
         if self.plot_fitness:
-            self.plotting()
+            self.plotting(population, logbook, hof)
+
+
+        if self.compute_errors:
+            hess = nd.Hessian(self.negloglike2)(best_params)
+            eigvl, eigvc = la.eig(hess)
+            print ('Hessian', hess, eigvl,)
+            self.cov = la.inv(hess)
+            print('Covariance matrix \n', self.cov)
+            # set errors:
+            #for i, pars in enumerate(self.params):
+            #    pars.setError(sp.sqrt(self.cov[i, i]))
+        # update with the final result
+        #self.result(self.negloglike(self.res.x))
+
+        if self.show_contours and self.compute_errors:
+            param_names = [par.name for par in self.params]
+            if (self.plot_param1 in param_names) and (self.plot_param2 in param_names):
+                idx_param1 = param_names.index(self.plot_param1)
+                idx_param2 = param_names.index(self.plot_param2)
+            else:
+                sys.exit('\n Not a base parameter, derived-errors still on construction')
+
+            fig = plt.figure(figsize=(6,6))
+            ax = fig.add_subplot(111)
+            plot_elipses(best_params, self.cov, idx_param1, idx_param2, ax=ax)
+            plt.show()
         return population, logbook, hof
 
 
@@ -146,11 +185,26 @@ class GA_deap:
         self.like.updateParams(self.params)
         loglike = self.like.loglike_wprior()
 
-        if (sp.isnan(loglike)):
+        if sp.isnan(loglike):
+            print('-1-'*10,loglike,'--'*10)
             return self.lastval+10
         else:
             self.lastval = -loglike
-            return -loglike,
+        return -loglike,
+
+
+    def negloglike2(self, x):
+        for i, pars in enumerate(self.params):
+            pars.setValue(x[i])
+        self.like.updateParams(self.params)
+        loglike = self.like.loglike_wprior()
+
+        if sp.isnan(loglike):
+            return self.lastval+10
+        else:
+            self.lastval = -loglike
+        return -loglike
+
 
 
     def change_prior(self, i, x):

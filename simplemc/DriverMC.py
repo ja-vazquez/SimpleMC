@@ -581,14 +581,14 @@ class DriverMC:
         if iniFile:
             compute_errors = self.config.getboolean('maxlike', 'compute_errors', fallback=False)
             show_contours = self.config.getboolean('maxlike', 'show_contours', fallback=False)
-            plot_par1 = self.config.get('maxlike', 'plot_par1', fallback=None)
-            plot_par2 = self.config.get('maxlike', 'plot_par2', fallback=None)
+            plot_param1 = self.config.get('maxlike', 'plot_param1', fallback=None)
+            plot_param2 = self.config.get('maxlike', 'plot_param2', fallback=None)
             compute_derived = self.config.getboolean('maxlike', 'compute_derived', fallback=False)
         else:
             compute_errors = kwargs.pop('compute_errors', False)
             show_contours = kwargs.pop('show_contours', False)
-            plot_par1 = kwargs.pop('plot_par1', None)
-            plot_par2 = kwargs.pop('plot_par2', None)
+            plot_param1 = kwargs.pop('plot_param1', None)
+            plot_param2 = kwargs.pop('plot_param2', None)
             compute_derived = kwargs.pop('compute_derived ', False)
             if kwargs:
                 logger.critical('Unexpected **kwargs for MaxLike: {}'.format(kwargs))
@@ -599,7 +599,7 @@ class DriverMC:
         ti = time.time()
         A = MaxLikeAnalyzer(self.L, self.model, compute_errors=compute_errors,
                             compute_derived=compute_derived, show_contours=show_contours,\
-                            param1=plot_par1, param2=plot_par2)
+                            plot_param1=plot_param1, plot_param2=plot_param2)
         params = self.T.printParameters(A.params)
         self.ttime = time.time() - ti
         self.result = ['maxlike', A, params]
@@ -732,18 +732,18 @@ class DriverMC:
         self.outputpath = '{}_{}_ga_deap'.format(self.outputpath, self.analyzername)
         self.outputChecker()
         if iniFile:
-            plot_fitness = self.config.getboolean('ga_deap', 'show_contours', fallback=False)
-            compute_errors = self.config.getboolean('maxlike', 'compute_errors', fallback=False)
+            plot_fitness = self.config.getboolean('ga_deap', 'plot_fitness', fallback=False)
+            compute_errors = self.config.getboolean('ga_deap', 'compute_errors', fallback=False)
             show_contours = self.config.getboolean('ga_deap', 'show_contours', fallback=False)
-            plot_par1 = self.config.get('ga_deap', 'plot_par1', fallback=None)
-            plot_par2 = self.config.get('ga_deap', 'plot_par2', fallback=None)
+            plot_param1 = self.config.get('ga_deap', 'plot_param1', fallback=None)
+            plot_param2 = self.config.get('ga_deap', 'plot_param2', fallback=None)
         else:
             sys.exit(1)
 
         M = GA_deap(self.L, self.model, plot_fitness=plot_fitness, compute_errors=compute_errors,
-                    show_contours=show_contours, plot_par1=plot_par1, plot_par2=plot_par2)
+                    show_contours=show_contours, plot_param1=plot_param1, plot_param2=plot_param2)
         result = M.main()
-        M.plotting()
+        #M.plotting()
         self.result = ['genetic', M, result]
         return True
 
