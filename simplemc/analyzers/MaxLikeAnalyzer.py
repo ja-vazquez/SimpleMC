@@ -16,8 +16,8 @@ except:
 
 
 class MaxLikeAnalyzer:
-    def __init__(self, like, model, withErrors=False, compute_derived= False,
-                 show_contours=False, param1=False, param2=False):
+    def __init__(self, like, model, compute_errors=False, compute_derived= False,
+                 show_contours=False, param1=None, param2=None):
         """
         This is an analyzer that takes a Likelihood function
         and then tries to maximize it and get the errors from the
@@ -26,7 +26,7 @@ class MaxLikeAnalyzer:
         ----------
         like
         model
-        withErrors
+        compute_errors
         param1
         param2
 
@@ -43,7 +43,7 @@ class MaxLikeAnalyzer:
         print("Minimizing...", self.vpars, "with bounds", bounds)
 
         self.res = minimize(self.negloglike, self.vpars, bounds=bounds, method='L-BFGS-B')
-        print(self.res, 'with Errors =', withErrors)
+        print(self.res, 'with Errors =', compute_errors)
 
 
         if compute_derived:
@@ -58,7 +58,7 @@ class MaxLikeAnalyzer:
             # for errors, consider the df = J cov_x J^t
 
 
-        if (withErrors):
+        if (compute_errors):
             hess    = nd.Hessian(self.negloglike)(self.res.x)
             eigvl, eigvc = la.eig(hess)
             print ('Hessian', hess, eigvl,)
@@ -73,7 +73,7 @@ class MaxLikeAnalyzer:
 
 
 
-        if show_contours and withErrors:
+        if show_contours and compute_errors:
             param_names = [par.name for par in self.params]
             if (param1 in param_names) and (param2 in param_names):
                 idx_param1 = param_names.index(param1)
