@@ -16,8 +16,8 @@ except:
 
 
 class MaxLikeAnalyzer:
-    def __init__(self, like, model, withErrors=False, showderived= False,
-                 showplot=False, param1=False, param2=False):
+    def __init__(self, like, model, withErrors=False, compute_derived= False,
+                 show_contours=False, param1=False, param2=False):
         """
         This is an analyzer that takes a Likelihood function
         and then tries to maximize it and get the errors from the
@@ -34,19 +34,19 @@ class MaxLikeAnalyzer:
         -------
 
         """
-        self.like   = like
-        self.model  = model
+        self.like = like
+        self.model = model
         self.params = like.freeParameters()
-        self.vpars  = [p.value for p in self.params]
-        self.sigma  = sp.array([p.error for p in self.params])
+        self.vpars = [p.value for p in self.params]
+        self.sigma = sp.array([p.error for p in self.params])
         bounds = [p.bounds for p in self.params]
         print("Minimizing...", self.vpars, "with bounds", bounds)
 
         self.res = minimize(self.negloglike, self.vpars, bounds=bounds, method='L-BFGS-B')
-        print(self.res, 'with noErrors =', withErrors)
+        print(self.res, 'with Errors =', withErrors)
 
 
-        if showderived:
+        if compute_derived:
             for par, val in zip(self.params, self.res.x):
                 par.setValue(val)
             self.like.updateParams(self.params)
@@ -73,18 +73,17 @@ class MaxLikeAnalyzer:
 
 
 
-        if showplot and param1 is not None:
-            par1, par2 = -1, -1
-            for idx, par in enumerate(self.like.freeParameters()):
-                if param1 == par.name: par1 = idx
-                elif param2 == par.name: par2 = idx
-
-            if par1 == -1 or par2==-1:
+        if show_contours and withErrors:
+            param_names = [par.name for par in self.params]
+            if (param1 in param_names) and (param2 in param_names):
+                idx_param1 = param_names.index(param1)
+                idx_param2 = param_names.index(param2)
+            else:
                 sys.exit('\n Not a base parameter, derived-errors still on construction')
 
             fig = plt.figure(figsize=(6,6))
             ax = fig.add_subplot(111)
-            plot_elipses(self.res.x, self.cov, par1, par2, ax=ax)
+            plot_elipses(self.res.x, self.cov, idx_param1, idx_param2, ax=ax)
             plt.show()
 
 

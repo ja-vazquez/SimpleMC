@@ -1,3 +1,7 @@
+
+#TODO check: if self.analyzername is None
+#TODO check: ttime
+
 from .analyzers import MaxLikeAnalyzer
 from .analyzers import SimpleGenetic
 from .analyzers import GA_deap
@@ -49,7 +53,7 @@ class DriverMC:
             The name of the analyzer. It can be a sampler: {mcmc, nested, emcee}
             or a optimizer: {maxlike, genetic}
 
-        addDerived : bool
+        compute_derived : bool
             True generates at the flight some derived parameters (such as
             Omega_Lambda or Universe Age, and save them in the output text file.
 
@@ -569,22 +573,22 @@ class DriverMC:
         plot_par2 : bool
 
         """
-        if self.analyzername is None: self.analyzername = 'maxlike'
+        if self.analyzername is None:
+            self.analyzername = 'maxlike'
         self.outputpath = '{}_{}_optimization'.format(self.outputpath, self.analyzername)
         self.outputChecker()
         if iniFile:
             withErrors = self.config.getboolean('maxlike', 'withErrors', fallback=False)
-            showplot   = self.config.getboolean('maxlike', 'showplot', fallback=False)
-            plot_par1  = self.config.get('maxlike', 'plot_par1', fallback=None)
-            plot_par2  = self.config.get('maxlike', 'plot_par2', fallback=None)
-            showderived= self.config.getboolean('maxlike', 'showderived', fallback=False)
-
+            show_contours = self.config.getboolean('maxlike', 'show_contours', fallback=False)
+            plot_par1 = self.config.get('maxlike', 'plot_par1', fallback=None)
+            plot_par2 = self.config.get('maxlike', 'plot_par2', fallback=None)
+            compute_derived = self.config.getboolean('maxlike', 'compute_derived', fallback=False)
         else:
-            withErrors  = kwargs.pop('withErrors', False)
-            showplot    = kwargs.pop('showplot', False)
-            plot_par1   = kwargs.pop('plot_par1', None)
-            plot_par2   = kwargs.pop('plot_par2', None)
-            showderived = kwargs.pop('showderived', False)
+            withErrors = kwargs.pop('withErrors', False)
+            show_contours = kwargs.pop('show_contours', False)
+            plot_par1 = kwargs.pop('plot_par1', None)
+            plot_par2 = kwargs.pop('plot_par2', None)
+            compute_derived = kwargs.pop('compute_derived ', False)
             if kwargs:
                 logger.critical('Unexpected **kwargs for MaxLike: {}'.format(kwargs))
                 logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
@@ -592,8 +596,9 @@ class DriverMC:
                             '\n\twithErrors (bool) Default: False')
                 sys.exit(1)
         ti = time.time()
-        A = MaxLikeAnalyzer(self.L, self.model, withErrors=withErrors, showderived=showderived,\
-                            showplot=showplot, param1=plot_par1, param2=plot_par2)
+        A = MaxLikeAnalyzer(self.L, self.model, withErrors=withErrors,
+                            compute_derived=compute_derived, show_contours=show_contours,\
+                            param1=plot_par1, param2=plot_par2)
         params = self.T.printParameters(A.params)
         self.ttime = time.time() - ti
         self.result = ['maxlike', A, params]
@@ -728,6 +733,7 @@ class DriverMC:
 
         M = GA_deap(self.L, self.model)
         result = M.main()
+        M.plotting()
         self.result = ['genetic', M, result]
         return True
 
