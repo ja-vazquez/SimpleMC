@@ -15,35 +15,76 @@ import random
 
 
 class GA_deap:
-    def __init__(self, like, model):
+    def __init__(self, like, model, plot_fitness=False, compute_errors=False, \
+                 show_contours=False, plot_par1=None, plot_par2=None):
 
-        self.like   = like
-        self.model  = model
+        self.like = like
+        self.model = model
         self.params = like.freeParameters()
-        self.vpars  = [p.value for p in self.params]
-        self.sigma  = sp.array([p.error for p in self.params])
+        self.vpars = [p.value for p in self.params]
+        self.sigma = sp.array([p.error for p in self.params])
         self.bounds = [p.bounds for p in self.params]
         print("Minimizing...", self.vpars, "with bounds", self.bounds)
 
+        self.plot_fitness = plot_fitness
 
         # Genetic Algorithm constants:
-        self.POPULATION_SIZE   = 10    # 10-20
-        self.P_CROSSOVER       = 0.7   # probability for crossover
-        self.P_MUTATION        = 0.3   # (try also 0.5) probability for mutating an individual
-        self.MAX_GENERATIONS   = 10    # 100- 300
+        self.POPULATION_SIZE = 50    # 10-20
+        self.P_CROSSOVER = 0.7       # probability for crossover
+        self.P_MUTATION = 0.3        # (try also 0.5) probability for mutating an individual
+        self.MAX_GENERATIONS = 30    # 100- 300
         self.HALL_OF_FAME_SIZE = 1
-        self.CROWDING_FACTOR   = 20.0  # crowding factor for crossover and mutation
+        self.CROWDING_FACTOR = 20.0  # crowding factor for crossover and mutation
 
-        self.RANDOM_SEED = 42          # set the random seed
+        self.RANDOM_SEED = 42        # set the random seed
 
         self.DIMENSIONS = len(self.params)        # number of dimensions
         self.BOUND_LOW, self.BOUND_UP = 0.0, 1.0  # boundaries for all dimensions
+
+
+
+
+    def main(self):
+        toolbox= self.GA()
+
+        # create initial population (generation 0):
+        population = toolbox.populationCreator(n=self.POPULATION_SIZE)
+
+        # prepare the statistics object:
+        stats = tools.Statistics(lambda ind: ind.fitness.values)
+        stats.register("min", np.min)
+        stats.register("avg", np.mean)
+
+        # define the hall-of-fame object:
+        hof = tools.HallOfFame(self.HALL_OF_FAME_SIZE)
+
+        # perform the Genetic Algorithm flow with elitism:
+        population, logbook = elitism.eaSimpleWithElitism(population, toolbox, cxpb=self.P_CROSSOVER, \
+                                        mutpb=self.P_MUTATION, ngen=self.MAX_GENERATIONS, \
+                                        stats=stats, halloffame=hof, verbose=True)
+
+        # print info for best solution found:
+        best = hof.items[0]
+        print("-- Best Fitness = ", best.fitness.values[0])
+        print("- Best solutions are:")
+        for i, x in enumerate(best):
+            print("-- Best %s = "%self.params[i].name , self.change_prior(i, x))
+
+        #for i in range(self.HALL_OF_FAME_SIZE):
+        #    print(i, ": ", hof.items[i].fitness.values[0], " -> ", self.old_prior(i, hof.items[i]) )
+
+        if self.plot_fitness:
+            self.plotting()
+        return population, logbook, hof
+
 
 
     # helper function for creating random real numbers uniformly distributed within a given range [low, up]
     # it assumes that the range is the same for every dimension
     def randomFloat(self, low, up):
         return [random.uniform(l, u) for l, u in zip([low]*self.DIMENSIONS, [up]*self.DIMENSIONS)]
+
+
 
 
     def GA(self):
@@ -79,40 +120,8 @@ class GA_deap:
         return toolbox
 
 
-    def main(self):
-        toolbox= self.GA()
 
-        # create initial population (generation 0):
-        population = toolbox.populationCreator(n=self.POPULATION_SIZE)
-
-        # prepare the statistics object:
-        stats = tools.Statistics(lambda ind: ind.fitness.values)
-        stats.register("min", np.min)
-        stats.register("avg", np.mean)
-
-        # define the hall-of-fame object:
-        hof = tools.HallOfFame(self.HALL_OF_FAME_SIZE)
-
-        # perform the Genetic Algorithm flow with elitism:
-        population, logbook = elitism.eaSimpleWithElitism(population, toolbox, cxpb=self.P_CROSSOVER, \
-                                        mutpb=self.P_MUTATION, ngen=self.MAX_GENERATIONS, \
-                                        stats=stats, halloffame=hof, verbose=True)
-
-        # print info for best solution found:
-        best = hof.items[0]
-        print("-- Best Fitness = ", best.fitness.values[0])
-        print("- Best solutions are:")
-        for i, x in enumerate(best):
-            print("-- Best %s = "%self.params[i].name , self.change_prior(i, x))
-
-        #for i in range(self.HALL_OF_FAME_SIZE):
-        #    print(i, ": ", hof.items[i].fitness.values[0], " -> ", self.old_prior(i, hof.items[i]) )
-
-        return population, logbook, hof
-
-
-    def plotting(self):
-        pop, log, hof = self.main()
+    def plotting(self, pop, log, hof):
 
         # extract statistics
         gen, avg, min_, max_ = log.select("gen", "avg", "min", "max")
