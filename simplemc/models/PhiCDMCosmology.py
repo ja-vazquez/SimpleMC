@@ -24,14 +24,14 @@ class PhiCosmology(LCDMCosmology):
         self.varybeta    = varybeta
         self.varyalpha   = varyalpha
 
-        self.Ok     = curv #Ok_par.value
+        self.Ok     = curv   #Ok_par.value
         self.alpha  = alpha
-        self.beta   = beta #phibeta_par.value
-        self.mu     = mu #phimu_par.value
-        self.ilam   = ilam #philam_par.value
+        self.beta   = beta   #phibeta_par.value
+        self.mu     = mu     #phimu_par.value
+        self.ilam   = ilam   #philam_par.value
         self.eps    = eps
 
-        self.lna   = np.linspace(-6, 0, 500)
+        self.lna   = np.linspace(-6.5, 0, 500)
         self.z     = np.exp(-self.lna) - 1.
         self.zvals = np.linspace(0, 5, 200)
 

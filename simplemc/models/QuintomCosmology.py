@@ -1,5 +1,6 @@
 
-
+## This is Quintom cosmology
+# with the interaction term
 
 from simplemc.models.LCDMCosmology import LCDMCosmology
 from simplemc.cosmo.paramDefs import *
@@ -29,7 +30,8 @@ class QuintomCosmology(LCDMCosmology):
         self.lna = np.linspace(-10, 0, 500)
         self.z = np.exp(-self.lna) - 1.
 
-        self.chatty = False
+        #whether we rather printing all
+        self.chatty = True
 
         LCDMCosmology.__init__(self, mnu=0)
 
@@ -96,8 +98,8 @@ class QuintomCosmology(LCDMCosmology):
 
     def sf_rho(self, variables):
         """ Computes the density for the scalar field. """
-        phi, dot_phi, psi, dot_psi = variables
-        sf_rho = dot_phi**2 - dot_psi**2 + self.sf_potential(phi, psi, 0)/(3*self.h**2)
+        phi, x_phi, psi, x_psi = variables
+        sf_rho = x_phi**2 - x_psi**2 + self.sf_potential(phi, psi, 0)/(3*self.h**2)
         return sf_rho
 
 
@@ -140,12 +142,12 @@ class QuintomCosmology(LCDMCosmology):
         # Compute hubble function.
         hubble  = self.hubble(lna, variables=variables)
 
-        phi, dot_phi, psi, dot_psi = variables
+        phi, x_phi, psi, x_psi = variables
         # Right hand side of the dynamical system.
-        rhs = [factor*dot_phi/hubble,
-               -3*self.h*dot_phi + self.sf_potential(phi, psi, 'phi')/(factor*hubble),
-               factor*dot_psi/hubble,
-               -3*self.h*dot_psi - self.sf_potential(phi, psi, 'psi')/(factor*hubble)]
+        rhs = [factor*x_phi/hubble,
+               -3*x_phi - self.sf_potential(phi, psi, 'phi')/(factor*hubble),
+               factor*x_psi/hubble,
+               -3*x_psi + self.sf_potential(phi, psi, 'psi')/(factor*hubble)]
         return rhs
 
 
@@ -172,7 +174,7 @@ class QuintomCosmology(LCDMCosmology):
         elif self.vary_mphan and (self.mquin == 0) and (self.coupling == 0):
             phi_ini, psi_ini = 0, 10**ini_guess
         else:
-            phi_ini, psi_ini = 10**ini_guess, 10**ini_guess
+            phi_ini, psi_ini = 10**ini_guess, 0.8 #10**ini_guess
 
         # Find the solution for such a guess.
         solution = self.solve_eqns(phi_ini, 0.0, psi_ini, 0.0)
@@ -206,13 +208,13 @@ class QuintomCosmology(LCDMCosmology):
             Initial condition for the field: ``mid_guess``.
 
         solution : list
-            Found solution (if any): ``solution`` which contains [phi, dotPhi, psi, dotPhi].
+            Found solution (if any): ``solution`` which contains [phi, xPhi, psi, xPsi].
 
         """
 
         mid_guess = 0.5*(low_guess + high_guess)
 
-        while 0.5*(high_guess - low_guess) > tolerance:
+        while (high_guess - low_guess) > tolerance:
             # Compute the solution for an initial guess.
             solution, current_tolerance = self.compute_omega_de(mid_guess)
             low_tolerance = self.compute_omega_de(low_guess)[1]
@@ -233,20 +235,24 @@ class QuintomCosmology(LCDMCosmology):
         grad = np.abs(np.gradient(self.sf_rho(solution))).max()
         mid_guess = -1 if grad < 1.0E-2 else 0
 
-        if self.chatty and mid_guess == -1:
-            print('No solution found!, but looks like LCDM', mid_guess, self.mquin, self.mphan)
+        if self.chatty:
+            if mid_guess == -1:
+                print('looks a lot like LCDM', mid_guess, self.mquin, self.mphan)
+        if mid_guess == 0:
+            print('-- No solution found!', mid_guess, self.mquin, self.mphan)
         return mid_guess, solution
 
 
 
     def initialize(self):
         """
-        Main method that searches the initial conditions and computes [phi, dotPhi, psi, dotPhi]
+        Main method that searches the initial conditions and computes [phi, xPhi, psi, xPsi]
         for a given scalar field potential.
         """
 
+        high_guess = 2 if self.coupling >0 else 1
         #It's slower than newton, but finds more solutions
-        self.phi_ini, self.solution = self.find_initial_phi(-3, 3)
+        self.phi_ini, self.solution = self.find_initial_phi(-2, high_guess)
 
         if self.phi_ini == 0:
             # Solution couldn't be found, then reject that point.
