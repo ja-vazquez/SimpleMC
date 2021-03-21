@@ -5,9 +5,7 @@ and creates a param file.
 # from simplemc.tools.Simple_Plots import Simple_plots
 from simplemc.cosmo.Derivedparam import AllDerived
 from simplemc import logger
-import os.path as path
 import numpy as np
-import sys
 import re
 
 #TODO EMCEE
@@ -35,35 +33,6 @@ class PostProcessing:
 
 
 
-    def saveNestedChain(self):
-        """
-        This generates an output Simple(cosmo)MC style for dynesty Samplers.
-
-        Returns
-        -------
-
-        """
-
-        f = open(self.filename + '.txt', 'w+')
-        # Only for nestle
-        for i in range(len(self.result.samples)):
-            strweights  = self.cleanf(self.result.weights[i])
-            strlogl     = self.cleanf(-1 * self.result.logl[i])
-            strsamples  = self.cleanf(self.result.samples[i])
-            row  = strweights + ' ' + strlogl + ' ' + strsamples
-            nrow = " ".join(row.split())
-            if self.derived:
-                for pd in self.AD.listDerived(self.loglike):
-                    nrow = "{} {}".format(nrow, pd.value)
-            f.write(nrow + '\n')
-        f.close()
-
-
-
-    def cleanf(self, func):
-        return str(func).lstrip('[').rstrip(']')
-
-
     def writeSummary(self, time, *args):
         file = open(self.filename + "_Summary" + ".txt", 'w')
         file.write('SUMMARY\n-------\n')
@@ -88,7 +57,6 @@ class PostProcessing:
 
         if self.engine =='dynesty':
             pars = self.loglike.freeParameters()
-            dims = len(pars)
             for i, p in enumerate(pars):
                 mean = np.mean(self.result.samples[:, i])
                 std = np.std(self.result.samples[:, i])
@@ -133,7 +101,6 @@ class PostProcessing:
 
     # AJUSTAR!
     def saveEmceeSamples(self, thin=1):
-        dims = len(self.paramList)
         f = open(self.filename + '.txt', 'w+')
         logprobs = self.result.get_log_prob(discard=self.skip, flat=True, thin=thin)
         postsamples = self.result.get_chain(discard=self.skip, flat=True, thin=thin)
