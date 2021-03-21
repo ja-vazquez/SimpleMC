@@ -4,6 +4,7 @@ and creates a param file.
 """
 # from simplemc.tools.Simple_Plots import Simple_plots
 from simplemc.cosmo.Derivedparam import AllDerived
+from simplemc.analyzers.dynesty import utils as dyfunc
 from simplemc import logger
 import numpy as np
 import re
@@ -57,9 +58,13 @@ class PostProcessing:
 
         if self.engine =='dynesty':
             pars = self.loglike.freeParameters()
+            samples, weights = self.result.samples, np.exp(self.result.logwt - self.result.logz[-1])
+            means, cov = dyfunc.mean_and_cov(samples, weights)
+            stdevs = np.sqrt(np.diag(cov))
+            
             for i, p in enumerate(pars):
-                mean = np.mean(self.result.samples[:, i])
-                std = np.std(self.result.samples[:, i])
+                mean = means[i]
+                std = stdevs[i]
                 print("{}: {:.4f} +/- {:.4f}".format(p.name, mean, std))
                 file.write("{}: {:.4f} +/- {:.4f}\n".format(p.name, mean, std))
 
