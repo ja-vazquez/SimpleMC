@@ -12,14 +12,14 @@
 from simplemc.cosmo.Parameter import Parameter
 
 # Parameters are value, variation, bounds.
-Om_par   = Parameter("Om",   0.3038,  0.05,    (0.05, 0.5),   "\Omega_m")
+Om_par   = Parameter("Om",   0.3038,  0.05,    (0.1, 0.5),   "\Omega_m")
 Obh2_par = Parameter("Obh2", 0.02234, 0.001, (0.02, 0.025), "\Omega_{b}h^2")
-h_par    = Parameter("h",    0.6821,  0.05,   (0.4, 0.9),    "h")
+h_par    = Parameter("h",    0.6821,  0.05,   (0.4, 0.8),    "h")
 
 mnu_par  = Parameter("mnu",  0.06,    0.1,    (0, 1.0),      "\Sigma m_{\\nu}")
 Nnu_par  = Parameter("Nnu",  3.046,   0.5,    (3.046, 5.046),"N_{\\rm eff}")
 
-Ok_par = Parameter("Ok", 0.0, 0.01, (-0.1, 0.1), "\Omega_k")
+Ok_par = Parameter("Ok", 0.0, 0.01, (-0.02, 0.02), "\Omega_k")
 w_par  = Parameter("w", -1., 0.1, (-2.0, 0.0), "w_0")
 wa_par = Parameter("wa", 0.0, 0.1, (-2.0, 2.0), "w_a")
 wb_par = Parameter("wb", 0.7, 0.2,  (-2., 3.0), "w_b")
@@ -115,9 +115,9 @@ ralpha_par  = Parameter("alpha", 0.01, 0.005, (0.001, 0.05), "\\alpha")
 alpha_par  = Parameter("alpha", 0., 0.01, (-1, 1), "alpha")
 
 # Quintom Cosology.
-mquin_par  = Parameter("mquin", 1.2, 0.1, (0, 4), "m_{\phi}")
-mphan_par  = Parameter("mphan", 0.7 , 0.1, (0, 2), "m_{\psi}")
-beta2_par  = Parameter("beta",  1.0, 0.5, (0, 20), "\\beta")
+mquin_par = Parameter("mquin", 1.2, 0.1, (0, 3), "m_{\phi}")
+mphan_par = Parameter("mphan", 0.7 , 0.1, (0, 2), "m_{\psi}")
+coupling_par = Parameter("beta",  1.0, 0.5, (0, 20), "\\beta")
 iniphi_par = Parameter("iniphi", 1.0, 0.1, (0, 2), "\phi_0")
 
 # Fourier series expansion for w(z).
@@ -136,7 +136,7 @@ nk_par = Parameter("nk", 0.0, 0.1, (-1, 1), "n")
 kk_par = Parameter("kk", 1.5, 0.1, (0.01, 3.14), "k")
 
 # Graduated DE.
-ggama_par     = Parameter("ggama", -0.0, 0.003, (-0.5, 0.5), "\gamma")
+ggama_par     = Parameter("ggama", -1.0, 0.1, (-1.3, -0.7), "\gamma")
 glambda_par   = Parameter("glambda", 0, 0.2, (-10, 0), "\lambda")
 
 # Phi Cosmology, e-Scalar field.
@@ -160,3 +160,8 @@ rs_par =   Parameter("rs",  400., 10.0, (0.0, 600.0), "r_s")
 # Restrained DE.
 weff_par      = Parameter("weff", -1.0, 0.02, (-1., 0.), "w_{eff}")
 wcpl_par      = Parameter("wcpl", 0.0, 0.03, (0, 0.5), "w_{cpl}")
+
+
+LMBD_par      = Parameter("LMBD", 0.65, 0.02, (0, 1), "w_{cpl}")
+
+

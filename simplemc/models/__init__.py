@@ -28,3 +28,5 @@ from .TiredLightDecorator import TiredLightDecorator
 from .wCDMCosmology import wCDMCosmology
 from .WeirdCDMCosmology import WeirdCDMCosmology
 from .wFourierCosmology import wFourierCosmology
+
+from .ePhiCDMCosmology import ePhiCosmology

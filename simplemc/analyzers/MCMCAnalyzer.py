@@ -1,5 +1,8 @@
 
 
+#TODO print the Accepted # for each rank
+
+
 from simplemc.cosmo.Derivedparam import AllDerived
 import scipy.linalg as la
 import scipy as sp
@@ -117,6 +120,7 @@ class MCMCAnalyzer:
         self.done   = False
         #converge
         self.lpars   = []
+        #Uses the last percentage of the chain
         self.percen  = 0.4
 
         gr = None
@@ -148,14 +152,14 @@ class MCMCAnalyzer:
                 self.cw += 1
 
             print("Accepted: {:d} | loglike: {:3.4f} | "
-                  "GR: {}".format(self.co, self.cloglike, gr), end='\r')
+                  "Gelman-Rubin: {}".format(self.co, self.cloglike, gr), end='\r')
             sys.stdout.flush()
             if (self.co >0 and self.co % self.checkgr == 0):
                 chains = comm.gather(self.lpars, root=0)
                 if comm.rank ==0:
                     gr = self.GRDRun(chains)
-                    # print('Gelman-Rubin R-1:', gr)
-                    if (sp.all(gr< self.GRcondition)):
+                    #print('Gelman-Rubin R-1:', gr)
+                    if (sp.all(gr < self.GRcondition)):
                         condition = 1
                         self.closeFiles()
                     else:
