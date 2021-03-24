@@ -31,9 +31,9 @@ class SNLikelihood(BaseLikelihood):
 
     def loglike(self):
         zs = self.like.get_redshifts()
-        angular_distance = [self.theory_.Da_z(z)*(1+z) for z in zs]
+        angular_distance = [self.theory_.AD_z(z) for z in zs]
+        print (angular_distance)
         chi2 = self.like.loglike(angular_distance, {'alpha': 0.1325237, 'beta': 2.959805}) * 2
-
         return -chi2/2
 
 

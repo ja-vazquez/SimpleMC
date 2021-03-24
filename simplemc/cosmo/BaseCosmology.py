@@ -153,6 +153,10 @@ class BaseCosmology:
             q = sp.sqrt(-self.Curv)
             return sp.sin(r*q)/(q)
 
+    #Angular distance
+    def AD_z(self, z):
+        return self.c_/(self.h*100)*self.Da_z(z)*(1+z)
+
 
     # D_a / rd
     def DaOverrd(self, z):
