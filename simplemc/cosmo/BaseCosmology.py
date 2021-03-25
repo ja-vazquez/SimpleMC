@@ -155,7 +155,7 @@ class BaseCosmology:
 
     #Angular distance
     def AD_z(self, z):
-        return self.c_/(self.h*100)*self.Da_z(z)*(1+z)
+        return self.Da_z(z)*self.c_/(self.h*100)/(1+z)
 
 
     # D_a / rd
