@@ -318,7 +318,6 @@ if __name__ == "__main__":
     path_to_file = r'/Users/josevazquezgonzalez/Desktop/Codigos_SimpleMC/new_SimpleMC/SimpleMC/simplemc/data/jla_cosmo_v2/jla.dataset'
     like = SN_likelihood(path_to_file,  marginalize=False)
     zs = like.get_redshifts()
-    print('*'*10, zs)
     start = time.time()
     chi2 = like.loglike(fit(zs), {'alpha': 0.1325237, 'beta': 2.959805}) * 2
     print('Likelihood execution time:', time.time() - start)
