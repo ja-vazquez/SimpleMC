@@ -1,0 +1,1 @@
+This folder contains the saved neural networks model to several likelihood functions.
