@@ -31,7 +31,7 @@ class QuintomCosmology(LCDMCosmology):
         self.z = np.exp(-self.lna) - 1.
 
         #whether we rather printing all
-        self.chatty = True
+        self.chatty = False
 
         LCDMCosmology.__init__(self, mnu=0)
 
@@ -174,7 +174,7 @@ class QuintomCosmology(LCDMCosmology):
         elif self.vary_mphan and (self.mquin == 0) and (self.coupling == 0):
             phi_ini, psi_ini = 0, 10**ini_guess
         else:
-            phi_ini, psi_ini = 10**ini_guess, 0.8 #10**ini_guess
+            phi_ini, psi_ini = 10**ini_guess, 10**ini_guess
 
         # Find the solution for such a guess.
         solution = self.solve_eqns(phi_ini, 0.0, psi_ini, 0.0)
