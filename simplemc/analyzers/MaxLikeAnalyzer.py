@@ -15,6 +15,7 @@ except:
     sys.exit('install numdifftools')
 
 
+
 class MaxLikeAnalyzer:
     def __init__(self, like, model, compute_errors=False, compute_derived= False,
                  show_contours=False, plot_param1=None, plot_param2=None):

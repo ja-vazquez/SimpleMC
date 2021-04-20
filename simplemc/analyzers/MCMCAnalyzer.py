@@ -326,7 +326,7 @@ class MCMCAnalyzer:
                 outstr = self.formstr % tuple(tmp)
             self.fout.write(outstr)
             # Flush file on regular basis
-            if (self.co % 1 == 0): #JAV 1000
+            if (self.co % 100 == 0): #JAV 1000
                 self.fout.flush()
 
             if (self.cloglike > self.maxloglike):
