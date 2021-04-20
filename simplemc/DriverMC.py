@@ -86,6 +86,7 @@ class DriverMC:
             self.datasets     = kwargs.pop('datasets','HD')
             self.analyzername = kwargs.pop('analyzername', None)
             self.addDerived   = kwargs.pop('addDerived', False)
+            self.useNeuralLike = kwargs.pop('useNeuralLike', False)
 
 
             ## Next two are for custom model
@@ -137,6 +138,10 @@ class DriverMC:
         self.root = "{}_{}_{}".format(self.model, self.prefact,
                                     self.datasets)
         self.outputpath = "{}/{}".format(self.chainsdir, self.root)
+
+        if self.useNeuralLike:
+            neural_model = self.neuralLike(iniFile=self.iniFile)
+            self.logLike = neural_model.loglikelihood
 
 
 
@@ -197,6 +202,7 @@ class DriverMC:
         self.analyzername = self.config.get(        'custom', 'analyzername', fallback=None)
         self.varys8       = self.config.getboolean( 'custom', 'varys8',       fallback=False)
         self.addDerived   = self.config.getboolean( 'custom', 'addDerived',   fallback=False)
+        self.useNeuralLike = self.config.getboolean('custom', 'useNeuralLike', fallback=False)
 
         self.custom_parameters = self.config.get(   'custom', 'custom_parameters', fallback=None)
         self.custom_function   = self.config.get(   'custom', 'custom_function',   fallback=None)
@@ -983,3 +989,33 @@ class DriverMC:
                 pool = mp.Pool(processes=nprocess)
 
         return pool, nprocess
+
+    def neuralLike(self, iniFile=None, **kwargs):
+        from simplemc.analyzers.neuralike.NeuralManager import NeuralManager
+        self.outputpath = '{}_neuralike'.format(self.outputpath)
+        if iniFile:
+            ndivsgrid = self.config.getint('neuralike', 'ndivsgrid', fallback=50)
+            epochs = self.config.getint('neuralike', 'epochs', fallback=500)
+            learning_rate = self.config.getfloat('neuralike', 'learning_rate', fallback=5e-4)
+            batch_size = self.config.getint('neuralike', 'batch_size', fallback=32)
+            psplit = self.config.getfloat('neuralike', 'psplit', fallback=0.8)
+            hidden_layers_neurons = [int(x) for x in self.config.get('neuralike', 'hidden_layers_neurons',
+                                                                     fallback=[100, 100, 200]).split(',')]
+            nproc = self.config.getint('neuralike', 'nproc', fallback=3)
+        else:
+            ndivsgrid = kwargs.pop('ndivsgrid', 50)
+            epochs = kwargs.pop('epochs', 500)
+            learning_rate = kwargs.pop('learning_rate', 5e-4)
+            batch_size = kwargs.pop('batch_size', 32)
+            psplit = kwargs.pop('psplit', 0.8)
+            hidden_layers_neurons = kwargs.pop('hidden_layers_neurons', [100, 100, 200])
+            nproc = kwargs.pop('nproc', 3)
+        if nproc > 1:
+            import multiprocessing as mp
+            pool = mp.Pool(processes=nproc)
+        else:
+            pool = None
+
+        return NeuralManager(self.logLike, self.bounds, self.root, ndivsgrid=ndivsgrid,
+                             epochs=epochs, hidden_layers_neurons=hidden_layers_neurons, psplit=psplit,
+                             learning_rate=learning_rate, batch_size=batch_size, pool=pool)
