@@ -29,4 +29,4 @@ from .wCDMCosmology import wCDMCosmology
 from .WeirdCDMCosmology import WeirdCDMCosmology
 from .wFourierCosmology import wFourierCosmology
 
-from .ePhiCDMCosmology import ePhiCosmology
+#from .ePhiCDMCosmology import ePhiCosmology

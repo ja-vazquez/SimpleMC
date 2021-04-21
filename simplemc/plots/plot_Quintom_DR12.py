@@ -17,7 +17,7 @@ steps = 9
 coupling = 0
 zl = np.arange(0, 3, 0.05)
 
-fname = 'Quintom_mquin'
+fname = 'Quintessence'
 
 # ---
 if fname == 'Quintessence':
