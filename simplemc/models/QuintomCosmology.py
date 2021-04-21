@@ -280,13 +280,15 @@ class QuintomCosmology(LCDMCosmology):
 
 
 
+
+
     def RHSquared_a(self, a):
         """ This is relative hsquared as a function of a, i.e. H(z)^2/H(z=0)^2. """
 
         if (1./a-1 < self.zvals[-1]):
             hubble = (self.sf_hubble(np.log(a))/self.h)**2.
         else:
-            hubble = self.hubble(self.lna, use_sf=False)
+            hubble = (self.hubble(self.lna, use_sf=False)/self.h)**2
         return hubble
 
 
@@ -321,6 +323,7 @@ class QuintomCosmology(LCDMCosmology):
         else:
             w_eos = self.sf_eos(self.solution)
 
+        #self.w_eos = interp1d(self.lna, w_eos)
         self.w_eos = interp1d(self.lna, w_eos)
         return True
 
