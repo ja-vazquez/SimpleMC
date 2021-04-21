@@ -10,7 +10,7 @@ import numpy as np
 
 
 class QuintomCosmology(LCDMCosmology):
-    def __init__(self, vary_mquin=False, vary_mphan=False, vary_coupling=False):
+    def __init__(self, vary_mquin=False, vary_mphan=False, vary_iniphi=False, vary_coupling=False):
 
         """
         It better to start the chains at masses equal one, othewise may take much longer.
@@ -21,6 +21,7 @@ class QuintomCosmology(LCDMCosmology):
         self.vary_mquin = vary_mquin
         self.vary_mphan = vary_mphan
         self.vary_coupling = vary_coupling
+        self.vary_iniphi = vary_iniphi
 
         self.mquin = 0 if (vary_mphan and (not vary_mquin)) else mquin_par.value
         self.mphan = 0 if (vary_mquin and (not vary_mphan)) else mphan_par.value
@@ -46,6 +47,8 @@ class QuintomCosmology(LCDMCosmology):
             l.append(mquin_par)
         if self.vary_mphan:
             l.append(mphan_par)
+        if self.vary_iniphi:
+            l.append(iniphi_par)
         if self.vary_coupling:
             l.append(coupling_par)
         return l
@@ -62,6 +65,8 @@ class QuintomCosmology(LCDMCosmology):
                 self.mquin = p.value
             elif p.name == "mphan":
                 self.mphan = p.value
+            elif p.name == "iniphi":
+                self.iniphi = p.value
             elif p.name == 'beta':
                 self.coupling = p.value
 
@@ -174,7 +179,10 @@ class QuintomCosmology(LCDMCosmology):
         elif self.vary_mphan and (self.mquin == 0) and (self.coupling == 0):
             phi_ini, psi_ini = 0, 10**ini_guess
         else:
-            phi_ini, psi_ini = 10**ini_guess, 10**ini_guess
+            if self.vary_iniphi:
+                phi_ini, psi_ini = 10**ini_guess, self.iniphi
+            else:
+                phi_ini, psi_ini = 10**ini_guess, 10**ini_guess
 
         # Find the solution for such a guess.
         solution = self.solve_eqns(phi_ini, 0.0, psi_ini, 0.0)
