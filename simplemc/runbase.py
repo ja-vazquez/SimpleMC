@@ -167,6 +167,8 @@ def ParseModel(model, **kwargs):
         T = QuintomCosmology(vary_mphan=True)
     elif model == 'Quintom':
         T = QuintomCosmology(vary_mquin=True, vary_mphan=True)
+    elif model == 'Quintom_ini':
+        T = QuintomCosmology(vary_mquin=True, vary_mphan=True, vary_iniphi=True)
     elif model == "Rotation":
         T = RotationCurves()
     elif model == 'custom':

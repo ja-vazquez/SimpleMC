@@ -26,6 +26,7 @@ class QuintomCosmology(LCDMCosmology):
         self.mquin = 0 if (vary_mphan and (not vary_mquin)) else mquin_par.value
         self.mphan = 0 if (vary_mquin and (not vary_mphan)) else mphan_par.value
         self.coupling = 0 if (not vary_coupling) else coupling_par.value
+        self.iniphi = 0
 
         self.zvals = np.linspace(0, 3, 100)
         self.lna = np.linspace(-10, 0, 500)
@@ -245,9 +246,9 @@ class QuintomCosmology(LCDMCosmology):
 
         if self.chatty:
             if mid_guess == -1:
-                print('looks a lot like LCDM', mid_guess, self.mquin, self.mphan)
+                print('looks a lot like LCDM', mid_guess, self.mquin, self.mphan, self.iniphi)
         if mid_guess == 0:
-            print('-- No solution found!', mid_guess, self.mquin, self.mphan)
+            print('-- No solution found!', mid_guess, self.mquin, self.mphan, self.iniphi)
         return mid_guess, solution
 
 

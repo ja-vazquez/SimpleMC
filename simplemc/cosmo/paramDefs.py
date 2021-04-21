@@ -115,10 +115,10 @@ ralpha_par  = Parameter("alpha", 0.01, 0.005, (0.001, 0.05), "\\alpha")
 alpha_par  = Parameter("alpha", 0., 0.01, (-1, 1), "alpha")
 
 # Quintom Cosology.
-mquin_par = Parameter("mquin", 1.2, 0.1, (0, 3.0), "m_{\phi}")
-mphan_par = Parameter("mphan", 0.7 , 0.1, (0, 2), "m_{\psi}")
+mquin_par = Parameter("mquin", 1.7, 0.2, (0, 3.0), "m_{\phi}")
+mphan_par = Parameter("mphan", 0.8, 0.2, (0, 2), "m_{\psi}")
+iniphi_par = Parameter("iniphi", 0.5, 0.1, (0, 2), "\phi_0")
 coupling_par = Parameter("beta",  1.0, 0.5, (0, 20), "\\beta")
-iniphi_par = Parameter("iniphi", 1.0, 0.1, (0, 2), "\phi_0")
 
 # Fourier series expansion for w(z).
 a0_par = Parameter("a0", -2., 0.1, (-3.0, -1.0), "a_0")
