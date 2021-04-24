@@ -10,7 +10,7 @@ import numpy as np
 
 
 class QuintomCosmology(LCDMCosmology):
-    def __init__(self, vary_mquin=False, vary_mphan=False, vary_iniphi=False, vary_coupling=False):
+    def __init__(self, vary_mquin=False, vary_mphan=False, vary_iniphi=False, vary_coupling=False, vary_Ok=False):
 
         """
         It better to start the chains at masses equal one, othewise may take much longer.
@@ -22,11 +22,13 @@ class QuintomCosmology(LCDMCosmology):
         self.vary_mphan = vary_mphan
         self.vary_coupling = vary_coupling
         self.vary_iniphi = vary_iniphi
+        self.varyOk = varyOk
 
         self.mquin = 0 if (vary_mphan and (not vary_mquin)) else mquin_par.value
         self.mphan = 0 if (vary_mquin and (not vary_mphan)) else mphan_par.value
         self.coupling = 0 if (not vary_coupling) else coupling_par.value
         self.iniphi = 0
+        self.Ok = Ok_par.value
 
         self.zvals = np.linspace(0, 3, 100)
         self.lna = np.linspace(-10, 0, 500)
@@ -34,6 +36,8 @@ class QuintomCosmology(LCDMCosmology):
 
         #whether we rather printing all
         self.chatty = False
+
+        self.Ol = 0
 
         LCDMCosmology.__init__(self, mnu=0)
 
@@ -44,14 +48,11 @@ class QuintomCosmology(LCDMCosmology):
     # Free parameters. We add Ok on top of LCDM ones (we inherit LCDM).
     def freeParameters(self):
         l = LCDMCosmology.freeParameters(self)
-        if self.vary_mquin:
-            l.append(mquin_par)
-        if self.vary_mphan:
-            l.append(mphan_par)
-        if self.vary_iniphi:
-            l.append(iniphi_par)
-        if self.vary_coupling:
-            l.append(coupling_par)
+        if self.vary_mquin: l.append(mquin_par)
+        if self.vary_mphan: l.append(mphan_par)
+        if self.vary_iniphi: l.append(iniphi_par)
+        if self.vary_coupling: l.append(coupling_par)
+        if self.varyOk: l.append(Ok_par)
         return l
 
 
@@ -70,6 +71,11 @@ class QuintomCosmology(LCDMCosmology):
                 self.iniphi = p.value
             elif p.name == 'beta':
                 self.coupling = p.value
+            elif p.name == "Ok":
+                self.Ok = p.value
+                self.setCurvature(self.Ok)
+                if (abs(self.Ok) > 1.0):
+                    return False
 
 
         # Searches initial conditions and stores the Hubble function.
@@ -132,10 +138,10 @@ class QuintomCosmology(LCDMCosmology):
         if use_sf:
             omega_de = self.sf_rho(variables)
         else:
-            omega_de = 1.0 - self.Om
+            omega_de = 1.0 - self.Om - self.Ok - self.Ol
 
         a = np.exp(lna)
-        hubble = self.h*np.sqrt(self.Ocb/a**3 + self.Omrad/a**4 + omega_de)
+        hubble = self.h*np.sqrt(self.Omrad/a**4 + self.Ocb/a**3 + self.Ok/a**2 + self.Ol + omega_de)
         return hubble
 
 
@@ -149,6 +155,7 @@ class QuintomCosmology(LCDMCosmology):
         hubble  = self.hubble(lna, variables=variables)
 
         phi, x_phi, psi, x_psi = variables
+
         # Right hand side of the dynamical system.
         rhs = [factor*x_phi/hubble,
                -3*x_phi - self.sf_potential(phi, psi, 'phi')/(factor*hubble),
@@ -192,7 +199,7 @@ class QuintomCosmology(LCDMCosmology):
         sf_rho = self.sf_rho(solution[-1])
         omega_de = sf_rho*(self.h/self.hubble(self.lna[-1], solution[-1]))**2
 
-        tolerance = (1 - self.Ocb - self.Omrad) - omega_de
+        tolerance = (1 - self.Omrad - self.Ocb - self.Ok - self.Ol) - omega_de
         return solution.T, tolerance
 
 
@@ -248,7 +255,7 @@ class QuintomCosmology(LCDMCosmology):
             if mid_guess == -1:
                 print('looks a lot like LCDM', mid_guess, self.mquin, self.mphan, self.iniphi)
         if mid_guess == 0:
-            print('-- No solution found!', mid_guess, self.mquin, self.mphan, self.iniphi)
+            if self.chatty: print('-- No solution found!', mid_guess, self.mquin, self.mphan, self.iniphi)
         return mid_guess, solution
 
 
@@ -260,6 +267,7 @@ class QuintomCosmology(LCDMCosmology):
         """
 
         high_guess = 2 if self.coupling >0 else 1
+
         #It's slower than newton, but finds more solutions
         self.phi_ini, self.solution = self.find_initial_phi(-2, high_guess)
 
@@ -310,9 +318,10 @@ class QuintomCosmology(LCDMCosmology):
 
     def sf_eos(self, variables):
         phi, dot_phi, psi, dot_psi = variables
+
         w1 = dot_phi**2 - dot_psi**2 - self.sf_potential(phi, psi, 0)/(3*self.h**2)
         w2 = dot_phi**2 - dot_psi**2 + self.sf_potential(phi, psi, 0)/(3*self.h**2)
-        return w1/w2
+        return  w1/w2
 
 
     def call_functions(self):
@@ -323,7 +332,6 @@ class QuintomCosmology(LCDMCosmology):
         else:
             w_eos = self.sf_eos(self.solution)
 
-        #self.w_eos = interp1d(self.lna, w_eos)
         self.w_eos = interp1d(self.lna, w_eos)
         return True
 
