@@ -22,7 +22,7 @@ class QuintomCosmology(LCDMCosmology):
         self.vary_mphan = vary_mphan
         self.vary_coupling = vary_coupling
         self.vary_iniphi = vary_iniphi
-        self.varyOk = varyOk
+        self.vary_Ok = vary_Ok
 
         self.mquin = 0 if (vary_mphan and (not vary_mquin)) else mquin_par.value
         self.mphan = 0 if (vary_mquin and (not vary_mphan)) else mphan_par.value
@@ -52,7 +52,7 @@ class QuintomCosmology(LCDMCosmology):
         if self.vary_mphan: l.append(mphan_par)
         if self.vary_iniphi: l.append(iniphi_par)
         if self.vary_coupling: l.append(coupling_par)
-        if self.varyOk: l.append(Ok_par)
+        if self.vary_Ok: l.append(Ok_par)
         return l
 
 
