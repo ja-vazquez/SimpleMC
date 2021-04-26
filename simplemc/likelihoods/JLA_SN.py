@@ -17,7 +17,11 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import numpy as np
-from getdist import IniFile
+try:
+    from getdist import IniFile
+except:
+    import warnings
+    warnings.warn("Please import GetDist library if you want to make getdist posterior plots.")
 import io
 import os
 

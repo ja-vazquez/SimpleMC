@@ -5,11 +5,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 try:
-   # import tensorflow as tf
-   # import tensorflow.keras as K
-   pass
+   import tensorflow as tf
+   import tensorflow.keras as K
 except:
-    sys.exit("You need to install tensorflow")
+    import warnings
+    warnings.warn("Please install tensorflow library if you want to use neural networks")
 
 
 class NeuralNet:

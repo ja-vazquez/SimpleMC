@@ -13,7 +13,9 @@ import sys
 try:
     import tensorflow as tf
 except:
-    sys.exit("You need to install tensorflow")
+    import warnings
+    warnings.warn("Please install tensorflow library if you want to use neural networks")
+
 
 class BambiManager(object):
     """Does all the talking for BAMBI.

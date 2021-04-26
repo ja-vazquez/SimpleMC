@@ -10,13 +10,18 @@ Date: June 2020
 """
 import numpy
 import sys
-from sklearn.preprocessing import StandardScaler
 
 try:
-    import tensorflow as tf
+    from sklearn.preprocessing import StandardScaler
 except:
-    sys.exit("You need to install tensorflow")
+    import warnings
+    warnings.warn("Please install sklearn library if you want to use neural networks in pybambi")
 
+try:
+   import tensorflow as tf
+except:
+    import warnings
+    warnings.warn("Please install tensorflow library if you want to use neural networks")
 
 class KerasNetInterpolation:
     """Keras neural net interpolation.
