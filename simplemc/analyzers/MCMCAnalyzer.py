@@ -146,8 +146,10 @@ class MCMCAnalyzer:
             else:
                 self.cw += 1
 
-            print("Accepted: {:d} | loglike: {:3.4f} | "
-                  "Gelman-Rubin: {}".format(self.co, self.cloglike, gr), end='\r')
+            if (self.comm and self.comm.rank == 0) or self.comm==None:
+                print("Accepted: {:d} | loglike: {:3.4f} | "
+                      "Gelman-Rubin: {}".format(self.co, self.cloglike, gr), end='\r')
+
             sys.stdout.flush()
             if (self.co >0 and self.co % self.checkgr == 0):
                 try:
