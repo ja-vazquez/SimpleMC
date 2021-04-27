@@ -296,7 +296,7 @@ class QuintomCosmology(LCDMCosmology):
         if (1./a-1 < self.zvals[-1]):
             hubble = (self.sf_hubble(np.log(a))/self.h)**2.
         else:
-            hubble = (self.hubble(self.lna, use_sf=False)/self.h)**2
+            hubble = (self.hubble(np.log(a), use_sf=False)/self.h)**2
         return hubble
 
 
