@@ -25,7 +25,7 @@ wa_par = Parameter("wa", 0.0, 0.1, (-2.0, 2.0), "w_a")
 wb_par = Parameter("wb", 0.7, 0.2,  (-2., 3.0), "w_b")
 wc_par = Parameter("wc", 0.7, 0.2,   (-3., 5.0), "w_c")
 
-s8_par    = Parameter("s8", 0.8, 0.01, (0.6, 1.0), "s8")
+s8_par    = Parameter("s8", 0.8, 0.01, (0.5, 1.0), "s8")
 
 # This is the prefactor parameter c/rdH0.
 Pr_par = Parameter("Pr", 28.6, 4, (5, 70), "c/(H_0r_d)")
@@ -115,10 +115,10 @@ ralpha_par  = Parameter("alpha", 0.01, 0.005, (0.001, 0.05), "\\alpha")
 alpha_par  = Parameter("alpha", 0., 0.01, (-1, 1), "alpha")
 
 # Quintom Cosology.
-mquin_par = Parameter("mquin", 1.7, 0.2, (0, 3.0), "m_{\phi}")
-mphan_par = Parameter("mphan", 0.8, 0.2, (0, 2), "m_{\psi}")
+mquin_par = Parameter("mquin", 1.7, 0.2, (0, 4.0), "m_{\phi}")
+mphan_par = Parameter("mphan", 0.8, 0.2, (0, 3.0), "m_{\psi}")
 iniphi_par = Parameter("iniphi", 0.5, 0.1, (0, 1.5), "\phi_0")
-coupling_par = Parameter("beta",  1.0, 0.5, (0, 10), "\\beta")
+coupling_par = Parameter("beta",  1.0, 0.5, (-10, 10), "\\beta")
 
 # Fourier series expansion for w(z).
 a0_par = Parameter("a0", -2., 0.1, (-3.0, -1.0), "a_0")
