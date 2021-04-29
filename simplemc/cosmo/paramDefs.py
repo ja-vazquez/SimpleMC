@@ -154,7 +154,7 @@ Oq_par = Parameter("Oq",  0.7, 0.05, (0.5, 1.0), "\Omega_q")
 wq_par = Parameter("wq",  -0.9, 0.05, (-1.0, -0.5), "w_q")
 
 # Rotation curves, for astrophysical purposes.
-Anfw_par = Parameter("Anfw",  0.1, 0.01, (0.0, 0.5), "A_s")
+Anfw_par = Parameter("Anfw",  0.1, 0.01, (0.0, 5.5), "A_s")
 rs_par =   Parameter("rs",  400., 10.0, (0.0, 600.0), "r_s")
 
 # Restrained DE.

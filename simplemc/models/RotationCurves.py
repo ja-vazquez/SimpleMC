@@ -32,6 +32,15 @@ class RotationCurves():
         if (self.varyb): l.append(rs_par)
         return l
 
+    def printFreeParameters(self):
+        print("Free parameters and values currently accepted:")
+        self.printParameters(self.freeParameters())
+
+
+    def printParameters(self, params):
+        for p in params:
+            print(p.name, '=' , p.value , '+/-' , p.error)
+
 
     def updateParams(self, pars):
         for p in pars:
