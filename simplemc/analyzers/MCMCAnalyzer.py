@@ -10,18 +10,9 @@ import copy
 import random
 import sys
 
-from mpi4py import MPI
-
-comm = MPI.COMM_WORLD
-name = MPI.Get_processor_name()
-
-
-print ("Hello, World! "
-       "I am process %d of %d on %s" %
-       (comm.rank, comm.size, name))
 
 class MCMCAnalyzer:
-    def __init__(self, like, outfile, skip=5000, nsamp=100000, temp=1.0,
+    def __init__(self, like, outfile, comm=None, skip=5000, nsamp=100000, temp=1.0,
                  cov=None, chain_num=None, addDerived=False, GRstop=0.01, checkGR=500):
         """
         MCMC sampler (Metropolis-Hastings).
@@ -61,7 +52,11 @@ class MCMCAnalyzer:
         self.nsamp     = nsamp
         self.skip      = skip
         self.temp      = float(temp)  # temperature
-        self.chain_num = comm.rank+1  #chain_num
+        self.comm = comm
+        if comm:
+            self.chain_num = comm.rank+1  #chain_num
+        else:
+            self.chain_num = 1  # chain_num
         self.cpars     = like.freeParameters()
         self.N         = len(self.cpars)
         self.derived   = addDerived
@@ -151,27 +146,32 @@ class MCMCAnalyzer:
             else:
                 self.cw += 1
 
-            print("Accepted: {:d} | loglike: {:3.4f} | "
-                  "Gelman-Rubin: {}".format(self.co, self.cloglike, gr), end='\r')
+            if (self.comm and self.comm.rank == 0) or self.comm==None:
+                print("Accepted: {:d} | loglike: {:3.4f} | "
+                      "Gelman-Rubin: {}".format(self.co, self.cloglike, gr), end='\r')
+
             sys.stdout.flush()
             if (self.co >0 and self.co % self.checkgr == 0):
-                chains = comm.gather(self.lpars, root=0)
-                if comm.rank ==0:
-                    gr = self.GRDRun(chains)
-                    #print('Gelman-Rubin R-1:', gr)
-                    if (sp.all(gr < self.GRcondition)):
-                        condition = 1
-                        self.closeFiles()
+                try:
+                    chains = self.comm.gather(self.lpars, root=0)
+                    if self.comm.rank ==0:
+                        gr = self.GRDRun(chains)
+                        #print('Gelman-Rubin R-1:', gr)
+                        if (sp.all(gr < self.GRcondition)):
+                            condition = 1
+                            self.closeFiles()
+                        else:
+                            condition = 0
                     else:
-                        condition = 0
-                else:
-                        condition = None
-                recvmsg = comm.bcast(condition, root=0)
-                if recvmsg ==1:
-                    print('\n---- Gelman-Rubin achived ---- ')
-                    return True
-
-
+                            condition = None
+                    recvmsg = self.comm.bcast(condition, root=0)
+                    if recvmsg ==1:
+                        print('\n---- Gelman-Rubin achived ---- ')
+                        return True
+                except:
+                    gr = self.GRDRun(self.lpars)
+                    if (sp.all(gr < self.GRcondition)):
+                        self.closeFiles()
 
     def GRDRun(self, chains):
         """

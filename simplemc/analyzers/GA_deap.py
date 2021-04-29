@@ -5,8 +5,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from simplemc.plots.Plot_elipses import plot_elipses
 
-# Importamos libreria de algoritmos evolutivos
-from deap import base, creator, tools, algorithms
+try:
+    # Importamos libreria de algoritmos evolutivos
+    from deap import base, creator, tools, algorithms
+except:
+    import warnings
+    warnings.warn("Pleas install DEAP library if you want to use ga_deap genetic algorithms.")
 
 # We import an independent module to implement elitism in the GA.
 from simplemc.analyzers import elitism

@@ -16,6 +16,7 @@ from simplemc import logger
 import numpy as np
 import sys, os
 import time
+import glob
 
 
 class DriverMC:
@@ -251,7 +252,7 @@ class DriverMC:
             skip     = self.config.getint(      'mcmc', 'skip',    fallback=300)
             ## temperature at which to sample, weights get readjusted on the fly
             temp     = self.config.getfloat(    'mcmc', 'temp',    fallback=2)
-            chainno  = self.config.getint(      'mcmc', 'chainno', fallback=1)
+            self.chainno  = self.config.getint(      'mcmc', 'chainno', fallback=1)
             GRstop   = self.config.getfloat(    'mcmc', 'GRstop',  fallback=0.01)
             checkGR  = self.config.getfloat(    'mcmc', 'checkGR', fallback=500)
             evidence = self.config.getboolean(  'mcmc', 'evidence',fallback=False)
@@ -259,7 +260,7 @@ class DriverMC:
             nsamp    = kwargs.pop('nsamp', 50000)
             skip     = kwargs.pop('skip',  300)
             temp     = kwargs.pop('temp',  2)
-            chainno  = kwargs.pop('chainno', 1)
+            self.chainno  = kwargs.pop('chainno', 1)
             GRstop   = kwargs.pop('GRstop', 0.01)
             checkGR  = kwargs.pop('checkGR', 500)
             evidence = kwargs.pop('evidence', False)
@@ -274,7 +275,21 @@ class DriverMC:
                 #raise TypeError('Unexpected **kwargs: {}'.format(kwargs))
         logger.info("\n\tnsamp: {}\n\tskip: {}\n\t"
                     "temp: {}\n\tchain num: {}\n\tevidence: {}".format(
-                    nsamp, skip, temp, chainno, evidence))
+                    nsamp, skip, temp, self.chainno, evidence))
+        if self.chainno>1:
+            try:
+                from mpi4py import MPI
+                self.comm = MPI.COMM_WORLD
+                name = MPI.Get_processor_name()
+                print ("Hello, World! "
+                       "I am process {} of {} on {}".format(self.comm.rank, self.comm.size, name))
+            except:
+                sys.exit("You need to install MPI to run mcmc in parallel via mpirun -np nproc python3 test.py\\"
+                         "nproc must be the same number than chainno in the ini file.\\"
+                         "If you only want use one processor, set chainno=1 in the ini file.")
+        else:
+            self.comm = None
+
         if self.analyzername is None: self.analyzername = 'mcmc'
         self.outputpath = "{}_{}".format(self.outputpath, self.analyzername)
         #Check whether the file already exists
@@ -282,8 +297,8 @@ class DriverMC:
         ti = time.time()
 
         #Main process
-        M = MCMCAnalyzer(self.L, self.outputpath, skip=skip, nsamp=nsamp, temp = temp,
-                        chain_num=chainno, addDerived=self.addDerived, GRstop=GRstop, checkGR=checkGR)
+        M = MCMCAnalyzer(self.L, self.outputpath, comm=self.comm, skip=skip, nsamp=nsamp, temp = temp,
+                         chain_num=self.chainno, addDerived=self.addDerived, GRstop=GRstop, checkGR=checkGR)
 
         self.ttime = time.time() - ti
 
@@ -866,13 +881,18 @@ class DriverMC:
         new one with extension _new in its name.
 
         """
-        if os.path.isfile(self.outputpath+".txt"):
-            logger.info("{0} file already exists, {0}_new was created".format(self.outputpath))
-            self.outputpath = "{}_new".format(self.outputpath)
-        #for i in range(1,10):
-        #    if os.path.isfile("{}_{}.txt".format(self.outputpath, i)):
-        #        logger.info("{0}_{1} file already exists, {0}_new was created".format(self.outputpath, i))
-        #        self.outputpath = "{}_new".format(self.outputpath)
+        if self.analyzername == 'mcmc' and self.chainno > 1:
+            for p in range(self.comm.size):
+                files = glob.glob('{}_*p.txt'.format(self.outputpath))
+                for _ in files:
+                # if os.path.isfile("{}_{}.txt".format(self.outputpath, p)):
+                    logger.info("{0} file already exists, {0}_new was created".format(self.outputpath, p))
+                    self.outputpath = "{}_new".format(self.outputpath)
+        else:
+            files = glob.glob('{}_*.txt'.format(self.outputpath))
+            for _ in files:
+                logger.info("{0} file already exists, {0}_new was created".format(self.outputpath))
+                self.outputpath = "{}_new".format(self.outputpath)
         self.paramFiles()
 
         return True
