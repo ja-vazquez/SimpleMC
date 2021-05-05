@@ -19,6 +19,9 @@ import time
 import glob
 
 
+#from simplemc.analyzers.neuralike.NeuralNet import NeuralNet
+import tensorflow as tf
+
 class DriverMC:
     """
         This class is the manager and wrapper between all
@@ -141,10 +144,13 @@ class DriverMC:
         self.outputpath = "{}/{}".format(self.chainsdir, self.root)
 
         if self.useNeuralLike:
-            #change that later
+            #change that later: cuando se usa model funciona, pero no cuando se le agrega el self.
             self.nl = False
-            self.neural_model = self.neuralLike(iniFile=self.iniFile)
+            model_path = 'simplemc/analyzers/neuralike/neural_models/LCDM_phy_HD.h5'
+            self.model2 = tf.keras.models.load_model('{}'.format(model_path))
             self.nl = True
+            print('hi '*4, self.model2.predict([[0.32275483, 0.02201632, 0.67949482]]))
+
 
 
     def executer(self, **kwargs):
@@ -787,8 +793,9 @@ class DriverMC:
 
         """
 
+
         if self.useNeuralLike and self.nl:
-            loglike = self.neural_model.loglikelihood
+            loglike = -1
         else:
             assert len(self.pars_info) == len(values)
             for pars, val in zip(self.pars_info, values):
