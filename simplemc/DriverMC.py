@@ -121,7 +121,7 @@ class DriverMC:
                                         path_to_cov=self.path_to_cov, fn=self.fn)
 
         if self.prefact == "pre":  T.setVaryPrefactor()
-        if self.varys8  == True: T.setVarys8()
+        if self.varys8 : T.setVarys8()
         T.printFreeParameters()
 
         #set the likelihood for a model
@@ -141,8 +141,10 @@ class DriverMC:
         self.outputpath = "{}/{}".format(self.chainsdir, self.root)
 
         if self.useNeuralLike:
-            neural_model = self.neuralLike(iniFile=self.iniFile)
-            self.logLike = neural_model.loglikelihood
+            #change that later
+            self.nl = False
+            self.neural_model = self.neuralLike(iniFile=self.iniFile)
+            self.nl = True
 
 
     def executer(self, **kwargs):
@@ -785,17 +787,20 @@ class DriverMC:
 
         """
 
-        assert len(self.pars_info) == len(values)
-        for pars, val in zip(self.pars_info, values):
-            pars.setValue(val)
-
-        self.T.updateParams(self.pars_info)
-        self.L.setTheory(self.T)
-        if (self.L.name()=="Composite"):
-            cloglikes=self.L.compositeLogLikes_wprior()
-            loglike=cloglikes.sum()
+        if self.useNeuralLike and self.nl:
+            loglike = self.neural_model.loglikelihood
         else:
-            loglike = self.L.loglike_wprior()
+            assert len(self.pars_info) == len(values)
+            for pars, val in zip(self.pars_info, values):
+                pars.setValue(val)
+
+            self.T.updateParams(self.pars_info)
+            self.L.setTheory(self.T)
+            if (self.L.name()=="Composite"):
+                cloglikes=self.L.compositeLogLikes_wprior()
+                loglike=cloglikes.sum()
+            else:
+                loglike = self.L.loglike_wprior()
         return loglike
 
 
@@ -1011,7 +1016,6 @@ class DriverMC:
 
     def neuralLike(self, iniFile=None, **kwargs):
         from simplemc.analyzers.neuralike.NeuralManager import NeuralManager
-        self.outputpath = '{}_neuralike'.format(self.outputpath)
         if iniFile:
             ndivsgrid = self.config.getint('neuralike', 'ndivsgrid', fallback=50)
             epochs = self.config.getint('neuralike', 'epochs', fallback=500)
@@ -1036,7 +1040,7 @@ class DriverMC:
             pool = None
 
         self.outputpath = '{}_neuralike'.format(self.outputpath)
-        self.outputChecker()
+
         return NeuralManager(self.logLike, self.bounds, self.root, ndivsgrid=ndivsgrid,
                              epochs=epochs, hidden_layers_neurons=hidden_layers_neurons, psplit=psplit,
                              learning_rate=learning_rate, batch_size=batch_size, pool=pool)

@@ -1,3 +1,6 @@
+
+## TODO: usar modelChecker once it is trained, and flag for overige
+
 from .GridLikes import GridLikes
 from .NeuralNet import NeuralNet
 import os
@@ -37,7 +40,7 @@ class NeuralManager:
         neural_model.train()
         neural_model.save_model('{}'.format(self.model_path))
         if self.plot:
-            neural_model.plot(save=True, figname='{}'.format(self.fig_path))
+            neural_model.plot(save=True, figname='{}'.format(self.fig_path), show=False)
 
         return True
 
