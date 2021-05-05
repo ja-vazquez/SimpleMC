@@ -145,7 +145,6 @@ class DriverMC:
             self.logLike = neural_model.loglikelihood
 
 
-
     def executer(self, **kwargs):
         """
         This is a wrapper of the runners of the analyzer in order to make
@@ -1036,6 +1035,8 @@ class DriverMC:
         else:
             pool = None
 
+        self.outputpath = '{}_neuralike'.format(self.outputpath)
+        self.outputChecker()
         return NeuralManager(self.logLike, self.bounds, self.root, ndivsgrid=ndivsgrid,
                              epochs=epochs, hidden_layers_neurons=hidden_layers_neurons, psplit=psplit,
                              learning_rate=learning_rate, batch_size=batch_size, pool=pool)
