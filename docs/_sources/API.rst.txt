@@ -1,0 +1,10 @@
+===
+API
+===
+
+This page details the methods and classes provided by the `SuperMC`.
+
+**Run modules**
+===================
+
+
