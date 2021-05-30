@@ -1,24 +1,50 @@
-=============================================================================
-Welcome to SimpleMC's documentation!
-=============================================================================
+===========
+SimpleMC
+===========
 
 **[Under construction]**
 
-This is the documentation for SimpleMC, a code for cosmological parameter estimation and model comparison using Bayesian inference, optimization and machine learning algorithms.
+This is the ``SimpleMC`` documentation, a code for cosmological parameter estimation and model comparison using Bayesian inference, optimization and machine learning algorithms.
 
-You can visit the `GitHub code repository <https://github.com/ja-vazquez/SimpleMC.git>`_ , download the `source code here <https://github.com/ja-vazquez/SimpleMC/archive/refs/heads/master.zip>`_ or clone it as follows:
+You can visit the `GitHub code repository <https://github.com/ja-vazquez/SimpleMC.git>`_, download the `source code here <https://github.com/ja-vazquez/SimpleMC/archive/refs/heads/master.zip>`_ or clone it as follows:
 
    .. code-block:: bash
 
       git clone https://github.com/ja-vazquez/SimpleMC.git
 
-* Please see the `requirements <intro.html#requirements>`_  in order to have the full funcionality of the code.
-* See the first steps in `Quickstart <intro.html#quick-start>`_.
+Please read the `introduction <intro.html>`_ section where you can see the `requirements <intro.html#requirements>`_  and a simple `quick start <intro.html#quick-start>`_.
+
+In ``SimpleMC`` we use amazing external codes, please if you consider pertinent cite them, go to the `citation  section <Citation.html#cite-external-codes>`_ to details. 
+
+Changelog
+----------
+
+- **0.9.5.8 (26/04/2021)** Quintom with coupling and curvature. Beta version of neuralike. Warnings for non-essential libraries.
+- **0.9.5.4 (21/03/2021)** Fixed parameter estimation problem in Summary of nested chains.
+- **0.9.5.2 (07/02/2021)** GA from deap working with fisher matrix for errors.
+- **0.9.5 (19/09/2020)** Test and fix bambi with modified dynesty.
+- **0.9.4 (25/06/2020)** Working on neutrinos. New models: logt, IBEG, anisotropic, brans-dickie. Maxanalizer and fisher working. 
+- **0.9.3.5 (05/06/2020)** SimpleMC Workshop via Zoom for ICF-UNAM
+- **0.9.3 (02/06/2020)** Fix typos and little errrors. DriverMC. Testing models and cosmology. Running and cleanning genetic functions.
+- **0.9.2 (23/04/2020)** adding modified dynesty. Postprocessing. Compressed data. GR for a single chain.
+- **0.9.1 (06/04/2020)** paralelise MCMC and added GR. Simple plots. Nested samplers. Updating hubble diagram to 31 points. 
+- **0.9.0 (28/11/2019)** Gelman-Rubin diagnostics for MCMCAnalyzer. Ini files. Generic models and likelihoods.
+- **0.8.9 (25/11/2019)** Moving likelihoods into a likelihoods folder and models on to models folder.
+- **0.8.7 (20/11/2019)** Adding HD and full JLA. Ordering directories.
+- **0.8.6 (20/08/2019)** Bug in the MCMC sampler.
+- **0.8.5 (29/04/2019)** Updated Lya likelihood to DR14.
+- **0.8.4 (23/03/2019)** python 3, towards eBOSS.
+- **0.8.3 (10/10/2017)** Added binned cosmology.
+- **0.8.2 (25/07/2017)** DR12 and DR14 data.
+- **0.8.1 (06/01/2016)** Added sampling test for demonstration of MCMC.
+- **0.8.0 (01/09/2014)** Initial version.
+
 
 Index:
 -------
+
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    intro
    
@@ -35,10 +61,3 @@ Index:
    Citation
 
    API
-
-.. Indices and tables
-.. -------------------
-
-.. * :ref:`genindex`
-.. * :ref:`modindex`
-.. * :ref:`search`

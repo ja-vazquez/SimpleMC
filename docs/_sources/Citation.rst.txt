@@ -2,49 +2,58 @@
 Citation
 =========
 
-We have gathered great codes made by others and put them to work together in the cosmological context. In particular, we use the following:
+   * Vazquez, JA., Gómez-Vargas, I., & Slosar, A. (2021). SimpleMC: A package for cosmological parameter estimation and model comparison. [arXiv.xxx.xxx]. **In process**.	
 
-   * `SimpleMC first version <https://github.com/ja-vazquez/april.git>`_ written by Anže Slosar and Jose Vazquez.  
-   * `Dynesty <dynesty.readthedocs.io/>`_ developed by Josh Speagle. This contains Ellipsoidal Nested Sampling, Multinest, cubic bounds and ball bounds for nested sampling.
-   * `MCEvidence <https://github.com/yabebalFantaye/MCEvidence>`_ by Yabebal Fantaye. This code allows us to estimate bayesian evidence since the chains produced by a Metropolis-Hastings. 
-   * `pyBambi <https://pybambi.readthedocs.io/en/latest/>`_ by Will Handley . We use the set of Neural Networks of this code to provide at the Nestle samplers to Neural Networks. 
-   * `Corner <https://corner.readthedocs.io/en/latest/index.html>`_ by Daniel Foreman-Mackey. This library is for create smooth corner plots. 
-   * `Getdist <https://getdist.readthedocs.io>`_ by Antony Lewis. A package for analysing and plotting Monte Carlo (or other) samples
-
-
-Cite SimpleMC
------------------
-
-   * Vazquez, JA., Gómez-Vargas, I., & Slosar, A. (2021). SimpleMC: A package for cosmological parameter estimation and model comparison.
+   * Aubourg, É., et al (2015). Cosmological implications of baryon acoustic oscillation measurements. Physical Review D, 92(12), 123516.
 
 
 Cite external codes
 --------------------
-If you consider it pertinent, please also cite:
+We have gathered great codes made by others and put them to work together in the cosmological context. In particular, we use the following, if you consider it pertinent, please also cite them.
+	
+	* Nested samplers (dynesty):
+		* Speagle, J. S. (2020). dynesty: a dynamic nested sampling package for estimating Bayesian posteriors and evidences. Monthly Notices of the Royal Astronomical Society, 493(3), 3132-3158.
 
-   * For Ellipsoidal Nested Sampling (snest):
+	* Single ellipsoidal nested sampling:
+		* Mukherjee, P., Parkinson, D., & Liddle, A. R. (2006). A nested sampling algorithm for cosmological model selection. The Astrophysical Journal Letters, 638(2), L51. 
 
-      * `Mukherjee, P., Parkinson, D., & Liddle, A. R. (2006). A nested sampling algorithm for cosmological model selection. The Astrophysical Journal Letters, 638(2), L51.  <https://iopscience.iop.org/article/10.1086/501068/metal>`_
+	
+	* Multi ellipsoidal nested sampling:
+		* Feroz, F., Hobson, M. P., & Bridges, M. (2009). MultiNest: an efficient and robust Bayesian inference tool for cosmology and particle physics. Monthly Notices of the Royal Astronomical Society, 398(4), 1601-1614.
 
-   * For Multinest (mnest):
+	* Cube and ball nested sampling:
+		* Buchner, J. (2016). A statistical test for nested sampling algorithms. Statistics and Computing, 26(1-2), 383-392.
 
-      * `Feroz, F., Hobson, M. P., & Bridges, M. (2009). MultiNest: an efficient and robust Bayesian inference tool for cosmology and particle physics. Monthly Notices of the Royal Astronomical Society, 398(4), 1601-1614. <https://academic.oup.com/mnras/article/398/4/1601/981502>`_
+	* Random walk nested sampling:
+		* Skilling, J. (2006). Nested sampling for general Bayesian computation. Bayesian analysis, 1(4), 833-859.
 
-   * For Artificial Neural Networks in nested sampling:
+	* Slice nested sampling:
+		* Handley, W. J., Hobson, M. P., & Lasenby, A. N. (2015). POLYCHORD: next-generation nested sampling. Monthly Notices of the Royal Astronomical Society, 453(4), 4384-4398.
 
-      * `Graff, P., Feroz, F., Hobson, M. P., & Lasenby, A. (2012). BAMBI: blind accelerated multimodal Bayesian inference. Monthly Notices of the Royal Astronomical Society, 421(1), 169-180. <https://academic.oup.com/mnras/article/421/1/169/989639>`_
+	* Dynamic nested sampling:
+		* Handley, W. J., Hobson, M. P., & Lasenby, A. N. (2015). POLYCHORD: next-generation nested sampling. Monthly Notices of the Royal Astronomical Society, 453(4), 4384-4398.
 
-   * For MCEvidence:
-      
-      * `Heavens, A., Fantaye, Y., Mootoovaloo, A., Eggers, H., Hosenie, Z., Kroon, S., & Sellentin, E. (2017). Marginal Likelihoods from Monte Carlo Markov Chains. arXiv preprint arXiv:1704.03472. <https://arxiv.org/abs/1704.03472>`_
+ 	* Artificial Neural Networks in nested sampling: 
+ 		* Graff, P., Feroz, F., Hobson, M. P., & Lasenby, A. (2012). BAMBI: blind accelerated multimodal Bayesian inference. Monthly Notices of the Royal Astronomical Society, 421(1), 169-180. 
+ 		* Will Handley, & mjw63. (2018, December 22). DarkMachines/pyBAMBI: Continuous integration set up (Version 0.1.1). Zenodo. http://doi.org/10.5281/zenodo.2500878.
 
-   * If use Corner plots: 
+	* EMCEE:
+		* Foreman-Mackey, D., Hogg, D. W., Lang, D., & Goodman, J. (2013). emcee: the MCMC hammer. Publications of the Astronomical Society of the Pacific, 125(925), 306.
+ 
+ 	* MCEvidence:
+ 		* Heavens, A., Fantaye, Y., Mootoovaloo, A., Eggers, H., Hosenie, Z., Kroon, S., & Sellentin, E. (2017). Marginal Likelihoods from Monte Carlo Markov Chains. arXiv preprint arXiv:1704.03472.
 
-      * `Foreman-Mackey, D. (2016). corner: Scatterplot matrices in Python. The Journal of Open Source Software, 1. <https://joss.theoj.org/papers/10.21105/joss.00024#>`_
+  	* Corner plots:
+  		* Foreman-Mackey, D. (2016). corner: Scatterplot matrices in Python. The Journal of Open Source Software, 1.
+	
+	* Getdist plots:
+		* Lewis, A. (2019). GetDist: a Python package for analysing Monte Carlo samples. arXiv preprint arXiv:1910.13970.
 
-   * If use Getdist:
-    
-      * `Lewis, A. (2019). GetDist: a Python package for analysing Monte Carlo samples. arXiv preprint arXiv:1910.13970. <https://arxiv.org/abs/1910.13970>`_
+	* Genetic algoritms from DEAP (ga_deap):
+   		* Fortin, F. A., De Rainville, F. M., Gardner, M. A. G., Parizeau, M., & Gagné, C. (2012). DEAP: Evolutionary algorithms made easy. The Journal of Machine Learning Research, 13(1), 2171-2175.
+
+	* Neural nets (tensorflow):
+		* Abadi, M., et al (2016). Tensorflow: A system for large-scale machine learning. In 12th USENIX symposium on operating systems design and implementation (OSDI 16) (pp. 265-283).
 
 
 

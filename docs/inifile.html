@@ -92,7 +92,10 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data.html"><strong>Data</strong></a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Customize ini file</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Customize ini file</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#baseconfig-ini">baseConfig.ini</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="plotters.html"><strong>Plotters</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html"><strong>Analyzers</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
@@ -167,6 +170,62 @@
             
   <div class="section" id="customize-ini-file">
 <h1>Customize ini file<a class="headerlink" href="#customize-ini-file" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[Custom]</span></code></p></li>
+</ul>
+<blockquote>
+<div><p>See <a class="reference external" href="intro.html#ini-file">ini file quickstart</a>.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[mcmc]</span></code></p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">mcmc</span><span class="p">]</span>
+<span class="n">nsamp</span>   <span class="o">=</span> <span class="mi">4000</span>
+<span class="n">skip</span>    <span class="o">=</span> <span class="mi">100</span>
+<span class="n">temp</span>    <span class="o">=</span> <span class="mi">2</span>
+
+<span class="p">;</span><span class="k">if</span> <span class="n">single</span> <span class="n">cpu</span><span class="p">,</span> <span class="n">otherwise</span> <span class="n">use</span> <span class="n">mpi</span> <span class="o">-</span><span class="n">np</span> <span class="c1">#</span>
+<span class="n">chainno</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="p">;</span><span class="n">add</span> <span class="n">derived</span> <span class="n">parameters</span> <span class="p">(</span><span class="kc">True</span><span class="o">/</span><span class="kc">False</span><span class="p">)</span> <span class="p">,</span>
+<span class="p">;</span><span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span> <span class="n">Omega_Lambda</span><span class="p">,</span> <span class="n">H0</span><span class="p">,</span> <span class="n">Age</span> <span class="n">of</span> <span class="n">the</span> <span class="n">Universe</span>
+<span class="n">addderived</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[nested]</span></code></p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dynamic</span> <span class="o">=</span> <span class="n">no</span>
+<span class="n">neuralNetwork</span> <span class="o">=</span> <span class="n">no</span>
+
+<span class="p">;</span><span class="nb">type</span><span class="p">:</span> <span class="k">for</span> <span class="n">dynesty</span> <span class="o">-&gt;</span> <span class="p">{</span><span class="s1">&#39;single&#39;</span><span class="p">,</span><span class="s1">&#39;multi&#39;</span><span class="p">,</span> <span class="s1">&#39;balls&#39;</span><span class="p">,</span> <span class="s1">&#39;cubes&#39;</span><span class="p">}</span>
+<span class="p">;</span><span class="nb">type</span> <span class="k">for</span> <span class="n">nestle</span> <span class="o">-&gt;</span> <span class="p">{</span><span class="s1">&#39;single&#39;</span><span class="p">,</span> <span class="s1">&#39;multi&#39;</span><span class="p">}</span>
+<span class="n">nestedType</span> <span class="o">=</span> <span class="n">multi</span>
+
+<span class="p">;</span><span class="n">it</span> <span class="ow">is</span> <span class="n">recommended</span> <span class="n">around</span> <span class="n">nlivepoints</span><span class="o">=</span><span class="mi">50</span><span class="o">*</span><span class="n">ndim</span><span class="p">,</span> <span class="n">recommended</span> <span class="mi">1024</span>
+<span class="n">nlivepoints</span> <span class="o">=</span> <span class="mi">500</span>
+
+
+<span class="p">;</span><span class="n">recommended</span> <span class="mf">0.5</span>
+<span class="n">accuracy</span> <span class="o">=</span> <span class="mf">0.01</span>
+
+<span class="p">;</span><span class="n">u</span> <span class="k">for</span> <span class="n">flat</span><span class="p">(</span><span class="n">uniform</span><span class="p">)</span> <span class="ow">or</span> <span class="n">g</span> <span class="k">for</span> <span class="n">gaussian</span> <span class="n">prior</span>
+<span class="n">priortype</span> <span class="o">=</span> <span class="n">u</span>
+
+<span class="p">;</span><span class="n">nproc</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span><span class="o">//</span><span class="mi">2</span> <span class="n">by</span> <span class="n">default</span><span class="p">,</span> <span class="n">you</span> <span class="n">can</span> <span class="nb">set</span> <span class="k">with</span> <span class="n">another</span> <span class="n">positive</span> <span class="n">integer</span>
+<span class="n">nproc</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="p">;</span><span class="k">if</span> <span class="n">neuralNetwork</span> <span class="o">=</span> <span class="n">yes</span><span class="p">,</span> <span class="n">then</span> <span class="n">you</span> <span class="n">can</span> <span class="nb">set</span><span class="p">:</span>
+
+<span class="p">[</span><span class="n">neural</span><span class="p">]</span>
+<span class="n">split</span> <span class="o">=</span> <span class="mf">0.8</span>
+
+<span class="p">;</span><span class="n">numNeurons</span> <span class="n">of</span> <span class="n">hidden</span> <span class="n">layer</span>
+<span class="n">numNeurons</span> <span class="o">=</span> <span class="mi">50</span>
+</pre></div>
+</div>
+<div class="section" id="baseconfig-ini">
+<span id="baseconfig"></span><h2>baseConfig.ini<a class="headerlink" href="#baseconfig-ini" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">custom</span><span class="p">]</span>
 <span class="c1"># custom -&gt; for all analyzers : samplers and optimizers</span>
 <span class="n">chainsdir</span> <span class="o">=</span> <span class="n">chains</span>
@@ -298,6 +357,7 @@
 <li><p>For <em>priortype</em> u is uniform prior and g gaussian prior. At this time, only nested sampling accept both of them.</p></li>
 <li><p><em>chainsdir</em> is the directory where the chains in a text file and the plots will be saved.</p></li>
 </ul>
+</div>
 </div>
 </div>
 

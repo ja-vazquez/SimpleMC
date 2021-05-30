@@ -2,6 +2,65 @@
 Customize ini file
 ==================
 
+- ``[Custom]``
+ See `ini file quickstart <intro.html#ini-file>`_.
+
+
+- ``[mcmc]``
+
+.. code-block::
+
+      [mcmc]
+      nsamp   = 4000
+      skip    = 100
+      temp    = 2
+
+      ;if single cpu, otherwise use mpi -np #
+      chainno = 1
+
+      ;add derived parameters (True/False) ,
+      ;i.e. Omega_Lambda, H0, Age of the Universe
+      addderived = False
+
+
+- ``[nested]``
+
+.. code-block::
+
+        dynamic = no
+        neuralNetwork = no
+
+        ;type: for dynesty -> {'single','multi', 'balls', 'cubes'}
+        ;type for nestle -> {'single', 'multi'}
+        nestedType = multi
+
+        ;it is recommended around nlivepoints=50*ndim, recommended 1024
+        nlivepoints = 500
+
+
+        ;recommended 0.5
+        accuracy = 0.01
+
+        ;u for flat(uniform) or g for gaussian prior
+        priortype = u
+
+        ;nproc = mp.cpu_count()//2 by default, you can set with another positive integer
+        nproc = 0
+
+        ;if neuralNetwork = yes, then you can set:
+
+        [neural]
+        split = 0.8
+
+        ;numNeurons of hidden layer
+        numNeurons = 50
+
+
+
+..  _baseConfig:
+
+baseConfig.ini
+---------------
 .. code-block::
 
         [custom]

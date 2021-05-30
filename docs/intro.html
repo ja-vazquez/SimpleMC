@@ -40,7 +40,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Data" href="data.html" />
-    <link rel="prev" title="Welcome to SimpleMC’s documentation!" href="index.html" /> 
+    <link rel="prev" title="SimpleMC" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -92,11 +92,18 @@
               <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quick-start">Quick Start</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ini-file">ini file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#python-script">Python script</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run-in-terminal">run in terminal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#analyze-outputs">analyze outputs</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#general-structure">General structure</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data.html"><strong>Data</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="inifile.html">Customize ini file</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plotters.html"><strong>Plotters</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html"><strong>Analyzers</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
@@ -171,54 +178,88 @@
             
   <div class="section" id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="#requirements"><span class="std std-ref">Requirements</span></a></p></li>
+<li><p><a class="reference internal" href="#quick-start"><span class="std std-ref">Quick Start</span></a></p></li>
+<li><p><a class="reference internal" href="#general-structure"><span class="std std-ref">General structure</span></a></p></li>
+</ul>
+<p>Generally speaking, the steps to run <code class="docutils literal notranslate"><span class="pre">SimpleMC</span></code>  are as follows: 1) configure an <a class="reference internal" href="#ini-file"><span class="std std-ref">ini file</span></a>, 2) read this in a <a class="reference internal" href="#python-script"><span class="std std-ref">Python script</span></a>, 3) <a class="reference internal" href="#run-in-terminal"><span class="std std-ref">run in terminal</span></a>, and 4) <a class="reference internal" href="#analyze-outputs"><span class="std std-ref">analyze outputs</span></a>.</p>
+<p>The main output of Bayesian inference algoritms (mcmc and nested) are text files that have the same structure of the <a class="reference external" href="https://cosmologist.info/cosmomc/">CosmoMC</a> chains consisting in:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>First column.- weights of the sampling method.</p></li>
+<li><p>Second column.- log-likelihood function.</p></li>
+<li><p>Third to N+2 columns.- N free parameters of the cosmological model under analysis.</p></li>
+<li><p>Last columns.- log-likelihood function per each type of data and derived parameters.</p></li>
+</ul>
+</div></blockquote>
+<p>In addition, two other output files are generated: a summary and a <code class="docutils literal notranslate"><span class="pre">.paramnames</span></code> file with the names of the free parameters of the cosmological model.</p>
 <div class="section" id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<span id="id1"></span><h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
 <p>This code runs both in Python 2x and 3x. However, we highly recommend Python 3x.</p>
-<p>You need the following scientific modules:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo pip install numpy matplotlib scipy dynesty emcee
+<p>Mandatorily, you need the following libraries:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo pip install numpy matplotlib scipy
 </pre></div>
 </div>
-<p>In addition, MCEvidence is necessary to estimate the bayesian evidence in the Metropolis-Hastings sampler:</p>
+<p>Only if you want to use EMCEE sampler:
+.. code-block:: bash</p>
+<blockquote>
+<div><p>sudo pip install emcee</p>
+</div></blockquote>
+<p>Optionally, MCEvidence is necessary to estimate the bayesian evidence in the Metropolis-Hastings sampler:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install git+https://github.com/yabebalFantaye/MCEvidence
 </pre></div>
 </div>
-<p>For use Artificial Neural Networks with multinest and ellipsoidal sampling (as in pyBAMBI), you need to install:</p>
+<p>To use Artificial Neural Networks with nested sampling or to learn likelihood functions, you need to install:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install tensorflow keras
 </pre></div>
 </div>
-<p>For use genetic algorithms in order to maximize the Likelihood function:</p>
+<p>To use genetic algorithms in order to maximize the Likelihood function:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install deap
 </pre></div>
 </div>
-<p>If you want to use the full options to plot:</p>
+<p>If you want the full options to plot:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install corner getdist
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>All in one copy-paste line:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install numpy matplotlib scipy tensorflow keras dynesty corner getdist deap git+https://github.com/yabebalFantaye/MCEvidence
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install numpy matplotlib scipy tensorflow keras corner getdist deap git+https://github.com/yabebalFantaye/MCEvidence
 </pre></div>
 </div>
 </div>
+<p>To run MCMC analyzer (Metropolis-Hastings) in parallel you need to have <a class="reference external" href="https://www.open-mpi.org/">MPI</a>  in your computer and then install the Python library:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install mpi4py
+</pre></div>
+</div>
+<p>this requirement is not necessary if you want to use nested sampling or optimization algorithms.</p>
 </div>
 <div class="section" id="quick-start">
-<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
-<p>In this section we show a basic use of SimpleMC.</p>
+<span id="id2"></span><h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>In this section we show a basic four steps to use <code class="docutils literal notranslate"><span class="pre">SimpleMC</span></code>:</p>
 <ol class="arabic simple">
-<li><p>First you need to create an <code class="docutils literal notranslate"><span class="pre">ini</span> <span class="pre">file</span></code> or use the default <code class="docutils literal notranslate"><span class="pre">baseConfig.ini</span></code> as follows:</p></li>
+<li><p>Set an <a class="reference internal" href="#ini-file"><span class="std std-ref">ini file</span></a>.</p></li>
+<li><p>Read the configuration in a <a class="reference internal" href="#python-script"><span class="std std-ref">Python script</span></a>.</p></li>
+<li><p>Then <a class="reference internal" href="#run-in-terminal"><span class="std std-ref">run in terminal</span></a>.</p></li>
+<li><p>Finally <a class="reference internal" href="#analyze-outputs"><span class="std std-ref">analyze outputs</span></a>.</p></li>
 </ol>
+<div class="section" id="ini-file">
+<span id="id3"></span><h3>ini file<a class="headerlink" href="#ini-file" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">ini</span> <span class="pre">file</span></code> has all the necessary options to <code class="docutils literal notranslate"><span class="pre">SimpleMC</span></code>, the mandatory options are in the <code class="docutils literal notranslate"><span class="pre">[custom]</span></code> section, the rest have default values corresponding to specific analyzers and you can modify them accordingly with your needs  (see <a class="reference external" href="inifile.html">Customize inifile</a> or  <a class="reference external" href="inifile.html#baseconfig-ini">baseConfig</a>.ini file for more information).</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">[custom]</span></code> section has the following structure:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">custom</span><span class="p">]</span>
 
 <span class="n">chainsdir</span> <span class="o">=</span> <span class="n">chains</span>
 
-<span class="n">model</span> <span class="o">=</span> <span class="n">owaCDM</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">LCDM</span>
 
 <span class="n">datasets</span> <span class="o">=</span> <span class="n">BBAO</span><span class="o">+</span><span class="n">HD</span><span class="o">+</span><span class="n">UnionSN</span><span class="o">+</span><span class="n">Planck</span>
 
-<span class="n">analyzer</span> <span class="o">=</span> <span class="n">genetic</span>
+<span class="n">analyzer</span> <span class="o">=</span> <span class="n">mcmc</span>
 </pre></div>
 </div>
+<p>you must choose an existing directory to save the outputs (chains, summary, and .paramnames). The options for model, datasets and analyzer are as follows:</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <ul class="simple">
@@ -237,7 +278,7 @@
 </dl>
 </li>
 <li><dl class="simple">
-<dt>data options:</dt><dd><ul>
+<dt>data options (you can combine any of them):</dt><dd><ul>
 <li><p>HD, BBAO, GBAO, GBAO_no6dF, CMASS, LBAO, LaBAO, LxBAO, MGS, Planck, WMAP, PlRd, WRd, PlDa, PlRdx10, CMBW, SN, SNx10, UnionSN, RiessH0, 6dFGS, dline</p></li>
 </ul>
 </dd>
@@ -245,28 +286,37 @@
 </li>
 </ul>
 </div>
-<ol class="arabic simple" start="2">
-<li><p>Then in <em>test.py</em>, please put the path of the <em>ini file</em>:</p></li>
-</ol>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DriverMC</span> <span class="kn">import</span> <span class="n">DriverMC</span>
+</div>
+<div class="section" id="python-script">
+<span id="id4"></span><h3>Python script<a class="headerlink" href="#python-script" title="Permalink to this headline">¶</a></h3>
+<p>We can use <code class="docutils literal notranslate"><span class="pre">test.py</span></code> with the path of the <code class="docutils literal notranslate"><span class="pre">ini</span> <span class="pre">file</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">simplemc.DriverMC</span> <span class="kn">import</span> <span class="n">DriverMC</span>
 
-<span class="n">fileConfig</span> <span class="o">=</span> <span class="s2">&quot;/home/isidro/SuperMC_/baseConfig.ini&quot;</span>
+<span class="n">fileConfig</span> <span class="o">=</span> <span class="s2">&quot;path/baseConfig.ini&quot;</span>
 <span class="n">D</span> <span class="o">=</span> <span class="n">DriverMC</span><span class="p">(</span><span class="n">fileConfig</span><span class="p">)</span>
 </pre></div>
 </div>
-<ol class="arabic simple" start="3">
-<li><p>For last, you can run in the <em>SimpleMC</em> directory:</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python3 test.py
+</div>
+<div class="section" id="run-in-terminal">
+<span id="id5"></span><h3>run in terminal<a class="headerlink" href="#run-in-terminal" title="Permalink to this headline">¶</a></h3>
+<p>For last, run in the terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python test.py
 </pre></div>
 </div>
-<p>You can see your outputs in the <em>chains</em> directory.</p>
-<ul class="simple">
-<li><p>See the <a class="reference external" href="plotters.html">plots</a> .</p></li>
-</ul>
+<p>To run multiple MCMC (Metropolis-Hastings) chains in parallel:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mpirun -np <span class="m">4</span> python test.py
+</pre></div>
+</div>
+<p>where 4 is the number of chains and the number of processors.</p>
+</div>
+<div class="section" id="analyze-outputs">
+<span id="id6"></span><h3>analyze outputs<a class="headerlink" href="#analyze-outputs" title="Permalink to this headline">¶</a></h3>
+<p>You can see your outputs in the <em>chains</em> directory and then make plots. See the <a class="reference external" href="plotters.html">plots</a> section for details.</p>
+</div>
 </div>
 <div class="section" id="general-structure">
-<h2>General structure<a class="headerlink" href="#general-structure" title="Permalink to this headline">¶</a></h2>
+<span id="id7"></span><h2>General structure<a class="headerlink" href="#general-structure" title="Permalink to this headline">¶</a></h2>
+<p>The interconnection between the modules in <code class="docutils literal notranslate"><span class="pre">SimpleMC</span></code> can be seen in the following diagram:</p>
 <div class="figure align-default">
 <img alt="_images/simplemc.png" src="_images/simplemc.png" />
 </div>
@@ -280,7 +330,7 @@
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="data.html" class="btn btn-neutral float-right" title="Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to SimpleMC’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="SimpleMC" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

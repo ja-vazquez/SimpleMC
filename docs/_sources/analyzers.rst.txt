@@ -6,16 +6,7 @@ SimpleMC contains two types of analyzers :
    * Metropolis-Hastings.
       It is implemented in the **MCMCAnalyzer class**.
 
-   * Ellipsoidal Nested Sampling.
-      `Mukherjee, P., Parkinson, D., & Liddle, A. R. (2006). A nested sampling algorithm for cosmological model selection. The Astrophysical Journal Letters, 638(2), L51.  <https://iopscience.iop.org/article/10.1086/501068/metal>`_.
-
-   * MULTINEST
-      `Feroz, F., Hobson, M. P., & Bridges, M. (2009). MultiNest: an efficient and robust Bayesian inference tool for cosmology and particle physics. Monthly Notices of the Royal Astronomical Society, 398(4), 1601-1614. <https://academic.oup.com/mnras/article/398/4/1601/981502>`_.
-
-   * BAMBI = MULTINEST + Artificial Neural Networks.
-      `Graff, P., Feroz, F., Hobson, M. P., & Lasenby, A. (2012). BAMBI: blind accelerated multimodal Bayesian inference. Monthly Notices of the Royal Astronomical Society, 421(1), 169-180. <https://academic.oup.com/mnras/article/421/1/169/989639>`_.
-
-   * Ellipsoidal Nested Sampling with Artificial Neural Networks
+   
 
 
 Also, for a previous quickly test, SuperMC have **MaxAnalyzer** that analyze the most probably values of the parameters.
