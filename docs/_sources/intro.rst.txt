@@ -26,6 +26,12 @@ For use Artificial Neural Networks with multinest and ellipsoidal sampling (as i
    
    pip install tensorflow keras
 
+For use genetic algorithms in order to maximize the Likelihood function:
+
+.. code-block:: bash
+   
+   pip install deap
+
 
 If you want to use the full options to plot:
 
@@ -37,150 +43,45 @@ If you want to use the full options to plot:
 
    .. code-block:: bash
    
-      pip install numpy matplotlib scipy nestle tensorflow keras corner getdist git+https://github.com/yabebalFantaye/MCEvidence
+      pip install numpy matplotlib scipy tensorflow keras dynesty corner getdist deap git+https://github.com/yabebalFantaye/MCEvidence
 
 
 
 Quick Start
 ------------
 
-In this section we show a basic use of SuperMC. 
+In this section we show a basic use of SimpleMC. 
 
-1) First you need to create an *ini file* as follows:
+1) First you need to create an ``ini file`` or use the default ``baseConfig.ini`` as follows:
 
 .. code-block::
 
         [custom]
-        # custom -> for all analyzers : samplers and optimizers
+
         chainsdir = chains
-
-        ;set model
-        ;model options: LCDM, LCDMasslessnu, nuLCDM, NeffLCDM, noradLCDM, nuoLCDM,
-        ;nuwLCDM, oLCDM, wCDM, waCDM, owCDM, owaCDM, JordiCDM, WeirdCDM, TLight, StepCDM,
-        ;Spline, PolyCDM, fPolyCDM, Decay, Decay01, Decay05, EarlyDE, EarlyDE_rd_DE, SlowRDE, sline
+        
         model = owaCDM
-
-        ;prefact options : [pre, phy]
-        prefact = phy
-
-        ;set datasets used. Ex: UnionSN+BBAO+Planck
-        ;data options: HD, BBAO, GBAO, GBAO_no6dF, CMASS, LBAO, LaBAO,
-        ;LxBAO, MGS, Planck, WMAP, PlRd, WRd, PlDa, PlRdx10, CMBW, SN, SNx10, UnionSN,
-        ;RiessH0, 6dFGS, dline
+        
         datasets = BBAO+HD+UnionSN+Planck
-        ;sampler can be {mcmc, nested, emcee}
-        ;or analyzers {MaxLikeAnalyzer, genetic}
-        ;
-        ;mcmc -> metropolis-hastings
-        ;nested
-        ;engine can be {nestle, dynesty}
-        ;nestedType can be
-            ;none -> Prior mass without bounds
-            ;single -> Ellipsoidal nested sampling
-            ;multi -> multinest
-            ;balls ->  balls centered on each live point
-            ;cube -> cubes centered on each live point
-        ;emcee
-        ;MaxLikeAnalyzer -> Maximum Likelihood Analyzer
-        ;genetic
-        sampler = genetic
-        [mcmc]
-        nsamp   = 4000
-        skip    = 100
-        temp    = 2
 
-        ;if single cpu, otherwise use mpi -np #
-        chainno = 1
-
-        ;add derived parameters (True/False) ,
-        ;i.e. Omega_Lambda, H0, Age of the Universe
-        addderived = False
-
-
-        [nested]
-        ;engine can be nestle or dynesty
-        engine = dynesty
-
-        ;dynamic option is only for dynesty engine
-        ;dynamic and neuralNetwork can be yes/no
-        dynamic = no
-        neuralNetwork = no
-
-        ;type: for dynesty -> {'single','multi', 'balls', 'cubes'}
-        ;type for nestle -> {'single', 'multi'}
-        nestedType = multi
-
-        ;it is recommended around nlivepoints=50*ndim, recommended 1024
-        nlivepoints = 500
-
-
-        ;recommended 0.5
-        accuracy = 0.01
-
-        ;u for flat(uniform) or g for gaussian prior
-        priortype = u
-
-        ;nproc = mp.cpu_count()//2 by default, you can set with another positive integer
-        nproc = 0
-
-        ;if neuralNetwork = yes, then you can set:
-
-        [neural]
-        split = 0.8
-
-        ;numNeurons of hidden layer
-        numNeurons = 50
-
-        [emcee]
-        walkers = 200
-        burnin = 0
-        samples = 10000
-        nproc = 4
-
-        [MaxLikeAnalyzer]
-        ;compute errror from Hessian matrix
-        ;Yes/No
-        withErrors = No
-
-        ;[DerivedParameters]
-        ;add Derived Parameters to chains
-        ;genetic parameters
-
-        [genetic]
-        n_individuals = 10
-        n_generations = 500
-        ;selection_method = {tournament, ruleta, rank}
-        selection_method = tournament
-        ;mutation probability
-        mut_prob = 0.4
+        analyzer = genetic
 
 
 .. note::
 
-   Considerations:
-  
-   * *prefact* and *nsamp* are only for Metropolis-Hastings.
+	* model options:
+		* LCDM, LCDMasslessnu, nuLCDM, NeffLCDM, noradLCDM, nuoLCDM, nuwLCDM, oLCDM, wCDM, waCDM, owCDM, owaCDM, JordiCDM, WeirdCDM, TLight, StepCDM, Spline, PolyCDM, fPolyCDM, Decay, Decay01, Decay05, EarlyDE, EarlyDE_rd_DE, SlowRDE, sline
 
-   * *nlivepoints* and *accuracy* are only for nested sampling.
 
-   * *sampler* options are:
-   
-      * mcmc : Metropolis-Hastings.
-      * nested : Nested Sampling
+	* analyzer options: 
+		* mcmc, nested, emcee, MaxLikeAnalyzer, genetic, ga_deap
 
-   * *sampler* can be one *optimizer* of the following:
-      
-      * MaxLikeAnalyzer : from scipy.optimize.minimize
-      * genetic : a Simple Genetic Algorithm
-      
 
-   * *skip* is burnin. 
-  
-   * For *priortype* u is uniform prior and g gaussian prior. At this time, only nested sampling accept both of them.
-   
-   * *chainsdir* is the directory where the chains in a text file and the plots will be saved.
+   	* data options: 
+   		* HD, BBAO, GBAO, GBAO_no6dF, CMASS, LBAO, LaBAO, LxBAO, MGS, Planck, WMAP, PlRd, WRd, PlDa, PlRdx10, CMBW, SN, SNx10, UnionSN, RiessH0, 6dFGS, dline
 
-2) Then in *driver.py*, please put the path of the *ini file*:
+
+2) Then in *test.py*, please put the path of the *ini file*:
 
 .. code-block:: python
    
@@ -191,55 +92,24 @@ In this section we show a basic use of SuperMC.
 
 
 
-3) For last, you can run in the *SuperMC* directory:
+3) For last, you can run in the *SimpleMC* directory:
 
 .. code-block:: bash
    
-   $ python3 Run/driver.py
+   $ python3 test.py
 
 You can see your outputs in the *chains* directory.
 
 * See the `plots <plotters.html>`_ .
 
 
-General flow
--------------
+General structure
+------------------
 
-.. figure:: /img/SuperMCDiagram.png
-
-Samplers
----------
-
-SuperMC contains the nest samplers:
-
-   * Metropolis-Hastings.
-      It is implemented in the **MCMCAnalyzer class**.
-
-   * Ellipsoidal Nested Sampling.
-      `Mukherjee, P., Parkinson, D., & Liddle, A. R. (2006). A nested sampling algorithm for cosmological model selection. The Astrophysical Journal Letters, 638(2), L51.  <https://iopscience.iop.org/article/10.1086/501068/metal>`_.
-
-   * MULTINEST
-      `Feroz, F., Hobson, M. P., & Bridges, M. (2009). MultiNest: an efficient and robust Bayesian inference tool for cosmology and particle physics. Monthly Notices of the Royal Astronomical Society, 398(4), 1601-1614. <https://academic.oup.com/mnras/article/398/4/1601/981502>`_.
-
-   * BAMBI = MULTINEST + Artificial Neural Networks.
-      `Graff, P., Feroz, F., Hobson, M. P., & Lasenby, A. (2012). BAMBI: blind accelerated multimodal Bayesian inference. Monthly Notices of the Royal Astronomical Society, 421(1), 169-180. <https://academic.oup.com/mnras/article/421/1/169/989639>`_.
-
-   * Ellipsoidal Nested Sampling with Artificial Neural Networks
+.. figure:: /img/simplemc.png
 
 
-Also, for a previous quickly test, SuperMC have **MaxAnalyzer** that analyze the most probably values of the parameters.
 
-
-Sampler comparison
--------------------
-
-.. note:: 
-
-   To verify the consistency of the parameter estimation among the different samplers available, we have made the following graph.
-
-.. figure:: /img/samplersTriangle.png
-
-     We estimates the posteriors of the parameters of the owaCDM model (dark energy with timedependent equation-of-state in a model of unknown curvature) using Supernovae type Ia, Cosmic Chronometers (Hubble Distance) and BAO .
 
 
 

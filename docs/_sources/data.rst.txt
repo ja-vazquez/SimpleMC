@@ -1,11 +1,11 @@
 **Data**
 =========
 
-The data avaiable in SuperMC is the following:
+The data avaiable in SimpleMC is the following:
 
-   * Supernovaes Type 1a: Union2.1.
+   * Supernovaes Type 1a: Union2.1, JLA and Pantheon.
 
-   * Cosmic Chronometers: From https://arxiv.org/abs/1601.01701 and ... 
+   * Cosmic Chronometers: From https://arxiv.org/abs/1601.01701.
 
    * Baryonic Acoustics Oscillations: DR11LOWZ, DR11CMASS, 6dF Galaxy Survey, DR11 Lyman alpha and SDSS Main Galaxy Sample BAO.
 
@@ -16,6 +16,6 @@ Datasets combinations
 
 .. note:: 
 
-   For a CPL model, we can test different combination of datasets avaliables in *SuperMC*.
+   For a CPL model with curvature, we can test different combination of datasets avaliables in *SimpleMC*.
 
 .. figure:: /img/ObsTriangle.png
