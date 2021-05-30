@@ -36,6 +36,7 @@ Mandatorily, you need the following libraries:
 
 
 Only if you want to use EMCEE sampler: 
+
 .. code-block:: bash
    
    sudo pip install emcee
