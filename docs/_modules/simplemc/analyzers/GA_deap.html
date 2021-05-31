@@ -192,10 +192,17 @@
 <div class="viewcode-block" id="GA_deap"><a class="viewcode-back" href="../../../API.html#simplemc.analyzers.GA_deap.GA_deap">[docs]</a><span class="k">class</span> <span class="nc">GA_deap</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Genetic algorithms from deap library</span>
+
+<span class="sd">        :param like: likelihood function</span>
+<span class="sd">        :param model: theoretical model model</span>
+<span class="sd">        :param plot_fitness: True if you want to generate a plot of the fitness.</span>
+<span class="sd">        :param compute_errors: True if you want to compute errors.</span>
+<span class="sd">        :param show_contours: True if you want to show the contours in a plot.</span>
+<span class="sd">        :param plot_param1: a parameter to plot in x-axis.</span>
+<span class="sd">        :param plot_param2: a parameter to plot in y-axis.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">plot_fitness</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">compute_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> \
                  <span class="n">show_contours</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">plot_param1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plot_param2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">like</span> <span class="o">=</span> <span class="n">like</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">like</span><span class="o">.</span><span class="n">freeParameters</span><span class="p">()</span>
@@ -290,9 +297,6 @@
     <span class="c1"># it assumes that the range is the same for every dimension</span>
     <span class="k">def</span> <span class="nf">randomFloat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">up</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">u</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">low</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">DIMENSIONS</span><span class="p">,</span> <span class="p">[</span><span class="n">up</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">DIMENSIONS</span><span class="p">)]</span>
-
-
-
 
     <span class="k">def</span> <span class="nf">GA</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RANDOM_SEED</span><span class="p">)</span>

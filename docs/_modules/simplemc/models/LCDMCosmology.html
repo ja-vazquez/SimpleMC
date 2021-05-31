@@ -172,25 +172,29 @@
 
 
 <div class="viewcode-block" id="LCDMCosmology"><a class="viewcode-back" href="../../../API.html#simplemc.models.LCDMCosmology.LCDMCosmology">[docs]</a><span class="k">class</span> <span class="nc">LCDMCosmology</span><span class="p">(</span><span class="n">BaseCosmology</span><span class="p">,</span> <span class="n">RadiationAndNeutrinos</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This is LCDM cosmology</span>
-<span class="sd">    I didn&#39;t intend it that way, but it is used as a base class</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is LCDM cosmology, it is used as a base class</span>
 <span class="sd">    for most other cosmologies, mostly because it treats Neutrinos and Radiation</span>
 <span class="sd">    hassle.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    Obh2</span>
-<span class="sd">    Om</span>
-<span class="sd">    h</span>
-<span class="sd">    mnu</span>
-<span class="sd">    Nnu</span>
-<span class="sd">    degenerate_nu</span>
-<span class="sd">    disable_radiation</span>
-<span class="sd">    fixOm</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
+<span class="sd">    Obh2 : float</span>
+<span class="sd">        Barionic matter: \Omega_bh^2</span>
+<span class="sd">    Om : float</span>
+<span class="sd">        Matter density.</span>
+<span class="sd">    h : float</span>
+<span class="sd">        Hubble parameter H/100.</span>
+<span class="sd">    mnu : float</span>
+<span class="sd">        Standard value for the mass of neutrinos.</span>
+<span class="sd">    Nnu : float</span>
+<span class="sd">        Standard value for the number of families.</span>
+<span class="sd">    degenerate_nu : bool</span>
+<span class="sd">        Degenerate neutrinos.</span>
+<span class="sd">    disable_radiation : bool</span>
+<span class="sd">        Without radiation.</span>
+<span class="sd">    fixOm : bool</span>
+<span class="sd">        Om constant.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># possible options: &quot;Anderson&quot;, &quot;Cuesta&quot;, &quot;CuestaNeff&quot;, &quot;EH&quot;</span>
@@ -251,7 +255,7 @@
         <span class="k">return</span> <span class="n">l</span>
 
 
-    <span class="k">def</span> <span class="nf">updateParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pars</span><span class="p">):</span>
+<div class="viewcode-block" id="LCDMCosmology.updateParams"><a class="viewcode-back" href="../../../API.html#simplemc.models.LCDMCosmology.LCDMCosmology.updateParams">[docs]</a>    <span class="k">def</span> <span class="nf">updateParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pars</span><span class="p">):</span>
         <span class="n">BaseCosmology</span><span class="o">.</span><span class="n">updateParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pars</span><span class="p">)</span>
         <span class="n">RadiationAndNeutrinos</span><span class="o">.</span><span class="n">updateParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pars</span><span class="p">)</span>
 
@@ -271,15 +275,15 @@
                 <span class="n">Nnu</span> <span class="o">=</span> <span class="mf">3.04</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">setrd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rd_func_</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">Obh2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ocb</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Omnuh2</span><span class="p">,</span> <span class="n">Nnu</span><span class="p">))</span>
-        <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
 
 
     <span class="c1"># this is relative hsquared as a function of a</span>
     <span class="c1">## i.e. H(z)^2/H(z=0)^2</span>
     <span class="c1"># @autojit</span>
-    <span class="k">def</span> <span class="nf">RHSquared_a</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+<div class="viewcode-block" id="LCDMCosmology.RHSquared_a"><a class="viewcode-back" href="../../../API.html#simplemc.models.LCDMCosmology.LCDMCosmology.RHSquared_a">[docs]</a>    <span class="k">def</span> <span class="nf">RHSquared_a</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
         <span class="n">NuContrib</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">NuDensity</span><span class="o">.</span><span class="n">rho</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">**</span><span class="mi">2</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ocb</span><span class="o">/</span><span class="n">a</span><span class="o">**</span><span class="mi">3</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">Omrad</span><span class="o">/</span><span class="n">a</span><span class="o">**</span><span class="mi">4</span><span class="o">+</span><span class="n">NuContrib</span><span class="o">+</span><span class="p">(</span><span class="mf">1.0</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">Om</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ocb</span><span class="o">/</span><span class="n">a</span><span class="o">**</span><span class="mi">3</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">Omrad</span><span class="o">/</span><span class="n">a</span><span class="o">**</span><span class="mi">4</span><span class="o">+</span><span class="n">NuContrib</span><span class="o">+</span><span class="p">(</span><span class="mf">1.0</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">Om</span><span class="p">))</span></div>
 
 
 

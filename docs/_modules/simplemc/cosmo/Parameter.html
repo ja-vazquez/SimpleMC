@@ -171,21 +171,22 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    name : string</span>
+<span class="sd">    name : str</span>
 <span class="sd">        Name to identify the parameter.</span>
 
 <span class="sd">    value : float</span>
 <span class="sd">        Default value. In mcmc will be the stating value.</span>
 
-<span class="sd">    err: float, optional</span>
+<span class="sd">    err: float</span>
 <span class="sd">        Estimated error, in mcmc will be the step.</span>
 <span class="sd">        Default is 0, but better to write any positive number.</span>
 
-<span class="sd">    bounds: list of 2, optional</span>
+<span class="sd">    bounds: list</span>
 <span class="sd">        Priors. (minimum value, maximum value).</span>
+<span class="sd">        List of pairs of bounds.</span>
 <span class="sd">        Default is None, but computed as &#39;(value-5*err, value+5*err)&#39;.</span>
 
-<span class="sd">    Ltxname: string, optional</span>
+<span class="sd">    Ltxname: str</span>
 <span class="sd">        Latex name, use mainly for plotting.</span>
 <span class="sd">        Default is None, and in this case uses the &#39;name&#39; string.</span>
 

@@ -176,10 +176,35 @@
 <div class="viewcode-block" id="CosmoCalc"><a class="viewcode-back" href="../../API.html#simplemc.CosmoCalc.CosmoCalc">[docs]</a><span class="k">class</span> <span class="nc">CosmoCalc</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Cosmological calculator to plot the basic functions</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : object</span>
+<span class="sd">        Cosmological model.</span>
+<span class="sd">    funct : str</span>
+<span class="sd">        Chosen function. It can be one of the following: &#39;Hubble&#39;,</span>
+<span class="sd">        &#39;DaOverrd&#39;, &#39;HIOverrd&#39;, &#39;DVOverrd&#39;, &#39;HubInvOverz&#39;, &#39;SNIa&#39;, &#39;fs8&#39;, &#39;Age&#39;.</span>
+<span class="sd">    param : str</span>
+<span class="sd">        Name of parameter.</span>
+<span class="sd">    minparam : float</span>
+<span class="sd">        Min value of the chosen parameter.</span>
+<span class="sd">    maxparam : float</span>
+<span class="sd">        Max value of the chosen parameter.</span>
+<span class="sd">    nsteps : int</span>
+<span class="sd">        Number of steps to linspace for plot.</span>
+<span class="sd">    savepdf : bool</span>
+<span class="sd">        Save a plot in pdf.</span>
+<span class="sd">    zmax : float</span>
+<span class="sd">        Max value to redshift.</span>
+<span class="sd">    plot_data : bool</span>
+<span class="sd">        Plot observational dataset?</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">funct</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">minparam</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                     <span class="n">maxparam</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nsteps</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">savepdf</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">zmax</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
                     <span class="n">plot_data</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">T</span>     <span class="o">=</span> <span class="n">ParseModel</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">funct</span> <span class="o">=</span> <span class="n">funct</span>

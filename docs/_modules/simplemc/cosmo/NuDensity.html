@@ -179,7 +179,7 @@
 <span class="sd">    This module calculates the predictions for the evolution</span>
 <span class="sd">    of neutrino energy densities.</span>
 <span class="sd">    Here, we compute the integral I(r).</span>
-<span class="sd">    Initialiazes the \nu factor in \rho_nu (self.interpolator)</span>
+<span class="sd">    Initialiazes the nu factor in rho_nu (self.interpolator).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initalizing nu density look up table...&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
@@ -204,18 +204,18 @@
 
 <div class="viewcode-block" id="NuIntegral.SevenEights"><a class="viewcode-back" href="../../../API.html#simplemc.cosmo.NuDensity.NuIntegral.SevenEights">[docs]</a>    <span class="k">def</span> <span class="nf">SevenEights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mnuOT</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Given the \nu mass, returns the integral on the energy</span>
+<span class="sd">        Given the nu mass, returns the integral on the energy</span>
 <span class="sd">        density of neutrinos.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        mnuOT: float</span>
+<span class="sd">        mnuOT : float</span>
 <span class="sd">            Sum of the neutrino masses.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">            The integral given the sum of neutrino masses.</span>
-<span class="sd">            For massless neutrinosI(0)=78.</span>
+<span class="sd">            For massless neutrinos I(0)=78.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Massless neutrinos.</span>
@@ -261,7 +261,7 @@
 <span class="sd">        Combinations of massive neutrinos.</span>
 
 <span class="sd">    fact: float, optional</span>
-<span class="sd">        The ration contribution: omrad_fac   = 4.48130979e-7</span>
+<span class="sd">        The ration contribution: omrad_fac   = 4.48130979e-7.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">I</span> <span class="o">=</span> <span class="n">NuIntegral</span><span class="p">()</span>

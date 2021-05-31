@@ -213,10 +213,10 @@
 <span class="sd">        Covariance matrix. Default: None.</span>
 
 <span class="sd">    addDerived : bool</span>
-<span class="sd">        In order to ad derived parameters such as age of the universe and Omega_{Lambda}</span>
+<span class="sd">        In order to ad derived parameters such as age of the universe and Omega_{Lambda}.</span>
 
 <span class="sd">    GRstop : float</span>
-<span class="sd">        Gelman-Rubin criteria</span>
+<span class="sd">        Gelman-Rubin criteria.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">nsamp</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
                  <span class="n">cov</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chain_num</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">addDerived</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">GRstop</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">checkGR</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
@@ -343,12 +343,16 @@
 <span class="sd">        This is a implementation of the Gelman Rubin diagnostic.</span>
 <span class="sd">        If the number of chains is 1, then this method divides it in two</span>
 <span class="sd">        and does the diagnostic for convergence.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        chains</span>
+<span class="sd">        chains : list</span>
+<span class="sd">            List with the chains to perform the GR-diagnostic.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
+<span class="sd">        result : float</span>
+<span class="sd">            Gelman-Rubin diagnostic.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">mean_chain</span> <span class="o">=</span> <span class="p">[]</span>
@@ -388,8 +392,6 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Open the files to save the samples and maxlike.</span>
 <span class="sd">        Also add the Dervided Parameters if addDerived option is True.</span>
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">outfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outfile</span>
@@ -422,9 +424,6 @@
 <div class="viewcode-block" id="MCMCAnalyzer.getLikes"><a class="viewcode-back" href="../../../API.html#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.getLikes">[docs]</a>    <span class="k">def</span> <span class="nf">getLikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get loglikelihoods values from the used data.</span>
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">composite</span><span class="p">):</span>
             <span class="n">cloglikes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">like</span><span class="o">.</span><span class="n">compositeLogLikes_wprior</span><span class="p">()</span>
@@ -437,9 +436,7 @@
 
 <div class="viewcode-block" id="MCMCAnalyzer.GetProposal"><a class="viewcode-back" href="../../../API.html#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.GetProposal">[docs]</a>    <span class="k">def</span> <span class="nf">GetProposal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generation of proposal point in mcmc</span>
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
+<span class="sd">        Generation of proposal point in mcmc.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">vec</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>

@@ -186,10 +186,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This class is the manager and wrapper between all</span>
 <span class="sd">        the analyzers and the pertinent functions.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iniFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Read the input parameters or ini file.</span>
+<span class="sd">        It reads the input parameters or ini file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -237,8 +234,8 @@
 
 <span class="sd">        fn : str</span>
 <span class="sd">            Type of function to use in the likelihood due a custom data {&quot;generic&quot;, &quot;hz&quot;, ...}.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iniFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">iniFile</span> <span class="o">=</span> <span class="n">iniFile</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iniFile</span><span class="p">:</span>    <span class="bp">self</span><span class="o">.</span><span class="n">iniReader</span><span class="p">(</span><span class="n">iniFile</span><span class="p">)</span>
@@ -313,16 +310,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This is a wrapper of the runners of the analyzer in order to make</span>
 <span class="sd">        easier the execution, mainly if is through an ini file.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        All the parameters of the methods:</span>
-
-<span class="sd">            - mcmcRunner</span>
-<span class="sd">            - nestedRunner</span>
-<span class="sd">            - emceeRunner</span>
-<span class="sd">            - geneticRunner</span>
-<span class="sd">            - maxlikeRunner</span>
+<span class="sd">        **kwargs from mcmcRunner, nestedRunner, emceeRunner, geneticRunner and maxlikeRunner.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="o">==</span> <span class="s1">&#39;mcmc&#39;</span><span class="p">:</span>
@@ -474,7 +462,7 @@
 
 <div class="viewcode-block" id="DriverMC.nestedRunner"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.nestedRunner">[docs]</a>    <span class="k">def</span> <span class="nf">nestedRunner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iniFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method calls Dynesty samplers.</span>
+<span class="sd">        This method calls Dynesty nested samplers.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ___________</span>
@@ -738,10 +726,13 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        withErrors : bool</span>
+<span class="sd">            Plot errors.</span>
 
 <span class="sd">        plot_par1 : bool</span>
+<span class="sd">            First parameter to plot.</span>
 
 <span class="sd">        plot_par2 : bool</span>
+<span class="sd">            Second parameter to plot.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -897,7 +888,11 @@
 
 <span class="c1">##----------------------</span>
 
-    <span class="k">def</span> <span class="nf">geneticdeap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iniFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="DriverMC.geneticdeap"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.geneticdeap">[docs]</a>    <span class="k">def</span> <span class="nf">geneticdeap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iniFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Genetic algorithms from Deap library.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span> <span class="o">=</span> <span class="s1">&#39;ga_deap&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">_ga_deap&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzername</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outputChecker</span><span class="p">()</span>
@@ -915,7 +910,7 @@
         <span class="n">result</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
         <span class="c1">#M.plotting()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;genetic&#39;</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">result</span><span class="p">]</span>
-        <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
 
 <span class="c1">##---------------------- logLike and prior Transform function ----------------------</span>
 <span class="c1">##---------------------- for nested samplers ----------------------</span>
@@ -951,7 +946,15 @@
 
     <span class="c1">#priorsTransform</span>
 <div class="viewcode-block" id="DriverMC.priorTransform"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.priorTransform">[docs]</a>    <span class="k">def</span> <span class="nf">priorTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theta</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Prior Transform for gaussian and flat priors&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prior Transform for gaussian and flat priors</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+
+<span class="sd">        theta : array</span>
+<span class="sd">            Vector of the parameter space</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">priors</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsigma</span>
 
@@ -1154,7 +1157,11 @@
 
         <span class="k">return</span> <span class="n">pool</span><span class="p">,</span> <span class="n">nprocess</span></div>
 
-    <span class="k">def</span> <span class="nf">neuralLike</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iniFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="DriverMC.neuralLike"><a class="viewcode-back" href="../../API.html#simplemc.DriverMC.DriverMC.neuralLike">[docs]</a>    <span class="k">def</span> <span class="nf">neuralLike</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iniFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Under construction.</span>
+<span class="sd">        This method trains a neural network in order to learn the likelihood function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">simplemc.analyzers.neuralike.NeuralManager</span> <span class="kn">import</span> <span class="n">NeuralManager</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_neuralike&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputpath</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">iniFile</span><span class="p">:</span>
@@ -1182,7 +1189,7 @@
 
         <span class="k">return</span> <span class="n">NeuralManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logLike</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">ndivsgrid</span><span class="o">=</span><span class="n">ndivsgrid</span><span class="p">,</span>
                              <span class="n">epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">,</span> <span class="n">hidden_layers_neurons</span><span class="o">=</span><span class="n">hidden_layers_neurons</span><span class="p">,</span> <span class="n">psplit</span><span class="o">=</span><span class="n">psplit</span><span class="p">,</span>
-                             <span class="n">learning_rate</span><span class="o">=</span><span class="n">learning_rate</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span></div>
+                             <span class="n">learning_rate</span><span class="o">=</span><span class="n">learning_rate</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

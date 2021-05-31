@@ -181,15 +181,14 @@
 <span class="sd">    However, to get the angular diameter distance you need to pass it</span>
 <span class="sd">    its Curvature parameter (Omega_k basically), so you need to update it.</span>
 
-<span class="sd">    Also to use fs8 dataset you need to add s8 parameter</span>
+<span class="sd">    Also to use fs8 dataset you need to add s8 parameter.</span>
+
+<span class="sd">    We use speed of light in km s^-1.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    h</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-
-<span class="sd">    speed of light in km s^-1</span>
+<span class="sd">    h : float</span>
+<span class="sd">        Value of the Hubble parameter h = H/100.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">c_</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">c</span><span class="o">/</span><span class="mf">1000.</span>
 
@@ -260,7 +259,15 @@
 
 
 
-    <span class="k">def</span> <span class="nf">updateParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pars</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseCosmology.updateParams"><a class="viewcode-back" href="../../../API.html#simplemc.cosmo.BaseCosmology.BaseCosmology.updateParams">[docs]</a>    <span class="k">def</span> <span class="nf">updateParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pars</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update parameters values.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pars : list</span>
+<span class="sd">            List of intance of the Parameter class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pars</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;h&quot;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">value</span>
@@ -273,7 +280,7 @@
                 <span class="c1"># self.h=p.value*self.rd*100/self.c_</span>
             <span class="k">elif</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;s8&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">s8</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">value</span>
-        <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
 
 
     <span class="k">def</span> <span class="nf">prior_loglike</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -282,11 +289,19 @@
 
     <span class="c1"># this is relative hsquared as a function of a</span>
     <span class="c1">## i.e. H(z)^2/H(z=0)^2</span>
-    <span class="k">def</span> <span class="nf">RHSquared_a</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseCosmology.RHSquared_a"><a class="viewcode-back" href="../../../API.html#simplemc.cosmo.BaseCosmology.BaseCosmology.RHSquared_a">[docs]</a>    <span class="k">def</span> <span class="nf">RHSquared_a</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is relative h-squared as a function of the factor scale a</span>
+<span class="sd">        i.e. H(z)^2/H(z=0)^2.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        a : float</span>
+<span class="sd">            Factor scale.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;You should not instatiate BaseCosmology&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;BAD&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="mi">0</span>
-
+        <span class="k">return</span> <span class="mi">0</span></div>
 
     <span class="k">def</span> <span class="nf">Hinv_z</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
         <span class="k">return</span> <span class="mf">1.</span><span class="o">/</span><span class="n">sp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RHSquared_a</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">z</span><span class="p">)))</span>

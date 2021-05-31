@@ -162,11 +162,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for simplemc.PostProcessing</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module processes the samples from a nested sampler and prints, saves chains in a text file</span>
-<span class="sd">and creates a param file.</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="c1"># from simplemc.tools.Simple_Plots import Simple_plots</span>
+<span></span><span class="c1"># from simplemc.tools.Simple_Plots import Simple_plots</span>
 <span class="kn">from</span> <span class="nn">simplemc.cosmo.Derivedparam</span> <span class="kn">import</span> <span class="n">AllDerived</span>
 <span class="kn">from</span> <span class="nn">simplemc.analyzers.dynesty</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">dyfunc</span>
 <span class="kn">from</span> <span class="nn">simplemc</span> <span class="kn">import</span> <span class="n">logger</span>
@@ -177,7 +173,25 @@
 
 <div class="viewcode-block" id="PostProcessing"><a class="viewcode-back" href="../../API.html#simplemc.PostProcessing.PostProcessing">[docs]</a><span class="k">class</span> <span class="nc">PostProcessing</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">       In this class we...</span>
+<span class="sd">    This class makes postprocessing such as generate a summary or calculates some statistics.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ---------</span>
+<span class="sd">    list_result : list</span>
+<span class="sd">        List with results from sampling.</span>
+<span class="sd">    paramList : list</span>
+<span class="sd">        List with Parameter objects.</span>
+<span class="sd">    filename : str.</span>
+<span class="sd">        File name.</span>
+<span class="sd">    skip : float</span>
+<span class="sd">        Burn-in.</span>
+<span class="sd">    engine : str</span>
+<span class="sd">        Default None.</span>
+<span class="sd">    addDerived : bool</span>
+<span class="sd">        Derived parameters?</span>
+<span class="sd">    loglike : object</span>
+<span class="sd">        Likelihood object.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_result</span><span class="p">,</span> <span class="n">paramList</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> \
                  <span class="n">skip</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">addDerived</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">loglike</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>

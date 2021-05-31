@@ -165,86 +165,47 @@
 <span></span><span class="kn">from</span> <span class="nn">simplemc.analyzers.Population</span> <span class="kn">import</span> <span class="n">Population</span>
 <span class="kn">from</span> <span class="nn">simplemc</span> <span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-
+<span class="c1"># This script are a modified version of:</span>
+<span class="c1"># https://www.cienciadedatos.net/documentos/py01_optimizacion_ga</span>
 
 
 <div class="viewcode-block" id="SimpleGenetic"><a class="viewcode-back" href="../../../API.html#simplemc.analyzers.SimpleGenetic.SimpleGenetic">[docs]</a><span class="k">class</span> <span class="nc">SimpleGenetic</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        SimpleGenetic use the optimization method from Population class and execute it.</span>
-<span class="sd">        This script are a modified version of:</span>
-<span class="sd">        https://www.cienciadedatos.net/documentos/py01_optimizacion_ga</span>
+<span class="sd">    SimpleGenetic use the optimization method from Population class and execute it.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        target_function : method</span>
-<span class="sd">        Usually the likelihood function.</span>
-
-<span class="sd">        n_variables : int</span>
-<span class="sd">        Number of variables or free parameters</span>
-
-<span class="sd">        bounds : list</span>
-<span class="sd">        List with upper and lower bounds for each free parameter</span>
-
-<span class="sd">        n_individuals : int</span>
-<span class="sd">        Number of initial individuals</span>
-
-<span class="sd">        optimization : str</span>
-<span class="sd">        Options {&quot;maximize&quot;, &quot;minimize&quot;}. Default is &quot;maximize&quot;</span>
-
-<span class="sd">        n_generations : int</span>
-<span class="sd">        Number of generations to evolve the original population</span>
-
-<span class="sd">        method_selection : str</span>
-<span class="sd">        Type of selection method {&quot;tournament&quot;, &quot;rank&quot;, &quot;roulette&quot;}.</span>
-<span class="sd">        Default: &quot;tournament&quot;</span>
-
-<span class="sd">        elitism : float</span>
-<span class="sd">        Value of elitism in [0, 1].</span>
-<span class="sd">        Default: 0.001.</span>
-
-<span class="sd">        prob_mut : float</span>
-<span class="sd">        Probability of mutation in [0, 1].</span>
-<span class="sd">        Default: 0.4</span>
-
-<span class="sd">        distribution : str</span>
-<span class="sd">        {&quot;uniform&quot;, &quot;gaussian&quot;, &quot;random&quot;}</span>
-<span class="sd">        Default: uniform</span>
-
-<span class="sd">        media_distribution : float</span>
-<span class="sd">        Media value for gaussian distributions</span>
-
-<span class="sd">        sd_distribution : float</span>
-<span class="sd">        Standard deviation for gaussian distributions</span>
-<span class="sd">        Default: 1.0</span>
-
-<span class="sd">        min_distribution : float</span>
-<span class="sd">        Minimum value for uniform distributions</span>
-<span class="sd">        Default: -1.0</span>
-
-<span class="sd">        max_distribution : float</span>
-<span class="sd">        Maximum value for uniform distributions</span>
-<span class="sd">        Default: 1.0</span>
-
-<span class="sd">        stopping_early : bool</span>
-<span class="sd">        It needs a not None value for &quot;rounds_stopping&quot; and &quot;tolerance_stopping&quot;.</span>
-<span class="sd">        Default: True</span>
-
-<span class="sd">        rounds_stopping : int</span>
-<span class="sd">        Rounds to consider to stopping early with the tolerance_stopping value.</span>
-<span class="sd">        Default : 100</span>
-
-<span class="sd">        tolerance_stopping : float</span>
-<span class="sd">        Value to stopping early criteria. This value is the difference between the</span>
-<span class="sd">        best fit for the latest rounds_stopping generations.</span>
-<span class="sd">        Default : 0.01</span>
-
-<span class="sd">        outputname : str</span>
-<span class="sd">        Name for the output text file.</span>
-<span class="sd">        Default: &quot;geneticOutput&quot;</span>
+<span class="sd">    :param target_function: Usually the likelihood function.</span>
+<span class="sd">    :param n_variables: Number of variables or free parameters.</span>
+<span class="sd">    :type n_variables: int</span>
+<span class="sd">    :param bounds: List with upper and lower bounds for each free parameter.</span>
+<span class="sd">    :param n_individuals: Number of initial individuals.</span>
+<span class="sd">    :type n_individuals: int</span>
+<span class="sd">    :param optimization: Options {&quot;maximize&quot;, &quot;minimize&quot;}. Default: &quot;maximize&quot;.</span>
+<span class="sd">    :param n_generations: Number of generations to evolve the original population.</span>
+<span class="sd">    :type n_generations: int</span>
+<span class="sd">    :param method_selection: Type of selection method {&quot;tournament&quot;, &quot;rank&quot;, &quot;roulette&quot;}. Default: &quot;tournament&quot;</span>
+<span class="sd">    :param elitism: Value of elitism in [0, 1]. Default: 0.001.</span>
+<span class="sd">    :type elitism: float</span>
+<span class="sd">    :param prob_mut: Probability of mutation in [0, 1]. Default: 0.4.</span>
+<span class="sd">    :type prob_mut: float</span>
+<span class="sd">    :param distribution: {&quot;uniform&quot;, &quot;gaussian&quot;, &quot;random&quot;}. Default: uniform.</span>
+<span class="sd">    :type distribution: str</span>
+<span class="sd">    :param media_distribution: Media value for gaussian distributions.</span>
+<span class="sd">    :type media_distribution: float</span>
+<span class="sd">    :param sd_distribution: Standard deviation for gaussian distributions. Default: 1.0.</span>
+<span class="sd">    :type sd_distribution: float</span>
+<span class="sd">    :param min_distribution: Minimum value for uniform distributions. Default: -1.0.</span>
+<span class="sd">    :type min_distribution: float</span>
+<span class="sd">    :param max_distribution: Maximum value for uniform distributions. Default: 1.0.</span>
+<span class="sd">    :param max_distribution: float</span>
+<span class="sd">    :param stopping_early: It needs a not None value for &quot;rounds_stopping&quot; and &quot;tolerance_stopping&quot;. Default: True.</span>
+<span class="sd">    :type stopping_early: boolean</span>
+<span class="sd">    :param rounds_stopping: Integer number that indicates the rounds to consider to stopping early with the tolerance_stopping value. Default : 100</span>
+<span class="sd">    :param tolerance_stopping: Value to stopping early criteria. This value is the difference between the best fit for the latest rounds_stopping generations. Default : 0.01.</span>
+<span class="sd">    :type tolerance_stopping: float</span>
+<span class="sd">    :param outputname: Name for the output text file. Default: &quot;geneticOutput&quot;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_function</span><span class="p">,</span> <span class="n">n_variables</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-
         <span class="n">n_individuals</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;n_individuals&quot;</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
         <span class="n">optimization</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;optimization&quot;</span><span class="p">,</span> <span class="s2">&quot;maximize&quot;</span><span class="p">)</span>
         <span class="n">n_generations</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;n_generations&quot;</span><span class="p">,</span> <span class="mi">250</span><span class="p">)</span>
@@ -297,12 +258,6 @@
 <div class="viewcode-block" id="SimpleGenetic.optimize"><a class="viewcode-back" href="../../../API.html#simplemc.analyzers.SimpleGenetic.SimpleGenetic.optimize">[docs]</a>    <span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            This method generates a Population and then optimize it.</span>
-
-<span class="sd">            Returns</span>
-<span class="sd">            -------</span>
-<span class="sd">            Number of generations</span>
-<span class="sd">            Optimal value of variables:</span>
-<span class="sd">            Target function value</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">population</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="n">n_individuals</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_individuals</span><span class="p">,</span>

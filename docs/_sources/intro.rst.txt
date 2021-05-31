@@ -9,9 +9,9 @@ Introduction
 * :ref:`General structure`
 
 
-Generally speaking, the steps to run ``SimpleMC``  are as follows: 1) configure an :ref:`ini file`, 2) read this in a :ref:`Python script`, 3) :ref:`run in terminal`, and 4) :ref:`analyze outputs`.
+After proper installation of the :ref:`requirements`, generally speaking, the steps to run ``SimpleMC``  are as follows: 1) configure an :ref:`ini file`, 2) read this in a :ref:`Python script`, 3) :ref:`run in terminal`, and 4) :ref:`analyze outputs`.
 
-The main output of Bayesian inference algoritms (mcmc and nested) are text files that have the same structure of the `CosmoMC <https://cosmologist.info/cosmomc/>`_ chains consisting in:
+The output chains of Bayesian inference algoritms (mcmc and nested) are text files that have the same structure as the `CosmoMC <https://cosmologist.info/cosmomc/>`_ chains consisting in:
 
 	- First column.- weights of the sampling method. 
 	- Second column.- log-likelihood function.
@@ -21,7 +21,7 @@ The main output of Bayesian inference algoritms (mcmc and nested) are text files
 In addition, two other output files are generated: a summary and a ``.paramnames`` file with the names of the free parameters of the cosmological model. 
 
 
-..  _Requirements:
+..  _requirements:
 
 Requirements
 -------------
