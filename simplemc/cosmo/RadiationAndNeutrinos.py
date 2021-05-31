@@ -13,6 +13,24 @@ import sys
 
 
 class RadiationAndNeutrinos:
+    """
+    Class for neutrinos, Mnu and Nnu
+
+    Parameters
+    ----------
+    mnu : float
+        Standard value for the mass of neutrinos.
+    Nnu : float
+        Standard value for the number of families.
+    varyMnu : bool
+        Whether varying mass for neutrinos.
+    varyNnu : bool
+        Whether varying families for neutrinos.
+    degenerate : bool
+        Degenerate neutrinos.
+    disable : bool
+        Set radiation to zero.
+    """
     # type this shit into google
     # 8*pi^5*(boltzmann constant)^4/(15*(h*c)^3))*(1 Kelvin)**4/(3*(100 km/s/Mpc)^2/(8*Pi*G)*(speed of light)^2)
     # to get
@@ -23,21 +41,7 @@ class RadiationAndNeutrinos:
 
     def __init__(self, mnu=mnu_par.value, Nnu=Nnu_par.value,
                  varyMnu=False, varyNnu=False, degenerate=False, disable=False):
-        """
-        Class for neutrinos, Mnu and Nnu
-        Parameters
-        ----------
-        mnu: standard value for the mass of neutrinos
-        Nnu: standard value for the number of families
-        varyMnu: Whether varying mass for neutrinos
-        varyNnu: Whether varying families for neutrinos
-        degenerate
-        disable: set radiation to zero
-
-        Returns
-        -------
-
-        """
+        
         self.disabled = disable
         if (self.disabled):
             self.Omrad     = 0

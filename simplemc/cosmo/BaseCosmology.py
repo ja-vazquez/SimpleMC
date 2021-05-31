@@ -1,5 +1,3 @@
-
-
 from simplemc.cosmo.paramDefs import h_par, Pr_par, s8_par
 from scipy.misc import derivative
 import scipy.integrate as intg
@@ -9,29 +7,29 @@ import scipy as sp
 
 
 class BaseCosmology:
-    # speed of light in km s^-1
+    """
+    Base Cosmology class doesn't know about your
+    parameterization of the equation of state or densities or anything.
+    However, it does know about Hubble's constant at z=0 OR the prefactor
+    c/(H0*rd) which should be fit for in the case of "rd agnostic" fits.
+    That is why you should let it declare those parameters based on its settings
+
+    However, to get the angular diameter distance you need to pass it
+    its Curvature parameter (Omega_k basically), so you need to update it.
+
+    Also to use fs8 dataset you need to add s8 parameter.
+
+    We use speed of light in km s^-1.
+
+    Parameters
+    ----------
+    h : float
+        Value of the Hubble parameter h = H/100.
+    """
     c_ = constants.c/1000.
 
     def __init__(self, h=h_par.value):
-        """
-        Base Cosmology class doesn't know about your
-        parameterization of the equation of state or densities or anything.
-        However, it does know about Hubble's constant at z=0 OR the prefactor
-        c/(H0*rd) which should be fit for in the case of "rd agnostic" fits.
-        That is why you should let it declare those parameters based on its settings
-
-        However, to get the angular diameter distance you need to pass it
-        its Curvature parameter (Omega_k basically), so you need to update it.
-
-        Also to use fs8 dataset you need to add s8 parameter
-        Parameters
-        ----------
-        h
-
-        Returns
-        -------
-
-        """
+        
         self.Curv    = 0
         self.rd      = 149.50
         self.h       = h
@@ -98,6 +96,14 @@ class BaseCosmology:
 
 
     def updateParams(self, pars):
+        """
+        Update parameters values.
+
+        Parameters
+        ----------
+        pars : list
+            List of intance of the Parameter class
+        """
         for p in pars:
             if p.name == "h":
                 self.h = p.value
@@ -120,10 +126,18 @@ class BaseCosmology:
     # this is relative hsquared as a function of a
     ## i.e. H(z)^2/H(z=0)^2
     def RHSquared_a(self, a):
+        """
+        This is relative h-squared as a function of the factor scale a
+        i.e. H(z)^2/H(z=0)^2.
+
+        Parameters
+        ----------
+        a : float
+            Factor scale.
+        """
         print("You should not instatiate BaseCosmology")
         print("BAD")
         return 0
-
 
     def Hinv_z(self, z):
         return 1./sp.sqrt(self.RHSquared_a(1.0/(1+z)))

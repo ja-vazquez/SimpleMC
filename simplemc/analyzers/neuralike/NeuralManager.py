@@ -7,6 +7,19 @@ import os
 
 
 class NeuralManager:
+    """
+        Manager for neural networks to learn likelihood function over a grid
+        Parameters
+        -----------
+        loglikelihood
+        pars_bounds
+        rootname
+        ndivsgrid
+        hidden_layers_neurons
+        epochs
+        plot
+    """
+
     def __init__(self, loglikelihood, pars_bounds, rootname, ndivsgrid=5, hidden_layers_neurons=None,
                  epochs=100, plot=True, **kwargs):
         if hidden_layers_neurons is None:

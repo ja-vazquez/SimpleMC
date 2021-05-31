@@ -12,50 +12,51 @@ import sys
 
 from mpi4py import MPI
 
-comm = MPI.COMM_WORLD
-name = MPI.Get_processor_name()
-
-
-print ("Hello, World! "
-       "I am process %d of %d on %s" %
-       (comm.rank, comm.size, name))
+# comm = MPI.COMM_WORLD
+# name = MPI.Get_processor_name()
+#
+#
+# print ("Hello, World! "
+#        "I am process %d of %d on %s" %
+#        (comm.rank, comm.size, name))
 
 class MCMCAnalyzer:
+    """
+    MCMC sampler (Metropolis-Hastings).
+    This is the MCMC module. It spits out chains that are compatible with CosmoM
+    it calculates cov matrix during burn-in.
+    optional temperature makes it sample at a higher temperature but note that
+    this guy, as opposed to cosmomc, reweights the weights on the fly.
+
+    Parameters
+    -----------
+    like : Likelihood object
+        Object of a Likelihood class.
+
+    outfile : str
+         Output file.
+
+    skip : int
+        Burn-in.
+
+    nsamp : int
+        Number of mcmc samples.
+
+    temp : float
+        Temperature
+
+    cov : numpy.array
+        Covariance matrix. Default: None.
+
+    addDerived : bool
+        In order to ad derived parameters such as age of the universe and Omega_{Lambda}.
+
+    GRstop : float
+        Gelman-Rubin criteria.
+    """
     def __init__(self, like, outfile, skip=5000, nsamp=100000, temp=1.0,
                  cov=None, chain_num=None, addDerived=False, GRstop=0.01, checkGR=500):
-        """
-        MCMC sampler (Metropolis-Hastings).
-        This is the MCMC module. It spits out chains that are compatible with CosmoM
-        it calculates cov matrix during burn-in.
-        optional temperature makes it sample at a higher temperature but note that
-        this guy, as opposed to cosmomc, reweights the weights on the fly.
-
-        Parameters
-        -----------
-        like : Likelihood object
-            Object of a Likelihood class.
-
-        outfile : str
-             Output file.
-
-        skip : int
-            Burn-in.
-
-        nsamp : int
-            Number of mcmc samples.
-
-        temp : float
-            Temperature
-
-        cov : numpy.array
-            Covariance matrix. Default: None.
-
-        addDerived : bool
-            In order to ad derived parameters such as age of the universe and Omega_{Lambda}
-
-        GRstop : float
-            Gelman-Rubin criteria
-        """
+        
         self.like      = like
         self.outfile   = outfile
         self.nsamp     = nsamp
@@ -178,12 +179,16 @@ class MCMCAnalyzer:
         This is a implementation of the Gelman Rubin diagnostic.
         If the number of chains is 1, then this method divides it in two
         and does the diagnostic for convergence.
+
         Parameters
         ----------
-        chains
+        chains : list
+            List with the chains to perform the GR-diagnostic.
 
         Returns
         -------
+        result : float
+            Gelman-Rubin diagnostic.
 
         """
         mean_chain = []
@@ -223,8 +228,6 @@ class MCMCAnalyzer:
         """
         Open the files to save the samples and maxlike.
         Also add the Dervided Parameters if addDerived option is True.
-        Returns
-        -------
 
         """
         outfile = self.outfile
@@ -257,9 +260,6 @@ class MCMCAnalyzer:
     def getLikes(self):
         """
         Get loglikelihoods values from the used data.
-        Returns
-        -------
-
         """
         if (self.composite):
             cloglikes = self.like.compositeLogLikes_wprior()
@@ -272,9 +272,7 @@ class MCMCAnalyzer:
 
     def GetProposal(self):
         """
-        Generation of proposal point in mcmc
-        Returns
-        -------
+        Generation of proposal point in mcmc.
 
         """
         vec = sp.zeros(self.N)

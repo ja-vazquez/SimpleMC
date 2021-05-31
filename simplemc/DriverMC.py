@@ -22,10 +22,7 @@ class DriverMC:
     """
         This class is the manager and wrapper between all
         the analyzers and the pertinent functions.
-    """
-    def __init__(self, iniFile=None, **kwargs):
-        """
-        Read the input parameters or ini file.
+        It reads the input parameters or ini file.
 
         Parameters
         -----------
@@ -73,8 +70,8 @@ class DriverMC:
 
         fn : str
             Type of function to use in the likelihood due a custom data {"generic", "hz", ...}.
-
-        """
+    """
+    def __init__(self, iniFile=None, **kwargs):
 
         self.iniFile = iniFile
         if self.iniFile:    self.iniReader(iniFile)
@@ -149,16 +146,7 @@ class DriverMC:
         """
         This is a wrapper of the runners of the analyzer in order to make
         easier the execution, mainly if is through an ini file.
-
-        Parameters
-        ----------
-        All the parameters of the methods:
-
-            - mcmcRunner
-            - nestedRunner
-            - emceeRunner
-            - geneticRunner
-            - maxlikeRunner
+        **kwargs from mcmcRunner, nestedRunner, emceeRunner, geneticRunner and maxlikeRunner.
 
         """
         if self.analyzername == 'mcmc':
@@ -310,7 +298,7 @@ class DriverMC:
 
     def nestedRunner(self, iniFile=None, **kwargs):
         """
-        This method calls Dynesty samplers.
+        This method calls Dynesty nested samplers.
 
         Parameters
         ___________
@@ -574,10 +562,13 @@ class DriverMC:
         Parameters
         ----------
         withErrors : bool
+            Plot errors.
 
         plot_par1 : bool
+            First parameter to plot.
 
         plot_par2 : bool
+            Second parameter to plot.
 
         """
         if self.analyzername is None:
@@ -734,6 +725,10 @@ class DriverMC:
 ##----------------------
 
     def geneticdeap(self, iniFile=None, **kwargs):
+        """
+        Genetic algorithms from Deap library.
+
+        """
         if self.analyzername is None: self.analyzername = 'ga_deap'
         self.outputpath = '{}_{}_ga_deap'.format(self.outputpath, self.analyzername)
         self.outputChecker()
@@ -787,7 +782,15 @@ class DriverMC:
 
     #priorsTransform
     def priorTransform(self, theta):
-        """Prior Transform for gaussian and flat priors"""
+        """
+        Prior Transform for gaussian and flat priors
+
+        Parameters
+        -----------
+
+        theta : array
+            Vector of the parameter space
+        """
         priors = []
         n = self.nsigma
 
@@ -991,6 +994,10 @@ class DriverMC:
         return pool, nprocess
 
     def neuralLike(self, iniFile=None, **kwargs):
+        """
+        Under construction.
+        This method trains a neural network in order to learn the likelihood function.
+        """
         from simplemc.analyzers.neuralike.NeuralManager import NeuralManager
         self.outputpath = '{}_neuralike'.format(self.outputpath)
         if iniFile:

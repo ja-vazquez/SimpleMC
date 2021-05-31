@@ -3,21 +3,29 @@ import matplotlib.pyplot as plt
 from matplotlib import rcParams
 
 
-
-
 class Simple_plots(cosmochain):
+    """
+    Collection of plotters.
+
+    :param dir_name: Name of the directory with the mcmc chains text files.
+    :type dir_name: str
+    :param roots: root name of the file.
+    :param label: labels to each parameter.
+    :type label: list
+    :param kwargs: **kwargs to plots. colors: list of colours, nchains: number of chains, skip: (int) burn-in
+    """
     name = 'jav'
 
     def __init__(self, dir_name, roots, label=None, **kwargs):
         self.dir_name   = dir_name
         self.roots      = roots
 
-        self.label    = label
-        self.colors   = kwargs.pop("colors", ['red', 'blue', 'green', 'orange'])
+        self.label = label
+        self.colors = kwargs.pop("colors", ['red', 'blue', 'green', 'orange'])
         nchains = kwargs.pop("nchains", None)
         skip = kwargs.pop("skip", 0)
 
-        if (type(roots) == type("ch")):
+        if type(roots) == type("ch"):
             self.Clist = cosmochain(dir_name + roots)
         elif len(roots)>0:
             try:
@@ -25,9 +33,12 @@ class Simple_plots(cosmochain):
             except:
                 self.Clist = [cosmochain(dir_name + roots[0]+".txt", nchains=nchains, skip_=skip)]
 
-
-
     def Plots1D(self, params, **kwargs):
+        """
+        1D posterior plots.
+        :param params: parameters to plot.
+        :type params: list
+        """
         smooth = kwargs.pop("smooth", 2)
         normpeak = kwargs.pop("normpeak", True)
 
@@ -46,9 +57,14 @@ class Simple_plots(cosmochain):
         #plt.savefig('Plot_1D.pdf')
         #plt.show()
 
-
-
     def Plots2D(self, params_pair, **kwargs):
+        """
+        2D posterior plots between two parameters.
+
+        :param params_pair: pair of parameters to 2D plots.
+        :type params_pair: list
+        :param kwargs: pbest: boolean, solid: boolean.
+        """
         pbest = kwargs.pop("pbest", True)
         solid = kwargs.pop("solid", True)
         plt.figure(figsize=(5*len(params_pair), 4))
@@ -66,9 +82,12 @@ class Simple_plots(cosmochain):
         #plt.savefig('Plot_2D.pdf')
         plt.show()
 
-
-
     def triangle(self, parlist, new_style=True, **kwargs):
+        """
+        Triangle plots.
+
+        :param parlist: list of parameters
+        """
         color = kwargs.pop("color", "blue")
         rcParams.update({'xtick.labelsize': 12,
                          'ytick.labelsize': 12,})
@@ -77,9 +96,6 @@ class Simple_plots(cosmochain):
             #plt.savefig('Plot_triangle.pdf')
             #plt.show()
 
-
-
-
     def Show_limits(self, params):
         for i, C in enumerate(self.Clist):
             for j, param in enumerate(params):
@@ -87,33 +103,32 @@ class Simple_plots(cosmochain):
                 print ('--'*10)
                 print (param, '[3,2,1] sigma, best-fit', x)
 
-
-
     def Covariance(self, params):
         for i, C in enumerate(self.Clist):
             x = C.GetCovariance(params)
-            print ('--'*10)
-            print ('mean', x[0], '\n cov', x[1])
+            print('--'*10)
+            print('mean', x[0], '\n cov', x[1])
             return x
-
-
 
     def color_legend(self, leg):
         # """Color legend texts based on color of corresponding lines"""
         for line, txt in zip(leg.get_lines(), leg.get_texts()):
             txt.set_color(line.get_color())
 
-
-
     def draw_frame(self):
             leg = plt.legend(loc='upper right')
             leg.draw_frame(False)
             self.color_legend(leg)
 
-
-
-
     def cornerPlotter(self, params, color='g', show_titles=True, fill_contours=True):
+        """
+        Triangle plot using corner library.
+
+        :param params: list of parameters
+        :param color: color, eg. 'c', 'b', etc.
+        :param show_titles: True if you want to show tittles.
+        :param fill_contours: True if you want to fill the contours.
+        """
         import corner
         for C in self.Clist:
             parcols = [C.parcol[p] for p in params]
@@ -139,6 +154,14 @@ class Simple_plots(cosmochain):
 
 
     def fgivenx(self, params, z, func, labels=None):
+        """
+        Plots with fgivenx library.
+
+        :param params: list of parameters.
+        :param z: independent variable.
+        :param func: funtion of the independent variable.
+        :param labels: labels for each parameter.
+        """
         from fgivenx import plot_contours
 
         plist = [self.Clist.slist(p) for p in params]
@@ -155,5 +178,3 @@ class Simple_plots(cosmochain):
         plt.savefig('fgivenx.pdf')
         plt.tight_layout()
         plt.show()
-
-

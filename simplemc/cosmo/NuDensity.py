@@ -15,7 +15,7 @@ class NuIntegral:
     This module calculates the predictions for the evolution
     of neutrino energy densities.
     Here, we compute the integral I(r).
-    Initialiazes the \nu factor in \rho_nu (self.interpolator)
+    Initialiazes the nu factor in rho_nu (self.interpolator).
     """
     def __init__(self):
         print("Initalizing nu density look up table...", end=' ')
@@ -40,18 +40,18 @@ class NuIntegral:
 
     def SevenEights(self, mnuOT):
         """
-        Given the \nu mass, returns the integral on the energy
+        Given the nu mass, returns the integral on the energy
         density of neutrinos.
 
         Parameters
         ----------
-        mnuOT: float
+        mnuOT : float
             Sum of the neutrino masses.
 
         Returns
         -------
             The integral given the sum of neutrino masses.
-            For massless neutrinosI(0)=78.
+            For massless neutrinos I(0)=78.
 
         """
         # Massless neutrinos.
@@ -97,7 +97,7 @@ class NuDensity:
         Combinations of massive neutrinos.
 
     fact: float, optional
-        The ration contribution: omrad_fac   = 4.48130979e-7
+        The ration contribution: omrad_fac   = 4.48130979e-7.
 
     """
     I = NuIntegral()

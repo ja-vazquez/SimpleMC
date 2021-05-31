@@ -1,23 +1,14 @@
 from simplemc import logger
+from simplemc.models.LCDMCosmology import LCDMCosmology
 
-
-#TODO There's SimpleModel, SimpleCosmology and Generic, unify them
 
 
 class SimpleModel:
+    """
+    This is a generic model
+
+    """
     def __init__(self, parameters, function):
-        """
-        Parameters:
-            parameters: List of Parameter class objects
-            function: This function recivies a vector in the parameter space
-                        and returns its evaluation in the function.
-                        Example:
-                            def straight_line(parameters, x):
-                                m, b = parameters
-                                return m*x +b
-            cosmological: boolean value. If True, then the LCDMCosmology
-                          class will be the base of the model.
-        """
         self.parameters = parameters
         self.function = function
         SimpleModel.updateParams(self, [])

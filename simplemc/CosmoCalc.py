@@ -12,10 +12,35 @@ import sys
 class CosmoCalc:
     """
     Cosmological calculator to plot the basic functions
+
+
+    Parameters
+    ----------
+    model : object
+        Cosmological model.
+    funct : str
+        Chosen function. It can be one of the following: 'Hubble',
+        'DaOverrd', 'HIOverrd', 'DVOverrd', 'HubInvOverz', 'SNIa', 'fs8', 'Age'.
+    param : str
+        Name of parameter.
+    minparam : float
+        Min value of the chosen parameter.
+    maxparam : float
+        Max value of the chosen parameter.
+    nsteps : int
+        Number of steps to linspace for plot.
+    savepdf : bool
+        Save a plot in pdf.
+    zmax : float
+        Max value to redshift.
+    plot_data : bool
+        Plot observational dataset?
+
     """
     def __init__(self, model, funct=None, param=None, minparam=None,
                     maxparam=None, nsteps=3, savepdf=False, zmax=3,
                     plot_data=False):
+
         self.T     = ParseModel(model)
         self.model = model
         self.funct = funct

@@ -1,7 +1,3 @@
-"""
-This module processes the samples from a nested sampler and prints, saves chains in a text file
-and creates a param file.
-"""
 # from simplemc.tools.Simple_Plots import Simple_plots
 from simplemc.cosmo.Derivedparam import AllDerived
 from simplemc.analyzers.dynesty import utils as dyfunc
@@ -13,7 +9,25 @@ import re
 
 class PostProcessing:
     """
-       In this class we...
+    This class makes postprocessing such as generate a summary or calculates some statistics.
+
+    Parameters
+    ---------
+    list_result : list
+        List with results from sampling.
+    paramList : list
+        List with Parameter objects.
+    filename : str.
+        File name.
+    skip : float
+        Burn-in.
+    engine : str
+        Default None.
+    addDerived : bool
+        Derived parameters?
+    loglike : object
+        Likelihood object.
+
     """
     def __init__(self, list_result, paramList, filename, \
                  skip=0.1, engine=None, addDerived=True, loglike=None):

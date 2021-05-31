@@ -1,26 +1,27 @@
-
-
 from simplemc.models.LCDMCosmology import LCDMCosmology
 from simplemc.cosmo.paramDefs import w_par, wa_par, Ok_par
 import math as N
 
 #TODO Add more DE EoS for comparison
 
+
+
 class owa0CDMCosmology(LCDMCosmology):
+    """
+        This is CDM cosmology with w, wa and Ok.
+        CPL parameterization with curvature.
+        This class inherits LCDMCosmology class as the rest of the cosmological
+        models already included in SimpleMC.
+
+        :param varyw: variable w0 parameter
+        :type varyw: Boolean
+        :param varywa: variable wa parameter
+        :type varywa: Boolean
+        :param varyOk: variable Ok parameter
+        :type varyOk: Boolean
+
+    """
     def __init__(self, varyw=True, varywa=True, varyOk=True):
-        """
-        This is CDM cosmology with w, wa and Ok
-        Parameters
-        ----------
-        varyw
-        varywa
-        varyOk
-
-        Returns
-        -------
-
-        """
-
         self.varyw  = varyw
         self.varywa = varywa
         self.varyOk = varyOk
