@@ -197,7 +197,7 @@
 <div class="section" id="requirements">
 <span id="id1"></span><h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
 <p>This code runs both in Python 2x and 3x. However, we highly recommend Python 3x.</p>
-<p>Mandatorily, you need the following libraries:</p>
+<p>Imperative libraries are:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo pip install numpy matplotlib scipy
 </pre></div>
 </div>
@@ -253,7 +253,7 @@
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">LCDM</span>
 
-<span class="n">datasets</span> <span class="o">=</span> <span class="n">BBAO</span><span class="o">+</span><span class="n">HD</span><span class="o">+</span><span class="n">UnionSN</span><span class="o">+</span><span class="n">Planck</span>
+<span class="n">datasets</span> <span class="o">=</span> <span class="n">BBAO</span><span class="o">+</span><span class="n">HD</span><span class="o">+</span><span class="n">SN</span>
 
 <span class="n">analyzer</span> <span class="o">=</span> <span class="n">mcmc</span>
 </pre></div>
@@ -310,7 +310,8 @@
 </div>
 <div class="section" id="analyze-outputs">
 <span id="id6"></span><h3>analyze outputs<a class="headerlink" href="#analyze-outputs" title="Permalink to this headline">¶</a></h3>
-<p>You can see your outputs in the <em>chains</em> directory and then make plots. See the <a class="reference external" href="plotters.html">plots</a> section for details.</p>
+<p>You can see the outputs in the chains directory and then make plots. See the <a class="reference external" href="plotters.html">plots</a> section for details. The name of the outputs begins with the name of the model, prefact (pre / phy), datasets and analyzer, for the example of the above <code class="docutils literal notranslate"><span class="pre">ini</span> <span class="pre">file</span></code>: <code class="docutils literal notranslate"><span class="pre">LCDM_phy_BBAO+HD+SN_mcmc</span></code>.</p>
+<p>In addition to the chain file, it is a summary where you can notice the parameter estimation, the execution time and in the case of nested sampling, the Bayesian evidence, useful for the comparison of models.</p>
 </div>
 </div>
 <div class="section" id="general-structure">

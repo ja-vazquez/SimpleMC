@@ -28,7 +28,7 @@ Requirements
 
 This code runs both in Python 2x and 3x. However, we highly recommend Python 3x. 
 
-Mandatorily, you need the following libraries:
+Imperative libraries are:
 
 .. code-block:: bash
    
@@ -113,7 +113,7 @@ The ``[custom]`` section has the following structure:
         
         model = LCDM
         
-        datasets = BBAO+HD+UnionSN+Planck
+        datasets = BBAO+HD+SN
 
         analyzer = mcmc
 
@@ -173,7 +173,9 @@ where 4 is the number of chains and the number of processors.
 analyze outputs
 ****************
 
-You can see your outputs in the *chains* directory and then make plots. See the `plots <plotters.html>`_ section for details.
+You can see the outputs in the chains directory and then make plots. See the `plots <plotters.html>`_ section for details. The name of the outputs begins with the name of the model, prefact (pre / phy), datasets and analyzer, for the example of the above ``ini file``: ``LCDM_phy_BBAO+HD+SN_mcmc``.
+
+In addition to the chain file, it is a summary where you can notice the parameter estimation, the execution time and in the case of nested sampling, the Bayesian evidence, useful for the comparison of models. 
 
 
 

@@ -1,0 +1,583 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>simplemc.analyzers.MCMCAnalyzer &mdash; SimpleMC latest documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> SimpleMC
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html"><strong>Data</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../inifile.html">Customize ini file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plotters.html"><strong>Plotters</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../analyzers.html"><strong>Analyzers</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Citation.html">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../API.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimpleMC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>simplemc.analyzers.MCMCAnalyzer</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for simplemc.analyzers.MCMCAnalyzer</h1><div class="highlight"><pre>
+<span></span>
+
+<span class="c1">#TODO print the Accepted # for each rank</span>
+
+
+<span class="kn">from</span> <span class="nn">simplemc.cosmo.Derivedparam</span> <span class="kn">import</span> <span class="n">AllDerived</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span> <span class="k">as</span> <span class="nn">la</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
+
+<span class="c1"># comm = MPI.COMM_WORLD</span>
+<span class="c1"># name = MPI.Get_processor_name()</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># print (&quot;Hello, World! &quot;</span>
+<span class="c1">#        &quot;I am process %d of %d on %s&quot; %</span>
+<span class="c1">#        (comm.rank, comm.size, name))</span>
+
+<div class="viewcode-block" id="MCMCAnalyzer"><a class="viewcode-back" href="../../../API.html#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer">[docs]</a><span class="k">class</span> <span class="nc">MCMCAnalyzer</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    MCMC sampler (Metropolis-Hastings).</span>
+<span class="sd">    This is the MCMC module. It spits out chains that are compatible with CosmoM</span>
+<span class="sd">    it calculates cov matrix during burn-in.</span>
+<span class="sd">    optional temperature makes it sample at a higher temperature but note that</span>
+<span class="sd">    this guy, as opposed to cosmomc, reweights the weights on the fly.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    -----------</span>
+<span class="sd">    like : Likelihood object</span>
+<span class="sd">        Object of a Likelihood class.</span>
+
+<span class="sd">    outfile : str</span>
+<span class="sd">         Output file.</span>
+
+<span class="sd">    skip : int</span>
+<span class="sd">        Burn-in.</span>
+
+<span class="sd">    nsamp : int</span>
+<span class="sd">        Number of mcmc samples.</span>
+
+<span class="sd">    temp : float</span>
+<span class="sd">        Temperature</span>
+
+<span class="sd">    cov : numpy.array</span>
+<span class="sd">        Covariance matrix. Default: None.</span>
+
+<span class="sd">    addDerived : bool</span>
+<span class="sd">        In order to ad derived parameters such as age of the universe and Omega_{Lambda}</span>
+
+<span class="sd">    GRstop : float</span>
+<span class="sd">        Gelman-Rubin criteria</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">nsamp</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                 <span class="n">cov</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chain_num</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">addDerived</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">GRstop</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">checkGR</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">like</span>      <span class="o">=</span> <span class="n">like</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outfile</span>   <span class="o">=</span> <span class="n">outfile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nsamp</span>     <span class="o">=</span> <span class="n">nsamp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">skip</span>      <span class="o">=</span> <span class="n">skip</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temp</span>      <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>  <span class="c1"># temperature</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chain_num</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span><span class="o">+</span><span class="mi">1</span>  <span class="c1">#chain_num</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cpars</span>     <span class="o">=</span> <span class="n">like</span><span class="o">.</span><span class="n">freeParameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">N</span>         <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpars</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">derived</span>   <span class="o">=</span> <span class="n">addDerived</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkgr</span>   <span class="o">=</span> <span class="n">checkGR</span>
+
+        <span class="n">minvals</span><span class="p">,</span> <span class="n">maxvals</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">lb</span><span class="p">,</span> <span class="n">hb</span> <span class="ow">in</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">bounds</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpars</span><span class="p">]:</span>
+            <span class="n">minvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lb</span><span class="p">)</span>
+            <span class="n">maxvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hb</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minvals</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">minvals</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maxvals</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">maxvals</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bounds:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">minvals</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxvals</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">like</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Composite&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sublikenames</span> <span class="o">=</span> <span class="n">like</span><span class="o">.</span><span class="n">compositeNames</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">composite</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">composite</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">cov</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="c1"># make initial cov matrix from diagonal &quot;errors&quot;</span>
+            <span class="n">errs</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.01</span><span class="o">*</span><span class="n">p</span><span class="o">.</span><span class="n">error</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpars</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_pcov</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">errs</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_pcov</span><span class="p">(</span><span class="n">cov</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">derived</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">AD</span> <span class="o">=</span> <span class="n">AllDerived</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">GRcondition</span> <span class="o">=</span> <span class="n">GRstop</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">RunChain</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">init_pcov</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mat</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chol</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">RunChain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">openFiles</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cloglike</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cloglikes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getLikes</span><span class="p">()</span>
+        <span class="c1"># set up logofs based on the first log like which should be</span>
+        <span class="c1"># the same for all chains. Better than nothing.</span>
+        <span class="c1">#self.logofs=self.cloglike</span>
+        <span class="c1"># Actually, above doesn&#39;t seem to work very well.</span>
+        <span class="c1"># Instead, use zero, as our likelihoods never became very large</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logofs</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># current weight</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cw</span>     <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># current counter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">co</span>     <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># mean for burin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">swx</span>    <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meanx</span>  <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meanxx</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">))</span>
+        <span class="c1"># max loglike</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maxloglike</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1e30</span>
+        <span class="c1"># are we done</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">done</span>   <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1">#converge</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lpars</span>   <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1">#Uses the last percentage of the chain</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">percen</span>  <span class="o">=</span> <span class="mf">0.4</span>
+
+        <span class="n">gr</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting chain...&quot;</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">done</span><span class="p">):</span>
+            <span class="n">ppars</span><span class="p">,</span> <span class="n">numout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetProposal</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cw</span> <span class="o">+=</span> <span class="n">numout</span>  <span class="c1">## things hitting outside the prior are formally rejected samples</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">like</span><span class="o">.</span><span class="n">updateParams</span><span class="p">(</span><span class="n">ppars</span><span class="p">)</span>
+            <span class="n">ploglike</span><span class="p">,</span> <span class="n">ploglikes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getLikes</span><span class="p">()</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">ploglike</span><span class="p">)):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Something bad has happened, nan in loglike, assuming zero log&quot;</span><span class="p">)</span>
+                <span class="n">ploglike</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1e50</span>
+            <span class="c1"># print cloglike, ploglike, [p.value for p in like.freeParameters()], [p.value for p in self.cpars]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">ploglike</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">cloglike</span><span class="p">):</span>
+                <span class="n">accept</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">accept</span> <span class="o">=</span> <span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="n">ploglike</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">cloglike</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">temp</span><span class="p">)</span>
+                          <span class="o">&gt;</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">))</span>
+
+            <span class="c1"># print [p.value for p in ppars], accept, ploglike</span>
+            <span class="c1"># stop</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">accept</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ProcessAccepted</span><span class="p">(</span><span class="n">ppars</span><span class="p">,</span> <span class="n">ploglike</span><span class="p">,</span> <span class="n">ploglikes</span><span class="p">)</span>
+                <span class="c1"># for i, item in enumerate(ppars):</span>
+                <span class="c1">#     print(&quot;\nPPARS&quot;, i, item.value, ploglike, ploglikes)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cw</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Accepted: </span><span class="si">{:d}</span><span class="s2"> | loglike: </span><span class="si">{:3.4f}</span><span class="s2"> | &quot;</span>
+                  <span class="s2">&quot;Gelman-Rubin: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">co</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cloglike</span><span class="p">,</span> <span class="n">gr</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">co</span> <span class="o">&gt;</span><span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">co</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkgr</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">chains</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lpars</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">gr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GRDRun</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span>
+                    <span class="c1">#print(&#39;Gelman-Rubin R-1:&#39;, gr)</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">gr</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">GRcondition</span><span class="p">)):</span>
+                        <span class="n">condition</span> <span class="o">=</span> <span class="mi">1</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">closeFiles</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">condition</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span>
+                        <span class="n">condition</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">recvmsg</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">condition</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">recvmsg</span> <span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">---- Gelman-Rubin achived ---- &#39;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+
+
+
+<div class="viewcode-block" id="MCMCAnalyzer.GRDRun"><a class="viewcode-back" href="../../../API.html#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.GRDRun">[docs]</a>    <span class="k">def</span> <span class="nf">GRDRun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chains</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is a implementation of the Gelman Rubin diagnostic.</span>
+<span class="sd">        If the number of chains is 1, then this method divides it in two</span>
+<span class="sd">        and does the diagnostic for convergence.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        chains</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mean_chain</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">var_chain</span>  <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">lchain</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">//</span><span class="mi">2</span>
+            <span class="n">chains</span> <span class="o">=</span> <span class="p">[</span><span class="n">chains</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="n">lchain</span><span class="p">],</span> <span class="n">chains</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">lchain</span><span class="p">:]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">clen</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span> <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chains</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">clen</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">lchain</span> <span class="o">=</span> <span class="n">clen</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1">#print(&#39;take same # steps&#39;, clen)</span>
+                <span class="n">lchain</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">clen</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chains</span><span class="p">:</span>
+                <span class="n">mean_chain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">chain</span><span class="p">[</span><span class="o">-</span><span class="n">lchain</span><span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+                <span class="n">var_chain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">chain</span><span class="p">[</span><span class="o">-</span><span class="n">lchain</span><span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span>
+
+        <span class="n">M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">mean_chain</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">W</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">var_chain</span><span class="p">,</span>  <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">B</span><span class="o">=</span> <span class="nb">sum</span><span class="p">([(</span><span class="n">b</span><span class="o">-</span><span class="n">M</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">mean_chain</span><span class="p">])</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">lchain</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span><span class="o">-</span> <span class="mf">1.</span><span class="p">)</span><span class="o">*</span><span class="n">B</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="mf">1.</span><span class="o">/</span><span class="n">lchain</span><span class="p">)</span><span class="o">*</span><span class="n">W</span> <span class="o">+</span>  <span class="n">B</span><span class="o">/</span><span class="n">lchain</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span> <span class="n">sp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">R</span><span class="o">/</span><span class="n">W</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="MCMCAnalyzer.openFiles"><a class="viewcode-back" href="../../../API.html#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.openFiles">[docs]</a>    <span class="k">def</span> <span class="nf">openFiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Open the files to save the samples and maxlike.</span>
+<span class="sd">        Also add the Dervided Parameters if addDerived option is True.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">outfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outfile</span>
+        <span class="n">formstr</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%g</span><span class="s1"> &#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="si">%g</span><span class="s1"> &#39;</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">derived</span><span class="p">:</span>
+            <span class="n">formstr</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%g</span><span class="s1"> &#39;</span><span class="o">*</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">AD</span><span class="o">.</span><span class="n">list</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">composite</span><span class="p">):</span>
+            <span class="n">formstr</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%g</span><span class="s1"> &#39;</span><span class="o">*</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sublikenames</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">formstr</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chain_num</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">cfname</span>  <span class="o">=</span> <span class="n">outfile</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span>
+            <span class="n">mlfname</span> <span class="o">=</span> <span class="n">outfile</span> <span class="o">+</span> <span class="s2">&quot;.maxlike&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cfname</span>  <span class="o">=</span> <span class="n">outfile</span> <span class="o">+</span> <span class="s2">&quot;_</span><span class="si">%i</span><span class="s2">.txt&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chain_num</span><span class="p">)</span>
+            <span class="n">mlfname</span> <span class="o">=</span> <span class="n">outfile</span> <span class="o">+</span> <span class="s2">&quot;_</span><span class="si">%i</span><span class="s2">.maxlike&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chain_num</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fout</span>    <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">cfname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlfout</span>  <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">mlfname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">formstr</span> <span class="o">=</span> <span class="n">formstr</span></div>
+
+
+    <span class="k">def</span> <span class="nf">closeFiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlfout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+
+<div class="viewcode-block" id="MCMCAnalyzer.getLikes"><a class="viewcode-back" href="../../../API.html#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.getLikes">[docs]</a>    <span class="k">def</span> <span class="nf">getLikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get loglikelihoods values from the used data.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">composite</span><span class="p">):</span>
+            <span class="n">cloglikes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">like</span><span class="o">.</span><span class="n">compositeLogLikes_wprior</span><span class="p">()</span>
+            <span class="n">cloglike</span>  <span class="o">=</span> <span class="n">cloglikes</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cloglikes</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">cloglike</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">like</span><span class="o">.</span><span class="n">loglike_wprior</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">cloglike</span><span class="p">,</span> <span class="n">cloglikes</span></div>
+
+
+<div class="viewcode-block" id="MCMCAnalyzer.GetProposal"><a class="viewcode-back" href="../../../API.html#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.GetProposal">[docs]</a>    <span class="k">def</span> <span class="nf">GetProposal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generation of proposal point in mcmc</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vec</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
+        <span class="n">numreject</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">ppars</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpars</span><span class="p">)</span>
+            <span class="n">step</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_pcov</span><span class="p">()</span>
+            <span class="c1">#print (&#39;step #&#39;, [p.value for p in  ppars])</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ppars</span><span class="p">):</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="n">step</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>   <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">value</span>
+
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">vec</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">minvals</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="n">vec</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxvals</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">ppars</span><span class="p">,</span> <span class="n">numreject</span>
+            <span class="n">numreject</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+
+
+    <span class="k">def</span> <span class="nf">draw_pcov</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">random</span><span class="o">.</span><span class="n">gauss</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mi">1</span><span class="p">,)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chol</span><span class="p">)</span>
+
+
+
+    <span class="k">def</span> <span class="nf">ProcessAccepted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ppars</span><span class="p">,</span> <span class="n">ploglike</span><span class="p">,</span> <span class="n">ploglikes</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">co</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c1"># if (self.co % 100 == 0): #JAV 1000</span>
+        <span class="c1">#     print(&quot;Accepted samples&quot;, self.co, self.cw)</span>
+        <span class="n">vec</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpars</span><span class="p">]</span>
+
+        <span class="c1">#for convergence</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lpars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">co</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">lpars</span><span class="p">[:</span><span class="nb">int</span><span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">percen</span><span class="p">)</span><span class="o">*</span><span class="mi">10</span><span class="p">)]</span>
+
+
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">co</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip</span><span class="p">):</span>
+            <span class="c1"># weight rescaled</span>
+            <span class="n">wers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw</span><span class="o">*</span><span class="n">sp</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">cloglike</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">logofs</span><span class="p">)</span>
+                               <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temp</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">temp</span><span class="p">)</span>
+
+            <span class="n">tmp</span> <span class="o">=</span> <span class="p">[</span><span class="n">wers</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">cloglike</span><span class="p">]</span> <span class="o">+</span> <span class="n">vec</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">derived</span><span class="p">:</span>
+                <span class="n">tmp</span> <span class="o">+=</span> <span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">pd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">AD</span><span class="o">.</span><span class="n">listDerived</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">like</span><span class="p">)]</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">composite</span><span class="p">):</span>
+                <span class="n">outstr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formstr</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">tmp</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cloglikes</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">outstr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formstr</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">outstr</span><span class="p">)</span>
+            <span class="c1"># Flush file on regular basis</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">co</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span> <span class="c1">#JAV 1000</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cloglike</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxloglike</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">maxloglike</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cloglike</span>
+                <span class="c1">#print(&quot;New maxloglike&quot;, self.maxloglike)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mlfout</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mlfout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">outstr</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mlfout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">maxloglike</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">co</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsamp</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of steps achieved&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">co</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">swx</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meanx</span>  <span class="o">+=</span> <span class="n">v</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">cw</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meanxx</span> <span class="o">+=</span> <span class="n">sp</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">cw</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cw</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Still burning in, weight too large&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chol</span> <span class="o">*=</span> <span class="mf">0.9</span>
+                <span class="c1"># print(self.cw)</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># co==skip</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meanx</span>  <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">swx</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meanxx</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">swx</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meanxx</span> <span class="o">-=</span> <span class="n">sp</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meanx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">meanx</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Re-initializing covariance matrix after burn-in&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meanxx</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">()</span>
+            <span class="c1"># for i, p in enumerate(self.cpars):</span>
+            <span class="c1">#     print(&quot;{}: {} +/- {}&quot;.format(p.name, p.value, sp.sqrt(self.meanxx[i, i])))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_pcov</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meanxx</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cw</span>    <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cpars</span> <span class="o">=</span> <span class="n">ppars</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cloglike</span> <span class="o">=</span> <span class="n">ploglike</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">composite</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cloglikes</span> <span class="o">=</span> <span class="n">ploglikes</span></div>
+
+
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, A Slosar, JA Vazquez, I Gomez-Vargas.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

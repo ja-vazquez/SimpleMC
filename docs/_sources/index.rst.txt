@@ -16,6 +16,29 @@ Please read the `introduction <intro.html>`_ section where you can see the `requ
 
 In ``SimpleMC`` we use amazing external codes, please if you consider pertinent cite them, go to the `citation  section <Citation.html#cite-external-codes>`_ to details. 
 
+Index:
+-------
+
+.. toctree::
+   :maxdepth: 1
+
+   intro
+   
+   data
+
+   inifile    
+
+   plotters
+
+   analyzers
+
+   examples
+
+   Citation
+
+   API
+
+
 Changelog
 ----------
 
@@ -40,24 +63,10 @@ Changelog
 - **0.8.0 (01/09/2014)** Initial version.
 
 
-Index:
--------
+TODO
+-----
 
-.. toctree::
-   :maxdepth: 1
-
-   intro
-   
-   data
-
-   inifile    
-
-   plotters
-
-   analyzers
-
-   examples
-
-   Citation
-
-   API
+- To unify GenericModel, SimpleModel and SimpleCosmoModel.
+- Add more DE EoS for comparison, for example, in CPL (owaCDM).
+- Unify pybambi and nerualike. 
+- Neural networks methods with dynesty multiprocessing fails.

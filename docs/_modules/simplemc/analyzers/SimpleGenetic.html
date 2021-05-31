@@ -1,0 +1,373 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>simplemc.analyzers.SimpleGenetic &mdash; SimpleMC latest documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> SimpleMC
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html"><strong>Data</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../inifile.html">Customize ini file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plotters.html"><strong>Plotters</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../analyzers.html"><strong>Analyzers</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Citation.html">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../API.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimpleMC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>simplemc.analyzers.SimpleGenetic</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for simplemc.analyzers.SimpleGenetic</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">simplemc.analyzers.Population</span> <span class="kn">import</span> <span class="n">Population</span>
+<span class="kn">from</span> <span class="nn">simplemc</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+
+
+<div class="viewcode-block" id="SimpleGenetic"><a class="viewcode-back" href="../../../API.html#simplemc.analyzers.SimpleGenetic.SimpleGenetic">[docs]</a><span class="k">class</span> <span class="nc">SimpleGenetic</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        SimpleGenetic use the optimization method from Population class and execute it.</span>
+<span class="sd">        This script are a modified version of:</span>
+<span class="sd">        https://www.cienciadedatos.net/documentos/py01_optimizacion_ga</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        target_function : method</span>
+<span class="sd">        Usually the likelihood function.</span>
+
+<span class="sd">        n_variables : int</span>
+<span class="sd">        Number of variables or free parameters</span>
+
+<span class="sd">        bounds : list</span>
+<span class="sd">        List with upper and lower bounds for each free parameter</span>
+
+<span class="sd">        n_individuals : int</span>
+<span class="sd">        Number of initial individuals</span>
+
+<span class="sd">        optimization : str</span>
+<span class="sd">        Options {&quot;maximize&quot;, &quot;minimize&quot;}. Default is &quot;maximize&quot;</span>
+
+<span class="sd">        n_generations : int</span>
+<span class="sd">        Number of generations to evolve the original population</span>
+
+<span class="sd">        method_selection : str</span>
+<span class="sd">        Type of selection method {&quot;tournament&quot;, &quot;rank&quot;, &quot;roulette&quot;}.</span>
+<span class="sd">        Default: &quot;tournament&quot;</span>
+
+<span class="sd">        elitism : float</span>
+<span class="sd">        Value of elitism in [0, 1].</span>
+<span class="sd">        Default: 0.001.</span>
+
+<span class="sd">        prob_mut : float</span>
+<span class="sd">        Probability of mutation in [0, 1].</span>
+<span class="sd">        Default: 0.4</span>
+
+<span class="sd">        distribution : str</span>
+<span class="sd">        {&quot;uniform&quot;, &quot;gaussian&quot;, &quot;random&quot;}</span>
+<span class="sd">        Default: uniform</span>
+
+<span class="sd">        media_distribution : float</span>
+<span class="sd">        Media value for gaussian distributions</span>
+
+<span class="sd">        sd_distribution : float</span>
+<span class="sd">        Standard deviation for gaussian distributions</span>
+<span class="sd">        Default: 1.0</span>
+
+<span class="sd">        min_distribution : float</span>
+<span class="sd">        Minimum value for uniform distributions</span>
+<span class="sd">        Default: -1.0</span>
+
+<span class="sd">        max_distribution : float</span>
+<span class="sd">        Maximum value for uniform distributions</span>
+<span class="sd">        Default: 1.0</span>
+
+<span class="sd">        stopping_early : bool</span>
+<span class="sd">        It needs a not None value for &quot;rounds_stopping&quot; and &quot;tolerance_stopping&quot;.</span>
+<span class="sd">        Default: True</span>
+
+<span class="sd">        rounds_stopping : int</span>
+<span class="sd">        Rounds to consider to stopping early with the tolerance_stopping value.</span>
+<span class="sd">        Default : 100</span>
+
+<span class="sd">        tolerance_stopping : float</span>
+<span class="sd">        Value to stopping early criteria. This value is the difference between the</span>
+<span class="sd">        best fit for the latest rounds_stopping generations.</span>
+<span class="sd">        Default : 0.01</span>
+
+<span class="sd">        outputname : str</span>
+<span class="sd">        Name for the output text file.</span>
+<span class="sd">        Default: &quot;geneticOutput&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_function</span><span class="p">,</span> <span class="n">n_variables</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">n_individuals</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;n_individuals&quot;</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="n">optimization</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;optimization&quot;</span><span class="p">,</span> <span class="s2">&quot;maximize&quot;</span><span class="p">)</span>
+        <span class="n">n_generations</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;n_generations&quot;</span><span class="p">,</span> <span class="mi">250</span><span class="p">)</span>
+        <span class="n">method_selection</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;method_selection&quot;</span><span class="p">,</span> <span class="s2">&quot;tournament&quot;</span><span class="p">)</span>
+        <span class="n">elitism</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;elitism&quot;</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)</span>
+        <span class="n">prob_mut</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;prob_mut&quot;</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">)</span>
+        <span class="n">distribution</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;distribution&quot;</span><span class="p">,</span> <span class="s2">&quot;uniform&quot;</span><span class="p">)</span>
+        <span class="n">media_distribution</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;media_distribution&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">sd_distribution</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;sd_distribution&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">min_distribution</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;min_distribution&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">max_distribution</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;max_distribution&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">stopping_early</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;stopping_early&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">rounds_stopping</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;rounds_stopping&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">tolerance_stopping</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;tolerance_stopping&quot;</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+        <span class="n">outputname</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;outputname&quot;</span><span class="p">,</span> <span class="s2">&quot;geneticOutput&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;Unexpected **kwargs for SimpleGenetic: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kwargs</span><span class="p">))</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_function</span> <span class="o">=</span> <span class="n">target_function</span>
+        <span class="c1"># These bounds are a list where every input is the limit of a param</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">bounds</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lower_bounds</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upper_bounds</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">bound</span> <span class="ow">in</span> <span class="n">bounds</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lower_bounds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bound</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">upper_bounds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bound</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_individuals</span> <span class="o">=</span> <span class="n">n_individuals</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_variables</span> <span class="o">=</span> <span class="n">n_variables</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">distribution</span> <span class="o">=</span> <span class="n">distribution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elitism</span> <span class="o">=</span> <span class="n">elitism</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_distribution</span> <span class="o">=</span> <span class="n">max_distribution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">media_distribution</span> <span class="o">=</span> <span class="n">media_distribution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method_selection</span> <span class="o">=</span> <span class="n">method_selection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_distribution</span> <span class="o">=</span> <span class="n">min_distribution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_generations</span> <span class="o">=</span> <span class="n">n_generations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimization</span> <span class="o">=</span> <span class="n">optimization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopping_early</span> <span class="o">=</span> <span class="n">stopping_early</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prob_mut</span> <span class="o">=</span> <span class="n">prob_mut</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rounds_stopping</span> <span class="o">=</span> <span class="n">rounds_stopping</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sd_distribution</span> <span class="o">=</span> <span class="n">sd_distribution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tolerance_stopping</span>  <span class="o">=</span> <span class="n">tolerance_stopping</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputname</span> <span class="o">=</span> <span class="n">outputname</span>
+
+
+
+<div class="viewcode-block" id="SimpleGenetic.optimize"><a class="viewcode-back" href="../../../API.html#simplemc.analyzers.SimpleGenetic.SimpleGenetic.optimize">[docs]</a>    <span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            This method generates a Population and then optimize it.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            Number of generations</span>
+<span class="sd">            Optimal value of variables:</span>
+<span class="sd">            Target function value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">population</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="n">n_individuals</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_individuals</span><span class="p">,</span>
+                <span class="n">n_variables</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_variables</span><span class="p">,</span>
+                <span class="n">lower_bounds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lower_bounds</span><span class="p">,</span>
+                <span class="n">upper_bounds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">upper_bounds</span><span class="p">)</span>
+
+        <span class="n">o</span> <span class="o">=</span> <span class="n">population</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">target_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_function</span><span class="p">,</span>
+                            <span class="n">optimization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">optimization</span><span class="p">,</span>
+                            <span class="n">n_generations</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_generations</span><span class="p">,</span>
+                            <span class="n">method_selection</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">method_selection</span><span class="p">,</span>
+                            <span class="n">elitism</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">elitism</span><span class="p">,</span>
+                            <span class="n">prob_mut</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prob_mut</span><span class="p">,</span>
+                            <span class="n">distribution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="p">,</span>
+                            <span class="n">media_distribution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">media_distribution</span><span class="p">,</span>
+                            <span class="n">sd_distribution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sd_distribution</span><span class="p">,</span>
+                            <span class="n">min_distribution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_distribution</span><span class="p">,</span>
+                            <span class="n">max_distribution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_distribution</span><span class="p">,</span>
+                            <span class="n">stopping_early</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stopping_early</span><span class="p">,</span>
+                            <span class="n">rounds_stopping</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rounds_stopping</span><span class="p">,</span>
+                            <span class="n">outputname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outputname</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">o</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, A Slosar, JA Vazquez, I Gomez-Vargas.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,441 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>simplemc.analyzers.GA_deap &mdash; SimpleMC latest documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> SimpleMC
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html"><strong>Data</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../inifile.html">Customize ini file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plotters.html"><strong>Plotters</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../analyzers.html"><strong>Analyzers</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Citation.html">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../API.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimpleMC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>simplemc.analyzers.GA_deap</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for simplemc.analyzers.GA_deap</h1><div class="highlight"><pre>
+<span></span>
+
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">simplemc.plots.Plot_elipses</span> <span class="kn">import</span> <span class="n">plot_elipses</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># Importamos libreria de algoritmos evolutivos</span>
+    <span class="kn">from</span> <span class="nn">deap</span> <span class="kn">import</span> <span class="n">base</span><span class="p">,</span> <span class="n">creator</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">algorithms</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">warnings</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Pleas install DEAP library if you want to use ga_deap genetic algorithms.&quot;</span><span class="p">)</span>
+
+<span class="c1"># We import an independent module to implement elitism in the GA.</span>
+<span class="kn">from</span> <span class="nn">simplemc.analyzers</span> <span class="kn">import</span> <span class="n">elitism</span>
+
+<span class="kn">import</span> <span class="nn">scipy.linalg</span> <span class="k">as</span> <span class="nn">la</span>
+
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">numdifftools</span> <span class="k">as</span> <span class="nn">nd</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;install numdifftools&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GA_deap"><a class="viewcode-back" href="../../../API.html#simplemc.analyzers.GA_deap.GA_deap">[docs]</a><span class="k">class</span> <span class="nc">GA_deap</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Genetic algorithms from deap library</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">plot_fitness</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">compute_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> \
+                 <span class="n">show_contours</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">plot_param1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plot_param2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">like</span> <span class="o">=</span> <span class="n">like</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">like</span><span class="o">.</span><span class="n">freeParameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vpars</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">error</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">bounds</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Minimizing...&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vpars</span><span class="p">,</span> <span class="s2">&quot;with bounds&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_fitness</span> <span class="o">=</span> <span class="n">plot_fitness</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compute_errors</span> <span class="o">=</span> <span class="n">compute_errors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_contours</span> <span class="o">=</span> <span class="n">show_contours</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_param1</span> <span class="o">=</span> <span class="n">plot_param1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_param2</span> <span class="o">=</span> <span class="n">plot_param2</span>
+
+        <span class="c1"># Genetic Algorithm constants:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">POPULATION_SIZE</span> <span class="o">=</span> <span class="mi">20</span>    <span class="c1"># 10-20</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">P_CROSSOVER</span> <span class="o">=</span> <span class="mf">0.7</span>       <span class="c1"># probability for crossover</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">P_MUTATION</span> <span class="o">=</span> <span class="mf">0.3</span>        <span class="c1"># (try also 0.5) probability for mutating an individual</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MAX_GENERATIONS</span> <span class="o">=</span> <span class="mi">20</span>    <span class="c1"># 100- 300</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">HALL_OF_FAME_SIZE</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">CROWDING_FACTOR</span> <span class="o">=</span> <span class="mf">20.0</span>  <span class="c1"># crowding factor for crossover and mutation</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">RANDOM_SEED</span> <span class="o">=</span> <span class="mi">42</span>        <span class="c1"># set the random seed</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">DIMENSIONS</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>        <span class="c1"># number of dimensions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">BOUND_LOW</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">BOUND_UP</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span>  <span class="c1"># boundaries for all dimensions</span>
+
+    <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">toolbox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GA</span><span class="p">()</span>
+
+        <span class="c1"># create initial population (generation 0):</span>
+        <span class="n">population</span> <span class="o">=</span> <span class="n">toolbox</span><span class="o">.</span><span class="n">populationCreator</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">POPULATION_SIZE</span><span class="p">)</span>
+
+        <span class="c1"># prepare the statistics object:</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">Statistics</span><span class="p">(</span><span class="k">lambda</span> <span class="n">ind</span><span class="p">:</span> <span class="n">ind</span><span class="o">.</span><span class="n">fitness</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">stats</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">)</span>
+        <span class="n">stats</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;avg&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+
+        <span class="c1"># define the hall-of-fame object:</span>
+        <span class="n">hof</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">HallOfFame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">HALL_OF_FAME_SIZE</span><span class="p">)</span>
+
+        <span class="c1"># perform the Genetic Algorithm flow with elitism:</span>
+        <span class="n">population</span><span class="p">,</span> <span class="n">logbook</span> <span class="o">=</span> <span class="n">elitism</span><span class="o">.</span><span class="n">eaSimpleWithElitism</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">toolbox</span><span class="p">,</span> <span class="n">cxpb</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">P_CROSSOVER</span><span class="p">,</span>\
+                                                          <span class="n">mutpb</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">P_MUTATION</span><span class="p">,</span> <span class="n">ngen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_GENERATIONS</span><span class="p">,</span>\
+                                                          <span class="n">stats</span><span class="o">=</span><span class="n">stats</span><span class="p">,</span> <span class="n">halloffame</span><span class="o">=</span><span class="n">hof</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># print info for best solution found:</span>
+        <span class="n">best</span> <span class="o">=</span> <span class="n">hof</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-- Best Fitness = &quot;</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">fitness</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Best solutions are:&quot;</span><span class="p">)</span>
+        <span class="n">best_params</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">change_prior</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">best</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">best_params</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-- Best </span><span class="si">%s</span><span class="s2"> = &quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+
+        <span class="c1">#for i in range(self.HALL_OF_FAME_SIZE):</span>
+        <span class="c1">#    print(i, &quot;: &quot;, hof.items[i].fitness.values[0], &quot; -&gt; &quot;, self.old_prior(i, hof.items[i]) )</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_fitness</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plotting</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">logbook</span><span class="p">,</span> <span class="n">hof</span><span class="p">)</span>
+
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_errors</span><span class="p">:</span>
+            <span class="n">hess</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="n">Hessian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">negloglike2</span><span class="p">)(</span><span class="n">best_params</span><span class="p">)</span>
+            <span class="n">eigvl</span><span class="p">,</span> <span class="n">eigvc</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">hess</span><span class="p">)</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Hessian&#39;</span><span class="p">,</span> <span class="n">hess</span><span class="p">,</span> <span class="n">eigvl</span><span class="p">,)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cov</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">hess</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Covariance matrix </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">)</span>
+            <span class="c1"># set errors:</span>
+            <span class="c1">#for i, pars in enumerate(self.params):</span>
+            <span class="c1">#    pars.setError(sp.sqrt(self.cov[i, i]))</span>
+        <span class="c1"># update with the final result</span>
+        <span class="c1">#self.result(self.negloglike(self.res.x))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_contours</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_errors</span><span class="p">:</span>
+            <span class="n">param_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">par</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">par</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_param1</span> <span class="ow">in</span> <span class="n">param_names</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_param2</span> <span class="ow">in</span> <span class="n">param_names</span><span class="p">):</span>
+                <span class="n">idx_param1</span> <span class="o">=</span> <span class="n">param_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_param1</span><span class="p">)</span>
+                <span class="n">idx_param2</span> <span class="o">=</span> <span class="n">param_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_param2</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> Not a base parameter, derived-errors still on construction&#39;</span><span class="p">)</span>
+
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+            <span class="n">plot_elipses</span><span class="p">(</span><span class="n">best_params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">,</span> <span class="n">idx_param1</span><span class="p">,</span> <span class="n">idx_param2</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">population</span><span class="p">,</span> <span class="n">logbook</span><span class="p">,</span> <span class="n">hof</span>
+
+
+
+    <span class="c1"># helper function for creating random real numbers uniformly distributed within a given range [low, up]</span>
+    <span class="c1"># it assumes that the range is the same for every dimension</span>
+    <span class="k">def</span> <span class="nf">randomFloat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">up</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">u</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">low</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">DIMENSIONS</span><span class="p">,</span> <span class="p">[</span><span class="n">up</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">DIMENSIONS</span><span class="p">)]</span>
+
+
+
+
+    <span class="k">def</span> <span class="nf">GA</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RANDOM_SEED</span><span class="p">)</span>
+        <span class="n">toolbox</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">Toolbox</span><span class="p">()</span>
+
+        <span class="c1"># define a single objective, minimizing fitness strategy:</span>
+        <span class="n">creator</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;FitnessMin&quot;</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">Fitness</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,))</span>
+
+        <span class="c1"># create the Individual class based on list:</span>
+        <span class="n">creator</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;Individual&quot;</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">fitness</span><span class="o">=</span><span class="n">creator</span><span class="o">.</span><span class="n">FitnessMin</span><span class="p">)</span>
+
+        <span class="c1"># create an operator that randomly returns a float in the desired range and dimension:</span>
+        <span class="n">toolbox</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;attrFloat&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">randomFloat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">BOUND_LOW</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">BOUND_UP</span><span class="p">)</span>
+
+        <span class="c1"># create the individual operator to fill up an Individual instance:</span>
+        <span class="n">toolbox</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;individualCreator&quot;</span><span class="p">,</span> <span class="n">tools</span><span class="o">.</span><span class="n">initIterate</span><span class="p">,</span> <span class="n">creator</span><span class="o">.</span><span class="n">Individual</span><span class="p">,</span> <span class="n">toolbox</span><span class="o">.</span><span class="n">attrFloat</span><span class="p">)</span>
+
+        <span class="c1"># create the population operator to generate a list of individuals:</span>
+        <span class="n">toolbox</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;populationCreator&quot;</span><span class="p">,</span> <span class="n">tools</span><span class="o">.</span><span class="n">initRepeat</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">toolbox</span><span class="o">.</span><span class="n">individualCreator</span><span class="p">)</span>
+
+        <span class="c1">## ----- here the connection</span>
+        <span class="n">toolbox</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;evaluate&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">negloglike</span><span class="p">)</span>
+        <span class="c1">## -----</span>
+
+        <span class="c1"># genetic operators:</span>
+        <span class="n">toolbox</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;select&quot;</span><span class="p">,</span> <span class="n">tools</span><span class="o">.</span><span class="n">selTournament</span><span class="p">,</span> <span class="n">tournsize</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">toolbox</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;mate&quot;</span><span class="p">,</span> <span class="n">tools</span><span class="o">.</span><span class="n">cxSimulatedBinaryBounded</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">BOUND_LOW</span><span class="p">,</span> \
+                         <span class="n">up</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">BOUND_UP</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">CROWDING_FACTOR</span><span class="p">)</span>
+        <span class="n">toolbox</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;mutate&quot;</span><span class="p">,</span> <span class="n">tools</span><span class="o">.</span><span class="n">mutPolynomialBounded</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">BOUND_LOW</span><span class="p">,</span> \
+                         <span class="n">up</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">BOUND_UP</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">CROWDING_FACTOR</span><span class="p">,</span> <span class="n">indpb</span><span class="o">=</span><span class="mf">1.0</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">DIMENSIONS</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">toolbox</span>
+
+
+
+    <span class="k">def</span> <span class="nf">plotting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">hof</span><span class="p">):</span>
+
+        <span class="c1"># extract statistics</span>
+        <span class="n">gen</span><span class="p">,</span> <span class="n">avg</span><span class="p">,</span> <span class="n">min_</span><span class="p">,</span> <span class="n">max_</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;gen&quot;</span><span class="p">,</span> <span class="s2">&quot;avg&quot;</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">gen</span><span class="p">,</span> <span class="n">min_</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;minimum&quot;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Fitness Evolution&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Generation&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Fitness&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">)</span>
+        <span class="c1">#plt.savefig(&#39;GA_wwCDM_150.pdf&#39;)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+
+    <span class="k">def</span> <span class="nf">negloglike</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pars</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">):</span>
+            <span class="n">new_par</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_prior</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">pars</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">new_par</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">like</span><span class="o">.</span><span class="n">updateParams</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">loglike</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">like</span><span class="o">.</span><span class="n">loglike_wprior</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">loglike</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-1-&#39;</span><span class="o">*</span><span class="mi">10</span><span class="p">,</span><span class="n">loglike</span><span class="p">,</span><span class="s1">&#39;--&#39;</span><span class="o">*</span><span class="mi">10</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lastval</span><span class="o">+</span><span class="mi">10</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lastval</span> <span class="o">=</span> <span class="o">-</span><span class="n">loglike</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">loglike</span><span class="p">,</span>
+
+
+    <span class="k">def</span> <span class="nf">negloglike2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pars</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">):</span>
+            <span class="n">pars</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">like</span><span class="o">.</span><span class="n">updateParams</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">loglike</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">like</span><span class="o">.</span><span class="n">loglike_wprior</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">loglike</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lastval</span><span class="o">+</span><span class="mi">10</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lastval</span> <span class="o">=</span> <span class="o">-</span><span class="n">loglike</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">loglike</span>
+
+
+
+    <span class="k">def</span> <span class="nf">change_prior</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">new_par</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">x</span>
+        <span class="k">return</span> <span class="n">new_par</span>
+
+    <span class="k">def</span> <span class="nf">old_prior</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">old_par</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">old_par</span>
+
+
+    <span class="k">def</span> <span class="nf">result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loglike</span><span class="p">):</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;------&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimal loglike : &quot;</span><span class="p">,</span> <span class="n">loglike</span><span class="p">)</span></div>
+
+
+<span class="k">if</span>  <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span> <span class="p">:</span>
+    <span class="n">g</span><span class="o">=</span> <span class="n">GA_deap</span><span class="p">()</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">GA</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, A Slosar, JA Vazquez, I Gomez-Vargas.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

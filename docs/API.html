@@ -39,7 +39,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Plotters" href="plotters.html" /> 
+    <link rel="prev" title="Citation" href="Citation.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -90,11 +90,18 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data.html"><strong>Data</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="inifile.html">Customize ini file</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plotters.html"><strong>Plotters</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyzers.html"><strong>Analyzers</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Citation.html">Citation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#run-modules"><strong>Run modules</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-simplemc.DriverMC">Top level interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-simplemc.likelihoods.BaseLikelihood">Likelihood</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-simplemc.cosmo.Parameter">Cosmo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-simplemc.models.LCDMCosmology">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-simplemc.analyzers.MCMCAnalyzer">Analyzers</a></li>
 </ul>
 </li>
 </ul>
@@ -166,9 +173,727 @@
             
   <div class="section" id="api">
 <h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
-<p>This page details the methods and classes provided by the <cite>SimpleMC</cite>.</p>
-<div class="section" id="run-modules">
-<h2><strong>Run modules</strong><a class="headerlink" href="#run-modules" title="Permalink to this headline">¶</a></h2>
+<p>This page details the methods and classes provided by the <code class="docutils literal notranslate"><span class="pre">SimpleMC</span></code>.</p>
+<div class="section" id="module-simplemc.DriverMC">
+<span id="top-level-interface"></span><h2>Top level interface<a class="headerlink" href="#module-simplemc.DriverMC" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="simplemc.DriverMC.DriverMC">
+<em class="property">class </em><code class="sig-prename descclassname">simplemc.DriverMC.</code><code class="sig-name descname">DriverMC</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">iniFile</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class is the manager and wrapper between all
+the analyzers and the pertinent functions.</p>
+<dl class="py method">
+<dt id="simplemc.DriverMC.DriverMC.emceeRunner">
+<code class="sig-name descname">emceeRunner</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">iniFile</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.emceeRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.emceeRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method calls the emcee library to use ensamble sampler.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>walkers</strong> (<em>int</em>) – Number of walkers or ensambles.</p></li>
+<li><p><strong>nsamp</strong> (<em>int</em>) – Number of mcmc steps for each walker.</p></li>
+<li><p><strong>burnin</strong> (<em>int</em>) – skip steps.</p></li>
+<li><p><strong>nproc</strong> (<em>int</em>) – Number of processors in order to parallelise.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.DriverMC.DriverMC.executer">
+<code class="sig-name descname">executer</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.executer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.executer" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a wrapper of the runners of the analyzer in order to make
+easier the execution, mainly if is through an ini file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>the parameters of the methods</strong> (<em>All</em>) – <ul class="simple">
+<li><p>mcmcRunner</p></li>
+<li><p>nestedRunner</p></li>
+<li><p>emceeRunner</p></li>
+<li><p>geneticRunner</p></li>
+<li><p>maxlikeRunner</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.DriverMC.DriverMC.geneticRunner">
+<code class="sig-name descname">geneticRunner</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">iniFile</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.geneticRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.geneticRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>It calls SimpleGenetic class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_individuals</strong> (<em>int</em>) – Number of individuals.</p></li>
+<li><p><strong>n_generations</strong> (<em>int</em>) – Number of generations.</p></li>
+<li><p><strong>selection_method</strong> (<em>str</em>) – Selection method {tournament, roulette, rank}</p></li>
+<li><p><strong>mut_prob</strong> (<em>float</em>) – Probability of mutation.</p></li>
+<li><p><strong>distribution</strong> (<em>str</em>) – {“uniform”, “gaussian”, “random”}
+Default: uniform</p></li>
+<li><p><strong>media_distribution</strong> (<em>float</em>) – Media value for gaussian distributions</p></li>
+<li><p><strong>sd_distribution</strong> (<em>float</em>) – Standard deviation for gaussian distributions
+Default: 1.0</p></li>
+<li><p><strong>min_distribution</strong> (<em>float</em>) – Minimum value for uniform distributions
+Default: -1.0</p></li>
+<li><p><strong>max_distribution</strong> (<em>float</em>) – Maximum value for uniform distributions
+Default: 1.0</p></li>
+<li><p><strong>stopping_early</strong> (<em>bool</em>) – It needs a not None value for “rounds_stopping” and “tolerance_stopping”.
+Default: True</p></li>
+<li><p><strong>rounds_stopping</strong> (<em>int</em>) – Rounds to consider to stopping early with the tolerance_stopping value.
+Default : 100</p></li>
+<li><p><strong>tolerance_stopping</strong> (<em>float</em>) – Value to stopping early criteria. This value is the difference between the
+best fit for the latest rounds_stopping generations.
+Default : 0.01</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.DriverMC.DriverMC.iniReader">
+<code class="sig-name descname">iniReader</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">iniFile</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.iniReader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.iniReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>It reads the ini file through configparser.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>iniFile</strong> (<em>file .ini</em>) – Text file with settings</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.DriverMC.DriverMC.logLike">
+<code class="sig-name descname">logLike</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.logLike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.logLike" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the sampler used isn’t the MCMC of MCMCAnalyzer then, we need to set
+other types of likelihoods and priors objects. This method allows that. It is a
+likelihood defined for an external samplers and is used
+as parameter of the sampler run function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>values</strong> (<em>n-dim vector</em>) – implicit values, they are generated by the sampler.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.DriverMC.DriverMC.logPosterior">
+<code class="sig-name descname">logPosterior</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">theta</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.logPosterior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.logPosterior" title="Permalink to this definition">¶</a></dt>
+<dd><p>The natural logarithm of the joint posterior.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>theta</strong> (<em>tuple</em>) – A sample containing individual parameter values</p></li>
+<li><p><strong>data</strong> (<em>list</em>) – The set of data/observations</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>) – The standard deviation of the data points</p></li>
+<li><p><strong>x</strong> (<em>list</em>) – The abscissa values at which the data/model is defined</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.DriverMC.DriverMC.logPrior">
+<code class="sig-name descname">logPrior</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">theta</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.logPrior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.logPrior" title="Permalink to this definition">¶</a></dt>
+<dd><p>The natural logarithm of the prior probability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>theta</strong> (<em>tuple</em>) – A sample containing individual parameter values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.DriverMC.DriverMC.maxLikeRunner">
+<code class="sig-name descname">maxLikeRunner</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">iniFile</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.maxLikeRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.maxLikeRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>It calls MaxLikeAnalyzer class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>withErrors</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>plot_par1</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>plot_par2</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.DriverMC.DriverMC.mcmcRunner">
+<code class="sig-name descname">mcmcRunner</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">iniFile</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.mcmcRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.mcmcRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method calls MCMCAnalyzer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nsamp</strong> (<em>int</em>) – Number of mcmc steps.</p></li>
+<li><p><strong>skip</strong> (<em>int</em>) – Burn-in.</p></li>
+<li><p><strong>temp</strong> (<em>float</em>) – Temperature for the weights.</p></li>
+<li><p><strong>chainno</strong> (<em>int</em>) – Number of chains in parallel.</p></li>
+<li><p><strong>GRstop</strong> (<em>float</em>) – Gelman Rubin criteria for stopping (0, 0.1].</p></li>
+<li><p><strong>evidence</strong> (<em>bool</em>) – True if after the mcmc chain was generated,
+estimates bayesian evidence throug MCEvidence (arXiv:1704.03472).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.DriverMC.DriverMC.mppool">
+<code class="sig-name descname">mppool</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nproc</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.mppool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.mppool" title="Permalink to this definition">¶</a></dt>
+<dd><p>It creates a multiprocessing objet to parallelise nested and emcee samplers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>nproc</strong> (<em>int</em>) – number of processors to use.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>pool</strong> (<em>multiprocessing.Pool</em>) – object</p></li>
+<li><p><strong>nproc</strong> (<em>int</em>) – Number of processes</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.DriverMC.DriverMC.nestedRunner">
+<code class="sig-name descname">nestedRunner</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">iniFile</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.nestedRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.nestedRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method calls Dynesty samplers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>engine</strong> (<em>str</em>) – Use dynesty or nestle library</p></li>
+<li><p><strong>dynamic</strong> (<em>bool</em>) – Default <cite>False</cite></p></li>
+<li><p><strong>neuralNetwork</strong> (<em>bool</em>) – If True use a pybambi neural network.
+Default: False.</p></li>
+<li><p><strong>nestedType</strong> (<em>str</em>) – {single, multi, balls, cubes}</p></li>
+<li><p><strong>nlivepoints</strong> (<em>int</em>) – Number of live points.</p></li>
+<li><p><strong>accuracy</strong> (<em>float</em>) – Stopping criteria in terms of logz.</p></li>
+<li><p><strong>nproc</strong> (<em>int</em>) – Number of processors to parallelize.
+Use 1 or 0 if you don’t want parallelise.</p></li>
+<li><p><strong>priortype</strong> (<em>str</em>) – Gaussian or uniform prior {‘g’, ‘u’}.</p></li>
+<li><p><strong>nsigma</strong> (<em>float</em>) – Sigma for gaussian priors.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.DriverMC.DriverMC.outputChecker">
+<code class="sig-name descname">outputChecker</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.outputChecker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.outputChecker" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method check if the name of the outputfile exists, if it already exists creates a
+new one with extension _new in its name.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.DriverMC.DriverMC.paramFiles">
+<code class="sig-name descname">paramFiles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.paramFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.paramFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method writes the .paramnames file with theirs LaTeX names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>T</strong> (<em>model</em>) – T is result of ParseModel(model)</p></li>
+<li><p><strong>L</strong> (<em>likelihood</em>) – L is result of ParseDataset(datasets)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.DriverMC.DriverMC.plot">
+<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple connection with the plotters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>show</strong> (<em>bool</em>) – Default False</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.DriverMC.DriverMC.postprocess">
+<code class="sig-name descname">postprocess</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">summary</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">stats</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">addtxt</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.postprocess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.postprocess" title="Permalink to this definition">¶</a></dt>
+<dd><p>It calls the PostProcessing class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>summary</strong> (<em>bool</em>) – True for save summary.</p></li>
+<li><p><strong>addtxt</strong> (<em>list</em>) – A list with strings to save with the summary.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.DriverMC.DriverMC.priorTransform">
+<code class="sig-name descname">priorTransform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">theta</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/DriverMC.html#DriverMC.priorTransform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.DriverMC.DriverMC.priorTransform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prior Transform for gaussian and flat priors</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-simplemc.CosmoCalc"></span><dl class="py class">
+<dt id="simplemc.CosmoCalc.CosmoCalc">
+<em class="property">class </em><code class="sig-prename descclassname">simplemc.CosmoCalc.</code><code class="sig-name descname">CosmoCalc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">funct</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">param</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">minparam</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">maxparam</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nsteps</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">savepdf</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">zmax</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">plot_data</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/CosmoCalc.html#CosmoCalc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.CosmoCalc.CosmoCalc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Cosmological calculator to plot the basic functions</p>
+</dd></dl>
+
+<span class="target" id="module-simplemc.PostProcessing"></span><p>This module processes the samples from a nested sampler and prints, saves chains in a text file
+and creates a param file.</p>
+<dl class="py class">
+<dt id="simplemc.PostProcessing.PostProcessing">
+<em class="property">class </em><code class="sig-prename descclassname">simplemc.PostProcessing.</code><code class="sig-name descname">PostProcessing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">list_result</span></em>, <em class="sig-param"><span class="n">paramList</span></em>, <em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">skip</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">engine</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">addDerived</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">loglike</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/PostProcessing.html#PostProcessing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.PostProcessing.PostProcessing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>In this class we…</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-simplemc.likelihoods.BaseLikelihood">
+<span id="likelihood"></span><h2>Likelihood<a class="headerlink" href="#module-simplemc.likelihoods.BaseLikelihood" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="simplemc.likelihoods.BaseLikelihood.BaseLikelihood">
+<em class="property">class </em><code class="sig-prename descclassname">simplemc.likelihoods.BaseLikelihood.</code><code class="sig-name descname">BaseLikelihood</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/likelihoods/BaseLikelihood.html#BaseLikelihood"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.likelihoods.BaseLikelihood.BaseLikelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is the base likelihood object. Base for all other likelihoods.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-simplemc.cosmo.Parameter">
+<span id="cosmo"></span><h2>Cosmo<a class="headerlink" href="#module-simplemc.cosmo.Parameter" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="simplemc.cosmo.Parameter.Parameter">
+<em class="property">class </em><code class="sig-prename descclassname">simplemc.cosmo.Parameter.</code><code class="sig-name descname">Parameter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">err</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">bounds</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">Ltxname</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/Parameter.html#Parameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.Parameter.Parameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A simple class for dealing with Parameter.
+Parameter has a name, a value, an error and some bounds
+Names are also latex names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>string</em>) – Name to identify the parameter.</p></li>
+<li><p><strong>value</strong> (<em>float</em>) – Default value. In mcmc will be the stating value.</p></li>
+<li><p><strong>err</strong> (<em>float</em><em>, </em><em>optional</em>) – Estimated error, in mcmc will be the step.
+Default is 0, but better to write any positive number.</p></li>
+<li><p><strong>bounds</strong> (<em>list of 2</em><em>, </em><em>optional</em>) – Priors. (minimum value, maximum value).
+Default is None, but computed as ‘(value-5*err, value+5*err)’.</p></li>
+<li><p><strong>Ltxname</strong> (<em>string</em><em>, </em><em>optional</em>) – Latex name, use mainly for plotting.
+Default is None, and in this case uses the ‘name’ string.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>The hubble parameter
+h_par    = Parameter(‘h’, 0.6821,  0.05,   (0.4, 1.0),    ‘h’)</p>
+</dd></dl>
+
+<span class="target" id="module-simplemc.cosmo.BaseCosmology"></span><dl class="py class">
+<dt id="simplemc.cosmo.BaseCosmology.BaseCosmology">
+<em class="property">class </em><code class="sig-prename descclassname">simplemc.cosmo.BaseCosmology.</code><code class="sig-name descname">BaseCosmology</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">h</span><span class="o">=</span><span class="default_value">0.6821</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/BaseCosmology.html#BaseCosmology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.BaseCosmology.BaseCosmology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base Cosmology class doesn’t know about your
+parameterization of the equation of state or densities or anything.
+However, it does know about Hubble’s constant at z=0 OR the prefactor
+c/(H0*rd) which should be fit for in the case of “rd agnostic” fits.
+That is why you should let it declare those parameters based on its settings</p>
+<p>However, to get the angular diameter distance you need to pass it
+its Curvature parameter (Omega_k basically), so you need to update it.</p>
+<p>Also to use fs8 dataset you need to add s8 parameter
+:param h:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>speed of light in km s^-1</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-simplemc.cosmo.RadiationAndNeutrinos"></span><dl class="py class">
+<dt id="simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos">
+<em class="property">class </em><code class="sig-prename descclassname">simplemc.cosmo.RadiationAndNeutrinos.</code><code class="sig-name descname">RadiationAndNeutrinos</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mnu</span><span class="o">=</span><span class="default_value">0.06</span></em>, <em class="sig-param"><span class="n">Nnu</span><span class="o">=</span><span class="default_value">3.046</span></em>, <em class="sig-param"><span class="n">varyMnu</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">varyNnu</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">degenerate</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">disable</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/RadiationAndNeutrinos.html#RadiationAndNeutrinos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for neutrinos, Mnu and Nnu
+:param mnu:
+:type mnu: standard value for the mass of neutrinos
+:param Nnu:
+:type Nnu: standard value for the number of families
+:param varyMnu:
+:type varyMnu: Whether varying mass for neutrinos
+:param varyNnu:
+:type varyNnu: Whether varying families for neutrinos
+:param degenerate:
+:param disable:
+:type disable: set radiation to zero</p>
+</dd></dl>
+
+<span class="target" id="module-simplemc.cosmo.NuDensity"></span><dl class="py class">
+<dt id="simplemc.cosmo.NuDensity.NuDensity">
+<em class="property">class </em><code class="sig-prename descclassname">simplemc.cosmo.NuDensity.</code><code class="sig-name descname">NuDensity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">TCMB</span></em>, <em class="sig-param"><span class="n">Nnu</span><span class="o">=</span><span class="default_value">3.046</span></em>, <em class="sig-param"><span class="n">mnu</span><span class="o">=</span><span class="default_value">0.06</span></em>, <em class="sig-param"><span class="n">degenerate</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">fact</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/NuDensity.html#NuDensity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.NuDensity.NuDensity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Compute Density parameter for neutrinos.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>TCMB</strong> (<em>float</em>) – Temperature of the CMB.</p></li>
+<li><p><strong>Nnu</strong> (<em>float</em><em>, </em><em>optional</em>) – Families of neutrinos.
+Default value is ‘Neff=3.046’.</p></li>
+<li><p><strong>mnu</strong> (<em>float</em><em>, </em><em>optional</em>) – Sum of the neutrino masses.
+Default value is ‘mnu=0.06’.</p></li>
+<li><p><strong>degenerate</strong> (<em>bool</em><em>, </em><em>optional</em>) – Combinations of massive neutrinos.</p></li>
+<li><p><strong>fact</strong> (<em>float</em><em>, </em><em>optional</em>) – The ration contribution: omrad_fac   = 4.48130979e-7</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="simplemc.cosmo.NuDensity.NuDensity.rho">
+<code class="sig-name descname">rho</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/NuDensity.html#NuDensity.rho"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.NuDensity.NuDensity.rho" title="Permalink to this definition">¶</a></dt>
+<dd><p>Neutrinos density
+:param a:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>This returns the density at a normalized so that</em></p></li>
+<li><p><em>we get nuh2 at a=0</em></p></li>
+<li><p><em>(1 eV) / (Boltzmann constant * 1 kelvin) = 11 604.5193</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simplemc.cosmo.NuDensity.NuIntegral">
+<em class="property">class </em><code class="sig-prename descclassname">simplemc.cosmo.NuDensity.</code><code class="sig-name descname">NuIntegral</code><a class="reference internal" href="_modules/simplemc/cosmo/NuDensity.html#NuIntegral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.NuDensity.NuIntegral" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<blockquote>
+<div><p>This module calculates the predictions for the evolution
+of neutrino energy densities.
+Here, we compute the integral I(r).
+Initialiazes the</p>
+</div></blockquote>
+<p>u factor in
+ho_nu (self.interpolator)</p>
+<dl class="py method">
+<dt id="simplemc.cosmo.NuDensity.NuIntegral.SevenEights">
+<code class="sig-name descname">SevenEights</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mnuOT</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/NuDensity.html#NuIntegral.SevenEights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.NuDensity.NuIntegral.SevenEights" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Given the</p>
+</div></blockquote>
+<dl>
+<dt>u mass, returns the integral on the energy</dt><dd><p>density of neutrinos.</p>
+<dl class="simple">
+<dt>mnuOT: float</dt><dd><p>Sum of the neutrino masses.</p>
+</dd>
+</dl>
+<blockquote>
+<div><p>The integral given the sum of neutrino masses.
+For massless neutrinosI(0)=78.</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simplemc.cosmo.NuDensity.ZeroNuDensity">
+<em class="property">class </em><code class="sig-prename descclassname">simplemc.cosmo.NuDensity.</code><code class="sig-name descname">ZeroNuDensity</code><a class="reference internal" href="_modules/simplemc/cosmo/NuDensity.html#ZeroNuDensity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.NuDensity.ZeroNuDensity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Fake class that returns zeros if want to disable neutrino contributions.</p>
+</dd></dl>
+
+<span class="target" id="module-simplemc.cosmo.Derivedparam"></span><dl class="py class">
+<dt id="simplemc.cosmo.Derivedparam.AllDerived">
+<em class="property">class </em><code class="sig-prename descclassname">simplemc.cosmo.Derivedparam.</code><code class="sig-name descname">AllDerived</code><a class="reference internal" href="_modules/simplemc/cosmo/Derivedparam.html#AllDerived"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.Derivedparam.AllDerived" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Given base parameters, return a list of some Derived ones.</p>
+<dl class="py method">
+<dt id="simplemc.cosmo.Derivedparam.AllDerived.Omh2">
+<code class="sig-name descname">Omh2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">z1</span></em>, <em class="sig-param"><span class="n">z2</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/Derivedparam.html#AllDerived.Omh2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.Derivedparam.AllDerived.Omh2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the Omh2 diagnostic at two redshifts
+to test deviations from the LCDM model.
+For LCDM the value is a constant for any combination
+of redshifts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z1</strong> (<em>float</em>) – Redshift z1 to compute the diagnotic.</p></li>
+<li><p><strong>z2</strong> (<em>float</em>) – Redshift z2 to compute the diagnotic.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>Obh2</strong> – Obh2 dianotic: see [arXiv:1406.2209].</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.cosmo.Derivedparam.AllDerived.computeDerived">
+<code class="sig-name descname">computeDerived</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parname</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/Derivedparam.html#AllDerived.computeDerived"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.Derivedparam.AllDerived.computeDerived" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize and compute Derived parameters in
+terms of the base ones.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.cosmo.Derivedparam.AllDerived.listDerived">
+<code class="sig-name descname">listDerived</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">like</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/Derivedparam.html#AllDerived.listDerived"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.Derivedparam.AllDerived.listDerived" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given the free parameters compute derived ones.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>like</strong> (<em>object</em>) – object defined in BaseLikelihood, that contains
+free-parameters and theory.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>list</strong> – List with values from derived parameters.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="simplemc.cosmo.Derivedparam.Derivedparam">
+<em class="property">class </em><code class="sig-prename descclassname">simplemc.cosmo.Derivedparam.</code><code class="sig-name descname">Derivedparam</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">Ltxname</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/cosmo/Derivedparam.html#Derivedparam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.cosmo.Derivedparam.Derivedparam" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Auxiliary class, based on Parameter class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>string</em>) – Parameter name.</p></li>
+<li><p><strong>value</strong> (<em>float</em>) – Initialize the value, and use a function to update it.</p></li>
+<li><p><strong>Ltxname</strong> (<em>string</em><em>, </em><em>optional</em>) – Provide the Latex name, useful for plotting.
+Default is None, and in this case uses the ‘name’ string.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>Hubble parameter
+self.H0   = Derivedparam(‘H0’,  function, ‘H_0*’)</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-simplemc.models.LCDMCosmology">
+<span id="models"></span><h2>Models<a class="headerlink" href="#module-simplemc.models.LCDMCosmology" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="simplemc.models.LCDMCosmology.LCDMCosmology">
+<em class="property">class </em><code class="sig-prename descclassname">simplemc.models.LCDMCosmology.</code><code class="sig-name descname">LCDMCosmology</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Obh2</span><span class="o">=</span><span class="default_value">0.02234</span></em>, <em class="sig-param"><span class="n">Om</span><span class="o">=</span><span class="default_value">0.3038</span></em>, <em class="sig-param"><span class="n">h</span><span class="o">=</span><span class="default_value">0.6821</span></em>, <em class="sig-param"><span class="n">mnu</span><span class="o">=</span><span class="default_value">0.06</span></em>, <em class="sig-param"><span class="n">Nnu</span><span class="o">=</span><span class="default_value">3.046</span></em>, <em class="sig-param"><span class="n">degenerate_nu</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">disable_radiation</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">fixOm</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/LCDMCosmology.html#LCDMCosmology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.LCDMCosmology.LCDMCosmology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simplemc.cosmo.BaseCosmology.BaseCosmology" title="simplemc.cosmo.BaseCosmology.BaseCosmology"><code class="xref py py-class docutils literal notranslate"><span class="pre">simplemc.cosmo.BaseCosmology.BaseCosmology</span></code></a>, <a class="reference internal" href="#simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos" title="simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos"><code class="xref py py-class docutils literal notranslate"><span class="pre">simplemc.cosmo.RadiationAndNeutrinos.RadiationAndNeutrinos</span></code></a></p>
+<p>This is LCDM cosmology
+I didn’t intend it that way, but it is used as a base class
+for most other cosmologies, mostly because it treats Neutrinos and Radiation
+hassle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Obh2</strong> – </p></li>
+<li><p><strong>Om</strong> – </p></li>
+<li><p><strong>h</strong> – </p></li>
+<li><p><strong>mnu</strong> – </p></li>
+<li><p><strong>Nnu</strong> – </p></li>
+<li><p><strong>degenerate_nu</strong> – </p></li>
+<li><p><strong>disable_radiation</strong> – </p></li>
+<li><p><strong>fixOm</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-simplemc.models.SimpleModel"></span><dl class="py class">
+<dt id="simplemc.models.SimpleModel.SimpleModel">
+<em class="property">class </em><code class="sig-prename descclassname">simplemc.models.SimpleModel.</code><code class="sig-name descname">SimpleModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span></em>, <em class="sig-param"><span class="n">function</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/SimpleModel.html#SimpleModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.SimpleModel.SimpleModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is a generic model</p>
+</dd></dl>
+
+<span class="target" id="module-simplemc.models.owa0CDMCosmology"></span><dl class="py class">
+<dt id="simplemc.models.owa0CDMCosmology.owa0CDMCosmology">
+<em class="property">class </em><code class="sig-prename descclassname">simplemc.models.owa0CDMCosmology.</code><code class="sig-name descname">owa0CDMCosmology</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">varyw</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">varywa</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">varyOk</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/models/owa0CDMCosmology.html#owa0CDMCosmology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.models.owa0CDMCosmology.owa0CDMCosmology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simplemc.models.LCDMCosmology.LCDMCosmology" title="simplemc.models.LCDMCosmology.LCDMCosmology"><code class="xref py py-class docutils literal notranslate"><span class="pre">simplemc.models.LCDMCosmology.LCDMCosmology</span></code></a></p>
+<p>This is CDM cosmology with w, wa and Ok
+:param varyw:
+:param varywa:
+:param varyOk:</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-simplemc.analyzers.MCMCAnalyzer">
+<span id="analyzers"></span><h2>Analyzers<a class="headerlink" href="#module-simplemc.analyzers.MCMCAnalyzer" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer">
+<em class="property">class </em><code class="sig-prename descclassname">simplemc.analyzers.MCMCAnalyzer.</code><code class="sig-name descname">MCMCAnalyzer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">like</span></em>, <em class="sig-param"><span class="n">outfile</span></em>, <em class="sig-param"><span class="n">skip</span><span class="o">=</span><span class="default_value">5000</span></em>, <em class="sig-param"><span class="n">nsamp</span><span class="o">=</span><span class="default_value">100000</span></em>, <em class="sig-param"><span class="n">temp</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">cov</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">chain_num</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">addDerived</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">GRstop</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">checkGR</span><span class="o">=</span><span class="default_value">500</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/MCMCAnalyzer.html#MCMCAnalyzer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>MCMC sampler (Metropolis-Hastings).
+This is the MCMC module. It spits out chains that are compatible with CosmoM
+it calculates cov matrix during burn-in.
+optional temperature makes it sample at a higher temperature but note that
+this guy, as opposed to cosmomc, reweights the weights on the fly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>like</strong> (<em>Likelihood object</em>) – Object of a Likelihood class.</p></li>
+<li><p><strong>outfile</strong> (<em>str</em>) – Output file.</p></li>
+<li><p><strong>skip</strong> (<em>int</em>) – Burn-in.</p></li>
+<li><p><strong>nsamp</strong> (<em>int</em>) – Number of mcmc samples.</p></li>
+<li><p><strong>temp</strong> (<em>float</em>) – Temperature</p></li>
+<li><p><strong>cov</strong> (<em>numpy.array</em>) – Covariance matrix. Default: None.</p></li>
+<li><p><strong>addDerived</strong> (<em>bool</em>) – In order to ad derived parameters such as age of the universe and Omega_{Lambda}</p></li>
+<li><p><strong>GRstop</strong> (<em>float</em>) – Gelman-Rubin criteria</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.GRDRun">
+<code class="sig-name descname">GRDRun</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chains</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/MCMCAnalyzer.html#MCMCAnalyzer.GRDRun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.GRDRun" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a implementation of the Gelman Rubin diagnostic.
+If the number of chains is 1, then this method divides it in two
+and does the diagnostic for convergence.
+:param chains:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.GetProposal">
+<code class="sig-name descname">GetProposal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/MCMCAnalyzer.html#MCMCAnalyzer.GetProposal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.GetProposal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generation of proposal point in mcmc</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.getLikes">
+<code class="sig-name descname">getLikes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/MCMCAnalyzer.html#MCMCAnalyzer.getLikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.getLikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get loglikelihoods values from the used data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.openFiles">
+<code class="sig-name descname">openFiles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/MCMCAnalyzer.html#MCMCAnalyzer.openFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.MCMCAnalyzer.MCMCAnalyzer.openFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the files to save the samples and maxlike.
+Also add the Dervided Parameters if addDerived option is True.</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-simplemc.analyzers.MaxLikeAnalyzer"></span><span class="target" id="module-simplemc.analyzers.GA_deap"></span><dl class="py class">
+<dt id="simplemc.analyzers.GA_deap.GA_deap">
+<em class="property">class </em><code class="sig-prename descclassname">simplemc.analyzers.GA_deap.</code><code class="sig-name descname">GA_deap</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">like</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">plot_fitness</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">compute_errors</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">show_contours</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">plot_param1</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">plot_param2</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/GA_deap.html#GA_deap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.GA_deap.GA_deap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Genetic algorithms from deap library</p>
+</dd></dl>
+
+<span class="target" id="module-simplemc.analyzers.SimpleGenetic"></span><dl class="py class">
+<dt id="simplemc.analyzers.SimpleGenetic.SimpleGenetic">
+<em class="property">class </em><code class="sig-prename descclassname">simplemc.analyzers.SimpleGenetic.</code><code class="sig-name descname">SimpleGenetic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target_function</span></em>, <em class="sig-param"><span class="n">n_variables</span></em>, <em class="sig-param"><span class="n">bounds</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/SimpleGenetic.html#SimpleGenetic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.SimpleGenetic.SimpleGenetic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>SimpleGenetic use the optimization method from Population class and execute it.
+This script are a modified version of:
+<a class="reference external" href="https://www.cienciadedatos.net/documentos/py01_optimizacion_ga">https://www.cienciadedatos.net/documentos/py01_optimizacion_ga</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_function</strong> (<em>method</em>) – </p></li>
+<li><p><strong>the likelihood function.</strong> (<em>Usually</em>) – </p></li>
+<li><p><strong>n_variables</strong> (<em>int</em>) – </p></li>
+<li><p><strong>of variables</strong><strong> or </strong><strong>free parameters</strong> (<em>Number</em>) – </p></li>
+<li><p><strong>bounds</strong> (<em>list</em>) – </p></li>
+<li><p><strong>with upper and lower bounds for each free parameter</strong> (<em>List</em>) – </p></li>
+<li><p><strong>n_individuals</strong> (<em>int</em>) – </p></li>
+<li><p><strong>of initial individuals</strong> (<em>Number</em>) – </p></li>
+<li><p><strong>optimization</strong> (<em>str</em>) – </p></li>
+<li><p><strong>{&quot;maximize&quot;</strong> (<em>Options</em>) – </p></li>
+<li><p><strong>Default is &quot;maximize&quot;</strong> (<em>&quot;minimize&quot;}.</em>) – </p></li>
+<li><p><strong>n_generations</strong> (<em>int</em>) – </p></li>
+<li><p><strong>of generations to evolve the original population</strong> (<em>Number</em>) – </p></li>
+<li><p><strong>method_selection</strong> (<em>str</em>) – </p></li>
+<li><p><strong>of selection method {&quot;tournament&quot;</strong> (<em>Type</em>) – </p></li>
+<li><p><strong>&quot;rank&quot;</strong> – </p></li>
+<li><p><strong>&quot;roulette&quot;}.</strong> – </p></li>
+<li><p><strong>Default</strong> (<em>&quot;geneticOutput&quot;</em>) – </p></li>
+<li><p><strong>elitism</strong> (<em>float</em>) – </p></li>
+<li><p><strong>of elitism in</strong><strong> [</strong><strong>0</strong> (<em>Value</em>) – </p></li>
+<li><p><strong>1</strong><strong>]</strong><strong></strong> – </p></li>
+<li><p><strong>Default</strong> – </p></li>
+<li><p><strong>prob_mut</strong> (<em>float</em>) – </p></li>
+<li><p><strong>of mutation in</strong><strong> [</strong><strong>0</strong> (<em>Probability</em>) – </p></li>
+<li><p><strong>1</strong><strong>]</strong><strong></strong> – </p></li>
+<li><p><strong>Default</strong> – </p></li>
+<li><p><strong>distribution</strong> (<em>str</em>) – </p></li>
+<li><p><strong>{&quot;uniform&quot;</strong> – </p></li>
+<li><p><strong>&quot;gaussian&quot;</strong> – </p></li>
+<li><p><strong>&quot;random&quot;}</strong> – </p></li>
+<li><p><strong>Default</strong> – </p></li>
+<li><p><strong>media_distribution</strong> (<em>float</em>) – </p></li>
+<li><p><strong>value for gaussian distributions</strong> (<em>Media</em>) – </p></li>
+<li><p><strong>sd_distribution</strong> (<em>float</em>) – </p></li>
+<li><p><strong>deviation for gaussian distributions</strong> (<em>Standard</em>) – </p></li>
+<li><p><strong>Default</strong> – </p></li>
+<li><p><strong>min_distribution</strong> (<em>float</em>) – </p></li>
+<li><p><strong>value for uniform distributions</strong> (<em>Maximum</em>) – </p></li>
+<li><p><strong>Default</strong> – </p></li>
+<li><p><strong>max_distribution</strong> (<em>float</em>) – </p></li>
+<li><p><strong>value for uniform distributions</strong> – </p></li>
+<li><p><strong>Default</strong> – </p></li>
+<li><p><strong>stopping_early</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>needs a not None value for &quot;rounds_stopping&quot; and &quot;tolerance_stopping&quot;.</strong> (<em>It</em>) – </p></li>
+<li><p><strong>Default</strong> – </p></li>
+<li><p><strong>rounds_stopping</strong> (<em>int</em>) – </p></li>
+<li><p><strong>to consider to stopping early with the tolerance_stopping value.</strong> (<em>Rounds</em>) – </p></li>
+<li><p><strong>Default</strong> – </p></li>
+<li><p><strong>tolerance_stopping</strong> (<em>float</em>) – </p></li>
+<li><p><strong>to stopping early criteria. This value is the difference between the</strong> (<em>Value</em>) – </p></li>
+<li><p><strong>fit for the latest rounds_stopping generations.</strong> (<em>best</em>) – </p></li>
+<li><p><strong>Default</strong> – </p></li>
+<li><p><strong>outputname</strong> (<em>str</em>) – </p></li>
+<li><p><strong>for the output text file.</strong> (<em>Name</em>) – </p></li>
+<li><p><strong>Default</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="simplemc.analyzers.SimpleGenetic.SimpleGenetic.optimize">
+<code class="sig-name descname">optimize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/SimpleGenetic.html#SimpleGenetic.optimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.SimpleGenetic.SimpleGenetic.optimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method generates a Population and then optimize it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>Number of generations</em></p></li>
+<li><p><em>Optimal value of variables</em></p></li>
+<li><p><em>Target function value</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-simplemc.analyzers.neuralike.NeuralManager"></span><dl class="py class">
+<dt id="simplemc.analyzers.neuralike.NeuralManager.NeuralManager">
+<em class="property">class </em><code class="sig-prename descclassname">simplemc.analyzers.neuralike.NeuralManager.</code><code class="sig-name descname">NeuralManager</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">loglikelihood</span></em>, <em class="sig-param"><span class="n">pars_bounds</span></em>, <em class="sig-param"><span class="n">rootname</span></em>, <em class="sig-param"><span class="n">ndivsgrid</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">hidden_layers_neurons</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">epochs</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">plot</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/neuralike/NeuralManager.html#NeuralManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.neuralike.NeuralManager.NeuralManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manager for neural networks to learn likelihood function over a grid
+:param loglikelihood:
+:param pars_bounds:
+:param rootname:
+:param ndivsgrid:
+:param hidden_layers_neurons:
+:param epochs:
+:param plot:</p>
+<dl class="py method">
+<dt id="simplemc.analyzers.neuralike.NeuralManager.NeuralManager.modelChecker">
+<code class="sig-name descname">modelChecker</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplemc/analyzers/neuralike/NeuralManager.html#NeuralManager.modelChecker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplemc.analyzers.neuralike.NeuralManager.NeuralManager.modelChecker" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method checks if the name of the model.h5 exists, if it already exists use it, otherwise train a
+new neural net in order to generate a new model.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>We use several nested sampling algorithms included in <code class="docutils literal notranslate"><span class="pre">dynesty</span></code> library. We slightly modify <code class="docutils literal notranslate"><span class="pre">dynesty</span></code> to save the strings in the text file and also to incorporate neural networks. However, its <a class="reference external" href="https://dynesty.readthedocs.io/en/latest/">documentation</a>  is very complete, clear and didactic, so we recommend that you visit it.</p>
 </div>
 </div>
 
@@ -178,7 +903,7 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="plotters.html" class="btn btn-neutral float-left" title="Plotters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Citation.html" class="btn btn-neutral float-left" title="Citation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
