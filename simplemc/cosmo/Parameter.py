@@ -7,21 +7,22 @@ class Parameter:
 
     Parameters
     ----------
-    name : string
+    name : str
         Name to identify the parameter.
 
     value : float
         Default value. In mcmc will be the stating value.
 
-    err: float, optional
+    err: float
         Estimated error, in mcmc will be the step.
         Default is 0, but better to write any positive number.
 
-    bounds: list of 2, optional
+    bounds: list
         Priors. (minimum value, maximum value).
+        List of pairs of bounds.
         Default is None, but computed as '(value-5*err, value+5*err)'.
 
-    Ltxname: string, optional
+    Ltxname: str
         Latex name, use mainly for plotting.
         Default is None, and in this case uses the 'name' string.
 

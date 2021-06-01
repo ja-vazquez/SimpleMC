@@ -1,4 +1,3 @@
-
 import sys
 import scipy as sp
 from simplemc.cosmo import cosmoApprox as CA
@@ -9,32 +8,36 @@ from simplemc.cosmo.paramDefs import Obh2_par, Om_par, h_par, mnu_par, Nnu_par
 
 
 class LCDMCosmology(BaseCosmology, RadiationAndNeutrinos):
+    r"""
+    This is LCDM cosmology, it is used as a base class
+    for most other cosmologies, mostly because it treats Neutrinos and Radiation
+    hassle.
+
+    Parameters
+    ----------
+    Obh2 : float
+        Barionic matter: \Omega_bh^2
+    Om : float
+        Matter density.
+    h : float
+        Hubble parameter H/100.
+    mnu : float
+        Standard value for the mass of neutrinos.
+    Nnu : float
+        Standard value for the number of families.
+    degenerate_nu : bool
+        Degenerate neutrinos.
+    disable_radiation : bool
+        Without radiation.
+    fixOm : bool
+        Om constant.
+
+    """
     # possible options: "Anderson", "Cuesta", "CuestaNeff", "EH"
     rd_approx = "Cuesta"
 
     def __init__(self, Obh2=Obh2_par.value, Om=Om_par.value, h=h_par.value, mnu=mnu_par.value,
                  Nnu=Nnu_par.value, degenerate_nu=False, disable_radiation=False, fixOm=False):
-        """
-        This is LCDM cosmology
-        I didn't intend it that way, but it is used as a base class
-        for most other cosmologies, mostly because it treats Neutrinos and Radiation
-        hassle.
-
-        Parameters
-        ----------
-        Obh2
-        Om
-        h
-        mnu
-        Nnu
-        degenerate_nu
-        disable_radiation
-        fixOm
-
-        Returns
-        -------
-
-        """
 
         # two parameters: Om and h
         self.Om    = Om

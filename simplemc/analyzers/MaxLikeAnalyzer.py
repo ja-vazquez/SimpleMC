@@ -17,24 +17,28 @@ except:
 
 
 class MaxLikeAnalyzer:
+    """
+            This is an analyzer that takes a Likelihood function
+            and then tries to maximize it with L-BFGS-B method and get the errors from the
+            second derivative matrix. It kinda works, but not very well.
+
+            :param like: likelihood function.
+            :param model: theoretical model.
+            :param compute_errors: Compute errors.
+            :type compute_errors: Boolean
+            :param compute_derived: Compute derivatives.
+            :type compute_derived: Boolean
+            :param show_contours: Show contours in plots.
+            :type show_contours: Boolean
+            :param plot_param1: x-axis parameter to plot.
+            :type plot_param1: str
+            :param plot_param2: y-axis parameter to plot.
+            :type plot_param2: str
+
+            """
     def __init__(self, like, model, compute_errors=False, compute_derived= False,
                  show_contours=False, plot_param1=None, plot_param2=None):
-        """
-        This is an analyzer that takes a Likelihood function
-        and then tries to maximize it and get the errors from the
-        second derivative matrix. It kinda works, but not very well.
-        Parameters
-        ----------
-        like
-        model
-        compute_errors
-        plot_param1
-        plot_param1
 
-        Returns
-        -------
-
-        """
         self.like = like
         self.model = model
         self.params = like.freeParameters()

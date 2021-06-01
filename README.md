@@ -1,5 +1,5 @@
-simplemc 1.9.0
-===============
+SimpleMC
+==========
 
 A simple MCMC code for cosmological parameter estimation where only
 expansion history matters. Written by Anže Slosar and Jose Vazquez.
@@ -14,6 +14,7 @@ model without much hassle and very quickly. One just needs to define
 how Hubble parameter varies with redshift. It might also be useful for
 pedagogical reasons.
 
+Temporary documentation in: https://igomezv.github.io/SimpleMC/ 
 
 Directory structure:
 --------------------

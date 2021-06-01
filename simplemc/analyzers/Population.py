@@ -10,25 +10,16 @@ except:
     warnings.warn("Please install Pandas library if you want to use SimpleGenetic.")
 
 class Population:
+    """
+    It creates several objects of the Individual class and generates a Population.
+
+    :param n_individuals: Number of initial individuals.
+    :param n_variables: Number of variables or free parameters.
+    :param lower_bounds: List with the lower bounds for each free parameter.
+    :param upper_bounds: List with the upper bounds for each free parameter.
+    """
     def __init__(self, n_individuals, n_variables, lower_bounds=None,
                  upper_bounds=None):
-        """
-        It creates several objects of the Individual class and generates a Population.
-
-        Parameters
-        ----------
-        n_individuals : int
-            Number of initial individuals
-
-        n_variables : int
-            Number of variables or free parameters
-
-        lower_bounds : list
-            List with the lower bounds for each free parameter.
-
-        upper_bounds : list
-            List with the upper bounds for each free parameter.
-        """
 
         self.n_individuals = n_individuals
         self.n_variables = n_variables
@@ -79,9 +70,6 @@ class Population:
             {"maximize", "minimize}
             Default: maximize
 
-        Returns
-        -------
-
         """
         for i in np.arange(self.n_individuals):
             self.individuals[i].calculate_fitness(
@@ -102,15 +90,7 @@ class Population:
 
     def cross_individuals(self, parental_1, parental_2):
         """
-        Method to cross two differents individuals
-        Parameters
-        ----------
-        parental_1
-        parental_2
-
-        Returns
-        -------
-
+        Method to cross two differents individuals.
         """
 
         if parental_1 not in np.arange(self.n_individuals):
@@ -159,11 +139,18 @@ class Population:
         Parameters
         ----------
         n : int
+            Number of individuals.
         return_indexs : bool
+            Return index of selected individuals.
+            Defalult: False
         method_selection : str
+            Method selection.
+            Default: 'tournament'
 
         Returns
         -------
+        : list
+            Selected individuals.
 
         """
 

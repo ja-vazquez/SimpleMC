@@ -91,15 +91,15 @@ class AllDerived:
         Parameters
         ----------
         z1: float
-            Redshift z1 to compute the diagnotic.
+            Redshift z1 to compute the diagnostic.
 
         z2: float
-            Redshift z2 to compute the diagnotic.
+            Redshift z2 to compute the diagnostic.
 
         Returns
         -------
         Obh2: float
-            Obh2 dianotic: see [arXiv:1406.2209].
+            Obh2 diagnostic: see [arXiv:1406.2209].
         """
         h0 = self.like.theory_.h
         h1 = h0**2*self.like.theory_.RHSquared_a(1.0/(1+z1))
