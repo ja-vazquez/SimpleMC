@@ -12,13 +12,13 @@ import sys
 
 from mpi4py import MPI
 
-# comm = MPI.COMM_WORLD
-# name = MPI.Get_processor_name()
-#
-#
-# print ("Hello, World! "
-#        "I am process %d of %d on %s" %
-#        (comm.rank, comm.size, name))
+comm = MPI.COMM_WORLD
+name = MPI.Get_processor_name()
+
+
+print ("Hello, World! "
+        "I am process %d of %d on %s" %
+        (comm.rank, comm.size, name))
 
 class MCMCAnalyzer:
     """
