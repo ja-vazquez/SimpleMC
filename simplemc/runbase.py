@@ -27,9 +27,7 @@ from .models import CompressPantheon
 
 
 #Generic model
-from .models import GenericModel
-from .models import SimpleCosmoModel
-from .models import SimpleModel
+from .models.SimpleModel import SimpleModel, SimpleCosmoModel
 
 # Composite Likelihood
 from .likelihoods.CompositeLikelihood import CompositeLikelihood
@@ -153,8 +151,6 @@ def ParseModel(model, **kwargs):
         T.setVaryMnu()
     elif model == "Binned":
         T = BinnedWCosmology()
-    elif model == 'generic':
-        T = GenericModel()
     elif model == 'CPantheon':
         T = CompressPantheon()
     elif model == 'DGP':
@@ -171,7 +167,7 @@ def ParseModel(model, **kwargs):
         T = QuintomCosmology(vary_mquin=True, vary_mphan=True, vary_coupling=True)
     elif model == "Rotation":
         T = RotationCurves()
-    elif model == 'custom':
+    elif model == 'simple':
         T = SimpleModel(custom_parameters, custom_function)
     elif model == 'simpleCosmo':
         T = SimpleCosmoModel()
