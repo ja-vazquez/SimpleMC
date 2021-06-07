@@ -169,8 +169,8 @@ def ParseModel(model, **kwargs):
         T = RotationCurves()
     elif model == 'simple':
         T = SimpleModel(custom_parameters, custom_function)
-    elif model == 'simpleCosmo':
-        T = SimpleCosmoModel()
+    elif model == 'simple_cosmo':
+        T = SimpleCosmoModel(custom_parameters, RHSquared=custom_function)
     else:
         print("Cannot recognize model", model)
         sys.exit(1)
@@ -306,7 +306,7 @@ def ParseDataset(datasets, **kwargs):
         #    L.addLikelihood(PantheonLikelihood())
         elif name == 'RC':
             L.addLikelihood(RotationCurvesLike())
-        elif name == 'custom':
+        elif name == 'generic':
             L.addLikelihood(GenericLikelihood(path_to_data=path_to_data,
                                               path_to_cov=path_to_cov,
                                               fn=fn))

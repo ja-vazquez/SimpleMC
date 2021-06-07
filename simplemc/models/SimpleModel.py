@@ -1,18 +1,26 @@
 from simplemc import logger
 from simplemc.models.LCDMCosmology import LCDMCosmology
 from simplemc.cosmo.Parameter import Parameter
-from simplemc.cosmo.paramDefs import Ok_par, w_par, wa_par
 import math as N
-
+import numpy as np
+import sys
 
 class SimpleModel:
     """
     This is a generic model
 
+    Parameters
+    ----------
+    parameters : list
+        List of Parameter objects
+    model : str
+        model or function. It should be in terms of x
+        Example: '5*np.cos(x)' or 'x**2-5*x'
+
     """
-    def __init__(self, parameters, function):
+    def __init__(self, parameters, model):
         self.parameters = parameters
-        self.function = function
+        self.model = model
         SimpleModel.updateParams(self, [])
 
     # my free params (parameters/priors see ParamDefs.py)
@@ -24,39 +32,57 @@ class SimpleModel:
         self.printParameters(self.freeParameters())
 
     def printParameters(self, params):
+        l = []
         for p in params:
             logger.info('{} = {} +/- {}'.format(p.name, p.value, p.error))
+            l.append("{}: {} = +/- {}".format(p.name, p.value, p.error))
+        return l
+
+
+    def genericModel(self, x):
+        # values = []
+        # for param in self.parameters:
+        #     values.append(param.value)
+        # return self.function(values, x)
+        for param in self.parameters:
+            exec("%s = %f" % (param.name, param.value))
+        try:
+            r = eval(self.model)
+        except:
+            print("Please check your model expression: {}".format(self.model))
+            sys.exit("Your expression should be in terms of x. \\ For example: '5*np.sin(x)' or '5*x**2'")
+        return r
 
     def updateParams(self, pars):
         return True
-
-    def genericModel(self, x):
-        values = []
-        for param in self.parameters:
-            values.append(param.value)
-        return self.function(values, x)
 
     def prior_loglike(self):
         return 0
 
 
 class SimpleCosmoModel(LCDMCosmology):
-    def __init__(self):
-        # Create a list with your parameters,
-        # pull it from paramDefs or create them
-        self.miparam = Parameter("nombre", 0.5, 0.005, (0.01, 1), "\LaTeX")
-        # with the Parameter class
-        # self.nuevoparm = Parameter("nombre", 0.5)
-        self.parameters = [Ok_par, w_par, wa_par]
-        self.Ok = Ok_par.value
-        self.w0 = w_par.value
-        self.wa = wa_par.value
+    def __init__(self,  extra_params=None, RHSquared=None):
+        """
+        This is a simple cosmological model based on LCDMCosmology class.
 
+        Parameters
+        ----------
+        extra_params : list
+            List of Parameter objects with the extra parameters.
+            LCDM already have:
+                        h, NuContrib, Ocb, Omrad and Om
+        RHSquared : str
+            model or function. It should be in terms of scale factor a
+            Example: 'Ocb/a**3+Omrad/a**4+NuContrib+(1.0-Om-newparameter)'
+                      where newparameter = Parameter('newparameter', value, step, (b1,b2), '$Latex_name')
+        """
+        self.extra_params = extra_params
+        self.RHSquared = RHSquared
         LCDMCosmology.__init__(self)
-    # my free parameters. We add Ok on top of LCDM ones (we inherit LCDM)
+
     def freeParameters(self):
         l = LCDMCosmology.freeParameters(self)
-        for parameter in self.parameters:
+        for parameter in self.extra_params:
             l.append(parameter)
         return l
 
@@ -67,11 +93,17 @@ class SimpleCosmoModel(LCDMCosmology):
         return True
 
     # this is relative hsquared as a function of a
-    ## i.e. H(z)^2/H(z=0)^2
-    # 2) Write your own RHSquared function
-    # from LCDM you have self.h, self.Omrad, self.Om, self.Ocb
+    # i.e. H(z)^2/H(z=0)^2
     def RHSquared_a(self, a):
-        NuContrib = self.NuDensity.rho(a) / self.h ** 2
-        rhow = a ** (-3 * (1.0 + self.w0 + self.wa)) * N.exp(-3 * self.wa * (1 - a))
-        return (self.Ocb / a ** 3 + self.Ok / a ** 2 + self.Omrad / a ** 4 + NuContrib + (
-                    1.0 - self.Om - self.Ok) * rhow)
+        h = self.h
+        NuContrib = self.NuDensity.rho(a) / h ** 2
+        Ocb = self.Ocb
+        Omrad = self.Omrad
+        Om = self.Om
+        for param in self.extra_params:
+            exec("%s = %f" % (param.name, param.value))
+        if self.RHSquared:
+            return eval(self.RHSquared)
+        else:
+            sys.exit('Please set a string with the RHSquared (H(z)^2/H(z=0)^2) '
+                     'expression in terms of a (scale factor)')
