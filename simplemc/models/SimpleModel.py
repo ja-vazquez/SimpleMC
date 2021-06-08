@@ -14,7 +14,7 @@ class SimpleModel:
         parameters : list
             List of Parameter objects
         function : function
-            model or function. It should be in terms of the parameters
+            model or function. It should be in terms of the parameters list.
     """
     def __init__(self, parameters, function):
         self.parameters = parameters
