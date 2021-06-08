@@ -7,20 +7,18 @@ import sys
 
 class SimpleModel:
     """
-    This is a generic model
+        This is a generic model
 
-    Parameters
-    ----------
-    parameters : list
-        List of Parameter objects
-    model : str
-        model or function. It should be in terms of x
-        Example: '5*np.cos(x)' or 'x**2-5*x'
-
+        Parameters
+        ----------
+        parameters : list
+            List of Parameter objects
+        function : function
+            model or function. It should be in terms of the parameters
     """
-    def __init__(self, parameters, model):
+    def __init__(self, parameters, function):
         self.parameters = parameters
-        self.model = model
+        self.function = function
         SimpleModel.updateParams(self, [])
 
     # my free params (parameters/priors see ParamDefs.py)
@@ -38,23 +36,14 @@ class SimpleModel:
             l.append("{}: {} = +/- {}".format(p.name, p.value, p.error))
         return l
 
-
-    def genericModel(self, x):
-        # values = []
-        # for param in self.parameters:
-        #     values.append(param.value)
-        # return self.function(values, x)
-        for param in self.parameters:
-            exec("%s = %f" % (param.name, param.value))
-        try:
-            r = eval(self.model)
-        except:
-            print("Please check your model expression: {}".format(self.model))
-            sys.exit("Your expression should be in terms of x. \\ For example: '5*np.sin(x)' or '5*x**2'")
-        return r
-
     def updateParams(self, pars):
         return True
+
+    def genericModel(self, x):
+        values = []
+        for param in self.parameters:
+            values.append(param.value)
+        return self.function(values, x)
 
     def prior_loglike(self):
         return 0
@@ -63,7 +52,8 @@ class SimpleModel:
 class SimpleCosmoModel(LCDMCosmology):
     def __init__(self,  extra_params=None, RHSquared=None):
         """
-        This is a simple cosmological model based on LCDMCosmology class.
+        This is a simple cosmological model based on slightly deviations of LCDMCosmology
+        class, RHSquared must to have an analytical form.
 
         Parameters
         ----------
