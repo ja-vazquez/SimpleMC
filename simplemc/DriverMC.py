@@ -197,7 +197,7 @@ class DriverMC:
         ## Following two are for custom data
         self.path_to_data = self.config.get(        'custom', 'path_to_data', fallback=None)
         self.path_to_cov  = self.config.get(        'custom', 'path_to_cov',  fallback=None)
-        self.fn = self.config.get('custom', 'path_to_cov',  fallback="generic")
+        self.fn = self.config.get('custom', 'fn',  fallback="generic")
         return True
 
 
