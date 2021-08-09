@@ -36,9 +36,13 @@ class GA_deap:
         :param show_contours: True if you want to show the contours in a plot.
         :param plot_param1: a parameter to plot in x-axis.
         :param plot_param2: a parameter to plot in y-axis.
+
     """
-    def __init__(self, like, model, plot_fitness=False, compute_errors=False, \
-                 show_contours=False, plot_param1=None, plot_param2=None):
+    def __init__(self, like, model, population=20, crossover=0.7,
+                 mutation=0.3, max_generation=20, hof_size=1,
+                 crowding_factor=1, plot_fitness=False,
+                 compute_errors=False, show_contours=False,
+                 plot_param1=None, plot_param2=None):
         self.like = like
         self.model = model
         self.params = like.freeParameters()
@@ -54,12 +58,12 @@ class GA_deap:
         self.plot_param2 = plot_param2
 
         # Genetic Algorithm constants:
-        self.POPULATION_SIZE = 20    # 10-20
-        self.P_CROSSOVER = 0.7       # probability for crossover
-        self.P_MUTATION = 0.3        # (try also 0.5) probability for mutating an individual
-        self.MAX_GENERATIONS = 20    # 100- 300
-        self.HALL_OF_FAME_SIZE = 1
-        self.CROWDING_FACTOR = 20.0  # crowding factor for crossover and mutation
+        self.POPULATION_SIZE = population    # 10-20
+        self.P_CROSSOVER = crossover       # probability for crossover
+        self.P_MUTATION = mutation        # (try also 0.5) probability for mutating an individual
+        self.MAX_GENERATIONS = max_generation    # 100- 300
+        self.HALL_OF_FAME_SIZE = hof_size
+        self.CROWDING_FACTOR = crowding_factor  # crowding factor for crossover and mutation
 
         self.RANDOM_SEED = 42        # set the random seed
 

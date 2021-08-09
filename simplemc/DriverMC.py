@@ -738,10 +738,31 @@ class DriverMC:
             show_contours = self.config.getboolean('ga_deap', 'show_contours', fallback=False)
             plot_param1 = self.config.get('ga_deap', 'plot_param1', fallback=None)
             plot_param2 = self.config.get('ga_deap', 'plot_param2', fallback=None)
-        else:
-            sys.exit(1)
 
-        M = GA_deap(self.L, self.model, plot_fitness=plot_fitness, compute_errors=compute_errors,
+            population = self.config.getint('ga_deap','population', fallback=20)
+            crossover = self.config.getfloat('ga_deap', 'crossover', fallback=0.7)
+            mutation = self.config.getfloat('ga_deap', 'mutation', fallback=0.3)
+            max_generation = self.config.getint('ga_deap', 'max_generation', fallback=100)
+            hof_size = self.config.getint('ga_deap','hof_size', fallback=1)
+            crowding_factor = self.config.getfloat('ga_deap', 'crowding_factor',fallback=1)
+        else:
+            plot_fitness = kwargs.pop('plot_fitness', False)
+            compute_errors = kwargs.pop('compute_errors', False)
+            show_contours = kwargs.pop('show_contours', False)
+            plot_param1 = kwargs.pop('plot_param1', None)
+            plot_param2 = kwargs.pop('plot_param2', None)
+
+            population = kwargs.pop('population', 20)
+            crossover = kwargs.pop('crossover', 0.7)
+            mutation = kwargs.pop('mutation', 0.3)
+            max_generation = kwargs.pop('max_generation', 100)
+            hof_size = kwargs.pop('hof_size', 1)
+            crowding_factor = skwargs.pop('crowding_factor', 1)
+
+        M = GA_deap(self.L, self.model, population=population, crossover=crossover,
+                    mutation=mutation, max_generation=max_generation,
+                    hof_size=hof_size, crowding_factor=crowding_factor,
+                    plot_fitness=plot_fitness, compute_errors=compute_errors,
                     show_contours=show_contours, plot_param1=plot_param1, plot_param2=plot_param2)
         result = M.main()
         #M.plotting()
