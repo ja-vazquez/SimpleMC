@@ -1,7 +1,6 @@
 
 #TODO check: if self.analyzername is None
-#TODO check: ttime
-#TODO GA_deap, using baseConfig
+#TODO check: simplegenetic, mcevidence and emcee
 
 from .analyzers import MaxLikeAnalyzer
 from .analyzers import SimpleGenetic
@@ -163,6 +162,7 @@ class DriverMC:
             self.geneticdeap(iniFile=self.iniFile, **kwargs)
         else:
             sys.exit("{}: Sampler/Analyzer name invalid".format(self.analyzername))
+        self.postprocess()
         return True
 
 
@@ -288,7 +288,8 @@ class DriverMC:
                 # print("MCEvidence could not calculate the Bayesian evidence [very small weights]\n")
                 logger.error("MCEvidence could not calculate the Bayesian evidence [very small weights]")
         else:
-            self.result = ['mcmc', M, "Maxlike: {}".format(M.maxloglike)]
+            self.result = ['mcmc', M.get_results()[:2], "Maxlike: {}".format(M.maxloglike),
+                           "Gelman-Rubin diagnostic: {}".format(M.get_results()[2])]
 
         return True
 
@@ -302,9 +303,6 @@ class DriverMC:
 
         Parameters
         ___________
-        engine : str
-            Use dynesty or nestle library
-
         dynamic : bool
             Default `False`
 
@@ -334,7 +332,6 @@ class DriverMC:
 
         """
         if iniFile:
-            self.engine = self.config.get(          'nested', 'engine',       fallback='dynesty')
             dynamic     = self.config.getboolean(   'nested', 'dynamic',      fallback=False)
             neuralNetwork = self.config.getboolean( 'nested', 'neuralNetwork',fallback=False)
             nestedType  = self.config.get(          'nested', 'nestedType',   fallback='multi')
@@ -359,7 +356,6 @@ class DriverMC:
             failure_tolerance = self.config.getfloat('neural', 'failure_tolerance', fallback=0.5)
 
         else:
-            self.engine = kwargs.pop('engine',    'dynesty')
             dynamic     = kwargs.pop('dynamic',    False)
             neuralNetwork = kwargs.pop('neuralNetwork', False)
             nestedType  = kwargs.pop('nestedType', 'multi')
@@ -390,13 +386,12 @@ class DriverMC:
                             'nestedType {"multi", "single", "balls", "cubes"} Default: "multi"\n\t'
                             'neuralNetwork (bool) Default: True\n\t'
                             'dynamic (bool) Default: False\n\t'
-                            'addDerived (bool) Default: True\n\t'
-                            'engine {"dynesty", "nestle"} Default: "dynesty"')
+                            'addDerived (bool) Default: True')
                 sys.exit(1)
 
         #stored output files
         if self.analyzername is None: self.analyzername = 'nested'
-        self.outputpath = '{}_{}_{}_{}'.format(self.outputpath, self.analyzername, self.engine, nestedType)
+        self.outputpath = '{}_{}_{}'.format(self.outputpath, self.analyzername, nestedType)
         if neuralNetwork:
             self.outputpath = "{}_ANN".format(self.outputpath)
         self.outputChecker()
@@ -406,8 +401,7 @@ class DriverMC:
         pool, nprocess = self.mppool(nproc)
         logger.info("\n\tnlivepoints: {}\n"
                     "\taccuracy: {}\n"
-                    "\tnested type: {}\n"
-                    "\tengine: {}".format(nlivepoints, accuracy, nestedType, self.engine))
+                    "\tnested type: {}".format(nlivepoints, accuracy, nestedType))
 
         ti = time.time()
         if neuralNetwork:
@@ -441,7 +435,7 @@ class DriverMC:
             M = sampler.results
 
 
-        elif self.engine == 'dynesty':
+        else:
             sampler = NestedSampler(self.logLike, self.priorTransform, self.dims,
                         bound=nestedType, sample = 'unif', nlive = nlivepoints,
                         pool = pool, queue_size=nprocess, use_pool={'loglikelihood': False})
@@ -449,26 +443,13 @@ class DriverMC:
                                addDerived=self.addDerived, simpleLike=self.L, dumper=dumper)
             M = sampler.results
 
-
-        elif self.engine == 'nestle':
-            try:
-                import nestle
-                M = nestle.sample(self.logLike, self.priorTransform, ndim=self.dims, method=nestedType,
-                npoints=nlivepoints, dlogz=accuracy, callback=nestle.print_progress,
-                pool = pool, queue_size = nprocess)
-            except ImportError as error:
-                sys.exit("{}: Please install nestle module"
-                         "or use dynesty engine".format(error.__class__.__name__))
-        else:
-            sys.exit('wrong selection')
         try:
             pool.close()
         except:
             pass
         self.ttime = time.time() - ti
         self.result = ['nested', M, M.summary(), 'nested :{}'.format(nestedType),
-                       'dynamic : {}'.format(dynamic), 'ANN :{}'.format(neuralNetwork),
-                       'engine: {}'.format(self.engine)]
+                       'dynamic : {}'.format(dynamic), 'ANN :{}'.format(neuralNetwork)]
         return True
 
 
@@ -599,7 +580,7 @@ class DriverMC:
                             plot_param1=plot_param1, plot_param2=plot_param2)
         params = self.T.printParameters(A.params)
         self.ttime = time.time() - ti
-        self.result = ['maxlike', A, params]
+        self.result = ['maxlike', A, params, 'Optimal loglike: {}'.format(A.opt_loglike)]
         return True
 
 
@@ -666,14 +647,14 @@ class DriverMC:
             n_generations = self.config.getint('genetic', 'n_generations' , fallback=1000)
             selection_method = self.config.get('genetic', 'selection_method', fallback='tournament')
             mut_prob = self.config.getfloat('genetic', 'mut_prob', fallback=0.6)
-            distribution = self.config("distribution", fallback="uniform")
-            media_distribution = self.config.getfloat("media_distribution", fallback=1.0)
-            sd_distribution = self.config.getfloat("sd_distribution", fallback=1.0)
-            min_distribution = self.config.getfloat("min_distribution", fallback=-1.0)
-            max_distribution = self.config.getfloat("max_distribution", fallback=1.0)
-            stopping_early = self.config.getboolean("stopping_early", fallback=True)
-            rounds_stopping = self.config.getint("rounds_stopping", fallback=100)
-            tolerance_stopping = self.config.getfloat("tolerance_stopping", fallback=0.01)
+            distribution = self.config.get('genetic', 'distribution', fallback='uniform')
+            media_distribution = self.config.getfloat('genetic', "media_distribution", fallback=1.0)
+            sd_distribution = self.config.getfloat('genetic', "sd_distribution", fallback=1.0)
+            min_distribution = self.config.getfloat('genetic', "min_distribution", fallback=-1.0)
+            max_distribution = self.config.getfloat('genetic', "max_distribution", fallback=1.0)
+            stopping_early = self.config.getboolean('genetic', "stopping_early", fallback=True)
+            rounds_stopping = self.config.getint('genetic', "rounds_stopping", fallback=100)
+            tolerance_stopping = self.config.getfloat('genetic', "tolerance_stopping", fallback=0.01)
         else:
             n_individuals = kwargs.pop('n_individuals', 400)
             n_generations = kwargs.pop('n_generations', 1000)
@@ -738,14 +719,39 @@ class DriverMC:
             show_contours = self.config.getboolean('ga_deap', 'show_contours', fallback=False)
             plot_param1 = self.config.get('ga_deap', 'plot_param1', fallback=None)
             plot_param2 = self.config.get('ga_deap', 'plot_param2', fallback=None)
-        else:
-            sys.exit(1)
 
-        M = GA_deap(self.L, self.model, plot_fitness=plot_fitness, compute_errors=compute_errors,
+            population = self.config.getint('ga_deap','population', fallback=20)
+            crossover = self.config.getfloat('ga_deap', 'crossover', fallback=0.7)
+            mutation = self.config.getfloat('ga_deap', 'mutation', fallback=0.3)
+            max_generation = self.config.getint('ga_deap', 'max_generation', fallback=100)
+            hof_size = self.config.getint('ga_deap','hof_size', fallback=1)
+            crowding_factor = self.config.getfloat('ga_deap', 'crowding_factor',fallback=1)
+        else:
+            plot_fitness = kwargs.pop('plot_fitness', False)
+            compute_errors = kwargs.pop('compute_errors', False)
+            show_contours = kwargs.pop('show_contours', False)
+            plot_param1 = kwargs.pop('plot_param1', None)
+            plot_param2 = kwargs.pop('plot_param2', None)
+
+            population = kwargs.pop('population', 20)
+            crossover = kwargs.pop('crossover', 0.7)
+            mutation = kwargs.pop('mutation', 0.3)
+            max_generation = kwargs.pop('max_generation', 100)
+            hof_size = kwargs.pop('hof_size', 1)
+            crowding_factor = skwargs.pop('crowding_factor', 1)
+
+        ti = time.time()
+        M = GA_deap(self.L, self.model, population=population, crossover=crossover,
+                    mutation=mutation, max_generation=max_generation,
+                    hof_size=hof_size, crowding_factor=crowding_factor,
+                    plot_fitness=plot_fitness, compute_errors=compute_errors,
                     show_contours=show_contours, plot_param1=plot_param1, plot_param2=plot_param2)
         result = M.main()
+        self.ttime = time.time() - ti
         #M.plotting()
-        self.result = ['genetic', M, result]
+        self.result = ['genetic', result, 'Population: {}'.format(population),
+                       'Mutation: {}'.format(mutation), 'Crosover: {}'.format(crossover),
+                       result[3]]
         return True
 
 ##---------------------- logLike and prior Transform function ----------------------
@@ -902,7 +908,7 @@ class DriverMC:
             AD = AllDerived()
             for pd in AD.list:
                 fpar.write(pd.name + "\t\t\t" + pd.Ltxname + "\n")
-        if self.analyzername == 'mcmc' or (self.analyzername == 'nested' and self.engine=='dynesty'):
+        if self.analyzername == 'mcmc' or self.analyzername == 'nested':
             if (self.L.name() == "Composite"):
                 self.sublikenames = self.L.compositeNames()
                 for name in self.sublikenames:
@@ -924,17 +930,16 @@ class DriverMC:
         """
         if addtxt:
             self.result.extend(addtxt)
-        if self.analyzername == 'nested':
+        if self.analyzername == 'nested' or self.analyzername == 'mcmc':
             pp = PostProcessing(self.result, self.paramsList, self.outputpath,
-                engine=self.engine, addDerived=self.addDerived, loglike=self.L)
-            if self.engine == 'nestle':
-                pp.saveNestedChain()
+                                addDerived=self.addDerived, loglike=self.L)
         elif self.analyzername == 'emcee':
             pp = PostProcessing(self.result, self.paramsList, self.outputpath,
                                 skip=self.burnin, addDerived=self.addDerived, loglike=self.L)
             pp.saveEmceeSamples()
         else:
-            pp = PostProcessing(self.result, self.paramsList, self.outputpath)
+            pp = PostProcessing(self.result, self.paramsList, self.outputpath,
+                                addDerived=self.addDerived, loglike=self.L)
         if summary:
             pp.writeSummary(self.ttime)
 

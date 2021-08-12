@@ -9,6 +9,7 @@ import scipy as sp
 import copy
 import random
 import sys
+from numpy import loadtxt
 
 from mpi4py import MPI
 
@@ -94,6 +95,7 @@ class MCMCAnalyzer:
 
         self.RunChain()
 
+
     def init_pcov(self, mat):
         self.chol = la.cholesky(mat)
 
@@ -124,7 +126,7 @@ class MCMCAnalyzer:
         #Uses the last percentage of the chain
         self.percen  = 0.4
 
-        gr = None
+        self.gr = None
 
         print("Starting chain...")
 
@@ -153,14 +155,14 @@ class MCMCAnalyzer:
                 self.cw += 1
 
             print("Accepted: {:d} | loglike: {:3.4f} | "
-                  "Gelman-Rubin: {}".format(self.co, self.cloglike, gr), end='\r')
+                  "Gelman-Rubin: {}".format(self.co, self.cloglike, self.gr), end='\r')
             sys.stdout.flush()
             if (self.co >0 and self.co % self.checkgr == 0):
                 chains = comm.gather(self.lpars, root=0)
                 if comm.rank ==0:
-                    gr = self.GRDRun(chains)
-                    #print('Gelman-Rubin R-1:', gr)
-                    if (sp.all(gr < self.GRcondition)):
+                    self.gr = self.GRDRun(chains)
+                    #print('Gelman-Rubin R-1:', self.gr)
+                    if (sp.all(self.gr < self.GRcondition)):
                         condition = 1
                         self.closeFiles()
                     else:
@@ -240,18 +242,21 @@ class MCMCAnalyzer:
         formstr += '\n'
 
         if (self.chain_num == None):
-            cfname  = outfile + ".txt"
+            self.cfname  = outfile + ".txt"
             mlfname = outfile + ".maxlike"
         else:
-            cfname  = outfile + "_%i.txt" % (self.chain_num)
+            self.cfname  = outfile + "_%i.txt" % (self.chain_num)
             mlfname = outfile + "_%i.maxlike" % (self.chain_num)
 
-        self.fout    = open(cfname, 'w')
+        self.fout    = open(self.cfname, 'w')
         self.mlfout  = open(mlfname, 'w')
         self.formstr = formstr
 
 
     def closeFiles(self):
+        chain = loadtxt(self.cfname)
+        self.weights = chain[:, 0]
+        self.samples = chain[:, 2:2 + self.N]
         self.fout.close()
         self.mlfout.close()
 
@@ -338,6 +343,7 @@ class MCMCAnalyzer:
             if self.co > self.nsamp:
                 print('Number of steps achieved')
                 self.done = True
+                self.closeFiles()
 
         elif (self.co < self.skip):
             self.swx += self.cw
@@ -366,5 +372,5 @@ class MCMCAnalyzer:
         if self.composite:
             self.cloglikes = ploglikes
 
-
-
+    def get_results(self):
+        return self.samples, self.weights, self.gr
