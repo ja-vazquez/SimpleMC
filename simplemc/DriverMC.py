@@ -302,9 +302,6 @@ class DriverMC:
 
         Parameters
         ___________
-        engine : str
-            Use dynesty or nestle library
-
         dynamic : bool
             Default `False`
 
@@ -334,7 +331,6 @@ class DriverMC:
 
         """
         if iniFile:
-            self.engine = self.config.get(          'nested', 'engine',       fallback='dynesty')
             dynamic     = self.config.getboolean(   'nested', 'dynamic',      fallback=False)
             neuralNetwork = self.config.getboolean( 'nested', 'neuralNetwork',fallback=False)
             nestedType  = self.config.get(          'nested', 'nestedType',   fallback='multi')
@@ -359,7 +355,6 @@ class DriverMC:
             failure_tolerance = self.config.getfloat('neural', 'failure_tolerance', fallback=0.5)
 
         else:
-            self.engine = kwargs.pop('engine',    'dynesty')
             dynamic     = kwargs.pop('dynamic',    False)
             neuralNetwork = kwargs.pop('neuralNetwork', False)
             nestedType  = kwargs.pop('nestedType', 'multi')
@@ -390,13 +385,12 @@ class DriverMC:
                             'nestedType {"multi", "single", "balls", "cubes"} Default: "multi"\n\t'
                             'neuralNetwork (bool) Default: True\n\t'
                             'dynamic (bool) Default: False\n\t'
-                            'addDerived (bool) Default: True\n\t'
-                            'engine {"dynesty", "nestle"} Default: "dynesty"')
+                            'addDerived (bool) Default: True')
                 sys.exit(1)
 
         #stored output files
         if self.analyzername is None: self.analyzername = 'nested'
-        self.outputpath = '{}_{}_{}_{}'.format(self.outputpath, self.analyzername, self.engine, nestedType)
+        self.outputpath = '{}_{}_{}'.format(self.outputpath, self.analyzername, nestedType)
         if neuralNetwork:
             self.outputpath = "{}_ANN".format(self.outputpath)
         self.outputChecker()
@@ -406,8 +400,7 @@ class DriverMC:
         pool, nprocess = self.mppool(nproc)
         logger.info("\n\tnlivepoints: {}\n"
                     "\taccuracy: {}\n"
-                    "\tnested type: {}\n"
-                    "\tengine: {}".format(nlivepoints, accuracy, nestedType, self.engine))
+                    "\tnested type: {}".format(nlivepoints, accuracy, nestedType))
 
         ti = time.time()
         if neuralNetwork:
@@ -441,7 +434,7 @@ class DriverMC:
             M = sampler.results
 
 
-        elif self.engine == 'dynesty':
+        else:
             sampler = NestedSampler(self.logLike, self.priorTransform, self.dims,
                         bound=nestedType, sample = 'unif', nlive = nlivepoints,
                         pool = pool, queue_size=nprocess, use_pool={'loglikelihood': False})
@@ -449,26 +442,13 @@ class DriverMC:
                                addDerived=self.addDerived, simpleLike=self.L, dumper=dumper)
             M = sampler.results
 
-
-        elif self.engine == 'nestle':
-            try:
-                import nestle
-                M = nestle.sample(self.logLike, self.priorTransform, ndim=self.dims, method=nestedType,
-                npoints=nlivepoints, dlogz=accuracy, callback=nestle.print_progress,
-                pool = pool, queue_size = nprocess)
-            except ImportError as error:
-                sys.exit("{}: Please install nestle module"
-                         "or use dynesty engine".format(error.__class__.__name__))
-        else:
-            sys.exit('wrong selection')
         try:
             pool.close()
         except:
             pass
         self.ttime = time.time() - ti
         self.result = ['nested', M, M.summary(), 'nested :{}'.format(nestedType),
-                       'dynamic : {}'.format(dynamic), 'ANN :{}'.format(neuralNetwork),
-                       'engine: {}'.format(self.engine)]
+                       'dynamic : {}'.format(dynamic), 'ANN :{}'.format(neuralNetwork)]
         return True
 
 
@@ -923,7 +903,7 @@ class DriverMC:
             AD = AllDerived()
             for pd in AD.list:
                 fpar.write(pd.name + "\t\t\t" + pd.Ltxname + "\n")
-        if self.analyzername == 'mcmc' or (self.analyzername == 'nested' and self.engine=='dynesty'):
+        if self.analyzername == 'mcmc' or self.analyzername == 'nested':
             if (self.L.name() == "Composite"):
                 self.sublikenames = self.L.compositeNames()
                 for name in self.sublikenames:
@@ -947,9 +927,7 @@ class DriverMC:
             self.result.extend(addtxt)
         if self.analyzername == 'nested':
             pp = PostProcessing(self.result, self.paramsList, self.outputpath,
-                engine=self.engine, addDerived=self.addDerived, loglike=self.L)
-            if self.engine == 'nestle':
-                pp.saveNestedChain()
+                                addDerived=self.addDerived, loglike=self.L)
         elif self.analyzername == 'emcee':
             pp = PostProcessing(self.result, self.paramsList, self.outputpath,
                                 skip=self.burnin, addDerived=self.addDerived, loglike=self.L)

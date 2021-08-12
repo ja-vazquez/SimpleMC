@@ -21,8 +21,6 @@ class PostProcessing:
         File name.
     skip : float
         Burn-in.
-    engine : str
-        Default None.
     addDerived : bool
         Derived parameters?
     loglike : object
@@ -30,13 +28,12 @@ class PostProcessing:
 
     """
     def __init__(self, list_result, paramList, filename, \
-                 skip=0.1, engine=None, addDerived=True, loglike=None):
+                 skip=0.1, addDerived=True, loglike=None):
         self.analyzername = list_result[0]
         self.result    = list_result[1]
         self.paramList = paramList
         self.filename  = filename
         self.skip      = skip
-        self.engine    = engine
         self.derived   = addDerived
         self.loglike   = loglike
         self.args = []
@@ -70,23 +67,22 @@ class PostProcessing:
                 if item is not None:
                     file.write(str(item) + '\n')
 
-        if self.engine =='dynesty':
-            pars = self.loglike.freeParameters()
-            samples, weights = self.result.samples, np.exp(self.result.logwt - self.result.logz[-1])
-            means, cov = dyfunc.mean_and_cov(samples, weights)
-            stdevs = np.sqrt(np.diag(cov))
-            
-            for i, p in enumerate(pars):
-                mean = means[i]
-                std = stdevs[i]
-                print("{}: {:.4f} +/- {:.4f}".format(p.name, mean, std))
-                file.write("{}: {:.4f} +/- {:.4f}\n".format(p.name, mean, std))
+        pars = self.loglike.freeParameters()
+        samples, weights = self.result.samples, np.exp(self.result.logwt - self.result.logz[-1])
+        means, cov = dyfunc.mean_and_cov(samples, weights)
+        stdevs = np.sqrt(np.diag(cov))
 
-            file.write("nlive: {:d}\nniter: {:d}\nncall: {:d}\n"
-                       "eff(%): {:6.3f}\nlogz: "
-                       "{:6.3f} +/- {:6.3f}".format(self.result.nlive, self.result.niter,
-                                               sum(self.result.ncall), self.result.eff,
-                                               self.result.logz[-1], self.result.logzerr[-1]))
+        for i, p in enumerate(pars):
+            mean = means[i]
+            std = stdevs[i]
+            print("{}: {:.4f} +/- {:.4f}".format(p.name, mean, std))
+            file.write("{}: {:.4f} +/- {:.4f}\n".format(p.name, mean, std))
+
+        file.write("nlive: {:d}\nniter: {:d}\nncall: {:d}\n"
+                   "eff(%): {:6.3f}\nlogz: "
+                   "{:6.3f} +/- {:6.3f}".format(self.result.nlive, self.result.niter,
+                                           sum(self.result.ncall), self.result.eff,
+                                           self.result.logz[-1], self.result.logzerr[-1]))
 
         logger.info("\nElapsed time: {:.3f} minutes = {:.3f} seconds".format(time / 60, time))
         file.write('\nElapsed time: {:.3f} minutes = {:.3f} seconds \n'.format(time / 60, time))
