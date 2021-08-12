@@ -73,7 +73,8 @@ class MaxLikeAnalyzer:
             for i, pars in enumerate(self.params):
                 pars.setError(sp.sqrt(self.cov[i, i]))
         # update with the final result
-        self.result(self.negloglike(self.res.x))
+        self.opt_loglike = self.negloglike(self.res.x)
+        self.result(self.opt_loglike)
 
 
 

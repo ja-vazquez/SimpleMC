@@ -94,8 +94,11 @@ class GA_deap:
         print("-- Best Fitness = ", best.fitness.values[0])
         print("- Best solutions are:")
         best_params = [self.change_prior(i, x) for i, x in enumerate(best)]
+        res = [""]
         for i, x in enumerate(best_params):
             print("-- Best %s = "%self.params[i].name , x)
+            res.append("{}: {:.5f}".format(self.params[i].name, x))
+        res.append("Best Fitness: {:.5f}".format(best.fitness.values[0]))
 
 
         #for i in range(self.HALL_OF_FAME_SIZE):
@@ -129,7 +132,7 @@ class GA_deap:
             ax = fig.add_subplot(111)
             plot_elipses(best_params, self.cov, idx_param1, idx_param2, ax=ax)
             plt.show()
-        return population, logbook, hof
+        return population, logbook, hof, res
 
 
 

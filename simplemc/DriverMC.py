@@ -1,7 +1,6 @@
 
 #TODO check: if self.analyzername is None
-#TODO check: ttime
-#TODO GA_deap, using baseConfig
+#TODO check: simplegenetic, mcevidence and emcee
 
 from .analyzers import MaxLikeAnalyzer
 from .analyzers import SimpleGenetic
@@ -163,6 +162,7 @@ class DriverMC:
             self.geneticdeap(iniFile=self.iniFile, **kwargs)
         else:
             sys.exit("{}: Sampler/Analyzer name invalid".format(self.analyzername))
+        self.postprocess()
         return True
 
 
@@ -288,7 +288,8 @@ class DriverMC:
                 # print("MCEvidence could not calculate the Bayesian evidence [very small weights]\n")
                 logger.error("MCEvidence could not calculate the Bayesian evidence [very small weights]")
         else:
-            self.result = ['mcmc', M, "Maxlike: {}".format(M.maxloglike)]
+            self.result = ['mcmc', M.get_results()[:2], "Maxlike: {}".format(M.maxloglike),
+                           "Gelman-Rubin diagnostic: {}".format(M.get_results()[2])]
 
         return True
 
@@ -579,7 +580,7 @@ class DriverMC:
                             plot_param1=plot_param1, plot_param2=plot_param2)
         params = self.T.printParameters(A.params)
         self.ttime = time.time() - ti
-        self.result = ['maxlike', A, params]
+        self.result = ['maxlike', A, params, 'Optimal loglike: {}'.format(A.opt_loglike)]
         return True
 
 
@@ -646,14 +647,14 @@ class DriverMC:
             n_generations = self.config.getint('genetic', 'n_generations' , fallback=1000)
             selection_method = self.config.get('genetic', 'selection_method', fallback='tournament')
             mut_prob = self.config.getfloat('genetic', 'mut_prob', fallback=0.6)
-            distribution = self.config("distribution", fallback="uniform")
-            media_distribution = self.config.getfloat("media_distribution", fallback=1.0)
-            sd_distribution = self.config.getfloat("sd_distribution", fallback=1.0)
-            min_distribution = self.config.getfloat("min_distribution", fallback=-1.0)
-            max_distribution = self.config.getfloat("max_distribution", fallback=1.0)
-            stopping_early = self.config.getboolean("stopping_early", fallback=True)
-            rounds_stopping = self.config.getint("rounds_stopping", fallback=100)
-            tolerance_stopping = self.config.getfloat("tolerance_stopping", fallback=0.01)
+            distribution = self.config.get('genetic', 'distribution', fallback='uniform')
+            media_distribution = self.config.getfloat('genetic', "media_distribution", fallback=1.0)
+            sd_distribution = self.config.getfloat('genetic', "sd_distribution", fallback=1.0)
+            min_distribution = self.config.getfloat('genetic', "min_distribution", fallback=-1.0)
+            max_distribution = self.config.getfloat('genetic', "max_distribution", fallback=1.0)
+            stopping_early = self.config.getboolean('genetic', "stopping_early", fallback=True)
+            rounds_stopping = self.config.getint('genetic', "rounds_stopping", fallback=100)
+            tolerance_stopping = self.config.getfloat('genetic', "tolerance_stopping", fallback=0.01)
         else:
             n_individuals = kwargs.pop('n_individuals', 400)
             n_generations = kwargs.pop('n_generations', 1000)
@@ -739,14 +740,18 @@ class DriverMC:
             hof_size = kwargs.pop('hof_size', 1)
             crowding_factor = skwargs.pop('crowding_factor', 1)
 
+        ti = time.time()
         M = GA_deap(self.L, self.model, population=population, crossover=crossover,
                     mutation=mutation, max_generation=max_generation,
                     hof_size=hof_size, crowding_factor=crowding_factor,
                     plot_fitness=plot_fitness, compute_errors=compute_errors,
                     show_contours=show_contours, plot_param1=plot_param1, plot_param2=plot_param2)
         result = M.main()
+        self.ttime = time.time() - ti
         #M.plotting()
-        self.result = ['genetic', M, result]
+        self.result = ['genetic', result, 'Population: {}'.format(population),
+                       'Mutation: {}'.format(mutation), 'Crosover: {}'.format(crossover),
+                       result[3]]
         return True
 
 ##---------------------- logLike and prior Transform function ----------------------
@@ -925,7 +930,7 @@ class DriverMC:
         """
         if addtxt:
             self.result.extend(addtxt)
-        if self.analyzername == 'nested':
+        if self.analyzername == 'nested' or self.analyzername == 'mcmc':
             pp = PostProcessing(self.result, self.paramsList, self.outputpath,
                                 addDerived=self.addDerived, loglike=self.L)
         elif self.analyzername == 'emcee':
@@ -933,7 +938,8 @@ class DriverMC:
                                 skip=self.burnin, addDerived=self.addDerived, loglike=self.L)
             pp.saveEmceeSamples()
         else:
-            pp = PostProcessing(self.result, self.paramsList, self.outputpath)
+            pp = PostProcessing(self.result, self.paramsList, self.outputpath,
+                                addDerived=self.addDerived, loglike=self.L)
         if summary:
             pp.writeSummary(self.ttime)
 
