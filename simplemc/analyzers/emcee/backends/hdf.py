@@ -7,7 +7,6 @@ from tempfile import NamedTemporaryFile
 
 import numpy as np
 
-from .. import __version__
 from .backend import Backend
 
 __all__ = ["HDFBackend", "TempHDFBackend", "does_hdf5_support_longdouble"]
@@ -115,7 +114,6 @@ class HDFBackend(Backend):
                 del f[self.name]
 
             g = f.create_group(self.name)
-            g.attrs["version"] = __version__
             g.attrs["nwalkers"] = nwalkers
             g.attrs["ndim"] = ndim
             g.attrs["has_blobs"] = False
