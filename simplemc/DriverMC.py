@@ -7,6 +7,7 @@ from .analyzers import SimpleGenetic
 from .analyzers import GA_deap
 from .analyzers import MCMCAnalyzer
 from .analyzers import DynamicNestedSampler, NestedSampler
+from .analyzers import EnsembleSampler
 from .cosmo.Derivedparam import AllDerived
 from . import ParseDataset, ParseModel
 from . import PostProcessing
@@ -507,20 +508,16 @@ class DriverMC:
         for bound in self.bounds:
             ini.append(np.random.uniform(bound[0], bound[1], walkers))
         inisamples = np.array(ini).T # initial samples
-        try:
-            import emcee
-            ti = time.time()
-            sampler = emcee.EnsembleSampler(walkers, self.dims,
-                                            self.logPosterior, pool=pool)
-            #testing
-            sampler.sample(initial_state=self.means, tune=True, thin_by=3)
-            # pass the initial samples and total number of samples required
-            sampler.run_mcmc(inisamples, nsamp + burnin,
-                             progress=True)
-            self.ttime = time.time() - ti
-        except ImportError as error:
-            sys.exit("{}: Please install this module"
-                     "or try using other sampler".format(error.__class__.__name__))
+
+        ti = time.time()
+        sampler = EnsembleSampler(walkers, self.dims,
+                                        self.logPosterior, pool=pool)
+        #testing
+        sampler.sample(initial_state=self.means, tune=True, thin_by=3)
+        # pass the initial samples and total number of samples required
+        sampler.run_mcmc(inisamples, nsamp + burnin,
+                         progress=True)
+        self.ttime = time.time() - ti
         self.burnin = burnin
         try:
             pool.close()
