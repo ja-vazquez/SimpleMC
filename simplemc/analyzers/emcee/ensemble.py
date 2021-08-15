@@ -441,6 +441,13 @@ class EnsembleSampler(object):
         if self.like is not None:
             self.derived = addDerived
             self.cpars = self.like.freeParameters()
+            if (self.like.name() == "Composite"):
+                self.sublikenames = self.like.compositeNames()
+                self.composite = True
+            else:
+                self.composite = False
+        else:
+            self.composite = False
 
         if initial_state is None:
             if self._previous_state is None:
@@ -463,6 +470,16 @@ class EnsembleSampler(object):
                     derivedstr = str([pd.value for pd in self.AD.listDerived(self.like)]).lstrip('[').rstrip(']')
                     derivedstr = derivedstr.replace(",", "")
                     strsamples = "{} {}".format(strsamples, derivedstr)
+                if self.composite:
+                    _, self.cloglikes = self.getLikes()
+                    ppars = copy.deepcopy(self.cpars)
+                    for p, param in enumerate(ppars):
+                        param.value = res[0][i][p]
+                    self.like.updateParams(ppars)
+                    compositestr = str(self.cloglikes.tolist()).lstrip('[').rstrip(']')
+                    compositestr = compositestr.replace(",", "")
+                    strsamples = "{} {}".format(strsamples, compositestr)
+
                 strsamples = "{}\n".format(strsamples)
                 strsamples = re.sub(' +', ' ', strsamples)
                 strsamples = re.sub('\n ', ' ', strsamples)
