@@ -913,7 +913,7 @@ class DriverMC:
                 fpar.write("theory_prior \t\t\t None \n")
 
 
-    def postprocess(self, summary=True, stats=False, addtxt=None):
+    def postprocess(self, addtxt=None):
         """
         It calls the PostProcessing class.
 
@@ -927,18 +927,9 @@ class DriverMC:
         """
         if addtxt:
             self.result.extend(addtxt)
-        if self.analyzername == 'nested' or self.analyzername == 'mcmc':
-            pp = PostProcessing(self.result, self.paramsList, self.outputpath,
-                                addDerived=self.addDerived, loglike=self.L)
-        elif self.analyzername == 'emcee':
-            pp = PostProcessing(self.result, self.paramsList, self.outputpath,
-                                skip=self.burnin, addDerived=self.addDerived, loglike=self.L)
-            pp.saveEmceeSamples()
-        else:
-            pp = PostProcessing(self.result, self.paramsList, self.outputpath,
-                                addDerived=self.addDerived, loglike=self.L)
-        if summary:
-            pp.writeSummary(self.ttime)
+        pp = PostProcessing(self.result, self.paramsList, self.outputpath,
+                            addDerived=self.addDerived, loglike=self.L)
+        pp.writeSummary(self.ttime)
 
     def plot(self, show=False):
         """
