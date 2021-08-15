@@ -1,15 +1,13 @@
-# from simplemc.tools.Simple_Plots import Simple_plots
 from simplemc.cosmo.Derivedparam import AllDerived
 from simplemc.analyzers.dynesty import utils as dyfunc
 from simplemc import logger
 import numpy as np
 import re
 
-#TODO EMCEE
 
 class PostProcessing:
     """
-    This class makes postprocessing such as generate a summary or calculates some statistics.
+    This class makes postprocessing such as generate a summary with some statistics.
 
     Parameters
     ---------
@@ -93,47 +91,3 @@ class PostProcessing:
         logger.info("\nElapsed time: {:.3f} minutes = {:.3f} seconds".format(time / 60, time))
         file.write('\nElapsed time: {:.3f} minutes = {:.3f} seconds \n'.format(time / 60, time))
         file.close()
-
-# The following need to be considered or removed.
-    def getdistAnalyzer(self, cov=False):
-        from getdist import mcsamples
-
-        mcsamplefile = mcsamples.loadMCSamples(self.filename, settings={'ignore_rows': self.skip})
-
-        if cov:
-            cov = mcsamplefile.cov(pars=self.paramList)
-            np.savetxt(self.filename + '_' + 'cov.txt', cov)
-            logger.info("Covariance matrix:\n")
-            logger.info(cov)
-            logger.info("\n")
-
-        means  = mcsamplefile.getMeans()
-        stddev = mcsamplefile.std(self.paramList)
-        summaryResults = []
-
-        for i, param in enumerate(self.paramList):
-            logger.info(self.paramList[i] + " : " + str(round(means[i], 4)) + \
-                        "+/-" + str(round(stddev[i], 4)))
-            summaryResults.append(self.paramList[i] + " : " + str(round(means[i], 4)) + \
-                                  "+/-" + str(round(stddev[i], 4)))
-        return summaryResults
-
-
-    # AJUSTAR!
-    def saveEmceeSamples(self, thin=1):
-        f = open(self.filename + '.txt', 'w+')
-        logprobs = self.result.get_log_prob(discard=self.skip, flat=True, thin=thin)
-        postsamples = self.result.get_chain(discard=self.skip, flat=True, thin=thin)
-
-        for i, row in enumerate(postsamples):
-            strsamples = str(row).lstrip('[').rstrip(']')
-            strsamples = "{} {} {}\n".format(1, -2 * (logprobs[i]), strsamples)
-            strsamples = re.sub(' +', ' ', strsamples)
-            strsamples = re.sub('\n ', ' ', strsamples)
-            if self.derived:
-                for pd in self.AD.listDerived(self.loglike):
-                    strsamples = "{} {}".format(strsamples, pd.value)
-            f.write(strsamples)
-        f.close()
-
-
