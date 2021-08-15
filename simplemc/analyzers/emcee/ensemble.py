@@ -479,7 +479,6 @@ class EnsembleSampler(object):
                     compositestr = str(self.cloglikes.tolist()).lstrip('[').rstrip(']')
                     compositestr = compositestr.replace(",", "")
                     strsamples = "{} {}".format(strsamples, compositestr)
-
                 strsamples = "{}\n".format(strsamples)
                 strsamples = re.sub(' +', ' ', strsamples)
                 strsamples = re.sub('\n ', ' ', strsamples)
