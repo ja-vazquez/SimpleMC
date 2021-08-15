@@ -25,7 +25,7 @@ class PostProcessing:
         Likelihood object.
 
     """
-    def __init__(self, list_result, paramList, filename, \
+    def __init__(self, list_result, paramList, filename,
                  skip=0.1, addDerived=True, loglike=None):
         self.analyzername = list_result[0]
         self.result    = list_result[1]
@@ -69,8 +69,14 @@ class PostProcessing:
             samples, weights = self.result.samples, np.exp(self.result.logwt - self.result.logz[-1])
         elif self.analyzername == 'mcmc':
             samples, weights = self.result[0], self.result[1]
+        elif self.analyzername == 'emcee':
+            samples = self.result.get_chain(flat=True)
+            weights = np.ones(len(samples))
+        else:
+            samples = None
+            weights = None
 
-        if self.analyzername == 'mcmc' or self.analyzername == 'nested':
+        if self.analyzername in ['mcmc', 'nested', 'emcee']:
             means, cov = dyfunc.mean_and_cov(samples, weights)
             stdevs = np.sqrt(np.diag(cov))
 
