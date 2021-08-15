@@ -55,3 +55,6 @@ class State(object):
         return iter(
             (self.coords, self.log_prob, self.random_state, self.blobs)
         )
+
+    def res(self):
+        return self.coords, self.log_prob, self.blobs, self.random_state

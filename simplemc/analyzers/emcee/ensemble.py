@@ -5,6 +5,7 @@ from itertools import count
 from typing import Dict, List, Optional, Union
 
 import numpy as np
+import re
 
 from .backends import Backend
 from .model import Model
@@ -416,7 +417,7 @@ class EnsembleSampler(object):
                 # sorts of fun stuff with the results so far.
                 yield state
 
-    def run_mcmc(self, initial_state, nsteps, **kwargs):
+    def run_mcmc(self, initial_state, nsteps, outputname='emcce_samples', **kwargs):
         """
         Iterate :func:`sample` for ``nsteps`` iterations and return the result
 
@@ -440,12 +441,18 @@ class EnsembleSampler(object):
             initial_state = self._previous_state
 
         results = None
+        f = open(outputname + '.txt', 'w+')
         for results in self.sample(initial_state, iterations=nsteps, **kwargs):
-            pass
-
+            res = results.res()
+            for i in range(self.nwalkers):
+                strsamples = str(res[0][i]).lstrip('[').rstrip(']')
+                strsamples = "{} {} {} \n".format(1, res[1][i], strsamples)
+                strsamples = re.sub(' +', ' ', strsamples)
+                strsamples = re.sub('\n ', ' ', strsamples)
+                f.write(strsamples)
+        f.close()
         # Store so that the ``initial_state=None`` case will work
         self._previous_state = results
-
         return results
 
     def compute_log_prob(self, coords):
