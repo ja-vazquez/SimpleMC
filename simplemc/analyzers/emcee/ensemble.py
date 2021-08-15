@@ -6,6 +6,9 @@ from typing import Dict, List, Optional, Union
 
 import numpy as np
 import re
+import copy
+from simplemc.cosmo.Derivedparam import AllDerived
+
 
 from .backends import Backend
 from .model import Model
@@ -417,7 +420,8 @@ class EnsembleSampler(object):
                 # sorts of fun stuff with the results so far.
                 yield state
 
-    def run_mcmc(self, initial_state, nsteps, outputname='emcce_samples', **kwargs):
+    def run_mcmc(self, initial_state, nsteps, outputname='emcce_samples',
+                 addDerived=False, simpleLike=None, **kwargs):
         """
         Iterate :func:`sample` for ``nsteps`` iterations and return the result
 
@@ -432,6 +436,12 @@ class EnsembleSampler(object):
         This method returns the most recent result from :func:`sample`.
 
         """
+        self.like = simpleLike
+        self.outputname = outputname
+        if self.like is not None:
+            self.derived = addDerived
+            self.cpars = self.like.freeParameters()
+
         if initial_state is None:
             if self._previous_state is None:
                 raise ValueError(
@@ -446,10 +456,18 @@ class EnsembleSampler(object):
             res = results.res()
             for i in range(self.nwalkers):
                 strsamples = str(res[0][i]).lstrip('[').rstrip(']')
-                strsamples = "{} {} {} \n".format(1, res[1][i], strsamples)
+                strsamples = "{} {} {} ".format(1, res[1][i], strsamples)
+                if self.derived:
+                    self.AD = AllDerived()
+                    # simpleLike -> simpleMC loglike object
+                    derivedstr = str([pd.value for pd in self.AD.listDerived(self.like)]).lstrip('[').rstrip(']')
+                    derivedstr = derivedstr.replace(",", "")
+                    strsamples = "{} {}".format(strsamples, derivedstr)
+                strsamples = "{}\n".format(strsamples)
                 strsamples = re.sub(' +', ' ', strsamples)
                 strsamples = re.sub('\n ', ' ', strsamples)
                 f.write(strsamples)
+        f.flush()
         f.close()
         # Store so that the ``initial_state=None`` case will work
         self._previous_state = results
@@ -611,6 +629,17 @@ class EnsembleSampler(object):
     def get_autocorr_time(self, **kwargs):
         return self.backend.get_autocorr_time(**kwargs)
 
+    def getLikes(self):
+        # This function is to extract the likelihoods for each observational dataset
+        # used in simplemc and write them in the output text file
+        if (self.composite):
+            cloglikes = self.like.compositeLogLikes_wprior()
+            cloglike = cloglikes.sum()
+        else:
+            cloglikes = []
+            cloglike = self.like.loglike_wprior()
+        return cloglike, cloglikes
+
     get_autocorr_time.__doc__ = Backend.get_autocorr_time.__doc__
 
 
@@ -689,3 +718,4 @@ def ndarray_to_list_of_dicts(
       list of dictionaries of parameters
     """
     return [{key: xi[val] for key, val in key_map.items()} for xi in x]
+

@@ -511,12 +511,13 @@ class DriverMC:
 
         ti = time.time()
         sampler = EnsembleSampler(walkers, self.dims,
-                                        self.logPosterior, pool=pool)
+                                  self.logPosterior, pool=pool)
         #testing
         sampler.sample(initial_state=self.means, tune=True, thin_by=3)
         # pass the initial samples and total number of samples required
         sampler.run_mcmc(inisamples, nsamp + burnin,
-                         progress=True, outputname=self.outputpath)
+                         progress=True, outputname=self.outputpath,
+                         addDerived=self.addDerived, simpleLike=self.L)
         self.ttime = time.time() - ti
         self.burnin = burnin
         try:
