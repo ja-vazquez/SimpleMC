@@ -463,7 +463,8 @@ class EnsembleSampler(object):
             res = results.res()
             for i in range(self.nwalkers):
                 strsamples = str(res[0][i]).lstrip('[').rstrip(']')
-                strsamples = "{} {} {} ".format(1, res[1][i], strsamples)
+                # 1 as weight, -logP = -(logPrior + logLike), parameters
+                strsamples = "{} {} {} ".format(1, -res[1][i], strsamples)
                 if self.derived:
                     self.AD = AllDerived()
                     # simpleLike -> simpleMC loglike object
