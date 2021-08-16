@@ -56,7 +56,7 @@ class MCMCAnalyzer:
         Gelman-Rubin criteria.
     """
     def __init__(self, like, outfile, skip=5000, nsamp=100000, temp=1.0,
-                 cov=None, chain_num=None, addDerived=False, GRstop=0.01, checkGR=500):
+                 cov=None, addDerived=False, GRstop=0.01, checkGR=500):
         
         self.like      = like
         self.outfile   = outfile
@@ -241,12 +241,8 @@ class MCMCAnalyzer:
             formstr += '%g '*(len(self.sublikenames)+1)
         formstr += '\n'
 
-        if (self.chain_num == None):
-            self.cfname  = outfile + ".txt"
-            mlfname = outfile + ".maxlike"
-        else:
-            self.cfname  = outfile + "_%i.txt" % (self.chain_num)
-            mlfname = outfile + "_%i.maxlike" % (self.chain_num)
+        self.cfname  = outfile + ".txt"
+        mlfname = outfile + ".maxlike"
 
         self.fout    = open(self.cfname, 'w')
         self.mlfout  = open(mlfname, 'w')
