@@ -867,6 +867,7 @@ class DriverMC:
         new one with extension _new in its name.
 
         """
+        self.paramFiles()
         i = 1
         f_unique = False
         while f_unique is False:
@@ -877,9 +878,6 @@ class DriverMC:
                 self.outputpath = "{}_{}".format(self.outputpath, i)
                 logger.info("{}.txt was created".format(self.outputpath))
                 f_unique = True
-
-        self.paramFiles()
-
         return True
 
     def paramFiles(self):
@@ -896,7 +894,7 @@ class DriverMC:
 
         """
         cpars   = self.L.freeParameters()
-        parfile = "{}/{}.paramnames".format(self.chainsdir, self.root)
+        parfile = "{}.paramnames".format(self.outputpath)
         fpar = open(parfile, 'w')
         for p in cpars:
             fpar.write(p.name + "\t\t\t" + p.Ltxname + "\n")
