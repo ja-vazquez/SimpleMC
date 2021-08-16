@@ -949,7 +949,7 @@ class Sampler(object):
         # Run the main nested sampling loop.
         ncall = self.ncall
         # Open text file to save samples for SimpleMC
-        f = open(self.outputname + '_1.txt', 'w+')
+        f = open(self.outputname + '.txt', 'w+')
         for it, results in enumerate(self.sample(maxiter=maxiter,
                                                  maxcall=maxcall,
                                                  dlogz=dlogz,
