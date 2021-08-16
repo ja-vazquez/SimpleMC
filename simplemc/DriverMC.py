@@ -871,8 +871,8 @@ class DriverMC:
         f_unique = False
         while f_unique is False:
             if os.path.isfile("{}_{}.txt".format(self.outputpath, i)):
-                i += 1
                 logger.info("{}_{}.txt file already exists".format(self.outputpath, i))
+                i += 1
             else:
                 self.outputpath = "{}_{}".format(self.outputpath, i)
                 logger.info("{}.txt was created".format(self.outputpath))
