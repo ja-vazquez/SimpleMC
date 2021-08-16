@@ -997,7 +997,7 @@ class Sampler(object):
                 f.write("{}\n".format(rowstr))
                 f.flush()
         f.close()
-        f = open(self.outputname + '_1.txt', "+a")
+        f = open(self.outputname + '.txt', "+a")
         # Add remaining live points to samples.
         if add_live:
             for i, results in enumerate(self.add_live_points()):
