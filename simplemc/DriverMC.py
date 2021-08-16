@@ -272,7 +272,7 @@ class DriverMC:
 
         #Main process
         M = MCMCAnalyzer(self.L, self.outputpath, skip=skip, nsamp=nsamp, temp = temp,
-                        chain_num=chainno, addDerived=self.addDerived, GRstop=GRstop, checkGR=checkGR)
+                         addDerived=self.addDerived, GRstop=GRstop, checkGR=checkGR)
 
         self.ttime = time.time() - ti
 
@@ -873,13 +873,17 @@ class DriverMC:
         new one with extension _new in its name.
 
         """
-        if os.path.isfile(self.outputpath+".txt"):
-            logger.info("{0} file already exists, {0}_new was created".format(self.outputpath))
-            self.outputpath = "{}_new".format(self.outputpath)
-        #for i in range(1,10):
-        #    if os.path.isfile("{}_{}.txt".format(self.outputpath, i)):
-        #        logger.info("{0}_{1} file already exists, {0}_new was created".format(self.outputpath, i))
-        #        self.outputpath = "{}_new".format(self.outputpath)
+        i = 1
+        f_unique = False
+        while f_unique is False:
+            if os.path.isfile("{}_{}.txt".format(self.outputpath, i)):
+                i += 1
+                logger.info("{}_{}.txt file already exists".format(self.outputpath, i))
+            else:
+                self.outputpath = "{}_{}".format(self.outputpath, i)
+                logger.info("{}_{}.txt was created".format(self.outputpath, i))
+                f_unique = True
+
         self.paramFiles()
 
         return True
@@ -898,7 +902,7 @@ class DriverMC:
 
         """
         cpars   = self.L.freeParameters()
-        parfile = self.outputpath + ".paramnames"
+        parfile = "{}/{}.paramnames".format(self.chainsdir, self.root)
         fpar = open(parfile, 'w')
         for p in cpars:
             fpar.write(p.name + "\t\t\t" + p.Ltxname + "\n")
@@ -906,7 +910,7 @@ class DriverMC:
             AD = AllDerived()
             for pd in AD.list:
                 fpar.write(pd.name + "\t\t\t" + pd.Ltxname + "\n")
-        if self.analyzername == 'mcmc' or self.analyzername == 'nested':
+        if self.analyzername in ['mcmc', 'nested', 'emcee']:
             if (self.L.name() == "Composite"):
                 self.sublikenames = self.L.compositeNames()
                 for name in self.sublikenames:
