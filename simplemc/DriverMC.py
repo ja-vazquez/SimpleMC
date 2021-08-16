@@ -875,7 +875,7 @@ class DriverMC:
                 logger.info("{}_{}.txt file already exists".format(self.outputpath, i))
             else:
                 self.outputpath = "{}_{}".format(self.outputpath, i)
-                logger.info("{}_{}.txt was created".format(self.outputpath, i))
+                logger.info("{}.txt was created".format(self.outputpath))
                 f_unique = True
 
         self.paramFiles()
