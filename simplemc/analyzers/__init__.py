@@ -5,3 +5,4 @@ from .emcee import EnsembleSampler
 from .SimpleGenetic import SimpleGenetic
 from .GA_deap import GA_deap
 from .neuralike import NeuralManager
+from .MCEvidence import MCEvidence

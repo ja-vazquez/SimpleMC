@@ -8,6 +8,7 @@ from .analyzers import GA_deap
 from .analyzers import MCMCAnalyzer
 from .analyzers import DynamicNestedSampler, NestedSampler
 from .analyzers import EnsembleSampler
+from .analyzers import MCEvidence
 from .cosmo.Derivedparam import AllDerived
 from . import ParseDataset, ParseModel
 from . import PostProcessing
@@ -273,7 +274,6 @@ class DriverMC:
         #Compute Bayesian Evidence
         if evidence:
             try:
-                from MCEvidence import MCEvidence
                 logger.info("Aproximating bayesian evidence with MCEvidence (arXiv:1704.03472)\n")
                 MLE = MCEvidence(self.outputpath + ".txt" ).evidence()
                 self.result = ['mcmc', M, "Evidence with MCEvidence : {}\n".format(MLE), strresult]
