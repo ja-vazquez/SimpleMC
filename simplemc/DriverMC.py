@@ -274,7 +274,6 @@ class DriverMC:
         #Compute Bayesian Evidence
         if evidence:
             try:
-                from MCEvidence import MCEvidence
                 logger.info("Aproximating bayesian evidence with MCEvidence (arXiv:1704.03472)\n")
                 MLE = MCEvidence(self.outputpath + ".txt" ).evidence()
                 self.result = ['mcmc', M, "Evidence with MCEvidence : {}\n".format(MLE), strresult]
