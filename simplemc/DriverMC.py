@@ -8,6 +8,7 @@ from .analyzers import GA_deap
 from .analyzers import MCMCAnalyzer
 from .analyzers import DynamicNestedSampler, NestedSampler
 from .analyzers import EnsembleSampler
+from .analyzers import MCEvidence
 from .cosmo.Derivedparam import AllDerived
 from . import ParseDataset, ParseModel
 from . import PostProcessing
