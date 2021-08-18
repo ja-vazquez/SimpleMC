@@ -5,9 +5,11 @@ except:
     import warnings
     warnings.warn("Pleas install DEAP library if you want to use ga_deap genetic algorithms.")
 
+import re
+
 
 def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
-             halloffame=None, verbose=__debug__):
+             halloffame=None, outputname='deap_output.txt', verbose=__debug__):
     """This algorithm is similar to DEAP eaSimple() algorithm, with the modification that
     halloffame is used to implement an elitism mechanism. The individuals contained in the
     halloffame are directly injected into the next generation and are not subject to the
@@ -33,6 +35,10 @@ def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
     if verbose:
         print(logbook.stream)
 
+    # Write output file on the fly
+    f = open(outputname, 'w')
+    f.write("#Generation individual fitness(last column)\n")
+
     # Begin the generational process
     for gen in range(1, ngen + 1):
 
@@ -48,11 +54,28 @@ def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
 
+        # Write generation, individual and fitness in output file
+        fitnesses_all = toolbox.map(toolbox.evaluate, offspring)
+        for indall, fitall in zip(offspring, fitnesses_all):
+            strindall = str(indall).lstrip('[').rstrip(']')
+            strfitall = str(fitall).lstrip('(').rstrip(')')
+            strrow = "{} {} {}\n".format(gen, strindall, strfitall)
+            strrow = re.sub(',', '', strrow)
+            f.write(strrow)
+
         # add the best back to population:
         offspring.extend(halloffame.items)
 
         # Update the hall of fame with the generated individuals
         halloffame.update(offspring)
+
+        # Write the hall of fame of the current generation in the outputfile
+        fithof = toolbox.evaluate(halloffame.items[-1])
+        strhof = str(halloffame).lstrip('[').rstrip(']')
+        strfithof = str(fithof).lstrip('(').rstrip(')')
+        strtmp = "{} {}\n".format(strhof, strfithof)
+        strtmp = re.sub(',', '', strtmp)
+        f.write("# Hall of fame of generation {}: {}".format(gen, strtmp))
 
         # Replace the current population by the offspring
         population[:] = offspring
@@ -63,5 +86,6 @@ def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
         if verbose:
             print(logbook.stream)
 
+    f.close()
     return population, logbook
 
