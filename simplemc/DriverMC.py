@@ -692,7 +692,7 @@ class DriverMC:
 
         """
         if self.analyzername is None: self.analyzername = 'ga_deap'
-        self.outputpath = '{}_{}_ga_deap'.format(self.outputpath, self.analyzername)
+        self.outputpath = '{}_{}'.format(self.outputpath, self.analyzername)
         self.outputChecker()
         if iniFile:
             plot_fitness = self.config.getboolean('ga_deap', 'plot_fitness', fallback=False)
