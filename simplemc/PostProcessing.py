@@ -3,6 +3,8 @@ from simplemc.analyzers.dynesty import utils as dyfunc
 from simplemc import logger
 import numpy as np
 import re
+import sys
+from .analyzers import MCEvidence
 
 
 class PostProcessing:
@@ -97,3 +99,32 @@ class PostProcessing:
         logger.info("\nElapsed time: {:.3f} minutes = {:.3f} seconds".format(time / 60, time))
         file.write('\nElapsed time: {:.3f} minutes = {:.3f} seconds \n'.format(time / 60, time))
         file.close()
+
+    def mcevidence(self):
+        if self.analyzername not in ['mcmc', 'nested', 'emcee']:
+            sys.exit('MCEvidence only work on Bayesian samplers (mcmc, nested, '
+                     'emcee) not in optimizers')
+
+        mcev = MCEvidence('{}.txt'.format(self.filename))
+        mcevres = mcev.evidence(covtype='all')
+
+        burn_frac = 0.0
+
+        if (mcevres == np.inf).all():
+            logger.info("MCEvidence failed to calculate Bayesian evidence,\n"
+                        " it is trying again.")
+            valid = False
+            while not valid:
+                burn_frac += 0.1
+                logger.info("Burn-in: {}%".format(burn_frac*100))
+                mcev = MCEvidence('{}.txt'.format(self.filename),
+                                  burnlen=burn_frac)
+
+                mcevres = mcev.evidence(covtype='all')
+                if not (mcevres == np.inf).all():
+                    valid = True
+                if burn_frac > 0.8:
+                    print("MCEvidence can't estimate the evidence to your samples")
+
+        return '\nlog-Evidence with mcevidence: {}\n' \
+                   'Burn-in fraction: {:.1}\n'.format(mcevres, burn_frac)
