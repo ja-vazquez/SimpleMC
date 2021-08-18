@@ -70,7 +70,7 @@ def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
         halloffame.update(offspring)
 
         # Write the hall of fame of the current generation in the outputfile
-        fithof = toolbox.evaluate(halloffame.items[-1])
+        fithof = toolbox.evaluate(halloffame.items[0])
         strhof = str(halloffame).lstrip('[').rstrip(']')
         strfithof = str(fithof).lstrip('(').rstrip(')')
         strtmp = "{} {}\n".format(strhof, strfithof)
