@@ -3,7 +3,12 @@ try:
     from deap import algorithms
 except:
     import warnings
-    warnings.warn("Pleas install DEAP library if you want to use ga_deap genetic algorithms.")
+    warnings.warn("Please install DEAP library if you want to use ga_deap genetic algorithms.")
+    try:
+        import sys
+        sys.exit("Exit.")
+    except:
+        pass
 
 import re
 
