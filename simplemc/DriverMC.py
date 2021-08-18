@@ -722,11 +722,13 @@ class DriverMC:
             crowding_factor = skwargs.pop('crowding_factor', 1)
 
         ti = time.time()
-        M = GA_deap(self.L, self.model, population=population, crossover=crossover,
+        M = GA_deap(self.L, self.model, outputname=self.outputpath,
+                    population=population, crossover=crossover,
                     mutation=mutation, max_generation=max_generation,
                     hof_size=hof_size, crowding_factor=crowding_factor,
                     plot_fitness=plot_fitness, compute_errors=compute_errors,
-                    show_contours=show_contours, plot_param1=plot_param1, plot_param2=plot_param2)
+                    show_contours=show_contours, plot_param1=plot_param1,
+                    plot_param2=plot_param2)
         result = M.main()
         self.ttime = time.time() - ti
         #M.plotting()
