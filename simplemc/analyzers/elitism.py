@@ -9,7 +9,7 @@ import re
 
 
 def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
-             halloffame=None, outputname='deap_output.txt', verbose=__debug__):
+             halloffame=None, outputname='deap_output', verbose=__debug__):
     """This algorithm is similar to DEAP eaSimple() algorithm, with the modification that
     halloffame is used to implement an elitism mechanism. The individuals contained in the
     halloffame are directly injected into the next generation and are not subject to the
@@ -36,8 +36,8 @@ def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
         print(logbook.stream)
 
     # Write output file on the fly
-    f = open(outputname, 'w')
-    f.write("#Generation individual fitness(last column)\n")
+    f = open('{}.txt'.format(outputname), 'w')
+    f.write("#Generation(first column) individual fitness(last column)\n")
 
     # Begin the generational process
     for gen in range(1, ngen + 1):

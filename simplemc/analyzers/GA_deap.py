@@ -38,13 +38,15 @@ class GA_deap:
         :param plot_param2: a parameter to plot in y-axis.
 
     """
-    def __init__(self, like, model, population=20, crossover=0.7,
+    def __init__(self, like, model, outputname='deap_output',
+                 population=20, crossover=0.7,
                  mutation=0.3, max_generation=20, hof_size=1,
                  crowding_factor=1, plot_fitness=False,
                  compute_errors=False, show_contours=False,
                  plot_param1=None, plot_param2=None):
         self.like = like
         self.model = model
+        self.outputname = outputname
         self.params = like.freeParameters()
         self.vpars = [p.value for p in self.params]
         self.sigma = sp.array([p.error for p in self.params])
@@ -87,7 +89,8 @@ class GA_deap:
         # perform the Genetic Algorithm flow with elitism:
         population, logbook = elitism.eaSimpleWithElitism(population, toolbox, cxpb=self.P_CROSSOVER,\
                                                           mutpb=self.P_MUTATION, ngen=self.MAX_GENERATIONS,\
-                                                          stats=stats, halloffame=hof, verbose=True)
+                                                          stats=stats, halloffame=hof, verbose=True,
+                                                          outputname=self.outputname)
 
         # print info for best solution found:
         best = hof.items[0]
