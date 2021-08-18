@@ -37,7 +37,7 @@ def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
 
     # Write output file on the fly
     f = open('{}.txt'.format(outputname), 'w')
-    f.write("#Generation(first column) individual fitness(last column)\n")
+    f.write("#Generation(first column) individual(intermediate columns) fitness(last column)\n")
 
     # Begin the generational process
     for gen in range(1, ngen + 1):
