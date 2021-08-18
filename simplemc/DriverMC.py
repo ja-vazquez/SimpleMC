@@ -733,6 +733,7 @@ class DriverMC:
         self.ttime = time.time() - ti
         #M.plotting()
         self.result = ['genetic', result, 'Population: {}'.format(population),
+                       'Max number of generations: {}'.format(max_generation),
                        'Mutation: {}'.format(mutation), 'Crosover: {}'.format(crossover),
                        result[3]]
         return True
