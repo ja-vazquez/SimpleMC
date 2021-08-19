@@ -1,6 +1,5 @@
 
 #TODO check: if self.analyzername is None
-#TODO check: simplegenetic, mcevidence and emcee
 
 from .analyzers import MaxLikeAnalyzer
 from .analyzers import SimpleGenetic
