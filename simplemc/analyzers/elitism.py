@@ -42,7 +42,7 @@ def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
 
     # Write output file on the fly
     f = open('{}.txt'.format(outputname), 'w')
-    f.write("#Generation(first column) individual(intermediate columns) fitness(last column)\n")
+    f.write("#Generation(first column) fitness(second column) individual\n")
 
     # Begin the generational process
     for gen in range(1, ngen + 1):
@@ -59,12 +59,13 @@ def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
 
+        # SimpleMC_change
         # Write generation, individual and fitness in output file
         fitnesses_all = toolbox.map(toolbox.evaluate, offspring)
         for indall, fitall in zip(offspring, fitnesses_all):
             strindall = str(indall).lstrip('[').rstrip(']')
             strfitall = str(fitall).lstrip('(').rstrip(')')
-            strrow = "{} {} {}\n".format(gen, strindall, strfitall)
+            strrow = "{} {} {}\n".format(gen, strfitall, strindall)
             strrow = re.sub(',', '', strrow)
             f.write(strrow)
 
@@ -73,14 +74,6 @@ def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
 
         # Update the hall of fame with the generated individuals
         halloffame.update(offspring)
-
-        # Write the hall of fame of the current generation in the outputfile
-        fithof = toolbox.evaluate(halloffame.items[0])
-        strhof = str(halloffame).lstrip('[').rstrip(']')
-        strfithof = str(fithof).lstrip('(').rstrip(')')
-        strtmp = "{} {}\n".format(strhof, strfithof)
-        strtmp = re.sub(',', '', strtmp)
-        f.write("# Hall of fame of generation {}: {}".format(gen, strtmp))
 
         # Replace the current population by the offspring
         population[:] = offspring
