@@ -2,7 +2,6 @@
 #TODO check: if self.analyzername is None
 
 from .analyzers import MaxLikeAnalyzer
-from .analyzers import SimpleGenetic
 from .analyzers import GA_deap
 from .analyzers import MCMCAnalyzer
 from .analyzers import DynamicNestedSampler, NestedSampler
@@ -48,7 +47,7 @@ class DriverMC:
 
         analyzername : str
             The name of the analyzer. It can be a sampler: {mcmc, nested, emcee}
-            or a optimizer: {maxlike, genetic}
+            or a optimizer: {maxlike, ga_deap}
 
         compute_derived : bool
             True generates at the flight some derived parameters (such as
@@ -104,7 +103,7 @@ class DriverMC:
                 logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
                             'DriverMC **kwargs are:\n\tmodel\n\t'
                             'datasets\n\t'
-                            'analyzername {"nested", "mcmc", "maxlike", "emcee" , "genetic"} Default: mcmc'
+                            'analyzername {"nested", "mcmc", "maxlike", "emcee" , "ga_deap"} Default: mcmc'
                             '\n\tchainsdir Default: SimpleMC_chains\n\t')
                 sys.exit(1)
 
@@ -146,7 +145,7 @@ class DriverMC:
         """
         This is a wrapper of the runners of the analyzer in order to make
         easier the execution, mainly if is through an ini file.
-        **kwargs from mcmcRunner, nestedRunner, emceeRunner, geneticRunner and maxlikeRunner.
+        **kwargs from mcmcRunner, nestedRunner, emceeRunner, genetic_deap and maxlikeRunner.
 
         """
         if self.analyzername == 'mcmc':
@@ -157,8 +156,6 @@ class DriverMC:
             self.emceeRunner(iniFile=self.iniFile, **kwargs)
         elif self.analyzername == 'maxlike':
             self.maxLikeRunner(iniFile=self.iniFile, **kwargs)
-        elif self.analyzername == 'genetic':
-            self.geneticRunner(iniFile=self.iniFile, **kwargs)
         elif self.analyzername == 'ga_deap':
             self.geneticdeap(iniFile=self.iniFile, **kwargs)
         else:
@@ -566,125 +563,6 @@ class DriverMC:
 
 ##---------------------- Genetic Algorithms ----------------------
 
-
-    def geneticRunner(self, iniFile=None, **kwargs):
-        """
-        It calls SimpleGenetic class.
-
-        Parameters
-        -----------
-        n_individuals : int
-            Number of individuals.
-
-        n_generations : int
-            Number of generations.
-
-        selection_method : str
-            Selection method {tournament, roulette, rank}
-
-        mut_prob : float
-            Probability of mutation.
-
-        distribution : str
-            {"uniform", "gaussian", "random"}
-            Default: uniform
-
-        media_distribution : float
-            Media value for gaussian distributions
-
-        sd_distribution : float
-            Standard deviation for gaussian distributions
-            Default: 1.0
-
-        min_distribution : float
-            Minimum value for uniform distributions
-            Default: -1.0
-
-        max_distribution : float
-            Maximum value for uniform distributions
-            Default: 1.0
-
-        stopping_early : bool
-            It needs a not None value for "rounds_stopping" and "tolerance_stopping".
-            Default: True
-
-        rounds_stopping : int
-            Rounds to consider to stopping early with the tolerance_stopping value.
-            Default : 100
-
-        tolerance_stopping : float
-            Value to stopping early criteria. This value is the difference between the
-            best fit for the latest rounds_stopping generations.
-            Default : 0.01
-
-        """
-        if self.analyzername is None: self.analyzername = 'genetic'
-        self.outputpath = '{}_{}_optimization'.format(self.outputpath, self.analyzername)
-        self.outputChecker()
-
-        if iniFile:
-            n_individuals = self.config.getint('genetic', 'n_individuals', fallback=400)
-            n_generations = self.config.getint('genetic', 'n_generations' , fallback=1000)
-            selection_method = self.config.get('genetic', 'selection_method', fallback='tournament')
-            mut_prob = self.config.getfloat('genetic', 'mut_prob', fallback=0.6)
-            distribution = self.config.get('genetic', 'distribution', fallback='uniform')
-            media_distribution = self.config.getfloat('genetic', "media_distribution", fallback=1.0)
-            sd_distribution = self.config.getfloat('genetic', "sd_distribution", fallback=1.0)
-            min_distribution = self.config.getfloat('genetic', "min_distribution", fallback=-1.0)
-            max_distribution = self.config.getfloat('genetic', "max_distribution", fallback=1.0)
-            stopping_early = self.config.getboolean('genetic', "stopping_early", fallback=True)
-            rounds_stopping = self.config.getint('genetic', "rounds_stopping", fallback=100)
-            tolerance_stopping = self.config.getfloat('genetic', "tolerance_stopping", fallback=0.01)
-        else:
-            n_individuals = kwargs.pop('n_individuals', 400)
-            n_generations = kwargs.pop('n_generations', 1000)
-            selection_method = kwargs.pop('selection_method', 'tournament')
-            mut_prob = kwargs.pop('mut_prob', 0.6)
-            distribution = kwargs.pop("distribution", "uniform")
-            media_distribution = kwargs.pop("media_distribution", 1)
-            sd_distribution = kwargs.pop("sd_distribution", 1)
-            min_distribution = kwargs.pop("min_distribution", -1)
-            max_distribution = kwargs.pop("max_distribution", 1)
-            stopping_early = kwargs.pop("stopping_early", True)
-            rounds_stopping = kwargs.pop("rounds_stopping", 100)
-            tolerance_stopping = kwargs.pop("tolerance_stopping", 0.01)
-            if kwargs:
-                logger.critical('Unexpected **kwargs for genetic optimizer: {}'.format(kwargs))
-                logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
-                            'genetic executer options are:'
-                            '\n\tn_individuals (int) Default: 400\n\t'
-                            'n_generations (int) Default: 1000\n\t'
-                            'selection_method {"tournament","rank","roulette"} Default: "tournament"'
-                            '\n\tmut_prob (float) Default: 0.4')
-                sys.exit(1)
-        logger.info("\n\tn_individuals: {}\n\tn_generations: {}"
-                    "\n\tselection method: {}\n\t"
-                    "mut prob: {}".format(n_individuals, n_generations,
-                                        selection_method,mut_prob))
-        ti = time.time()
-
-        M = SimpleGenetic(self.logLike, self.dims, self.bounds,
-                          n_individuals=n_individuals,
-                          n_generations=n_generations,
-                          prob_mut=mut_prob, method_selection=selection_method,
-                          distribution=distribution,
-                          media_distribution=media_distribution,
-                          sd_distribution=sd_distribution,
-                          min_distribution=min_distribution,
-                          max_distribution=max_distribution,
-                          stopping_early=stopping_early,
-                          rounds_stopping=rounds_stopping,
-                          tolerance_stopping=tolerance_stopping,
-                          outputname=self.outputpath)
-
-        result = M.optimize()
-        self.ttime = time.time() - ti
-        self.result = ['genetic', M, result]
-        return True
-
-
-##----------------------
-
     def geneticdeap(self, iniFile=None, **kwargs):
         """
         Genetic algorithms from Deap library.
@@ -938,8 +816,7 @@ class DriverMC:
         """
         from .tools.SimplePlotter import SimplePlotter
         figure = SimplePlotter(self.chainsdir, self.paramsList, path=self.outputpath, show=show)
-        if self.analyzername == "genetic":
-            figure.simplex_vs_y(xlabel="iterations", ylabel="best fitness")
+
         return figure
 
 # ### pool from multiprocessing
