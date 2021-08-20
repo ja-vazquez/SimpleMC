@@ -56,7 +56,7 @@ class MCMCAnalyzer:
         Gelman-Rubin criteria.
     """
     def __init__(self, like, outfile, skip=5000, nsamp=100000, temp=1.0,
-                 cov=None, addDerived=False, GRstop=0.01, checkGR=500):
+                 cov=None, chain_num=None, addDerived=False, GRstop=0.01, checkGR=500):
         
         self.like      = like
         self.outfile   = outfile
@@ -172,7 +172,6 @@ class MCMCAnalyzer:
                 recvmsg = comm.bcast(condition, root=0)
                 if recvmsg ==1:
                     print('\n---- Gelman-Rubin achived ---- ')
-                    self.closeFiles()
                     return True
 
 
@@ -242,8 +241,12 @@ class MCMCAnalyzer:
             formstr += '%g '*(len(self.sublikenames)+1)
         formstr += '\n'
 
-        self.cfname  = outfile + ".txt"
-        mlfname = outfile + ".maxlike"
+        if (self.chain_num == None):
+            self.cfname  = outfile + ".txt"
+            mlfname = outfile + ".maxlike"
+        else:
+            self.cfname  = outfile + "_%i.txt" % (self.chain_num)
+            mlfname = outfile + "_%i.maxlike" % (self.chain_num)
 
         self.fout    = open(self.cfname, 'w')
         self.mlfout  = open(mlfname, 'w')
@@ -253,8 +256,7 @@ class MCMCAnalyzer:
     def closeFiles(self):
         chain = loadtxt(self.cfname)
         self.weights = chain[:, 0]
-        self.samples = chain[:, 2:2 + self.N]
-        self.fout.close()
+        self.samples = chain[:, 2:self.N+2]
         self.mlfout.close()
 
 
