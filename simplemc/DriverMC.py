@@ -83,6 +83,7 @@ class DriverMC:
             self.addDerived   = kwargs.pop('addDerived', False)
             self.useNeuralLike = kwargs.pop('useNeuralLike', False)
             self.mcevidence = kwargs.pop('mcevidence', False)
+            self.overwrite = kwargs.pop('overwrite', True)
 
 
             ## Next two are for custom model
@@ -190,6 +191,7 @@ class DriverMC:
         self.addDerived   = self.config.getboolean( 'custom', 'addDerived',   fallback=False)
         self.useNeuralLike = self.config.getboolean('custom', 'useNeuralLike', fallback=False)
         self.mcevidence = self.config.getboolean('custom', 'mcevidence', fallback=False)
+        self.overwrite = self.config.getboolean('custom', 'overwrite', fallback=True)
 
         self.custom_parameters = self.config.get(   'custom', 'custom_parameters', fallback=None)
         self.custom_function   = self.config.get(   'custom', 'custom_function',   fallback=None)
@@ -738,15 +740,18 @@ class DriverMC:
         """
         self.paramFiles()
         i = 1
-        f_unique = False
-        while f_unique is False:
-            if os.path.isfile("{}_{}.txt".format(self.outputpath, i)):
-                logger.info("{}_{}.txt file already exists".format(self.outputpath, i))
-                i += 1
-            else:
-                self.outputpath = "{}_{}".format(self.outputpath, i)
-                logger.info("{}.txt was created".format(self.outputpath))
-                f_unique = True
+        if self.overwrite:
+            self.outputpath = "{}".format(self.outputpath)
+
+
+        else:
+            filename_re = '{self.outputpath}_\d.txt'
+            for filename in os.listdir(directory):
+                print(filename)
+                if re.search(filename_re, filename):
+                    sys.exit('File with outputname {} already exists.\n'
+                             'Please move your files or set overwrite=True to'
+                             'overwrite outputs'.format(self.outputpath))
         return True
 
     def paramFiles(self):

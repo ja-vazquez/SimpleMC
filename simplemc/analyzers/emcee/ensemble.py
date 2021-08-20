@@ -458,7 +458,7 @@ class EnsembleSampler(object):
             initial_state = self._previous_state
 
         results = None
-        f = open(outputname + '.txt', 'w+')
+        f = open(outputname + '_1.txt', 'w+')
         for results in self.sample(initial_state, iterations=nsteps, **kwargs):
             res = results.res()
             for i in range(self.nwalkers):
