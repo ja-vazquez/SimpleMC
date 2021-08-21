@@ -742,16 +742,11 @@ class DriverMC:
         i = 1
         if self.overwrite:
             self.outputpath = "{}".format(self.outputpath)
-
-
         else:
-            filename_re = '{self.outputpath}_\d.txt'
-            for filename in os.listdir(directory):
-                print(filename)
-                if re.search(filename_re, filename):
-                    sys.exit('File with outputname {} already exists.\n'
-                             'Please move your files or set overwrite=True to'
-                             'overwrite outputs'.format(self.outputpath))
+            if os.path.isfile("{}_1.txt".format(self.outputpath)):
+                sys.exit('File with outputname {}_1.txt already exists.\n'
+                         'Please move your files or set overwrite=True to g'
+                         'overwrite outputs'.format(self.outputpath))
         return True
 
     def paramFiles(self):
