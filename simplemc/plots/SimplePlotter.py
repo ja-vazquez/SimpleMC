@@ -32,7 +32,7 @@ class SimplePlotter:
         burnin = kwargs.pop("burnin", 0.2)
         colors = kwargs.pop("colors", ['red', 'blue', 'black', 'green', 'yellow', 'purple', 'gray'])
         legend_labels = kwargs.pop("legend_labels", [])
-        filled = kwargs.pop("filled", False)
+        filled = kwargs.pop("filled", True)
         normalized = kwargs.pop("normalized", False)
         shaded = kwargs.pop("shaded", False)
         label = kwargs.pop("label", None)
