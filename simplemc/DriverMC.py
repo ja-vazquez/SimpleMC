@@ -805,20 +805,6 @@ class DriverMC:
             pp.writeSummary(self.ttime)
 
 
-    def plot(self, show=False):
-        """
-        Simple connection with the plotters.
-
-        Parameters
-        -----------
-        show : bool
-            Default False
-        """
-        from .tools.SimplePlotter import SimplePlotter
-        figure = SimplePlotter(self.chainsdir, self.paramsList, path=self.outputpath, show=show)
-
-        return figure
-
 # ### pool from multiprocessing
 
     def mppool(self, nproc):
