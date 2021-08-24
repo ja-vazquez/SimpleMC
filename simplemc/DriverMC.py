@@ -84,7 +84,10 @@ class DriverMC:
             self.useNeuralLike = kwargs.pop('useNeuralLike', False)
             self.mcevidence = kwargs.pop('mcevidence', False)
             self.overwrite = kwargs.pop('overwrite', True)
-
+            self.getdist = kwargs.pop('getdist', False)
+            self.corner = kwargs.pop('corner', False)
+            self.simpleplot = kwargs.pop('simpleplot', False)
+            self.showfig = kwargs.pop('showfig', False)
 
             ## Next two are for custom model
             self.custom_parameters = kwargs.pop('custom_parameters', None)
@@ -192,6 +195,10 @@ class DriverMC:
         self.useNeuralLike = self.config.getboolean('custom', 'useNeuralLike', fallback=False)
         self.mcevidence = self.config.getboolean('custom', 'mcevidence', fallback=False)
         self.overwrite = self.config.getboolean('custom', 'overwrite', fallback=True)
+        self.getdist = self.config.getboolean('custom', 'getdist', fallback=False)
+        self.corner = self.config.getboolean('custom', 'corner', fallback=False)
+        self.simpleplot = self.config.getboolean('custom', 'simpleplot', fallback=False)
+        self.showfig = self.config.getboolean('custom', 'showfig', fallback=False)
 
         self.custom_parameters = self.config.get(   'custom', 'custom_parameters', fallback=None)
         self.custom_function   = self.config.get(   'custom', 'custom_function',   fallback=None)
@@ -804,6 +811,12 @@ class DriverMC:
         else:
             pp.writeSummary(self.ttime)
 
+        if self.getdist:
+            pp.plot(chainsdir=self.chainsdir, show=self.showfig).simpleGetdist()
+        if self.corner:
+            pp.plot(chainsdir=self.chainsdir, show=self.showfig).simpleCorner()
+        if self.simpleplot:
+            pp.plot(chainsdir=self.chainsdir, show=self.showfig).simplePlot()
 
 # ### pool from multiprocessing
 
