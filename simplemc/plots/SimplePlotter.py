@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import webbrowser
 
+
 class SimplePlotter:
     def __init__(self, chainsdir, listpars, path=None, root=None, show=False, weights=None):
         self.chainsdir = chainsdir
@@ -127,7 +128,6 @@ class SimplePlotter:
         """
         Native simplemc plotter
         """
-        from simplemc.tools.Simple_Plots import Simple_plots
         type = kwargs.pop('type', 'triangle')
         roots = kwargs.pop('roots', [self.root])
         nchains = kwargs.pop('nchains', None)
