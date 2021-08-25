@@ -118,7 +118,7 @@ class PostProcessing:
                 burn_frac += 0.1
                 logger.info("Burn-in: {}%".format(burn_frac*100))
                 mcev = MCEvidence('{}'.format(self.filename),
-                                  burnlen=burn_frac)
+                                  burnlen=burn_frac, kmax=k)
 
                 mcevres = mcev.evidence(covtype='all')
                 if not (mcevres == np.inf).all():

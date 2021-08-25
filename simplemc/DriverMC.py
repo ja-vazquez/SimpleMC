@@ -806,7 +806,7 @@ class DriverMC:
                             addDerived=self.addDerived, loglike=self.L)
         if self.mcevidence:
             try:
-                ev = pp.mcevidence(k=self.mcevidence_k)
+                ev = pp.mcevidence(k=self.mcevidence_k+1)
                 pp.writeSummary(self.ttime, ev)
             except:
                 pp.writeSummary(self.ttime)
