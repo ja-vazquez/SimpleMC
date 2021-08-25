@@ -83,6 +83,7 @@ class DriverMC:
             self.addDerived   = kwargs.pop('addDerived', False)
             self.useNeuralLike = kwargs.pop('useNeuralLike', False)
             self.mcevidence = kwargs.pop('mcevidence', False)
+            self.mcevidence_k = kwargs.pop('mcevidence_k', 4)
             self.overwrite = kwargs.pop('overwrite', True)
             self.getdist = kwargs.pop('getdist', False)
             self.corner = kwargs.pop('corner', False)
@@ -194,6 +195,7 @@ class DriverMC:
         self.addDerived   = self.config.getboolean( 'custom', 'addDerived',   fallback=False)
         self.useNeuralLike = self.config.getboolean('custom', 'useNeuralLike', fallback=False)
         self.mcevidence = self.config.getboolean('custom', 'mcevidence', fallback=False)
+        self.mcevidence_k = self.config.getint('custom', 'mcevidence_k', fallback=4)
         self.overwrite = self.config.getboolean('custom', 'overwrite', fallback=True)
         self.getdist = self.config.getboolean('custom', 'getdist', fallback=False)
         self.corner = self.config.getboolean('custom', 'corner', fallback=False)
@@ -804,7 +806,7 @@ class DriverMC:
                             addDerived=self.addDerived, loglike=self.L)
         if self.mcevidence:
             try:
-                ev = pp.mcevidence()
+                ev = pp.mcevidence(k=self.mcevidence_k)
                 pp.writeSummary(self.ttime, ev)
             except:
                 pp.writeSummary(self.ttime)
