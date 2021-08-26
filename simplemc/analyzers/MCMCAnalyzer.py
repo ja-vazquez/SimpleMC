@@ -256,8 +256,7 @@ class MCMCAnalyzer:
     def closeFiles(self):
         chain = loadtxt(self.cfname)
         self.weights = chain[:, 0]
-        self.samples = chain[:, 2:2 + self.N]
-        self.fout.close()
+        self.samples = chain[:, 2:self.N+2]
         self.mlfout.close()
 
 

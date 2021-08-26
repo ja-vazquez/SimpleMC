@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import webbrowser
 
+
 class SimplePlotter:
     def __init__(self, chainsdir, listpars, path=None, root=None, show=False, weights=None):
         self.chainsdir = chainsdir
@@ -28,10 +29,10 @@ class SimplePlotter:
         from getdist import plots, MCSamples, chains
         smooth2d = kwargs.pop("smooth2d", 0.3)
         smooth1d = kwargs.pop("smooth1d", 0.3)
-        burnin = kwargs.pop("burnin", 0.2)
+        burnin = kwargs.pop("burnin", 0.1)
         colors = kwargs.pop("colors", ['red', 'blue', 'black', 'green', 'yellow', 'purple', 'gray'])
         legend_labels = kwargs.pop("legend_labels", [])
-        filled = kwargs.pop("filled", False)
+        filled = kwargs.pop("filled", True)
         normalized = kwargs.pop("normalized", False)
         shaded = kwargs.pop("shaded", False)
         label = kwargs.pop("label", None)
@@ -127,7 +128,6 @@ class SimplePlotter:
         """
         Native simplemc plotter
         """
-        from simplemc.tools.Simple_Plots import Simple_plots
         type = kwargs.pop('type', 'triangle')
         roots = kwargs.pop('roots', [self.root])
         nchains = kwargs.pop('nchains', None)

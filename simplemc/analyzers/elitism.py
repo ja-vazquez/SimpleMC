@@ -3,11 +3,18 @@ try:
     from deap import algorithms
 except:
     import warnings
-    warnings.warn("Pleas install DEAP library if you want to use ga_deap genetic algorithms.")
+    warnings.warn("Please install DEAP library if you want to use ga_deap genetic algorithms.")
+    try:
+        import sys
+        sys.exit("Exit.")
+    except:
+        pass
+
+import re
 
 
 def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
-             halloffame=None, verbose=__debug__):
+             halloffame=None, outputname='deap_output', verbose=__debug__):
     """This algorithm is similar to DEAP eaSimple() algorithm, with the modification that
     halloffame is used to implement an elitism mechanism. The individuals contained in the
     halloffame are directly injected into the next generation and are not subject to the
@@ -33,6 +40,10 @@ def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
     if verbose:
         print(logbook.stream)
 
+    # Write output file on the fly
+    f = open('{}_1.txt'.format(outputname), 'w')
+    f.write("#Generation(first column) fitness(second column) individual\n")
+
     # Begin the generational process
     for gen in range(1, ngen + 1):
 
@@ -47,6 +58,16 @@ def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
         fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
+
+        # SimpleMC_change
+        # Write generation, individual and fitness in output file
+        fitnesses_all = toolbox.map(toolbox.evaluate, offspring)
+        for indall, fitall in zip(offspring, fitnesses_all):
+            strindall = str(indall).lstrip('[').rstrip(']')
+            strfitall = str(fitall).lstrip('(').rstrip(')')
+            strrow = "{} {} {}\n".format(gen, strfitall, strindall)
+            strrow = re.sub(',', '', strrow)
+            f.write(strrow)
 
         # add the best back to population:
         offspring.extend(halloffame.items)
@@ -63,5 +84,6 @@ def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
         if verbose:
             print(logbook.stream)
 
+    f.close()
     return population, logbook
 

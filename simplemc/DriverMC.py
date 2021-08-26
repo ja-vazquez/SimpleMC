@@ -1,12 +1,11 @@
 
 #TODO check: if self.analyzername is None
-#TODO check: simplegenetic, mcevidence and emcee
 
 from .analyzers import MaxLikeAnalyzer
-from .analyzers import SimpleGenetic
 from .analyzers import GA_deap
 from .analyzers import MCMCAnalyzer
 from .analyzers import DynamicNestedSampler, NestedSampler
+from .analyzers import EnsembleSampler
 from .cosmo.Derivedparam import AllDerived
 from . import ParseDataset, ParseModel
 from . import PostProcessing
@@ -48,7 +47,7 @@ class DriverMC:
 
         analyzername : str
             The name of the analyzer. It can be a sampler: {mcmc, nested, emcee}
-            or a optimizer: {maxlike, genetic}
+            or a optimizer: {maxlike, ga_deap}
 
         compute_derived : bool
             True generates at the flight some derived parameters (such as
@@ -83,7 +82,13 @@ class DriverMC:
             self.analyzername = kwargs.pop('analyzername', None)
             self.addDerived   = kwargs.pop('addDerived', False)
             self.useNeuralLike = kwargs.pop('useNeuralLike', False)
-
+            self.mcevidence = kwargs.pop('mcevidence', False)
+            self.mcevidence_k = kwargs.pop('mcevidence_k', 4)
+            self.overwrite = kwargs.pop('overwrite', True)
+            self.getdist = kwargs.pop('getdist', False)
+            self.corner = kwargs.pop('corner', False)
+            self.simpleplot = kwargs.pop('simpleplot', False)
+            self.showfig = kwargs.pop('showfig', False)
 
             ## Next two are for custom model
             self.custom_parameters = kwargs.pop('custom_parameters', None)
@@ -103,7 +108,7 @@ class DriverMC:
                 logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
                             'DriverMC **kwargs are:\n\tmodel\n\t'
                             'datasets\n\t'
-                            'analyzername {"nested", "mcmc", "maxlike", "emcee" , "genetic"} Default: mcmc'
+                            'analyzername {"nested", "mcmc", "maxlike", "emcee" , "ga_deap"} Default: mcmc'
                             '\n\tchainsdir Default: SimpleMC_chains\n\t')
                 sys.exit(1)
 
@@ -145,7 +150,7 @@ class DriverMC:
         """
         This is a wrapper of the runners of the analyzer in order to make
         easier the execution, mainly if is through an ini file.
-        **kwargs from mcmcRunner, nestedRunner, emceeRunner, geneticRunner and maxlikeRunner.
+        **kwargs from mcmcRunner, nestedRunner, emceeRunner, genetic_deap and maxlikeRunner.
 
         """
         if self.analyzername == 'mcmc':
@@ -156,8 +161,6 @@ class DriverMC:
             self.emceeRunner(iniFile=self.iniFile, **kwargs)
         elif self.analyzername == 'maxlike':
             self.maxLikeRunner(iniFile=self.iniFile, **kwargs)
-        elif self.analyzername == 'genetic':
-            self.geneticRunner(iniFile=self.iniFile, **kwargs)
         elif self.analyzername == 'ga_deap':
             self.geneticdeap(iniFile=self.iniFile, **kwargs)
         else:
@@ -191,6 +194,13 @@ class DriverMC:
         self.varys8       = self.config.getboolean( 'custom', 'varys8',       fallback=False)
         self.addDerived   = self.config.getboolean( 'custom', 'addDerived',   fallback=False)
         self.useNeuralLike = self.config.getboolean('custom', 'useNeuralLike', fallback=False)
+        self.mcevidence = self.config.getboolean('custom', 'mcevidence', fallback=False)
+        self.mcevidence_k = self.config.getint('custom', 'mcevidence_k', fallback=4)
+        self.overwrite = self.config.getboolean('custom', 'overwrite', fallback=True)
+        self.getdist = self.config.getboolean('custom', 'getdist', fallback=False)
+        self.corner = self.config.getboolean('custom', 'corner', fallback=False)
+        self.simpleplot = self.config.getboolean('custom', 'simpleplot', fallback=False)
+        self.showfig = self.config.getboolean('custom', 'showfig', fallback=False)
 
         self.custom_parameters = self.config.get(   'custom', 'custom_parameters', fallback=None)
         self.custom_function   = self.config.get(   'custom', 'custom_function',   fallback=None)
@@ -223,9 +233,6 @@ class DriverMC:
         temp : float
             Temperature for the weights.
 
-        chainno : int
-            Number of chains in parallel.
-
         GRstop : float
             Gelman Rubin criteria for stopping (0, 0.1].
 
@@ -239,7 +246,6 @@ class DriverMC:
             skip     = self.config.getint(      'mcmc', 'skip',    fallback=300)
             ## temperature at which to sample, weights get readjusted on the fly
             temp     = self.config.getfloat(    'mcmc', 'temp',    fallback=2)
-            chainno  = self.config.getint(      'mcmc', 'chainno', fallback=1)
             GRstop   = self.config.getfloat(    'mcmc', 'GRstop',  fallback=0.01)
             checkGR  = self.config.getfloat(    'mcmc', 'checkGR', fallback=500)
             evidence = self.config.getboolean(  'mcmc', 'evidence',fallback=False)
@@ -247,7 +253,6 @@ class DriverMC:
             nsamp    = kwargs.pop('nsamp', 50000)
             skip     = kwargs.pop('skip',  300)
             temp     = kwargs.pop('temp',  2)
-            chainno  = kwargs.pop('chainno', 1)
             GRstop   = kwargs.pop('GRstop', 0.01)
             checkGR  = kwargs.pop('checkGR', 500)
             evidence = kwargs.pop('evidence', False)
@@ -256,13 +261,12 @@ class DriverMC:
                 logger.info('You can skip writing any option and SimpleMC will use default values.\n'
                             'MCMC executer kwargs are:\n\tnsamp (int) Default: 50000\n\t'
                             'skip (int) Default 300\n\ttemp (float) Default: 2.0'
-                            '\n\tchainno (int) Default: 1\n\t'
-                            'evidence (bool) Default: False')
+                            '\n\tevidence (bool) Default: False')
                 sys.exit(1)
                 #raise TypeError('Unexpected **kwargs: {}'.format(kwargs))
         logger.info("\n\tnsamp: {}\n\tskip: {}\n\t"
-                    "temp: {}\n\tchain num: {}\n\tevidence: {}".format(
-                    nsamp, skip, temp, chainno, evidence))
+                    "temp: {}\n\tevidence: {}".format(
+                    nsamp, skip, temp, evidence))
         if self.analyzername is None: self.analyzername = 'mcmc'
         self.outputpath = "{}_{}".format(self.outputpath, self.analyzername)
         #Check whether the file already exists
@@ -271,25 +275,12 @@ class DriverMC:
 
         #Main process
         M = MCMCAnalyzer(self.L, self.outputpath, skip=skip, nsamp=nsamp, temp = temp,
-                        chain_num=chainno, addDerived=self.addDerived, GRstop=GRstop, checkGR=checkGR)
+                         addDerived=self.addDerived, GRstop=GRstop, checkGR=checkGR)
 
         self.ttime = time.time() - ti
 
-        #Compute Bayesian Evidence
-        if evidence:
-            try:
-                from MCEvidence import MCEvidence
-                logger.info("Aproximating bayesian evidence with MCEvidence (arXiv:1704.03472)\n")
-                MLE = MCEvidence(self.outputpath + ".txt" ).evidence()
-                self.result = ['mcmc', M, "Evidence with MCEvidence : {}\n".format(MLE), strresult]
-            except:
-                #writeSummary(self.chainsdir, outputname, ttime)
-                # print("Warning!")
-                # print("MCEvidence could not calculate the Bayesian evidence [very small weights]\n")
-                logger.error("MCEvidence could not calculate the Bayesian evidence [very small weights]")
-        else:
-            self.result = ['mcmc', M.get_results()[:2], "Maxlike: {}".format(M.maxloglike),
-                           "Gelman-Rubin diagnostic: {}".format(M.get_results()[2])]
+        self.result = ['mcmc', M.get_results()[:2], "Maxlike: {}".format(M.maxloglike),
+                       "Gelman-Rubin diagnostic: {}".format(M.get_results()[2])]
 
         return True
 
@@ -507,20 +498,17 @@ class DriverMC:
         for bound in self.bounds:
             ini.append(np.random.uniform(bound[0], bound[1], walkers))
         inisamples = np.array(ini).T # initial samples
-        try:
-            import emcee
-            ti = time.time()
-            sampler = emcee.EnsembleSampler(walkers, self.dims,
-                                            self.logPosterior, pool=pool)
-            #testing
-            sampler.sample(initial_state=self.means, tune=True, thin_by=3)
-            # pass the initial samples and total number of samples required
-            sampler.run_mcmc(inisamples, nsamp + burnin,
-                             progress=True)
-            self.ttime = time.time() - ti
-        except ImportError as error:
-            sys.exit("{}: Please install this module"
-                     "or try using other sampler".format(error.__class__.__name__))
+
+        ti = time.time()
+        sampler = EnsembleSampler(walkers, self.dims,
+                                  self.logPosterior, pool=pool)
+        #testing
+        sampler.sample(initial_state=self.means, tune=True, thin_by=3)
+        # pass the initial samples and total number of samples required
+        sampler.run_mcmc(inisamples, nsamp + burnin,
+                         progress=True, outputname=self.outputpath,
+                         addDerived=self.addDerived, simpleLike=self.L)
+        self.ttime = time.time() - ti
         self.burnin = burnin
         try:
             pool.close()
@@ -586,132 +574,13 @@ class DriverMC:
 
 ##---------------------- Genetic Algorithms ----------------------
 
-
-    def geneticRunner(self, iniFile=None, **kwargs):
-        """
-        It calls SimpleGenetic class.
-
-        Parameters
-        -----------
-        n_individuals : int
-            Number of individuals.
-
-        n_generations : int
-            Number of generations.
-
-        selection_method : str
-            Selection method {tournament, roulette, rank}
-
-        mut_prob : float
-            Probability of mutation.
-
-        distribution : str
-            {"uniform", "gaussian", "random"}
-            Default: uniform
-
-        media_distribution : float
-            Media value for gaussian distributions
-
-        sd_distribution : float
-            Standard deviation for gaussian distributions
-            Default: 1.0
-
-        min_distribution : float
-            Minimum value for uniform distributions
-            Default: -1.0
-
-        max_distribution : float
-            Maximum value for uniform distributions
-            Default: 1.0
-
-        stopping_early : bool
-            It needs a not None value for "rounds_stopping" and "tolerance_stopping".
-            Default: True
-
-        rounds_stopping : int
-            Rounds to consider to stopping early with the tolerance_stopping value.
-            Default : 100
-
-        tolerance_stopping : float
-            Value to stopping early criteria. This value is the difference between the
-            best fit for the latest rounds_stopping generations.
-            Default : 0.01
-
-        """
-        if self.analyzername is None: self.analyzername = 'genetic'
-        self.outputpath = '{}_{}_optimization'.format(self.outputpath, self.analyzername)
-        self.outputChecker()
-
-        if iniFile:
-            n_individuals = self.config.getint('genetic', 'n_individuals', fallback=400)
-            n_generations = self.config.getint('genetic', 'n_generations' , fallback=1000)
-            selection_method = self.config.get('genetic', 'selection_method', fallback='tournament')
-            mut_prob = self.config.getfloat('genetic', 'mut_prob', fallback=0.6)
-            distribution = self.config.get('genetic', 'distribution', fallback='uniform')
-            media_distribution = self.config.getfloat('genetic', "media_distribution", fallback=1.0)
-            sd_distribution = self.config.getfloat('genetic', "sd_distribution", fallback=1.0)
-            min_distribution = self.config.getfloat('genetic', "min_distribution", fallback=-1.0)
-            max_distribution = self.config.getfloat('genetic', "max_distribution", fallback=1.0)
-            stopping_early = self.config.getboolean('genetic', "stopping_early", fallback=True)
-            rounds_stopping = self.config.getint('genetic', "rounds_stopping", fallback=100)
-            tolerance_stopping = self.config.getfloat('genetic', "tolerance_stopping", fallback=0.01)
-        else:
-            n_individuals = kwargs.pop('n_individuals', 400)
-            n_generations = kwargs.pop('n_generations', 1000)
-            selection_method = kwargs.pop('selection_method', 'tournament')
-            mut_prob = kwargs.pop('mut_prob', 0.6)
-            distribution = kwargs.pop("distribution", "uniform")
-            media_distribution = kwargs.pop("media_distribution", 1)
-            sd_distribution = kwargs.pop("sd_distribution", 1)
-            min_distribution = kwargs.pop("min_distribution", -1)
-            max_distribution = kwargs.pop("max_distribution", 1)
-            stopping_early = kwargs.pop("stopping_early", True)
-            rounds_stopping = kwargs.pop("rounds_stopping", 100)
-            tolerance_stopping = kwargs.pop("tolerance_stopping", 0.01)
-            if kwargs:
-                logger.critical('Unexpected **kwargs for genetic optimizer: {}'.format(kwargs))
-                logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
-                            'genetic executer options are:'
-                            '\n\tn_individuals (int) Default: 400\n\t'
-                            'n_generations (int) Default: 1000\n\t'
-                            'selection_method {"tournament","rank","roulette"} Default: "tournament"'
-                            '\n\tmut_prob (float) Default: 0.4')
-                sys.exit(1)
-        logger.info("\n\tn_individuals: {}\n\tn_generations: {}"
-                    "\n\tselection method: {}\n\t"
-                    "mut prob: {}".format(n_individuals, n_generations,
-                                        selection_method,mut_prob))
-        ti = time.time()
-
-        M = SimpleGenetic(self.logLike, self.dims, self.bounds,
-                          n_individuals=n_individuals,
-                          n_generations=n_generations,
-                          prob_mut=mut_prob, method_selection=selection_method,
-                          distribution=distribution,
-                          media_distribution=media_distribution,
-                          sd_distribution=sd_distribution,
-                          min_distribution=min_distribution,
-                          max_distribution=max_distribution,
-                          stopping_early=stopping_early,
-                          rounds_stopping=rounds_stopping,
-                          tolerance_stopping=tolerance_stopping,
-                          outputname=self.outputpath)
-
-        result = M.optimize()
-        self.ttime = time.time() - ti
-        self.result = ['genetic', M, result]
-        return True
-
-
-##----------------------
-
     def geneticdeap(self, iniFile=None, **kwargs):
         """
         Genetic algorithms from Deap library.
 
         """
         if self.analyzername is None: self.analyzername = 'ga_deap'
-        self.outputpath = '{}_{}_ga_deap'.format(self.outputpath, self.analyzername)
+        self.outputpath = '{}_{}'.format(self.outputpath, self.analyzername)
         self.outputChecker()
         if iniFile:
             plot_fitness = self.config.getboolean('ga_deap', 'plot_fitness', fallback=False)
@@ -741,15 +610,18 @@ class DriverMC:
             crowding_factor = skwargs.pop('crowding_factor', 1)
 
         ti = time.time()
-        M = GA_deap(self.L, self.model, population=population, crossover=crossover,
+        M = GA_deap(self.L, self.model, outputname=self.outputpath,
+                    population=population, crossover=crossover,
                     mutation=mutation, max_generation=max_generation,
                     hof_size=hof_size, crowding_factor=crowding_factor,
                     plot_fitness=plot_fitness, compute_errors=compute_errors,
-                    show_contours=show_contours, plot_param1=plot_param1, plot_param2=plot_param2)
+                    show_contours=show_contours, plot_param1=plot_param1,
+                    plot_param2=plot_param2)
         result = M.main()
         self.ttime = time.time() - ti
         #M.plotting()
         self.result = ['genetic', result, 'Population: {}'.format(population),
+                       'Max number of generations: {}'.format(max_generation),
                        'Mutation: {}'.format(mutation), 'Crosover: {}'.format(crossover),
                        result[3]]
         return True
@@ -875,15 +747,15 @@ class DriverMC:
         new one with extension _new in its name.
 
         """
-        if os.path.isfile(self.outputpath+".txt"):
-            logger.info("{0} file already exists, {0}_new was created".format(self.outputpath))
-            self.outputpath = "{}_new".format(self.outputpath)
-        #for i in range(1,10):
-        #    if os.path.isfile("{}_{}.txt".format(self.outputpath, i)):
-        #        logger.info("{0}_{1} file already exists, {0}_new was created".format(self.outputpath, i))
-        #        self.outputpath = "{}_new".format(self.outputpath)
         self.paramFiles()
-
+        i = 1
+        if self.overwrite:
+            self.outputpath = "{}".format(self.outputpath)
+        else:
+            if os.path.isfile("{}_1.txt".format(self.outputpath)):
+                sys.exit('File with outputname {}_1.txt already exists.\n'
+                         'Please move your files or set overwrite=True to g'
+                         'overwrite outputs'.format(self.outputpath))
         return True
 
     def paramFiles(self):
@@ -900,7 +772,7 @@ class DriverMC:
 
         """
         cpars   = self.L.freeParameters()
-        parfile = self.outputpath + ".paramnames"
+        parfile = "{}.paramnames".format(self.outputpath)
         fpar = open(parfile, 'w')
         for p in cpars:
             fpar.write(p.name + "\t\t\t" + p.Ltxname + "\n")
@@ -908,7 +780,7 @@ class DriverMC:
             AD = AllDerived()
             for pd in AD.list:
                 fpar.write(pd.name + "\t\t\t" + pd.Ltxname + "\n")
-        if self.analyzername == 'mcmc' or self.analyzername == 'nested':
+        if self.analyzername in ['mcmc', 'nested', 'emcee']:
             if (self.L.name() == "Composite"):
                 self.sublikenames = self.L.compositeNames()
                 for name in self.sublikenames:
@@ -916,7 +788,7 @@ class DriverMC:
                 fpar.write("theory_prior \t\t\t None \n")
 
 
-    def postprocess(self, summary=True, stats=False, addtxt=None):
+    def postprocess(self, addtxt=None):
         """
         It calls the PostProcessing class.
 
@@ -930,33 +802,23 @@ class DriverMC:
         """
         if addtxt:
             self.result.extend(addtxt)
-        if self.analyzername == 'nested' or self.analyzername == 'mcmc':
-            pp = PostProcessing(self.result, self.paramsList, self.outputpath,
-                                addDerived=self.addDerived, loglike=self.L)
-        elif self.analyzername == 'emcee':
-            pp = PostProcessing(self.result, self.paramsList, self.outputpath,
-                                skip=self.burnin, addDerived=self.addDerived, loglike=self.L)
-            pp.saveEmceeSamples()
+        pp = PostProcessing(self.result, self.paramsList, self.outputpath,
+                            addDerived=self.addDerived, loglike=self.L)
+        if self.mcevidence:
+            try:
+                ev = pp.mcevidence(k=self.mcevidence_k+1)
+                pp.writeSummary(self.ttime, ev)
+            except:
+                pp.writeSummary(self.ttime)
         else:
-            pp = PostProcessing(self.result, self.paramsList, self.outputpath,
-                                addDerived=self.addDerived, loglike=self.L)
-        if summary:
             pp.writeSummary(self.ttime)
 
-    def plot(self, show=False):
-        """
-        Simple connection with the plotters.
-
-        Parameters
-        -----------
-        show : bool
-            Default False
-        """
-        from .tools.SimplePlotter import SimplePlotter
-        figure = SimplePlotter(self.chainsdir, self.paramsList, path=self.outputpath, show=show)
-        if self.analyzername == "genetic":
-            figure.simplex_vs_y(xlabel="iterations", ylabel="best fitness")
-        return figure
+        if self.getdist:
+            pp.plot(chainsdir=self.chainsdir, show=self.showfig).simpleGetdist()
+        if self.corner:
+            pp.plot(chainsdir=self.chainsdir, show=self.showfig).simpleCorner()
+        if self.simpleplot:
+            pp.plot(chainsdir=self.chainsdir, show=self.showfig).simplePlot()
 
 # ### pool from multiprocessing
 

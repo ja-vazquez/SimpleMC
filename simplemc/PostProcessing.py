@@ -1,15 +1,15 @@
-# from simplemc.tools.Simple_Plots import Simple_plots
 from simplemc.cosmo.Derivedparam import AllDerived
 from simplemc.analyzers.dynesty import utils as dyfunc
 from simplemc import logger
 import numpy as np
 import re
+import sys
+from .analyzers import MCEvidence
 
-#TODO EMCEE
 
 class PostProcessing:
     """
-    This class makes postprocessing such as generate a summary or calculates some statistics.
+    This class makes postprocessing such as generate a summary with some statistics.
 
     Parameters
     ---------
@@ -27,7 +27,7 @@ class PostProcessing:
         Likelihood object.
 
     """
-    def __init__(self, list_result, paramList, filename, \
+    def __init__(self, list_result, paramList, filename,
                  skip=0.1, addDerived=True, loglike=None):
         self.analyzername = list_result[0]
         self.result    = list_result[1]
@@ -71,8 +71,14 @@ class PostProcessing:
             samples, weights = self.result.samples, np.exp(self.result.logwt - self.result.logz[-1])
         elif self.analyzername == 'mcmc':
             samples, weights = self.result[0], self.result[1]
+        elif self.analyzername == 'emcee':
+            samples = self.result.get_chain(flat=True)
+            weights = np.ones(len(samples))
+        else:
+            samples = None
+            weights = None
 
-        if self.analyzername == 'mcmc' or self.analyzername == 'nested':
+        if self.analyzername in ['mcmc', 'nested', 'emcee']:
             means, cov = dyfunc.mean_and_cov(samples, weights)
             stdevs = np.sqrt(np.diag(cov))
 
@@ -94,46 +100,45 @@ class PostProcessing:
         file.write('\nElapsed time: {:.3f} minutes = {:.3f} seconds \n'.format(time / 60, time))
         file.close()
 
-# The following need to be considered or removed.
-    def getdistAnalyzer(self, cov=False):
-        from getdist import mcsamples
+    def mcevidence(self, k):
+        if self.analyzername not in ['mcmc', 'nested', 'emcee']:
+            sys.exit('MCEvidence only work on Bayesian samplers (mcmc, nested, '
+                     'emcee) not in optimizers')
 
-        mcsamplefile = mcsamples.loadMCSamples(self.filename, settings={'ignore_rows': self.skip})
+        mcev = MCEvidence('{}'.format(self.filename), kmax=k)
+        mcevres = mcev.evidence(covtype='all')
 
-        if cov:
-            cov = mcsamplefile.cov(pars=self.paramList)
-            np.savetxt(self.filename + '_' + 'cov.txt', cov)
-            logger.info("Covariance matrix:\n")
-            logger.info(cov)
-            logger.info("\n")
+        burn_frac = 0.0
 
-        means  = mcsamplefile.getMeans()
-        stddev = mcsamplefile.std(self.paramList)
-        summaryResults = []
+        if (mcevres == np.inf).all():
+            logger.info("MCEvidence failed to calculate Bayesian evidence,\n"
+                        " it is trying again.")
+            valid = False
+            while not valid:
+                burn_frac += 0.1
+                logger.info("Burn-in: {}%".format(burn_frac*100))
+                mcev = MCEvidence('{}'.format(self.filename),
+                                  burnlen=burn_frac, kmax=k)
 
-        for i, param in enumerate(self.paramList):
-            logger.info(self.paramList[i] + " : " + str(round(means[i], 4)) + \
-                        "+/-" + str(round(stddev[i], 4)))
-            summaryResults.append(self.paramList[i] + " : " + str(round(means[i], 4)) + \
-                                  "+/-" + str(round(stddev[i], 4)))
-        return summaryResults
+                mcevres = mcev.evidence(covtype='all')
+                if not (mcevres == np.inf).all():
+                    valid = True
+                if burn_frac > 0.8:
+                    print("MCEvidence can't estimate the evidence to your samples")
 
+        return '\nlog-Evidence with mcevidence: {}\n' \
+                   'Burn-in fraction: {:.1}\n'.format(mcevres, burn_frac)
 
-    # AJUSTAR!
-    def saveEmceeSamples(self, thin=1):
-        f = open(self.filename + '.txt', 'w+')
-        logprobs = self.result.get_log_prob(discard=self.skip, flat=True, thin=thin)
-        postsamples = self.result.get_chain(discard=self.skip, flat=True, thin=thin)
+    def plot(self, chainsdir, show=False):
+        """
+        Simple connection with the plotters.
 
-        for i, row in enumerate(postsamples):
-            strsamples = str(row).lstrip('[').rstrip(']')
-            strsamples = "{} {} {}\n".format(1, -2 * (logprobs[i]), strsamples)
-            strsamples = re.sub(' +', ' ', strsamples)
-            strsamples = re.sub('\n ', ' ', strsamples)
-            if self.derived:
-                for pd in self.AD.listDerived(self.loglike):
-                    strsamples = "{} {}".format(strsamples, pd.value)
-            f.write(strsamples)
-        f.close()
+        Parameters
+        -----------
+        show : bool
+            Default False
+        """
+        from .plots.SimplePlotter import SimplePlotter
+        figure = SimplePlotter(chainsdir, self.paramList, path=self.filename, show=show)
 
-
+        return figure
