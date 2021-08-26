@@ -3,13 +3,11 @@
 numpy
 scipy
 corner
-pandas
 numdifftools
-nestle
-emcee
 GetDist
 fgivenx
 matplotlib
 tensorflow
 Keras
+deap
 mpi4py
