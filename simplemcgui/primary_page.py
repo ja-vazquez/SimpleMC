@@ -9,7 +9,7 @@ import PySimpleGUI as sg
 from simplemcgui.secondary_page import *
 
 # The theme of the GUI
-sg.ChangeLookAndFeel('DarkBlue7')
+sg.ChangeLookAndFeel('SandyBeach')
 
 #----- HELPFUL FUNCTIONS -----#
 
