@@ -1,11 +1,14 @@
 from simplemc.DriverMC import DriverMC
+from os import remove
 
 "read all setting from .ini file"
-inifile = "baseConfig.ini"
+inifile = "baseConfigGUI.ini"
 
 analyzer = DriverMC(iniFile=inifile)
 analyzer.executer()
 #analyzer.postprocess()
+
+remove("baseConfigGUI.ini")
 
 
 """ useful for short tests,
