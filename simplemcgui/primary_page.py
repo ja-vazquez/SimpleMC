@@ -1,7 +1,3 @@
-# Creating a GUI for the SimpleMC
-# The main idea is to write a baseConfig.ini file via python, by using PySimpleGUI
-# and later on executing the program
-
 #----- IMPORTING MODULES -----#
 
 
