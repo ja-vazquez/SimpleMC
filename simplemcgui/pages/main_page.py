@@ -1,14 +1,10 @@
-#----- IMPORTING MODULES -----#
-
-
 from pathlib import Path
 from subprocess import check_output
 
 import PySimpleGUI as sg
+from simplemcgui.pages.secondary_page import *
 
-from simplemcgui.secondary_page import *
-
-# The theme of the GUI
+# Theme of the GUI
 sg.ChangeLookAndFeel('SandyBeach')
 
 #----- HELPFUL FUNCTIONS -----#
@@ -16,29 +12,27 @@ sg.ChangeLookAndFeel('SandyBeach')
 
 def find_desktopPATH():
     """
-    Finding the Desktop path, which will be used as a default value while setting the output
-    directory
+    Finding the desktop path, which will be used as a default value while choosing the output directory.
 
     Returns:
-        desktopPATH [str]: THe path to the desktop directory
+        desktopPATH [str]: Path of the desktop directory
     """
     try:
         desktopPATH = Path.home() / 'Desktop'  # For Windows OS
     except:
-        desktopPATH = check_output(
-            ['xdg-user-dir', 'DESKTOP'])  # For Linux OS
+        desktopPATH = check_output(['xdg-user-dir', 'DESKTOP'])  # For Linux OS
     return desktopPATH
 
 
 def find_datasets(values):
     """
-    Finding the datasets for a given values in the main page
+    Exctracting the datasets from the given values, obtained from the GUI.
 
     Args:
-        values [dict]: A dictionary created by the GUI that contains results of the choose values
+        values [dict]: A dictionary created by the GUI that contains results of the selected parameters.
 
     Returns:
-        [str]: Datasets that is going to use in the program
+        [str]: Datasets that is going to be used in the program.
     """
     avaliable_dataset = ['HD', 'BBAO', 'GBAO', 'GBAO_no6dF', 'CMASS',
                         'LBAO', 'LaBAO', 'LxBAO', 'MGS', 'Planck', 'WRd',
@@ -67,7 +61,7 @@ models = ['Anisotropic', 'Binned', 'CPantheon', 'DGP',
           'wCDM', 'waCDM']
 
 
-sampler = ['mcmc', 'nested', 'emcee', 'maxlike', 'ga_deap']
+analyzers = ['mcmc', 'nested', 'emcee', 'maxlike', 'ga_deap']
 
 
 menu_def = [
@@ -75,89 +69,87 @@ menu_def = [
 ]
 
 
-def initial_stg_gui():
+def main_page_layout():
     """
-    The main page of the SimpleMC GUI
+    Creating the layout of the first page of the SimpleMC GUI.
     """
-    data_col1 = [
+    dataset_col1 = [
                     [sg.Checkbox('HD', font=('Verdana', 10))],
                     [sg.Checkbox('BBAO', default=True, font=('Verdana', 10))],
                     [sg.Checkbox('GBAO', font=('Verdana', 10))],
                     [sg.Checkbox('GBAO_no6dF', font=('Verdana', 10))],
                     [sg.Checkbox('CMASS', font=('Verdana', 10))]
                 ]
-
-    data_col2 = [
+    dataset_col2 = [
                     [sg.Checkbox('LBAO', font=('Verdana', 10))],
                     [sg.Checkbox('LaBAO', font=('Verdana', 10))],
                     [sg.Checkbox('LxBAO', font=('Verdana', 10))],
                     [sg.Checkbox('MGS', font=('Verdana', 10))],
                     [sg.Checkbox('Planck', default=True, font=('Verdana', 10))]
                 ]
-
-    data_col3 = [
+    dataset_col3 = [
                     [sg.Checkbox('WRd', font=('Verdana', 10))],
                     [sg.Checkbox('PlDa', font=('Verdana', 10))],
                     [sg.Checkbox('PlRdx10', font=('Verdana', 10))],
                     [sg.Checkbox('WMAP', font=('Verdana', 10))],
                     [sg.Checkbox('PlRd', font=('Verdana', 10))]
                 ]
-
-    data_col4 = [
+    dataset_col4 = [
                     [sg.Checkbox('CMBW', font=('Verdana', 10))],
                     [sg.Checkbox('SN', font=('Verdana', 10))],
                     [sg.Checkbox('SNx10', font=('Verdana', 10))],
                     [sg.Checkbox('UnionSN', default=True, font=('Verdana', 10))],
                     [sg.Checkbox('RiessH0', font=('Verdana', 10))]
                 ]
-
-    data_col5 = [
+    dataset_col5 = [
                     [sg.Checkbox('6dFGS', font=('Verdana', 10))],
                     [sg.Checkbox('dline', font=('Verdana', 10))]
                 ]
+    main_page_layout = [
+                            [sg.Menu(menu_def)],
 
-    layout_initial_stg_page = [
-                                [sg.Menu(menu_def)],
+                            [sg.Text('SimpleMC', size=(44, 1), justification='center',
+                            font=('Georgia', 16), relief=sg.RELIEF_SUNKEN)],
 
-                                [sg.Text('SimpleMC', size=(44, 1), justification='center',
-                                font=('Georgia', 16), relief=sg.RELIEF_SUNKEN)],
+                            [sg.Frame(layout=[
+                                [sg.In(find_desktopPATH(), font=('Verdana', 10)),
+                                sg.FolderBrowse(initial_folder=r'simplemc/chains')]
+                            ], title='Output Directory', font=('Georgia', 14), tooltip='Directory for chains/output')],
 
-                                [sg.Frame(layout=[
-                                    [sg.In(find_desktopPATH(), font=('Verdana', 10)),
-                                    sg.FolderBrowse(initial_folder=r'simplemc/chains')]
-                                ], title='Output Directory', font=('Georgia', 14), tooltip='Directory for chains/output')],
+                            [sg.Frame(layout=[
+                                [sg.InputCombo(models, default_value='LCDM', font=('Verdana', 10))]
+                            ], title='Models', font=('Georgia', 14), tooltip='Set Model'),
+                            sg.Frame(layout=[
+                                [sg.InputCombo(analyzers, default_value='mcmc', font=('Verdana', 10))]
+                            ], title='Analyzers', font=('Georgia', 14))],
 
-                                [sg.Frame(layout=[
-                                    [sg.InputCombo(models, default_value='LCDM', font=('Verdana', 10))]
-                                ], title='Models', font=('Georgia', 14), tooltip='Set Model'),
-                                sg.Frame(layout=[
-                                    [sg.InputCombo(sampler, default_value='mcmc', font=('Verdana', 10))]
-                                ], title='Sampler', font=('Georgia', 14))],
+                            [sg.Frame(layout=[
+                                [sg.Column(dataset_col1),
+                                sg.Column(dataset_col2),
+                                sg.Column(dataset_col3),
+                                sg.Column(dataset_col4),
+                                sg.Column(dataset_col5)]
+                            ], title='Datasets', font=('Georgia', 14), tooltip='Set datasets used. Ex: UnionSN+BBAO+Planck')],
 
-                                [sg.Frame(layout=[
-                                    [sg.Column(data_col1), sg.Column(data_col2), sg.Column(data_col3), sg.Column(data_col4), sg.Column(data_col5)]
-                                ], title='Datasets', font=('Georgia', 14), tooltip='Set datasets used. Ex: UnionSN+BBAO+Planck')],
-
-                                [sg.Button('Continue'), sg.Exit(button_color='red')]
+                            [sg.Button('Continue'), sg.Exit(button_color='red')]
                             ]
-    window_initial_stg_page = sg.Window('SimpleMC', layout_initial_stg_page)
+    window_main_page = sg.Window('SimpleMC', main_page_layout)
     while True:
-        event, values = window_initial_stg_page.read()
+        event, values = window_main_page.read()
         if event == sg.WIN_CLOSED or event == 'Exit':
             break
         # obtaining values from GUI
         chainsdir = values[1]
         model = values[2]
-        analyzername = values[3]
+        analyzer = values[3]
         datasets = find_datasets(values)
         # analyzing the events
         if event == 'Models':
             sg.popup('Information about the Cosmological Models can be put here')
         elif event == 'Datasets':
             sg.popup('Information about the Datasets can be put here')
-        elif event == 'Samplers':
-            sg.popup('Information about the Samplers can be put here')
+        elif event == 'Analyzers':
+            sg.popup('Information about the Analyzers can be put here')
         elif event == 'Continue':
-            advanced_stg_gui(chainsdir, model, analyzername, datasets)
-
-
+            window_main_page.close()
+            secondary_page_layout(chainsdir, model, analyzer, datasets)

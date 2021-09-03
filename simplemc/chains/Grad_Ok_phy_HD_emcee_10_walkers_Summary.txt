@@ -1,0 +1,15 @@
+SUMMARY
+-------
+walkers : 10
+samples: 200
+
+log-Evidence with mcevidence: [-18.70220965 -13.68258346]
+Burn-in fraction: 0e+00
+
+Om: 0.3170 +/- 0.0608
+Obh2: 0.0222 +/- 0.0005
+h: 0.6823 +/- 0.0473
+ggama: -0.9842 +/- 0.1664
+Ok: 0.0033 +/- 0.0106
+
+Elapsed time: 0.719 minutes = 43.152 seconds 

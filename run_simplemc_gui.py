@@ -1,5 +1,0 @@
-from simplemcgui.primary_page import initial_stg_gui as run_simplemcGUI
-
-# creating the baseConfigGUI.ini file
-run_simplemcGUI()
-

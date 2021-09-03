@@ -1,13 +1,13 @@
 SUMMARY
 -------
-Maxlike: -7.287438838564665
-Gelman-Rubin diagnostic: [0.79599015 2.299769   0.44341396]
+Maxlike: -7.272472983649177
+Gelman-Rubin diagnostic: [1.65469687 0.13850657 1.42457591]
 
-log-Evidence with mcevidence: [-21.8061975  -20.89908447]
+log-Evidence with mcevidence: [-21.32372816 -20.29453257]
 Burn-in fraction: 0.1
 
-Om: 0.3165 +/- 0.0322
-Obh2: 0.0219 +/- 0.0005
-h: 0.6655 +/- 0.0174
+Om: 0.2879 +/- 0.0248
+Obh2: 0.0218 +/- 0.0004
+h: 0.7070 +/- 0.0246
 
-Elapsed time: 0.067 minutes = 4.006 seconds 
+Elapsed time: 0.043 minutes = 2.575 seconds 
