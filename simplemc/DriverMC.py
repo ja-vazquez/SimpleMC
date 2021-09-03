@@ -166,7 +166,7 @@ class DriverMC:
         else:
             sys.exit("{}: Sampler/Analyzer name invalid".format(self.analyzername))
         self.postprocess()
-        return True
+        return self.result
 
 
 ##----------------------Initialization ------------------------
