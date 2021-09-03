@@ -71,6 +71,7 @@ class DriverMC:
     """
     def __init__(self, iniFile=None, **kwargs):
 
+        self.dict_resulẗ́ = {}
         self.iniFile = iniFile
         if self.iniFile:    self.iniReader(iniFile)
         else:
@@ -134,7 +135,6 @@ class DriverMC:
         self.means      = [p.value  for p in self.pars_info]
         self.paramsList = [p.name   for p in self.pars_info]
         self.dims       = len(self.paramsList)
-        self.result     = None
 
         self.root = "{}_{}_{}".format(self.model, self.prefact,
                                     self.datasets)
@@ -166,7 +166,7 @@ class DriverMC:
         else:
             sys.exit("{}: Sampler/Analyzer name invalid".format(self.analyzername))
         self.postprocess()
-        return self.result
+        return self.dict_result
 
 
 ##----------------------Initialization ------------------------
@@ -279,8 +279,10 @@ class DriverMC:
 
         self.ttime = time.time() - ti
 
-        self.result = ['mcmc', M.get_results()[:2], "Maxlike: {}".format(M.maxloglike),
-                       "Gelman-Rubin diagnostic: {}".format(M.get_results()[2])]
+        res = {'samples': M.get_results()[0], 'weights': M.get_results()[1],
+               'maxlike': M.maxloglike, 'gr_diagnostic': M.get_results()[2]}
+
+        self.dict_result = {'analyzer': 'mcmc', 'result': res}
 
         return True
 
@@ -439,8 +441,13 @@ class DriverMC:
         except:
             pass
         self.ttime = time.time() - ti
-        self.result = ['nested', M, M.summary(), 'nested :{}'.format(nestedType),
-                       'dynamic : {}'.format(dynamic), 'ANN :{}'.format(neuralNetwork)]
+
+        res = {'samples': M.samples, 'logwt': M.logwt, 'nlive': M.nlive, 'niter': M.niter,
+                'ncall': sum(M.ncall), '%eff': M.eff, 'logz': M.logz[-1], 'logzerr': M.logzerr[-1]}
+
+        self.dict_result = {'analyzer': 'nested',  'nested_algorithm': nestedType,
+                           'dynamic': dynamic, 'ANN': neuralNetwork,
+                           'result': res}
         return True
 
 
@@ -514,7 +521,8 @@ class DriverMC:
             pool.close()
         except:
             pass
-        self.result = ['emcee', sampler, 'walkers : {}'.format(walkers), 'samples: {}'.format(nsamp)]
+        res = {'samples': sampler.get_chain(flat=True)}
+        self.dict_result = {'analyzer': 'emcee', 'walkers': walkers, 'nsamples': nsamp, 'result': res}
         return True
 
 
@@ -566,9 +574,9 @@ class DriverMC:
         A = MaxLikeAnalyzer(self.L, self.model, compute_errors=compute_errors,
                             compute_derived=compute_derived, show_contours=show_contours,\
                             plot_param1=plot_param1, plot_param2=plot_param2)
-        params = self.T.printParameters(A.params)
+        self.T.printParameters(A.params)
         self.ttime = time.time() - ti
-        self.result = ['maxlike', A, params, 'Optimal loglike: {}'.format(A.opt_loglike)]
+        self.dict_result = {'analyzer': 'maxlike', 'result': A.result()}
         return True
 
 
@@ -607,7 +615,7 @@ class DriverMC:
             mutation = kwargs.pop('mutation', 0.3)
             max_generation = kwargs.pop('max_generation', 100)
             hof_size = kwargs.pop('hof_size', 1)
-            crowding_factor = skwargs.pop('crowding_factor', 1)
+            crowding_factor = kwargs.pop('crowding_factor', 1)
 
         ti = time.time()
         M = GA_deap(self.L, self.model, outputname=self.outputpath,
@@ -620,10 +628,8 @@ class DriverMC:
         result = M.main()
         self.ttime = time.time() - ti
         #M.plotting()
-        self.result = ['genetic', result, 'Population: {}'.format(population),
-                       'Max number of generations: {}'.format(max_generation),
-                       'Mutation: {}'.format(mutation), 'Crosover: {}'.format(crossover),
-                       result[3]]
+        self.dict_result = {'analyzer': 'ga_deap', 'max_generations': max_generation,
+                            'mutation': mutation, 'crossover': crossover, 'result': result}
         return True
 
 ##---------------------- logLike and prior Transform function ----------------------
@@ -801,17 +807,15 @@ class DriverMC:
             A list with strings to save with the summary.
         """
         if addtxt:
-            self.result.extend(addtxt)
-        pp = PostProcessing(self.result, self.paramsList, self.outputpath,
-                            addDerived=self.addDerived, loglike=self.L)
-        if self.mcevidence:
-            try:
-                ev = pp.mcevidence(k=self.mcevidence_k+1)
-                pp.writeSummary(self.ttime, ev)
-            except:
-                pp.writeSummary(self.ttime)
-        else:
-            pp.writeSummary(self.ttime)
+            self.dict_result['additional_notes:'] = addtxt
+        self.dict_result['time'] = self.ttime
+        pp = PostProcessing(self.dict_result, self.paramsList, self.outputpath,
+                            addDerived=self.addDerived)
+        if self.mcevidence and self.analyzername in ['mcmc', 'nested', 'emcee']:
+            ev = pp.mcevidence(k=self.mcevidence_k+1)
+            self.dict_resulẗ́['mc_evidence'] = ev
+
+        pp.writeSummary()
 
         if self.getdist:
             pp.plot(chainsdir=self.chainsdir, show=self.showfig).simpleGetdist()

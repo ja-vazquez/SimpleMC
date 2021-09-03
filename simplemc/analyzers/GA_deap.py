@@ -87,21 +87,21 @@ class GA_deap:
         hof = tools.HallOfFame(self.HALL_OF_FAME_SIZE)
 
         # perform the Genetic Algorithm flow with elitism:
-        population, logbook = elitism.eaSimpleWithElitism(population, toolbox, cxpb=self.P_CROSSOVER,\
-                                                          mutpb=self.P_MUTATION, ngen=self.MAX_GENERATIONS,\
-                                                          stats=stats, halloffame=hof, verbose=True,
-                                                          outputname=self.outputname)
+        population, logbook, gens = elitism.eaSimpleWithElitism(population, toolbox, cxpb=self.P_CROSSOVER,\
+                                                              mutpb=self.P_MUTATION, ngen=self.MAX_GENERATIONS,\
+                                                              stats=stats, halloffame=hof, verbose=True,
+                                                              outputname=self.outputname)
 
         # print info for best solution found:
         best = hof.items[0]
         print("-- Best Fitness = ", best.fitness.values[0])
         print("- Best solutions are:")
         best_params = [self.change_prior(i, x) for i, x in enumerate(best)]
-        res = [""]
+        # res = [""]
         for i, x in enumerate(best_params):
             print("-- Best %s = "%self.params[i].name , x)
-            res.append("{}: {:.5f}".format(self.params[i].name, x))
-        res.append("Best Fitness: {:.5f}".format(best.fitness.values[0]))
+            # res.append("{}: {:.5f}".format(self.params[i].name, x))
+        # res.append("Best Fitness: {:.5f}".format(best.fitness.values[0]))
 
 
         #for i in range(self.HALL_OF_FAME_SIZE):
@@ -110,13 +110,13 @@ class GA_deap:
         if self.plot_fitness:
             self.plotting(population, logbook, hof)
 
+        hess = nd.Hessian(self.negloglike2)(best_params)
+        eigvl, eigvc = la.eig(hess)
+        print('Hessian', hess, eigvl, )
+        self.cov = la.inv(hess)
+        print('Covariance matrix \n', self.cov)
+        # if self.compute_errors:
 
-        if self.compute_errors:
-            hess = nd.Hessian(self.negloglike2)(best_params)
-            eigvl, eigvc = la.eig(hess)
-            print ('Hessian', hess, eigvl,)
-            self.cov = la.inv(hess)
-            print('Covariance matrix \n', self.cov)
             # set errors:
             #for i, pars in enumerate(self.params):
             #    pars.setError(sp.sqrt(self.cov[i, i]))
@@ -135,7 +135,8 @@ class GA_deap:
             ax = fig.add_subplot(111)
             plot_elipses(best_params, self.cov, idx_param1, idx_param2, ax=ax)
             plt.show()
-        return population, logbook, hof, res
+        return {'population': len(population), 'no_generations': gens, 'param_fit': best_params,
+                'best_fitness': best.fitness.values[0], 'cov': self.cov}
 
 
 
