@@ -443,7 +443,8 @@ class DriverMC:
         self.ttime = time.time() - ti
 
         res = {'samples': M.samples, 'logwt': M.logwt, 'nlive': M.nlive, 'niter': M.niter,
-                'ncall': sum(M.ncall), '%eff': M.eff, 'logz': M.logz[-1], 'logzerr': M.logzerr[-1]}
+               'ncall': sum(M.ncall), '%eff': M.eff, 'logz': M.logz[-1], 'logzerr': M.logzerr[-1],
+               'weights': np.exp(M.logwt - M.logz[-1])}
 
         self.dict_result = {'analyzer': 'nested',  'nested_algorithm': nestedType,
                            'dynamic': dynamic, 'ANN': neuralNetwork,
@@ -521,7 +522,9 @@ class DriverMC:
             pool.close()
         except:
             pass
-        res = {'samples': sampler.get_chain(flat=True)}
+        samples = sampler.get_chain(flat=True)
+        weights = np.ones(len(samples))
+        res = {'samples': samples, 'weights': weights}
         self.dict_result = {'analyzer': 'emcee', 'walkers': walkers, 'nsamples': nsamp, 'result': res}
         return True
 
@@ -576,7 +579,10 @@ class DriverMC:
                             plot_param1=plot_param1, plot_param2=plot_param2)
         self.T.printParameters(A.params)
         self.ttime = time.time() - ti
-        self.dict_result = {'analyzer': 'maxlike', 'result': A.result()}
+        res = A.result()
+        res['weights'], res['samples'] = None, None
+
+        self.dict_result = {'analyzer': 'maxlike', 'result': res}
         return True
 
 
@@ -625,11 +631,12 @@ class DriverMC:
                     plot_fitness=plot_fitness, compute_errors=compute_errors,
                     show_contours=show_contours, plot_param1=plot_param1,
                     plot_param2=plot_param2)
-        result = M.main()
+        res = M.main()
         self.ttime = time.time() - ti
         #M.plotting()
+        res['weights'], res['samples'] = None, None
         self.dict_result = {'analyzer': 'ga_deap', 'max_generations': max_generation,
-                            'mutation': mutation, 'crossover': crossover, 'result': result}
+                            'mutation': mutation, 'crossover': crossover, 'result': res}
         return True
 
 ##---------------------- logLike and prior Transform function ----------------------

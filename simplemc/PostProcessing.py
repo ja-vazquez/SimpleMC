@@ -58,15 +58,7 @@ class PostProcessing:
                 else:
                     file.write('{}: {}\n'.format(key, self.result[key]))
 
-        if self.analyzername == 'nested':
-            samples, weights = self.result['samples'], np.exp(self.result['logwt'] - self.result['logz'])
-        elif self.analyzername == 'mcmc':
-            samples, weights = self.result['samples'], self.result['weights']
-        elif self.analyzername == 'emcee':
-            samples = self.result['samples']
-            weights = np.ones(len(samples))
-        else:
-            samples, weights = None, None
+        samples, weights = self.result['samples'], self.result['weights']
 
         if self.analyzername in ['mcmc', 'nested', 'emcee']:
             means, cov = dyfunc.mean_and_cov(samples, weights)
