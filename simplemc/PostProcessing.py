@@ -73,7 +73,10 @@ class PostProcessing:
             stdevs = np.sqrt(np.diag(cov))
             param_fits = means
         else:
-            stdevs = np.sqrt(np.diag(self.result['cov']))
+            try:
+                stdevs = np.sqrt(np.diag(self.result['cov']))
+            except:
+                stdevs = np.zeros(self.N)
             param_fits = self.result['param_fit']
 
         for i, parname in enumerate(self.paramList):
