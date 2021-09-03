@@ -1,7 +1,6 @@
 import PySimpleGUI as sg
 
 
-# Base Parameters
 def model_parameter_layout(model):
     """
     Creating a GUI layout for the model parameters.
