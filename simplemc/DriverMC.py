@@ -261,7 +261,7 @@ class DriverMC:
                 logger.info('You can skip writing any option and SimpleMC will use default values.\n'
                             'MCMC executer kwargs are:\n\tnsamp (int) Default: 50000\n\t'
                             'skip (int) Default 300\n\ttemp (float) Default: 2.0'
-                            '\n\tevidence (bool) Default: False')
+                            '\n\tevidence (bool) Default: False\n\tGRstop (float) Default: 0.01')
                 sys.exit(1)
                 #raise TypeError('Unexpected **kwargs: {}'.format(kwargs))
         logger.info("\n\tnsamp: {}\n\tskip: {}\n\t"
