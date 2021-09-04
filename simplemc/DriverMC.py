@@ -265,8 +265,8 @@ class DriverMC:
                 sys.exit(1)
                 #raise TypeError('Unexpected **kwargs: {}'.format(kwargs))
         logger.info("\n\tnsamp: {}\n\tskip: {}\n\t"
-                    "temp: {}\n\tevidence: {}".format(
-                    nsamp, skip, temp, evidence))
+                    "temp: {}\n\tevidence: {}\n\tGRstop: {}".format(
+                    nsamp, skip, temp, evidence, GRstop))
         if self.analyzername is None: self.analyzername = 'mcmc'
         self.outputpath = "{}_{}".format(self.outputpath, self.analyzername)
         #Check whether the file already exists
