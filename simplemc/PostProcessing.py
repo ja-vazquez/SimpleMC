@@ -23,89 +23,71 @@ class PostProcessing:
         Burn-in.
     addDerived : bool
         Derived parameters?
-    loglike : object
-        Likelihood object.
 
     """
-    def __init__(self, list_result, paramList, filename,
-                 skip=0.1, addDerived=True, loglike=None):
-        self.analyzername = list_result[0]
-        self.result    = list_result[1]
+    def __init__(self, dict_result, paramList, filename,
+                 skip=0.1, addDerived=True):
+        self.dict_result = dict_result
+        self.analyzername = dict_result['analyzer']
+        self.result    = dict_result['result']
+        self.time = dict_result['time']
         self.paramList = paramList
         self.N = len(paramList)
         self.filename  = filename
         self.skip      = skip
         self.derived   = addDerived
-        self.loglike   = loglike
         self.args = []
         if addDerived:
             self.AD = AllDerived()
 
-        for i in range(2, len(list_result)):
-            self.args.append(list_result[i])
-
-    def writeSummary(self, time, *args):
+    def writeSummary(self):
         file = open(self.filename + "_Summary" + ".txt", 'w')
         file.write('SUMMARY\n-------\n')
 
-        for item in self.args:
-            if type(item) is list:
-                for element in item:
-                    if element is not None:
-                        file.write(str(element) + '\n')
-            else:
-                if item is not None:
-                    file.write(str(item) + '\n')
+        for key in self.dict_result:
+            if key not in ['result', 'time']:
+                file.write('{}: {}\n'.format(key, self.dict_result[key]))
 
-        for item in args:
-            if type(item) is list:
-                for element in item:
-                    if element is not None:
-                        file.write(str(element) + '\n')
-            else:
-                if item is not None:
-                    file.write(str(item) + '\n')
+        for key in self.result:
+            if key not in ['param_fit', 'samples', 'cov', 'logwt', 'logzerr', 'weights']:
+                if isinstance(self.result[key], float):
+                    if key == 'logz':
+                        file.write('{}: {:.4f} +/- {:.4f}\n'.format(key, self.result[key], self.result['logzerr']))
+                    else:
+                        file.write('{}: {:.4f}\n'.format(key, self.result[key]))
+                else:
+                    file.write('{}: {}\n'.format(key, self.result[key]))
 
-        pars = self.loglike.freeParameters()
-        if self.analyzername == 'nested':
-            samples, weights = self.result.samples, np.exp(self.result.logwt - self.result.logz[-1])
-        elif self.analyzername == 'mcmc':
-            samples, weights = self.result[0], self.result[1]
-        elif self.analyzername == 'emcee':
-            samples = self.result.get_chain(flat=True)
-            weights = np.ones(len(samples))
-        else:
-            samples = None
-            weights = None
+        samples, weights = self.result['samples'], self.result['weights']
 
         if self.analyzername in ['mcmc', 'nested', 'emcee']:
             means, cov = dyfunc.mean_and_cov(samples, weights)
             stdevs = np.sqrt(np.diag(cov))
+            param_fits = means
+        else:
+            try:
+                stdevs = np.sqrt(np.diag(self.result['cov']))
+            except:
+                stdevs = np.zeros(self.N)
+            param_fits = self.result['param_fit']
 
-            for i, p in enumerate(pars):
-                mean = means[i]
-                std = stdevs[i]
-                print("{}: {:.4f} +/- {:.4f}".format(p.name, mean, std))
-                file.write("{}: {:.4f} +/- {:.4f}\n".format(p.name, mean, std))
+        for i, parname in enumerate(self.paramList):
+            param_fit = param_fits[i]
+            std = stdevs[i]
+            print("{}: {:.4f} +/- {:.4f}".format(parname, param_fit, std))
+            file.write("{}: {:.4f} +/- {:.4f}\n".format(parname, param_fit, std))
 
-            if self.analyzername == 'nested':
-                file.write("nlive: {:d}\nniter: {:d}\nncall: {:d}\n"
-                           "eff(%): {:6.3f}\nlogz: "
-                           "{:6.3f} +/- {:6.3f}\n".format(self.result.nlive, self.result.niter,
-                                                   sum(self.result.ncall), self.result.eff,
-                                                   self.result.logz[-1], self.result.logzerr[-1]))
-
-
-        logger.info("\nElapsed time: {:.3f} minutes = {:.3f} seconds".format(time / 60, time))
-        file.write('\nElapsed time: {:.3f} minutes = {:.3f} seconds \n'.format(time / 60, time))
+        logger.info("\nElapsed time: {:.3f} minutes = {:.3f} seconds".format(self.time / 60, self.time))
+        file.write('\nElapsed time: {:.3f} minutes = {:.3f} seconds \n'.format(self.time / 60, self.time))
         file.close()
+
 
     def mcevidence(self, k):
         if self.analyzername not in ['mcmc', 'nested', 'emcee']:
             sys.exit('MCEvidence only work on Bayesian samplers (mcmc, nested, '
                      'emcee) not in optimizers')
 
-        mcev = MCEvidence('{}'.format(self.filename), kmax=k)
+        mcev = MCEvidence('{}'.format(self.filename), kmax=k, dims=self.N)
         mcevres = mcev.evidence(covtype='all')
 
         burn_frac = 0.0
@@ -118,7 +100,7 @@ class PostProcessing:
                 burn_frac += 0.1
                 logger.info("Burn-in: {}%".format(burn_frac*100))
                 mcev = MCEvidence('{}'.format(self.filename),
-                                  burnlen=burn_frac, kmax=k)
+                                  burnlen=burn_frac, kmax=k, dims=self.N)
 
                 mcevres = mcev.evidence(covtype='all')
                 if not (mcevres == np.inf).all():

@@ -3,7 +3,9 @@ from matplotlib.patches import Ellipse
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plot_elipses(best, cov, par1, par2, ax=None, **kwargs):
+
+def plot_elipses(best, cov, par1, par2, ax=None, contour_col='g',
+                 axis_sty='-r', lw=4, label='Fisher', addtxt=None):
             #fig = plt.figure(figsize=(6,6))
             #ax = fig.add_subplot(111) #, aspect='equal')
 
@@ -27,22 +29,28 @@ def plot_elipses(best, cov, par1, par2, ax=None, **kwargs):
             vec[0]*=sp.sqrt(6.18*sp.real(vals[0]))
             vec[1]*=sp.sqrt(6.18*sp.real(vals[1]))
 
-            plt.plot(mn[par1], mn[par2],'bo') #, label=self.model)
+            maxdot = '{}o'.format(contour_col)
+            plt.plot(mn[par1], mn[par2],maxdot) #, label=self.model)
             plt.plot([mn[par1]-vec[0][0], mn[par1]+vec[0][0]],
-                [mn[par2]-vec[0][1],mn[par2]+vec[0][1]],'r-')
+                [mn[par2]-vec[0][1],mn[par2]+vec[0][1]], axis_sty)
             plt.plot([mn[par1]-vec[1][0],mn[par1]+vec[1][0]],
-                [mn[par2]-vec[1][1],mn[par2]+vec[1][1]],'r-')
+                [mn[par2]-vec[1][1],mn[par2]+vec[1][1]],axis_sty)
 
             theta = sp.degrees(np.arctan2(*vecs[:,0][::-1]))
 
             for i, sigs in enumerate(sigmas):
                 w, h = 2*sp.sqrt(vals)*sp.sqrt(sigs)
                 ell = Ellipse(xy=(mn[par1], mn[par2]),  width = w, height = h,\
-                              angle=theta, color='green',  lw=4)
+                              angle=theta, color=contour_col,  lw=lw)
                 ell.set_facecolor('none')
                 ax.add_artist(ell)
 
-            ax.legend([ell], ['Fisher'])
-            #plt.legend(loc='best')
-            #plt.title('Fisher', fontsize=10)
+
+            if addtxt:
+                ax.text(addtxt[0], addtxt[1], addtxt[2], color=contour_col, style='italic')
+            else:
+                ax.legend([ell], [label])
+            # plt.legend(loc='best')
+            #plt.title('Fisher', fon    tsize=10)
             #plt.show()
+            return ax
