@@ -248,25 +248,23 @@ class DriverMC:
             temp     = self.config.getfloat(    'mcmc', 'temp',    fallback=2)
             GRstop   = self.config.getfloat(    'mcmc', 'GRstop',  fallback=0.01)
             checkGR  = self.config.getfloat(    'mcmc', 'checkGR', fallback=500)
-            evidence = self.config.getboolean(  'mcmc', 'evidence',fallback=False)
         else:
             nsamp    = kwargs.pop('nsamp', 50000)
             skip     = kwargs.pop('skip',  300)
             temp     = kwargs.pop('temp',  2)
             GRstop   = kwargs.pop('GRstop', 0.01)
             checkGR  = kwargs.pop('checkGR', 500)
-            evidence = kwargs.pop('evidence', False)
             if kwargs:
                 logger.critical('Unexpected **kwargs for MCMC: {}'.format(kwargs))
                 logger.info('You can skip writing any option and SimpleMC will use default values.\n'
                             'MCMC executer kwargs are:\n\tnsamp (int) Default: 50000\n\t'
                             'skip (int) Default 300\n\ttemp (float) Default: 2.0'
-                            '\n\tevidence (bool) Default: False\n\tGRstop (float) Default: 0.01')
+                            '\n\tmcevidence (bool) Default: False\n\tGRstop (float) Default: 0.01')
                 sys.exit(1)
                 #raise TypeError('Unexpected **kwargs: {}'.format(kwargs))
         logger.info("\n\tnsamp: {}\n\tskip: {}\n\t"
-                    "temp: {}\n\tevidence: {}\n\tGRstop: {}".format(
-                    nsamp, skip, temp, evidence, GRstop))
+                    "temp: {}\n\tmcevidence: {}\n\tGRstop: {}".format(
+                    nsamp, skip, temp, self.mcevidence, GRstop))
         if self.analyzername is None: self.analyzername = 'mcmc'
         self.outputpath = "{}_{}".format(self.outputpath, self.analyzername)
         #Check whether the file already exists
