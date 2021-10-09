@@ -85,5 +85,5 @@ def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
             print(logbook.stream)
 
     f.close()
-    return population, logbook
+    return population, logbook, gen
 

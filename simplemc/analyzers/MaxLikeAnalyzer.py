@@ -62,19 +62,18 @@ class MaxLikeAnalyzer:
             print('--'*20)
             # for errors, consider the df = J cov_x J^t
 
-
+        hess = nd.Hessian(self.negloglike)(self.res.x)
+        eigvl, eigvc = la.eig(hess)
+        print('Hessian', hess, eigvl, )
+        self.cov = la.inv(hess)
         if (compute_errors):
-            hess    = nd.Hessian(self.negloglike)(self.res.x)
-            eigvl, eigvc = la.eig(hess)
-            print ('Hessian', hess, eigvl,)
-            self.cov = la.inv(hess)
             print('Covariance matrix \n', self.cov)
             # set errors:
             for i, pars in enumerate(self.params):
                 pars.setError(sp.sqrt(self.cov[i, i]))
         # update with the final result
         self.opt_loglike = self.negloglike(self.res.x)
-        self.result(self.opt_loglike)
+        self.result()
 
 
 
@@ -107,8 +106,9 @@ class MaxLikeAnalyzer:
             return -loglike
 
 
-    def result(self, loglike):
+    def result(self):
         print ("------")
         print("Done.")
-        print("Optimal loglike : ", loglike)
+        print("Optimal loglike : ", self.opt_loglike)
+        return {'maxlike': self.opt_loglike, 'param_fit': self.res.x, 'cov': self.cov}
 

@@ -535,11 +535,14 @@ class SamplesMIXIN(object):
 
 class MCSamples(SamplesMIXIN):
 
-    def __init__(self,str_or_dict,trueval=None,
+    def __init__(self,str_or_dict, dims, trueval=None,
                      debug=False,csplit=None,
                      names=None,labels=None,px='x',
                      **kwargs):
         
+        # #SimpleMC_change
+        self.dims = dims
+
         self.debug=debug
         self.names=None
         self.labels=None
@@ -560,8 +563,9 @@ class MCSamples(SamplesMIXIN):
     def read_list_to_array(self,flist):
         chains=[]
         for f in flist:
-            self.logger.info('loading: '+f)            
-            chains.append(np.loadtxt(f))
+            self.logger.info('loading: '+f)
+            # #SimpleMC_change
+            chains.append(np.loadtxt(f, usecols=range(self.dims+2)))
         return chains
         
     def load_from_file(self,fname,**kwargs):
@@ -611,7 +615,7 @@ class MCSamples(SamplesMIXIN):
 #============================================================
 
 class MCEvidence(object):
-    def __init__(self,method,ischain=True,isfunc=None,
+    def __init__(self,method, dims, ischain=True,isfunc=None,
                      thinlen=0.0,burnlen=0.0,
                      split=False,s1frac=0.5,shuffle=True,
                      ndim=None, kmax= 5, 
@@ -627,6 +631,8 @@ class MCEvidence(object):
                 If string or numpy array, it is interpreted as MCMC chain. 
                 Otherwise, it is interpreted as a python class with at least 
                 a single method sampler and will be used to generate chain.
+
+        :param (int) dims: number of free parameters. (#SimpleMC_change)
 
         :param ischain (bool): True indicates the passed method is to be interpreted as a chain.
                 This is important as a string name can be passed for to 
@@ -750,7 +756,9 @@ class MCEvidence(object):
         split_var = namedtuple('split_var','split frac shuffle')
         csplit = split_var(split=self.split,frac=s1frac,shuffle=shuffle)
         #
-        self.gd = MCSamples(method,csplit=csplit,debug=self.debug,**gdkwargs)
+        # #SimpleMC_change
+        self.gd = MCSamples(method,dims=dims,csplit=csplit,
+                            debug=self.debug,**gdkwargs)
 
         if isfunc:
             #try:
