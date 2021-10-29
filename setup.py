@@ -3,7 +3,7 @@
 
 import sys
 import os
-from setuptools import find_packages
+
 os.path = ["simplemc"] + os.path
 try:
     from setuptools import setup, Extension
@@ -27,8 +27,7 @@ class PyTest(TestCommand):
 
 
 desc = open("README.rst").read()
-required = ["numpy", "emcee", "scipy", "nestle", "keras", "tensorflow", "matplotlib", 
-            "corner", "getdist"]
+required = ["numpy", "scipy", "keras", "tensorflow", "matplotlib", "corner", "getdist"]
 test_requires = ["mock"]
 
 PACKAGE_PATH = os.path.abspath(os.path.join(__file__, os.pardir))
@@ -45,16 +44,20 @@ setup(
     long_description=desc,
     install_requires=required,
     test_requires=test_requires,
-    package_data={"": ["LICENSE"],
-                  'SimpleMC': ['data/*.dat']},
     include_package_data=True,
+    package_data={"": ["LICENSE"],
+    			  'simplemc':['Makefile'],
+                  'data': ['data/*.dat', 'data/*.txt', 'data/*.scan', 'data/*.02']
+                  },
     keywords=["SimpleMC",
               "parameter estimation",
+              "machine learning",
+              "dark energy",
               "cosmology",
               "MCMC"],
     cmdclass = {'test': PyTest},
     classifiers=[
-        "Development Status :: 2 - Beta",
+        "Development Status :: 0.9.2 - Beta",
         "Intended Audience :: Science/Research",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
