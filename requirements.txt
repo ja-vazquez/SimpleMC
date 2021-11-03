@@ -2,12 +2,8 @@
 # pip3 install -r requirements.txt
 numpy
 scipy
-corner
+sklearn
 numdifftools
-GetDist
-fgivenx
 matplotlib
-tensorflow
-Keras
 deap
 mpi4py
