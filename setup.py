@@ -1,67 +1,39 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-import sys
-import os
+from distutils.core import setup
 
-os.path = ["simplemc"] + os.path
-try:
-    from setuptools import setup, Extension
-    setup, Extension
-except ImportError:
-    from distutils.core import setup, Extension
-    setup, Extension
+with open("README.md", "r") as fh:
+    desc = fh.read()
 
-from setuptools.command.test import test as TestCommand
-
-class PyTest(TestCommand):
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-    def run_tests(self):
-        #import here, cause outside the eggs aren't loaded
-        import pytest
-        errno = pytest.main(self.test_args)
-        sys.exit(errno)
-
-
-desc = open("README.rst").read()
-required = ["numpy", "scipy", "keras", "tensorflow", "matplotlib", "corner", "getdist"]
-test_requires = ["mock"]
-
-PACKAGE_PATH = os.path.abspath(os.path.join(__file__, os.pardir))
+required = ["numpy", "scipy", "sklearn", "matplotlib", "numdifftools", "mpi4py"]
 
 setup(
-    name="SimpleMC",
-    version='2.0.0',
+    name="simplemc",
+    version='0.9.8',
     author='JA Vazquez, I Gomez-Vargas, A Slosar',
     author_email="jvazquez@icf.unam.mx",
-    url="https://github.com/ja-vazquez/SimpleMC",
+    url="https://github.com/igomezv/simplemc_tests",
     license="GPLv3",
-    # packages=find_packages(PACKAGE_PATH, "Tests"),
     description="Cosmological parameter estimation with SimpleMC",
     long_description=desc,
+    setup_requires=['setuptools_scm'],
     install_requires=required,
-    test_requires=test_requires,
     include_package_data=True,
-    package_data={"": ["LICENSE"],
-    			  'simplemc':['Makefile'],
-                  'data': ['data/*.dat', 'data/*.txt', 'data/*.scan', 'data/*.02']
-                  },
+    package_data={'simplemc': ['data/*.txt']},
     keywords=["SimpleMC",
               "parameter estimation",
               "machine learning",
               "dark energy",
               "cosmology",
               "MCMC"],
-    cmdclass = {'test': PyTest},
     classifiers=[
-        "Development Status :: 0.9.2 - Beta",
+        "Development Status :: 0.9.8 - Beta",
         "Intended Audience :: Science/Research",
         "Operating System :: OS Independent",
+        'License :: OSI Approved :: GPLv3 License',
         "Programming Language :: Python",
         'Natural Language :: English',
-        'Programming Language :: Python :: 3.6',
     ],
+    python_requires='>=3.6',
 )
