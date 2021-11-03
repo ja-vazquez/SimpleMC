@@ -3,6 +3,8 @@
 from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
 import scipy as sp
+from simplemc import cdir
+
 
 #uncoment lines for use a covariance matrix
 class RotationCurvesLikelihood(BaseLikelihood):
@@ -41,5 +43,5 @@ class RotationCurvesLikelihood(BaseLikelihood):
 
 class RotationCurvesLike(RotationCurvesLikelihood):
     def __init__(self):
-        RotationCurvesLikelihood.__init__(self,"RotCurves","simplemc/data/NGC2403.curve.02",
-            "simplemc/data/NGC2403.curve.02-cov.txt")
+        RotationCurvesLikelihood.__init__(self, "RotCurves", cdir+"/data/NGC2403.curve.02",
+                                          cdir+"/data/NGC2403.curve.02-cov.txt")

@@ -7,7 +7,7 @@ from simplemc.likelihoods.TabulatedBAODVLikelihood import TabulatedBAODVLikeliho
 from simplemc.likelihoods.GaussBAODVLikelihood import GaussBAODVLikelihood
 from simplemc.likelihoods.ConsensusBAOLikelihood import ConsensusBAOLikelihood
 from simplemc.models.LCDMCosmology import LCDMCosmology
-
+from simplemc import cdir
 
 
 class DR11LOWZ(GaussBAODVLikelihood):
@@ -31,7 +31,7 @@ class DR11CMASS(TabulatedBAOLikelihood):
         mnu  = 0  # rd=149.28
         fidTheory = LCDMCosmology(obh2, Om, h, mnu)
         # negative col means the cols is probability and not chi2
-        TabulatedBAOLikelihood.__init__(self, "DR11CMASS", 'simplemc/data/sdss_DR11CMASS_consensus.dat',
+        TabulatedBAOLikelihood.__init__(self, "DR11CMASS", cdir+'/data/sdss_DR11CMASS_consensus.dat',
                                         -2, fidTheory, 0.57)
 
 class DR12Consensus(ConsensusBAOLikelihood):
@@ -41,8 +41,8 @@ class DR12Consensus(ConsensusBAOLikelihood):
         h    = 0.676
         mnu  = 0.06
         fidTheory = LCDMCosmology(obh2, Om, h, mnu)
-        ConsensusBAOLikelihood.__init__(self, "BAODR12", "simplemc/data/sdss_DR12Consensus_bao.dat",
-                                             "simplemc/data/BAO_consensus_covtot_dM_Hz.txt", fidTheory)
+        ConsensusBAOLikelihood.__init__(self, "BAODR12", cdir+"/data/sdss_DR12Consensus_bao.dat",
+                                             cdir+"/data/BAO_consensus_covtot_dM_Hz.txt", fidTheory)
 
 
 class DR11LyaAuto(TabulatedBAOLikelihood):
@@ -56,7 +56,7 @@ class DR11LyaAuto(TabulatedBAOLikelihood):
         mnu  = 0.06  # ;# rd=149.77
         fidTheory = LCDMCosmology(obh2, Om, h, mnu)
         # File from 5/16 from Nicolas.
-        TabulatedBAOLikelihood.__init__(self, "DR11LyaAuto", 'simplemc/data/chi2_surface_dr11_baseline_fit.txt',
+        TabulatedBAOLikelihood.__init__(self, "DR11LyaAuto", cdir+'/data/chi2_surface_dr11_baseline_fit.txt',
                                         4, fidTheory, 2.34)
 
 
@@ -67,7 +67,7 @@ class DR11LyaCross(TabulatedBAOLikelihood):
         h    = 0.7
         mnu  = 0  # ;# rd=149.77
         fidTheory = LCDMCosmology(obh2, Om, h, mnu)
-        TabulatedBAOLikelihood.__init__(self, "DR11LyaCross", 'simplemc/data/lyabaocross.scan',
+        TabulatedBAOLikelihood.__init__(self, "DR11LyaCross", cdir+'/data/lyabaocross.scan',
                                         2, fidTheory, 2.36)
 
 
@@ -82,7 +82,7 @@ class DR14LyaAuto(TabulatedBAOLikelihood):
         Om   = 0.1426/h**2
         mnu  = 0.06  # rd=147.33
         fidTheory = LCDMCosmology(obh2, Om, h, mnu)
-        TabulatedBAOLikelihood.__init__(self, "DR14LyaAuto", 'simplemc/data/deSainteAgatheetal2019_ap_at_scan.dat',
+        TabulatedBAOLikelihood.__init__(self, "DR14LyaAuto", cdir+'/data/deSainteAgatheetal2019_ap_at_scan.dat',
                                         2, fidTheory, 2.34, aperp_col=1, apar_col=0, skiprows=1)
 
 
@@ -97,7 +97,7 @@ class DR14LyaCross(TabulatedBAOLikelihood):
         mnu  = 0.06  # rd=147.33
         fidTheory = LCDMCosmology(obh2, Om, h, mnu)
         # File from 5/16 from Nicolas.
-        TabulatedBAOLikelihood.__init__(self, "DR14LyaCross", 'simplemc/data/Blomqvistetal2019_ap_at_scan.dat',
+        TabulatedBAOLikelihood.__init__(self, "DR14LyaCross", cdir+'/data/Blomqvistetal2019_ap_at_scan.dat',
                                         2, fidTheory, 2.34, aperp_col=1, apar_col=0, skiprows=1)
 
 
@@ -136,4 +136,4 @@ class SDSSMGS(TabulatedBAODVLikelihood):
         mnu  = 0
         fidTheory = LCDMCosmology(obh2, Om, h, mnu)
         TabulatedBAODVLikelihood.__init__(
-            self, "MGS", "simplemc/data/chidavexi8stavePk5staverec.dat", fidTheory, 0.15)
+            self, "MGS", cdir+"/data/chidavexi8stavePk5staverec.dat", fidTheory, 0.15)
