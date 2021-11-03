@@ -4,6 +4,9 @@ __author__  = 'JA Vazquez, I Gomez-Vargas, A Slosar'
 import sys
 import logging
 import datetime
+from pathlib import Path
+
+cdir = str(Path(__file__).parent.resolve())
 
 log = False
 
