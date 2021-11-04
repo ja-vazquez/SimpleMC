@@ -28,10 +28,9 @@ setup(
               "cosmology",
               "MCMC"],
     classifiers=[
-        "Development Status :: 0.9.8 - Beta",
         "Intended Audience :: Science/Research",
         "Operating System :: OS Independent",
-        'License :: OSI Approved :: GPLv3 License',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
