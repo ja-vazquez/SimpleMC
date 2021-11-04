@@ -16,6 +16,22 @@ pedagogical reasons.
 
 Temporary documentation in: https://igomezv.github.io/SimpleMC/ 
 
+You can install simplemc on your computer using:
+
+     $ git clone https://github.com/ja-vazquez/SimpleMC
+     $ cd SimpleMC
+     $ pip3 install -e .
+
+then you can delete the cloned repo because you must have `simplemc` installed locally. 
+
+Other way to install `simplemc` is:
+
+     $ pip3 install -e git+https://github.com/ja-vazquez/SimpleMC
+
+
+In the `requirements.txt` file are the basic libraries to run `simplemc`, but some functions such as graphics or neural networks may not be available. To get the full requirements use `requirements_full.txt`. You can manually install these dependencies with `pip3 install -r requirements_full.txt`.
+
+
 Directory structure:
 --------------------
 simplemc (root) - actual executables - you should read them like scripts
@@ -32,7 +48,7 @@ models - Cosmological models based on LCDM
 
 tools - various tools we use for plotting, etc.  
 
-attick - various hacks and tests  
+
 
 Quick start:
 ------------
@@ -44,6 +60,7 @@ A quick start with the code, try:
 
 You can set the `baseConfig.ini` with the analyzer, model and datasets that
 you need.  
+
 
 How does it work:
 -----------------
