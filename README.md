@@ -26,7 +26,7 @@ then you can delete the cloned repo because you must have `simplemc` installed l
 
 Other way to install `simplemc` (without clonning) is:
 
-     $ pip3 install -e git+https://github.com/ja-vazquez/SimpleMC
+     $ pip3 install -e git+https://github.com/ja-vazquez/SimpleMC#egg=simplemc
 
 
 In the `requirements.txt` file are the basic libraries to run `simplemc`, but some functions such as graphics or neural networks may not be available. To get the full requirements use `requirements_full.txt`. You can manually install these dependencies with `pip3 install -r requirements_full.txt`.
