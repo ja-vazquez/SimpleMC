@@ -24,7 +24,7 @@ You can install simplemc on your computer using:
 
 then you can delete the cloned repo because you must have `simplemc` installed locally. 
 
-Other way to install `simplemc` is:
+Other way to install `simplemc` (without clonning) is:
 
      $ pip3 install -e git+https://github.com/ja-vazquez/SimpleMC
 
