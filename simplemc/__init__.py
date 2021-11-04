@@ -1,4 +1,4 @@
-__version__ = '1.9.0'
+__version__ = '0.9.8'
 __author__  = 'JA Vazquez, I Gomez-Vargas, A Slosar'
 
 import sys
