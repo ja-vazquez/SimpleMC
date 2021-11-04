@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from distutils.core import setup
+from setuptools import setup
+
 
 with open("README.md", "r") as fh:
     desc = fh.read()
@@ -13,11 +14,10 @@ setup(
     version='0.9.8',
     author='JA Vazquez, I Gomez-Vargas, A Slosar',
     author_email="jvazquez@icf.unam.mx",
-    url="https://github.com/igomezv/simplemc_tests",
+    url="https://github.com/ja-vazquez/SimpleMC",
     license="GPLv3",
     description="Cosmological parameter estimation with SimpleMC",
     long_description=desc,
-    setup_requires=['setuptools_scm'],
     install_requires=required,
     include_package_data=True,
     package_data={'simplemc': ['data/*.txt']},
@@ -32,8 +32,15 @@ setup(
         "Intended Audience :: Science/Research",
         "Operating System :: OS Independent",
         'License :: OSI Approved :: GPLv3 License',
-        "Programming Language :: Python",
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Natural Language :: English',
     ],
-    python_requires='>=3.6',
+
 )
