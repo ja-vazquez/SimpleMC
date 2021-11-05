@@ -18,8 +18,10 @@ Temporary documentation in: https://igomezv.github.io/SimpleMC/
 
 You can install simplemc on your computer using:
 
-     $ git clone https://github.com/ja-vazquez/SimpleMC
+     $ git clone https://github.com/ja-vazquez/SimpleMC 
+          
      $ cd SimpleMC
+     
      $ pip3 install -e .
 
 then you can delete the cloned repo because you must have `simplemc` installed locally. 
