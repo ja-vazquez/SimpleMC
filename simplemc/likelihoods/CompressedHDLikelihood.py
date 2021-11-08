@@ -3,6 +3,7 @@
 from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
 import scipy as sp
+from simplemc import cdir
 
 class CompressedHDLikelihood(BaseLikelihood):
     def __init__(self,name,values_filename, cov_filename):
@@ -48,5 +49,5 @@ class CompressedHDLikelihood(BaseLikelihood):
 class HubbleDiagram(CompressedHDLikelihood):
     # data from https://arxiv.org/abs/1802.01505
     def __init__(self):
-        CompressedHDLikelihood.__init__(self,"HD","simplemc/data/HDiagramCompilacion-data_31.txt",
-                                             "simplemc/data/HDiagramCompilacion-cov_31.txt")
+        CompressedHDLikelihood.__init__(self,"HD", cdir+"/data/HDiagramCompilacion-data_31.txt",
+                                            cdir+"/data/HDiagramCompilacion-cov_31.txt")

@@ -1,0 +1,6 @@
+recursive-include simplemc *
+include data/*.dat
+include data/*.txt
+include simplemc/data/*.txt
+include simplemc/data/*.txt
+

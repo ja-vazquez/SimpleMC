@@ -2,6 +2,8 @@
 from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 from simplemc.likelihoods.JLA_SN import SN_likelihood
 import matplotlib.pyplot as plt
+from simplemc import cdir
+
 
 class SNLikelihood(BaseLikelihood):
     def __init__ (self, name, filename):
@@ -44,4 +46,4 @@ class SNLikelihood(BaseLikelihood):
 
 class JLASN_Full(SNLikelihood):
     def __init__(self):
-        SNLikelihood.__init__(self, "JLASN", "simplemc/data/jla_cosmo_v2/jla.dataset")
+        SNLikelihood.__init__(self, "JLASN", cdir+"/data/jla_cosmo_v2/jla.dataset")
