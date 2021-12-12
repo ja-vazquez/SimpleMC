@@ -19,7 +19,7 @@ h_par = Parameter("h", 0.6821, 0.05, (0.4, 0.9), "h")
 
 # Neutrino mass and effective number.
 mnu_par = Parameter("mnu", 0.06, 0.1, (0, 1.0), "\Sigma m_{\\nu}")
-Nnu_par = Parameter("Nnu", 3.046, 0.5, (3.046, 5.046), "N_{\\rm eff}")
+Nnu_par = Parameter("Nnu", 3.046, 0.5, (3.0, 3.1), "N_{\\rm eff}")
 
 # Curvature and DE equation of state.
 Ok_par = Parameter("Ok", 0.0, 0.01, (-0.02, 0.02), "\Omega_k")
