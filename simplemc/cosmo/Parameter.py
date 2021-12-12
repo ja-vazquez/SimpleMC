@@ -3,7 +3,7 @@ class Parameter:
     """
     A simple class for dealing with Parameter.
     Parameter has a name, a value, an error and some bounds
-    Names are also latex names.
+    Names have also latex names.
 
     Parameters
     ----------
@@ -11,10 +11,10 @@ class Parameter:
         Name to identify the parameter.
 
     value : float
-        Default value. In mcmc will be the stating value.
+        Default value. In MCMC will be the starting value.
 
     err: float
-        Estimated error, in mcmc will be the step.
+        Estimated error, in MCMC will be the step of the chain.
         Default is 0, but better to write any positive number.
 
     bounds: list
@@ -30,7 +30,7 @@ class Parameter:
     Example
     -------
     The hubble parameter
-    h_par    = Parameter('h', 0.6821,  0.05,   (0.4, 1.0),    'h')
+    h_par = Parameter('h', 0.6821,  0.05,   (0.4, 1.0),    'h')
     """
 
     def __init__(self, name, value, err=0.0, bounds=None, Ltxname=None):
@@ -48,7 +48,7 @@ class Parameter:
 
         # Initialize the priors
         if bounds == None:
-            self.bounds = (value-5*err, value+5*err)
+            self.bounds = (value - 5*err, value + 5*err)
         else:
             self.bounds = bounds
 
