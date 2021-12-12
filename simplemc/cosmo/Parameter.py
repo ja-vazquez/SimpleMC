@@ -35,7 +35,7 @@ class Parameter:
 
     def __init__(self, name, value, err=0.0, bounds=None, Ltxname=None):
 
-        # Initialize name and Latex name
+        # Initialize name and Latex name.
         self.name = name
         if Ltxname:
             self.Ltxname = Ltxname
@@ -43,10 +43,10 @@ class Parameter:
             self.Ltxname = name
         self.value = value
 
-        # Initialize the estimated of error
+        # Initialize the estimated of error.
         self.error = err
 
-        # Initialize the priors
+        # Initialize the priors.
         if bounds == None:
             self.bounds = (value - 5*err, value + 5*err)
         else:

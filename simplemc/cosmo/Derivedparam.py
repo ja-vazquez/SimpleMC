@@ -12,7 +12,7 @@ class AllDerived:
     """
     def __init__(self):
 
-        #Standard cosmological parameters
+        #Standard cosmological parameters.
         self.Ol = Derivedparam('Ol', 0, '\Omega_\Lambda*')
         self.H0 = Derivedparam('H0', 0, 'H_0*')
         self.Age = Derivedparam('Age', 0, 'Age[Gyr]*')
