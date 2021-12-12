@@ -1,6 +1,6 @@
 ##
 # This is a class that provides relevant support
-# for treating radiation and neutrinos
+# for treating radiation and neutrinos.
 # Much of this functionality was in BasicCosmo,
 # but it became clutterish there.
 ##
@@ -31,12 +31,13 @@ class RadiationAndNeutrinos:
     disable : bool
         Set radiation to zero.
     """
-    # type this shit into google
+    # Type this into google
     # 8*pi^5*(boltzmann constant)^4/(15*(h*c)^3))*(1 Kelvin)**4/(3*(100 km/s/Mpc)^2/(8*Pi*G)*(speed of light)^2)
     # to get
-    omrad_fac   = 4.48130979e-7
+    omrad_fac = 4.48130979e-7
     omrad_pref_ = omrad_fac*CA.Tcmb**4
-    # check  4.48130979e-7*(2.725**4)=2.47099e-05 c.f. Doddie p. 41
+
+    # check  4.48130979e-7*(2.725**4)=2.47099e-05 c.f. Doddelson p. 41
     # now Omrad= omread_pref_/h**2
 
     def __init__(self, mnu=mnu_par.value, Nnu=Nnu_par.value,
@@ -44,11 +45,12 @@ class RadiationAndNeutrinos:
         
         self.disabled = disable
         if (self.disabled):
-            self.Omrad     = 0
-            self.Omnuh2    = 0
-            self.Omnu      = 0
+            self.Omrad = 0
+            self.Omnuh2 = 0
+            self.Omnu = 0
             self.NuDensity = ZeroNuDensity()
             return
+
         self.varyMnu = False
         self.varyNnu = False
         self.NuDensity = NuDensity(CA.Tcmb, Nnu, mnu, degenerate, fact=self.omrad_fac)
@@ -116,7 +118,7 @@ class RadiationAndNeutrinos:
                 self.setMnu(p.value)
             elif p.name == "Nnu":
                 self.setNnu(p.value)
-        # This assumes we know about h
+        # This assumes we know about h.
         # This base class alone doesn't, but if inherited in say
         # LCDM, it should. If it doesn't, the best thing is to
         # crash anyway, rather then to try to do something clever
