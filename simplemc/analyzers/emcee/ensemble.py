@@ -168,7 +168,7 @@ class EnsembleSampler(object):
         self.log_prob_fn = _FunctionWrapper(log_prob_fn, args, kwargs)
 
         # Save the parameter names
-        self.params_are_named: bool = parameter_names is not None
+        if self.params_are_named: bool = parameter_names is not None
         if self.params_are_named:
             assert isinstance(parameter_names, (list, dict))
 
