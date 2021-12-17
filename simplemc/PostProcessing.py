@@ -81,6 +81,14 @@ class PostProcessing:
         file.write('\nElapsed time: {:.3f} minutes = {:.3f} seconds \n'.format(self.time / 60, self.time))
         file.close()
 
+    def writeMaxlike(self):
+        file = open(self.filename + ".maxlike", 'w')
+        maxlogl_idx = np.argmax(self.result['loglikes'])
+        maxlogl = np.max(self.result['loglikes'])
+        maxsamp = str(self.result['samples'][maxlogl_idx]).lstrip('[').rstrip(']')
+        maxw = self.result['weights'][maxlogl_idx]
+        file.write('{} {} {}'.format(maxw, maxlogl, maxsamp))
+        file.close()
 
     def mcevidence(self, k):
         if self.analyzername not in ['mcmc', 'nested', 'emcee']:
