@@ -438,6 +438,7 @@ class EnsembleSampler(object):
         """
         self.like = simpleLike
         self.outputname = outputname
+        self.loglikes = []
         if self.like is not None:
             self.derived = addDerived
             self.cpars = self.like.freeParameters()
@@ -465,6 +466,7 @@ class EnsembleSampler(object):
                 strsamples = str(res[0][i]).lstrip('[').rstrip(']')
                 # 1 as weight, -logP = -(logPrior + logLike), parameters
                 strsamples = "{} {} {} ".format(1, -res[1][i], strsamples)
+                self.loglikes.append(-res[1][i])
                 if self.derived:
                     self.AD = AllDerived()
                     # simpleLike -> simpleMC loglike object
@@ -486,6 +488,7 @@ class EnsembleSampler(object):
                 f.write(strsamples)
         f.flush()
         f.close()
+        self.loglikes = np.array(self.loglikes)
         # Store so that the ``initial_state=None`` case will work
         self._previous_state = results
         return results
