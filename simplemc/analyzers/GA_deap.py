@@ -3,13 +3,14 @@
 import scipy as sp
 import numpy as np
 import matplotlib.pyplot as plt
+import warnings
+
 from simplemc.plots.Plot_elipses import plot_elipses
 
 try:
     # Importamos libreria de algoritmos evolutivos
     from deap import base, creator, tools, algorithms
 except:
-    import warnings
     warnings.warn("Please install DEAP library if you want to use ga_deap genetic algorithms.")
 
 # We import an independent module to implement elitism in the GA.
@@ -20,10 +21,6 @@ import scipy.linalg as la
 import random
 import sys
 
-try:
-    import numdifftools as nd
-except:
-    sys.exit('install numdifftools')
 
 class GA_deap:
     """
@@ -52,6 +49,7 @@ class GA_deap:
         self.sigma = sp.array([p.error for p in self.params])
         self.bounds = [p.bounds for p in self.params]
         print("Minimizing...", self.vpars, "with bounds", self.bounds)
+        self.cov = None
 
         self.plot_fitness = plot_fitness
         self.compute_errors = compute_errors
@@ -110,31 +108,34 @@ class GA_deap:
         if self.plot_fitness:
             self.plotting(population, logbook, hof)
 
-        hess = nd.Hessian(self.negloglike2)(best_params)
-        eigvl, eigvc = la.eig(hess)
-        print('Hessian', hess, eigvl, )
-        self.cov = la.inv(hess)
-        print('Covariance matrix \n', self.cov)
-        # if self.compute_errors:
+        if self.compute_errors:
+            try:
+                import numdifftools as nd
 
-            # set errors:
-            #for i, pars in enumerate(self.params):
-            #    pars.setError(sp.sqrt(self.cov[i, i]))
-        # update with the final result
-        #self.result(self.negloglike(self.res.x))
+                hess = nd.Hessian(self.negloglike2)(best_params)
+                eigvl, eigvc = la.eig(hess)
+                print('Hessian', hess, eigvl, )
+                self.cov = la.inv(hess)
+                print('Covariance matrix \n', self.cov)
+                # set errors:
+                for i, pars in enumerate(self.params):
+                   pars.setError(sp.sqrt(self.cov[i, i]))
 
-        if self.show_contours and self.compute_errors:
-            param_names = [par.name for par in self.params]
-            if (self.plot_param1 in param_names) and (self.plot_param2 in param_names):
-                idx_param1 = param_names.index(self.plot_param1)
-                idx_param2 = param_names.index(self.plot_param2)
-            else:
-                sys.exit('\n Not a base parameter, derived-errors still on construction')
+                if self.show_contours:
+                    param_names = [par.name for par in self.params]
+                    if (self.plot_param1 in param_names) and (self.plot_param2 in param_names):
+                        idx_param1 = param_names.index(self.plot_param1)
+                        idx_param2 = param_names.index(self.plot_param2)
+                    else:
+                        sys.exit('\n Not a base parameter, derived-errors still on construction')
 
-            fig = plt.figure(figsize=(6,6))
-            ax = fig.add_subplot(111)
-            plot_elipses(best_params, self.cov, idx_param1, idx_param2, ax=ax)
-            plt.show()
+                    fig = plt.figure(figsize=(6, 6))
+                    ax = fig.add_subplot(111)
+                    plot_elipses(best_params, self.cov, idx_param1, idx_param2, ax=ax)
+                    plt.show()
+            except:
+                warnings.warn('Please install numdifftools to compute errors in ga_deap analyzer.')
+
         return {'population': len(population), 'no_generations': gens, 'param_fit': best_params,
                 'best_fitness': best.fitness.values[0], 'cov': self.cov}
 
