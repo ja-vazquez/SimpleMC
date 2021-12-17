@@ -43,7 +43,6 @@ class MaxLikeAnalyzer:
         self.res = minimize(self.negloglike, self.vpars, bounds=bounds, method='L-BFGS-B')
         print(self.res, 'with Errors =', compute_errors)
 
-
         if compute_derived:
             for par, val in zip(self.params, self.res.x):
                 par.setValue(val)
