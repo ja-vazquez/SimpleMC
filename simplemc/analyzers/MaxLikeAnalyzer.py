@@ -1,5 +1,3 @@
-
-
 from simplemc.plots.Plot_elipses import plot_elipses
 from simplemc.cosmo.Derivedparam import AllDerived
 from scipy.optimize import minimize
@@ -7,13 +5,7 @@ import matplotlib.pyplot as plt
 import scipy.linalg as la
 import scipy as sp
 import sys
-
-
-try:
-    import numdifftools as nd
-except:
-    sys.exit('install numdifftools')
-
+import warnings
 
 
 class MaxLikeAnalyzer:
@@ -44,6 +36,7 @@ class MaxLikeAnalyzer:
         self.params = like.freeParameters()
         self.vpars = [p.value for p in self.params]
         self.sigma = sp.array([p.error for p in self.params])
+        self.cov = None
         bounds = [p.bounds for p in self.params]
         print("Minimizing...", self.vpars, "with bounds", bounds)
 
@@ -62,36 +55,35 @@ class MaxLikeAnalyzer:
             print('--'*20)
             # for errors, consider the df = J cov_x J^t
 
-        hess = nd.Hessian(self.negloglike)(self.res.x)
-        eigvl, eigvc = la.eig(hess)
-        print('Hessian', hess, eigvl, )
-        self.cov = la.inv(hess)
-        if (compute_errors):
-            print('Covariance matrix \n', self.cov)
-            # set errors:
-            for i, pars in enumerate(self.params):
-                pars.setError(sp.sqrt(self.cov[i, i]))
+        if compute_errors:
+            try:
+                import numdifftools as nd
+                hess = nd.Hessian(self.negloglike)(self.res.x)
+                eigvl, eigvc = la.eig(hess)
+                print('Hessian', hess, eigvl, )
+                self.cov = la.inv(hess)
+                print('Covariance matrix \n', self.cov)
+                # set errors:
+                for i, pars in enumerate(self.params):
+                    pars.setError(sp.sqrt(self.cov[i, i]))
+                if show_contours:
+                    param_names = [par.name for par in self.params]
+                    if (plot_param1 in param_names) and (plot_param2 in param_names):
+                        idx_param1 = param_names.index(plot_param1)
+                        idx_param2 = param_names.index(plot_param2)
+                    else:
+                        sys.exit('\n Not a base parameter, derived-errors still on construction')
+
+                    fig = plt.figure(figsize=(6, 6))
+                    ax = fig.add_subplot(111)
+                    plot_elipses(self.res.x, self.cov, idx_param1, idx_param2, ax=ax)
+                    plt.show()
+            except:
+                warnings.warn('Please install numdifftools to compute errors in MaxLikeAnalyzer')
+
         # update with the final result
         self.opt_loglike = self.negloglike(self.res.x)
         self.result()
-
-
-
-
-        if show_contours and compute_errors:
-            param_names = [par.name for par in self.params]
-            if (plot_param1 in param_names) and (plot_param2 in param_names):
-                idx_param1 = param_names.index(plot_param1)
-                idx_param2 = param_names.index(plot_param2)
-            else:
-                sys.exit('\n Not a base parameter, derived-errors still on construction')
-
-            fig = plt.figure(figsize=(6,6))
-            ax = fig.add_subplot(111)
-            plot_elipses(self.res.x, self.cov, idx_param1, idx_param2, ax=ax)
-            plt.show()
-
-
 
     def negloglike(self, x):
         for i, pars in enumerate(self.params):
@@ -104,7 +96,6 @@ class MaxLikeAnalyzer:
         else:
             self.lastval = -loglike
             return -loglike
-
 
     def result(self):
         print ("------")
