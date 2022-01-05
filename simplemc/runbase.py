@@ -40,9 +40,9 @@ from .likelihoods.BAOLikelihoods import DR11LOWZ, DR11CMASS, DR14LyaAuto, DR14Ly
                                         SixdFGS, SDSSMGS, DR11LyaAuto, DR11LyaCross, eBOSS, \
                                         DR12Consensus
 from .likelihoods.SimpleCMBLikelihood import PlanckLikelihood, PlanckLikelihood_15, WMAP9Likelihood
-from .likelihoods.CompressedSNLikelihood import BetouleSN, UnionSN, BinnedPantheon
+from .likelihoods.CompressedSNLikelihood import BetouleSN, UnionSN
 from .likelihoods.SNLikelihood import JLASN_Full
-from .likelihoods.PantheonSNLikelihood import PantheonSNLikelihood
+from .likelihoods.PantheonSNLikelihood import PantheonSN, BinnedPantheon
 from .likelihoods.CompressedHDLikelihood import HubbleDiagram
 from .likelihoods.Compressedfs8Likelihood import fs8Diagram
 from .likelihoods.HubbleParameterLikelihood import RiessH0
@@ -283,7 +283,7 @@ def ParseDataset(datasets, **kwargs):
         elif name == 'CMBW':
             L.addLikelihood(WMAP9Likelihood())
         elif name == 'Pantheon':
-            L.addLikelihood(PantheonSNLikelihood())
+            L.addLikelihood(PantheonSN())
         elif name == 'BPantheon':
             L.addLikelihood(BinnedPantheon())
         elif name == 'JLA':
