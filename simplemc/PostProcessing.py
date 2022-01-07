@@ -2,10 +2,9 @@ from simplemc.cosmo.Derivedparam import AllDerived
 from simplemc.analyzers.dynesty import utils as dyfunc
 from simplemc import logger
 import numpy as np
-import re
 import sys
 from .analyzers import MCEvidence
-
+from .tools.cosmich import cosmochain
 
 class PostProcessing:
     """
@@ -29,16 +28,20 @@ class PostProcessing:
                  skip=0.1, addDerived=True):
         self.dict_result = dict_result
         self.analyzername = dict_result['analyzer']
-        self.result    = dict_result['result']
+        self.result = dict_result['result']
         self.time = dict_result['time']
         self.paramList = paramList
         self.N = len(paramList)
-        self.filename  = filename
-        self.skip      = skip
-        self.derived   = addDerived
+        self.filename = filename
+        self.skip = skip
+        self.derived = addDerived
         self.args = []
         if addDerived:
             self.AD = AllDerived()
+
+        cosmochain_instance = cosmochain(self.filename)
+        self.cov_cosmich = cosmochain_instance.GetCovariance(self.paramList)
+        print("\ncosmich cov\n {} \n".format(self.cov_cosmich))
 
     def writeSummary(self):
         file = open(self.filename + "_Summary" + ".txt", 'w')
@@ -58,12 +61,18 @@ class PostProcessing:
                 else:
                     file.write('{}: {}\n'.format(key, self.result[key]))
 
-        samples, weights = self.result['samples'], self.result['weights']
+        loglikes, samples, weights = self.result['loglikes'], self.result['samples'], self.result['weights']
 
         if self.analyzername in ['mcmc', 'nested', 'emcee']:
-            means, cov = dyfunc.mean_and_cov(samples, weights)
-            stdevs = np.sqrt(np.diag(cov))
+            means, cov_dy = dyfunc.mean_and_cov(samples, weights)
+            stdevs = np.sqrt(np.diag(cov_dy))
             param_fits = means
+            print("\ndy cov\n {} \n".format(cov_dy))
+            from getdist import mcsamples
+            print(type(samples))
+            getdistsamples = mcsamples.loadMCSamples(self.filename)
+            cov_getdist = getdistsamples.cov(self.paramList)
+            print("\ngetdist cov\n {} \n".format(cov_getdist))
         else:
             try:
                 stdevs = np.sqrt(np.diag(self.result['cov']))
