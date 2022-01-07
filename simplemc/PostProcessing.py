@@ -39,6 +39,8 @@ class PostProcessing:
         if addDerived:
             self.AD = AllDerived()
 
+        self.maxlogl = np.max(self.result['loglikes'])
+
         cosmochain_instance = cosmochain(self.filename, skip_=0)
         _, self.cov_cosmich = cosmochain_instance.GetCovariance(self.paramList)
         print("\ncosmich cov\n {} \n".format(self.cov_cosmich))
@@ -90,6 +92,9 @@ class PostProcessing:
             print("{}: {:.4f} +/- {:.4f}".format(parname, param_fit, std))
             file.write("{}: {:.4f} +/- {:.4f}\n".format(parname, param_fit, std))
 
+        print("\nInformation criterions:\n")
+        print("\tAIC: {:.4f}".format(self.aic_criterion()))
+
         logger.info("\nElapsed time: {:.3f} minutes = {:.3f} seconds".format(self.time / 60, self.time))
         file.write('\nElapsed time: {:.3f} minutes = {:.3f} seconds \n'.format(self.time / 60, self.time))
         file.close()
@@ -97,18 +102,16 @@ class PostProcessing:
     def writeMaxlike(self):
         file = open(self.filename + ".maxlike", 'w')
         maxlogl_idx = np.argmax(self.result['loglikes'])
-        maxlogl = np.max(self.result['loglikes'])
+
         maxsamp = str(self.result['samples'][maxlogl_idx]).lstrip('[').rstrip(']')
         maxw = self.result['weights'][maxlogl_idx]
-        file.write('{} {} {}'.format(maxw, maxlogl, maxsamp))
+        file.write('{} {} {}'.format(maxw, self.maxlogl, maxsamp))
         file.close()
 
     def write_cov(self, cov):
         file = open(self.filename + ".covmat", 'w')
         file.write('{}'.format(cov))
         file.close()
-
-
 
     def mcevidence(self, k):
         if self.analyzername not in ['mcmc', 'nested', 'emcee']:
@@ -138,6 +141,13 @@ class PostProcessing:
 
         return '\nlog-Evidence with mcevidence: {}\n' \
                    'Burn-in fraction: {:.1}\n'.format(mcevres, burn_frac)
+
+    def aic_criterion(self):
+        aic = -2*self.maxlogl + 2*(len(self.paramList))
+        return aic
+
+    def bic_criterion(self):
+        pass
 
     def plot(self, chainsdir, show=False):
         """
