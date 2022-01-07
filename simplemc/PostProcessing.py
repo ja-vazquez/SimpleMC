@@ -39,8 +39,8 @@ class PostProcessing:
         if addDerived:
             self.AD = AllDerived()
 
-        cosmochain_instance = cosmochain(self.filename)
-        self.cov_cosmich = cosmochain_instance.GetCovariance(self.paramList)
+        cosmochain_instance = cosmochain(self.filename, skip_=0)
+        _, self.cov_cosmich = cosmochain_instance.GetCovariance(self.paramList)
         print("\ncosmich cov\n {} \n".format(self.cov_cosmich))
 
     def writeSummary(self):
@@ -68,11 +68,15 @@ class PostProcessing:
             stdevs = np.sqrt(np.diag(cov_dy))
             param_fits = means
             print("\ndy cov\n {} \n".format(cov_dy))
-            from getdist import mcsamples
-            print(type(samples))
-            getdistsamples = mcsamples.loadMCSamples(self.filename)
-            cov_getdist = getdistsamples.cov(self.paramList)
-            print("\ngetdist cov\n {} \n".format(cov_getdist))
+            self.write_cov(cov_dy)
+            try:
+                from getdist import mcsamples
+                print(type(samples))
+                getdistsamples = mcsamples.loadMCSamples(self.filename)
+                cov_getdist = getdistsamples.cov(self.paramList)
+                print("\ngetdist cov\n {} \n".format(cov_getdist))
+            except:
+                pass
         else:
             try:
                 stdevs = np.sqrt(np.diag(self.result['cov']))
@@ -98,6 +102,13 @@ class PostProcessing:
         maxw = self.result['weights'][maxlogl_idx]
         file.write('{} {} {}'.format(maxw, maxlogl, maxsamp))
         file.close()
+
+    def write_cov(self, cov):
+        file = open(self.filename + ".covmat", 'w')
+        file.write('{}'.format(cov))
+        file.close()
+
+
 
     def mcevidence(self, k):
         if self.analyzername not in ['mcmc', 'nested', 'emcee']:
