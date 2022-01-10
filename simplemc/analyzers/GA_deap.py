@@ -90,7 +90,7 @@ class GA_deap:
         population, logbook, gens = elitism.eaSimpleWithElitism(population, toolbox, cxpb=self.P_CROSSOVER,\
                                                               mutpb=self.P_MUTATION, ngen=self.MAX_GENERATIONS,\
                                                               stats=stats, halloffame=hof, verbose=True,
-                                                              outputname=self.outputname)
+                                                              outputname=self.outputname, bounds=self.bounds)
 
         # print info for best solution found:
         best = hof.items[0]

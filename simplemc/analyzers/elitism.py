@@ -14,7 +14,7 @@ import re
 
 
 def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
-             halloffame=None, outputname='deap_output', verbose=__debug__):
+             halloffame=None, outputname='deap_output', verbose=__debug__, bounds=None):
     """This algorithm is similar to DEAP eaSimple() algorithm, with the modification that
     halloffame is used to implement an elitism mechanism. The individuals contained in the
     halloffame are directly injected into the next generation and are not subject to the
@@ -63,7 +63,11 @@ def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
         # Write generation, individual and fitness in output file
         fitnesses_all = toolbox.map(toolbox.evaluate, offspring)
         for indall, fitall in zip(offspring, fitnesses_all):
-            strindall = str(indall).lstrip('[').rstrip(']')
+            # Back to the old param values
+            bds = lambda i, x: bounds[i][0] + (bounds[i][1] - bounds[i][0])*x
+            indall_tmp = [bds(i, x) for i,x in enumerate(indall)]
+            
+            strindall = str(indall_tmp).lstrip('[').rstrip(']')
             strfitall = str(fitall).lstrip('(').rstrip(')')
             strrow = "{} {} {}\n".format(gen, strfitall, strindall)
             strrow = re.sub(',', '', strrow)
