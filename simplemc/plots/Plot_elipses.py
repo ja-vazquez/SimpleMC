@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_elipses(best, cov, par1, par2, ax=None, contour_col='g',
+def plot_elipses(best, cov, par1, par2, par1_Ltx, par2_Ltx, ax=None, contour_col='b',
                  axis_sty='-r', lw=4, label='Fisher', addtxt=None):
             #fig = plt.figure(figsize=(6,6))
             #ax = fig.add_subplot(111) #, aspect='equal')
@@ -50,7 +50,10 @@ def plot_elipses(best, cov, par1, par2, ax=None, contour_col='g',
                 ax.text(addtxt[0], addtxt[1], addtxt[2], color=contour_col, style='italic')
             else:
                 ax.legend([ell], [label])
-            # plt.legend(loc='best')
+            ax.set_xlabel('$%s$'%par1_Ltx, fontsize=20)
+            ax.set_ylabel('$%s$'%par2_Ltx, fontsize=20)
+            plt.savefig('GA_fisher.pdf')
+            #plt.legend(loc='best')
             #plt.title('Fisher', fon    tsize=10)
             #plt.show()
             return ax
