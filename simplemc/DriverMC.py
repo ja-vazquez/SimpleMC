@@ -5,10 +5,10 @@ from .analyzers import MaxLikeAnalyzer
 from .analyzers import GA_deap
 from .analyzers import MCMCAnalyzer
 from .analyzers import DynamicNestedSampler, NestedSampler
-from .analyzers import EnsembleSampler
+#from .analyzers import EnsembleSampler
 from .cosmo.Derivedparam import AllDerived
 from . import ParseDataset, ParseModel
-from . import PostProcessing
+#from . import PostProcessing
 from scipy.special import ndtri
 from simplemc import logger
 import numpy as np
