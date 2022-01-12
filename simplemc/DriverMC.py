@@ -5,10 +5,10 @@ from .analyzers import MaxLikeAnalyzer
 from .analyzers import GA_deap
 from .analyzers import MCMCAnalyzer
 from .analyzers import DynamicNestedSampler, NestedSampler
-from .analyzers import EnsembleSampler
+#from .analyzers import EnsembleSampler
 from .cosmo.Derivedparam import AllDerived
 from . import ParseDataset, ParseModel
-from . import PostProcessing
+#from . import PostProcessing
 from scipy.special import ndtri
 from simplemc import logger
 import numpy as np
@@ -574,7 +574,7 @@ class DriverMC:
         ti = time.time()
         A = MaxLikeAnalyzer(self.L, self.model, compute_errors=compute_errors,
                             compute_derived=compute_derived, show_contours=show_contours,\
-                            plot_param1=plot_param1, plot_param2=plot_param2)
+                            plot_param1=plot_param1, plot_param2=plot_param2, outputname=self.outputpath)
         self.T.printParameters(A.params)
         self.ttime = time.time() - ti
         res = A.result()

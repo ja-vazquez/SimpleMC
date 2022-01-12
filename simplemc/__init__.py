@@ -28,7 +28,7 @@ if sys.version_info < (3, 0):
     logger.critical("You must use Python 3!")
     exit(1)
 
-from .PostProcessing import PostProcessing
+#from .PostProcessing import PostProcessing
 from .CosmoCalc import CosmoCalc
 from .runbase import ParseDataset, ParseModel
 from . import cosmo

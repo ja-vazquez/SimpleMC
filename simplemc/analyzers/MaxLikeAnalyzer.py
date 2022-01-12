@@ -6,6 +6,7 @@ from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 import scipy.linalg as la
 import scipy as sp
+import numpy as np
 import sys
 
 
@@ -37,10 +38,11 @@ class MaxLikeAnalyzer:
 
             """
     def __init__(self, like, model, compute_errors=False, compute_derived= False,
-                 show_contours=False, plot_param1=None, plot_param2=None):
+                 show_contours=False, plot_param1=None, plot_param2=None, outputname=None):
 
         self.like = like
         self.model = model
+        self.outputname = outputname
         self.params = like.freeParameters()
         self.vpars = [p.value for p in self.params]
         self.sigma = sp.array([p.error for p in self.params])
@@ -62,10 +64,17 @@ class MaxLikeAnalyzer:
             print('--'*20)
             # for errors, consider the df = J cov_x J^t
 
-        hess = nd.Hessian(self.negloglike)(self.res.x)
+        hess = nd.Hessian(self.negloglike, step=self.sigma*0.01)(self.res.x)
         eigvl, eigvc = la.eig(hess)
         print('Hessian', hess, eigvl, )
         self.cov = la.inv(hess)
+            
+        with open('{}.maxlike'.format(self.outputname), 'w') as f:
+            np.savetxt(f, self.res.x, fmt='%.4e', delimiter=',')
+
+        with open('{}.cov'.format(self.outputname), 'w') as f:
+            np.savetxt(f, self.cov, fmt='%.4e', delimiter=',')
+
         if (compute_errors):
             print('Covariance matrix \n', self.cov)
             # set errors:
