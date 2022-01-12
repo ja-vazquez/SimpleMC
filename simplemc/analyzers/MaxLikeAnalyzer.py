@@ -4,6 +4,7 @@ from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 import scipy.linalg as la
 import scipy as sp
+import numpy as np
 import sys
 import warnings
 
@@ -29,10 +30,11 @@ class MaxLikeAnalyzer:
 
             """
     def __init__(self, like, model, compute_errors=False, compute_derived= False,
-                 show_contours=False, plot_param1=None, plot_param2=None):
+                 show_contours=False, plot_param1=None, plot_param2=None, outputname=None):
 
         self.like = like
         self.model = model
+        self.outputname = outputname
         self.params = like.freeParameters()
         self.vpars = [p.value for p in self.params]
         self.sigma = sp.array([p.error for p in self.params])
@@ -54,31 +56,22 @@ class MaxLikeAnalyzer:
             print('--'*20)
             # for errors, consider the df = J cov_x J^t
 
-        if compute_errors:
-            try:
-                import numdifftools as nd
-                hess = nd.Hessian(self.negloglike)(self.res.x)
-                eigvl, eigvc = la.eig(hess)
-                print('Hessian', hess, eigvl, )
-                self.cov = la.inv(hess)
-                print('Covariance matrix \n', self.cov)
-                # set errors:
-                for i, pars in enumerate(self.params):
-                    pars.setError(sp.sqrt(self.cov[i, i]))
-                if show_contours:
-                    param_names = [par.name for par in self.params]
-                    if (plot_param1 in param_names) and (plot_param2 in param_names):
-                        idx_param1 = param_names.index(plot_param1)
-                        idx_param2 = param_names.index(plot_param2)
-                    else:
-                        sys.exit('\n Not a base parameter, derived-errors still on construction')
+        hess = nd.Hessian(self.negloglike, step=self.sigma*0.01)(self.res.x)
+        eigvl, eigvc = la.eig(hess)
+        print('Hessian', hess, eigvl, )
+        self.cov = la.inv(hess)
+            
+        with open('{}.maxlike'.format(self.outputname), 'w') as f:
+            np.savetxt(f, self.res.x, fmt='%.4e', delimiter=',')
 
-                    fig = plt.figure(figsize=(6, 6))
-                    ax = fig.add_subplot(111)
-                    plot_elipses(self.res.x, self.cov, idx_param1, idx_param2, ax=ax)
-                    plt.show()
-            except:
-                warnings.warn('Please install numdifftools to compute errors in MaxLikeAnalyzer')
+        with open('{}.cov'.format(self.outputname), 'w') as f:
+            np.savetxt(f, self.cov, fmt='%.4e', delimiter=',')
+
+        if (compute_errors):
+            print('Covariance matrix \n', self.cov)
+            # set errors:
+            for i, pars in enumerate(self.params):
+                pars.setError(sp.sqrt(self.cov[i, i]))
 
         # update with the final result
         self.opt_loglike = self.negloglike(self.res.x)

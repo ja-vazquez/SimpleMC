@@ -88,7 +88,7 @@ class GA_deap:
         population, logbook, gens = elitism.eaSimpleWithElitism(population, toolbox, cxpb=self.P_CROSSOVER,\
                                                               mutpb=self.P_MUTATION, ngen=self.MAX_GENERATIONS,\
                                                               stats=stats, halloffame=hof, verbose=True,
-                                                              outputname=self.outputname)
+                                                              outputname=self.outputname, bounds=self.bounds)
 
         # print info for best solution found:
         best = hof.items[0]
@@ -108,33 +108,42 @@ class GA_deap:
         if self.plot_fitness:
             self.plotting(population, logbook, hof)
 
-        if self.compute_errors:
-            try:
-                import numdifftools as nd
+        hess = nd.Hessian(self.negloglike2, step=self.sigma*0.01)(best_params)
+        eigvl, eigvc = la.eig(hess)
+        print('Hessian', hess, eigvl)
+        self.cov = la.inv(hess)
+        print('Covariance matrix \n', self.cov)
 
-                hess = nd.Hessian(self.negloglike2)(best_params)
-                eigvl, eigvc = la.eig(hess)
-                print('Hessian', hess, eigvl, )
-                self.cov = la.inv(hess)
-                print('Covariance matrix \n', self.cov)
-                # set errors:
-                for i, pars in enumerate(self.params):
-                   pars.setError(sp.sqrt(self.cov[i, i]))
+        with open('{}.maxlike'.format(self.outputname), 'w') as f:
+            np.savetxt(f, best_params, fmt='%.4e', delimiter=',')
 
-                if self.show_contours:
-                    param_names = [par.name for par in self.params]
-                    if (self.plot_param1 in param_names) and (self.plot_param2 in param_names):
-                        idx_param1 = param_names.index(self.plot_param1)
-                        idx_param2 = param_names.index(self.plot_param2)
-                    else:
-                        sys.exit('\n Not a base parameter, derived-errors still on construction')
+        with open('{}.cov'.format(self.outputname), 'w') as f:
+            np.savetxt(f, self.cov, fmt='%.4e', delimiter=',')
 
-                    fig = plt.figure(figsize=(6, 6))
-                    ax = fig.add_subplot(111)
-                    plot_elipses(best_params, self.cov, idx_param1, idx_param2, ax=ax)
-                    plt.show()
-            except:
-                warnings.warn('Please install numdifftools to compute errors in ga_deap analyzer.')
+        
+        # if self.compute_errors:
+
+            # set errors:
+            #for i, pars in enumerate(self.params):
+            #    pars.setError(sp.sqrt(self.cov[i, i]))
+        # update with the final result
+        #self.result(self.negloglike(self.res.x))
+
+        if self.show_contours and self.compute_errors:
+            param_names = [par.name for par in self.params]
+            param_Ltx_names = [par.Ltxname for par in self.params]
+            if (self.plot_param1 in param_names) and (self.plot_param2 in param_names):
+                idx_param1 = param_names.index(self.plot_param1)
+                idx_param2 = param_names.index(self.plot_param2)
+                param_Ltx1 = param_Ltx_names[idx_param1]
+                param_Ltx2 = param_Ltx_names[idx_param2]
+            else:
+                sys.exit('\n Not a base parameter, derived-errors still on construction')
+
+            fig = plt.figure(figsize=(6, 6))
+            ax = fig.add_subplot(111)
+            plot_elipses(best_params, self.cov, idx_param1, idx_param2, param_Ltx1, param_Ltx2, ax=ax)
+            plt.show()
 
         return {'population': len(population), 'no_generations': gens, 'param_fit': best_params,
                 'best_fitness': best.fitness.values[0], 'cov': self.cov}
@@ -185,16 +194,16 @@ class GA_deap:
         # extract statistics
         gen, avg, min_, max_ = log.select("gen", "avg", "min", "max")
 
-        plt.figure(figsize=(10, 7))
+        plt.figure(figsize=(6, 6))
 
         plt.plot(gen, min_, label="minimum")
 
         plt.title("Fitness Evolution")
-        plt.xlabel("Generation")
-        plt.ylabel("Fitness")
+        plt.xlabel("Generation", fontsize=20)
+        plt.ylabel("Fitness", fontsize=20)
         plt.legend(loc="upper right")
-        #plt.savefig('GA_wwCDM_150.pdf')
-        plt.show()
+        #plt.savefig('GA_fitness.pdf')
+        #plt.show()
 
 
 
