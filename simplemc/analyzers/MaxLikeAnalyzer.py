@@ -80,6 +80,19 @@ class MaxLikeAnalyzer:
         self.opt_loglike = self.negloglike(self.res.x)
         self.result()
 
+        if show_contours and compute_errors:
+            param_names = [par.name for par in self.params]
+            if (plot_param1 in param_names) and (plot_param2 in param_names):
+                idx_param1 = param_names.index(plot_param1)
+                idx_param2 = param_names.index(plot_param2)
+            else:
+                sys.exit('\n Not a base parameter, derived-errors still on construction')
+
+            fig = plt.figure(figsize=(6, 6))
+            ax = fig.add_subplot(111)
+            plot_elipses(self.res.x, self.cov, idx_param1, idx_param2, ax=ax)
+            plt.show()
+
     def negloglike(self, x):
         for i, pars in enumerate(self.params):
             pars.setValue(x[i])
