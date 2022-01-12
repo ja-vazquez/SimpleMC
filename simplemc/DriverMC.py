@@ -574,7 +574,7 @@ class DriverMC:
         ti = time.time()
         A = MaxLikeAnalyzer(self.L, self.model, compute_errors=compute_errors,
                             compute_derived=compute_derived, show_contours=show_contours,\
-                            plot_param1=plot_param1, plot_param2=plot_param2)
+                            plot_param1=plot_param1, plot_param2=plot_param2, outputname=self.outputpath)
         self.T.printParameters(A.params)
         self.ttime = time.time() - ti
         res = A.result()

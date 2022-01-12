@@ -110,11 +110,19 @@ class GA_deap:
         if self.plot_fitness:
             self.plotting(population, logbook, hof)
 
-        hess = nd.Hessian(self.negloglike2)(best_params)
+        hess = nd.Hessian(self.negloglike2, step=self.sigma*0.01)(best_params)
         eigvl, eigvc = la.eig(hess)
-        print('Hessian', hess, eigvl, )
+        print('Hessian', hess, eigvl)
         self.cov = la.inv(hess)
         print('Covariance matrix \n', self.cov)
+
+        with open('{}.maxlike'.format(self.outputname), 'w') as f:
+            np.savetxt(f, best_params, fmt='%.4e', delimiter=',')
+
+        with open('{}.cov'.format(self.outputname), 'w') as f:
+            np.savetxt(f, self.cov, fmt='%.4e', delimiter=',')
+
+        
         # if self.compute_errors:
 
             # set errors:
@@ -134,7 +142,7 @@ class GA_deap:
             else:
                 sys.exit('\n Not a base parameter, derived-errors still on construction')
 
-            fig = plt.figure(figsize=(6,6))
+            fig = plt.figure(figsize=(6, 6))
             ax = fig.add_subplot(111)
             plot_elipses(best_params, self.cov, idx_param1, idx_param2, param_Ltx1, param_Ltx2, ax=ax)
             plt.show()
@@ -187,16 +195,16 @@ class GA_deap:
         # extract statistics
         gen, avg, min_, max_ = log.select("gen", "avg", "min", "max")
 
-        plt.figure(figsize=(10, 7))
+        plt.figure(figsize=(6, 6))
 
         plt.plot(gen, min_, label="minimum")
 
         plt.title("Fitness Evolution")
-        plt.xlabel("Generation")
-        plt.ylabel("Fitness")
+        plt.xlabel("Generation", fontsize=20)
+        plt.ylabel("Fitness", fontsize=20)
         plt.legend(loc="upper right")
-        plt.savefig('GA_fitness.pdf')
-        plt.show()
+        #plt.savefig('GA_fitness.pdf')
+        #plt.show()
 
 
 
