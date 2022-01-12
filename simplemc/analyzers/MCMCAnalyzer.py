@@ -376,3 +376,4 @@ class MCMCAnalyzer:
     def get_results(self):
         return {'samples': self.samples, 'weights': self.weights, 'loglikes': self.loglikes,
                 'gr_diagnostic': self.gr}
+    
