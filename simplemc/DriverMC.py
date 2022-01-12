@@ -277,8 +277,9 @@ class DriverMC:
 
         self.ttime = time.time() - ti
 
-        res = {'samples': M.get_results()[0], 'weights': M.get_results()[1],
-               'maxlike': M.maxloglike, 'gr_diagnostic': M.get_results()[2]}
+        res = {'samples': M.get_results()['samples'], 'weights': M.get_results()['weights'],
+               'maxlike': -M.maxloglike, 'loglikes': M.get_results()['loglikes'],
+               'gr_diagnostic': M.get_results()['gr_diagnostic']}
 
         self.dict_result = {'analyzer': 'mcmc', 'result': res}
 
@@ -440,7 +441,8 @@ class DriverMC:
             pass
         self.ttime = time.time() - ti
 
-        res = {'samples': M.samples, 'logwt': M.logwt, 'nlive': M.nlive, 'niter': M.niter,
+        res = {'samples': M.samples, 'logwt': M.logwt, 'maxlike': -np.max(M.logl),
+               'loglikes': -M.logl, 'nlive': M.nlive, 'niter': M.niter,
                'ncall': sum(M.ncall), '%eff': M.eff, 'logz': M.logz[-1], 'logzerr': M.logzerr[-1],
                'weights': np.exp(M.logwt - M.logz[-1])}
 
@@ -522,7 +524,8 @@ class DriverMC:
             pass
         samples = sampler.get_chain(flat=True)
         weights = np.ones(len(samples))
-        res = {'samples': samples, 'weights': weights}
+        res = {'samples': samples, 'weights': weights,
+               'loglikes': sampler.loglikes, 'maxlike': np.max(sampler.loglikes)}
         self.dict_result = {'analyzer': 'emcee', 'walkers': walkers, 'nsamples': nsamp, 'result': res}
         return True
 
@@ -821,6 +824,9 @@ class DriverMC:
             self.dict_resulẗ́['mc_evidence'] = ev
 
         pp.writeSummary()
+
+        if self.analyzername in ['nested', 'emcee']:
+            pp.writeMaxlike()
 
         if self.getdist:
             pp.plot(chainsdir=self.chainsdir, show=self.showfig).simpleGetdist()

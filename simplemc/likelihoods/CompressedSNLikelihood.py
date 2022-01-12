@@ -65,10 +65,10 @@ class UnionSN(CompressedSNLikelihood):
                                         cdir+"/data/binned-covariance-sne-union21-v2.txt")
 
 
-class BinnedPantheon(CompressedSNLikelihood):
-    """
-    Likelihood to binned Pantheon dataset.
-    """
-    def __init__(self):
-        CompressedSNLikelihood.__init__(self, "BinnedPantheon", cdir+"/data/binned_pantheon_15.txt",
-                                        cdir+"/data/binned_cov_pantheon_15.txt")
+# class BinnedPantheon(CompressedSNLikelihood):
+#     """
+#     Likelihood to binned Pantheon dataset.
+#     """
+#     def __init__(self):
+#         CompressedSNLikelihood.__init__(self, "BinnedPantheon", cdir+"/data/binned_pantheon_15.txt",
+#                                         cdir+"/data/binned_cov_pantheon_15.txt")

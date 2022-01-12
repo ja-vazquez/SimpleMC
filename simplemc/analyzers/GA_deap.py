@@ -3,6 +3,7 @@
 import scipy as sp
 import numpy as np
 import matplotlib.pyplot as plt
+
 from simplemc.plots.Plot_elipses import plot_elipses
 
 try:
@@ -19,7 +20,6 @@ import scipy.linalg as la
 
 import random
 import sys
-
 try:
     import numdifftools as nd
 except:
@@ -52,6 +52,7 @@ class GA_deap:
         self.sigma = sp.array([p.error for p in self.params])
         self.bounds = [p.bounds for p in self.params]
         print("Minimizing...", self.vpars, "with bounds", self.bounds)
+        self.cov = None
 
         self.plot_fitness = plot_fitness
         self.compute_errors = compute_errors
@@ -146,6 +147,7 @@ class GA_deap:
             ax = fig.add_subplot(111)
             plot_elipses(best_params, self.cov, idx_param1, idx_param2, param_Ltx1, param_Ltx2, ax=ax)
             plt.show()
+
         return {'population': len(population), 'no_generations': gens, 'param_fit': best_params,
                 'best_fitness': best.fitness.values[0], 'cov': self.cov}
 

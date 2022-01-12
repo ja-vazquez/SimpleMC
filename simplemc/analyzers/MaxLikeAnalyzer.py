@@ -1,5 +1,3 @@
-
-
 from simplemc.plots.Plot_elipses import plot_elipses
 from simplemc.cosmo.Derivedparam import AllDerived
 from scipy.optimize import minimize
@@ -9,13 +7,10 @@ import scipy as sp
 import numpy as np
 import sys
 
-
 try:
     import numdifftools as nd
 except:
     sys.exit('install numdifftools')
-
-
 
 class MaxLikeAnalyzer:
     """
@@ -46,12 +41,12 @@ class MaxLikeAnalyzer:
         self.params = like.freeParameters()
         self.vpars = [p.value for p in self.params]
         self.sigma = sp.array([p.error for p in self.params])
+        self.cov = None
         bounds = [p.bounds for p in self.params]
         print("Minimizing...", self.vpars, "with bounds", bounds)
 
         self.res = minimize(self.negloglike, self.vpars, bounds=bounds, method='L-BFGS-B')
         print(self.res, 'with Errors =', compute_errors)
-
 
         if compute_derived:
             for par, val in zip(self.params, self.res.x):
@@ -80,12 +75,10 @@ class MaxLikeAnalyzer:
             # set errors:
             for i, pars in enumerate(self.params):
                 pars.setError(sp.sqrt(self.cov[i, i]))
+
         # update with the final result
         self.opt_loglike = self.negloglike(self.res.x)
         self.result()
-
-
-
 
         if show_contours and compute_errors:
             param_names = [par.name for par in self.params]
@@ -95,12 +88,10 @@ class MaxLikeAnalyzer:
             else:
                 sys.exit('\n Not a base parameter, derived-errors still on construction')
 
-            fig = plt.figure(figsize=(6,6))
+            fig = plt.figure(figsize=(6, 6))
             ax = fig.add_subplot(111)
             plot_elipses(self.res.x, self.cov, idx_param1, idx_param2, ax=ax)
             plt.show()
-
-
 
     def negloglike(self, x):
         for i, pars in enumerate(self.params):
@@ -113,7 +104,6 @@ class MaxLikeAnalyzer:
         else:
             self.lastval = -loglike
             return -loglike
-
 
     def result(self):
         print ("------")
