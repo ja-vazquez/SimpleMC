@@ -4,7 +4,6 @@ from simplemc import logger
 import numpy as np
 import sys
 from .analyzers import MCEvidence
-from .tools.cosmich import cosmochain
 
 class PostProcessing:
     """
@@ -41,10 +40,6 @@ class PostProcessing:
 
         self.maxlogl = np.max(self.result['loglikes'])
 
-        cosmochain_instance = cosmochain(self.filename, skip_=0)
-        _, self.cov_cosmich = cosmochain_instance.GetCovariance(self.paramList)
-        print("\ncosmich cov\n {} \n".format(self.cov_cosmich))
-
     def writeSummary(self):
         file = open(self.filename + "_Summary" + ".txt", 'w')
         file.write('SUMMARY\n-------\n')
@@ -73,7 +68,6 @@ class PostProcessing:
             self.write_cov(cov_dy)
             try:
                 from getdist import mcsamples
-                print(type(samples))
                 getdistsamples = mcsamples.loadMCSamples(self.filename)
                 cov_getdist = getdistsamples.cov(self.paramList)
                 print("\ngetdist cov\n {} \n".format(cov_getdist))
