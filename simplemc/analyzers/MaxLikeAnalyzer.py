@@ -6,8 +6,11 @@ import scipy.linalg as la
 import scipy as sp
 import numpy as np
 import sys
-import warnings
 
+try:
+    import numdifftools as nd
+except:
+    sys.exit('install numdifftools')
 
 class MaxLikeAnalyzer:
     """

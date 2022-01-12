@@ -3,7 +3,6 @@
 import scipy as sp
 import numpy as np
 import matplotlib.pyplot as plt
-import warnings
 
 from simplemc.plots.Plot_elipses import plot_elipses
 
@@ -11,6 +10,7 @@ try:
     # Importamos libreria de algoritmos evolutivos
     from deap import base, creator, tools, algorithms
 except:
+    import warnings
     warnings.warn("Please install DEAP library if you want to use ga_deap genetic algorithms.")
 
 # We import an independent module to implement elitism in the GA.
@@ -20,7 +20,10 @@ import scipy.linalg as la
 
 import random
 import sys
-
+try:
+    import numdifftools as nd
+except:
+    sys.exit('install numdifftools')
 
 class GA_deap:
     """
