@@ -172,6 +172,7 @@ class MCMCAnalyzer:
                 recvmsg = comm.bcast(condition, root=0)
                 if recvmsg ==1:
                     print('\n---- Gelman-Rubin achived ---- ')
+                    self.closeFiles()
                     return True
 
 
