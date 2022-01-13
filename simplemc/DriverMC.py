@@ -141,9 +141,9 @@ class DriverMC:
         self.outputpath = "{}/{}".format(self.chainsdir, self.root)
 
         if self.useNeuralLike:
-            neural_model = self.neuralLike(iniFile=self.iniFile)
-            self.logLike = neural_model.loglikelihood
-
+            print("Neuralike is under development. It cannot be used at this time.")
+            # neural_model = self.neuralLike(iniFile=self.iniFile)
+            # self.logLike = neural_model.loglikelihood
 
 
     def executer(self, **kwargs):
