@@ -298,10 +298,6 @@ class DriverMC:
         dynamic : bool
             Default `False`
 
-        neuralNetwork : bool
-            If True use a pybambi neural network.
-            Default: False.
-
         nestedType : str
             {single, multi, balls, cubes}
 
@@ -325,7 +321,6 @@ class DriverMC:
         """
         if iniFile:
             dynamic     = self.config.getboolean(   'nested', 'dynamic',      fallback=False)
-            neuralNetwork = self.config.getboolean( 'nested', 'neuralNetwork',fallback=False)
             nestedType  = self.config.get(          'nested', 'nestedType',   fallback='multi')
             nlivepoints = self.config.getint(       'nested', 'nlivepoints',  fallback=1024)
             accuracy    = self.config.getfloat(     'nested', 'accuracy',     fallback=0.01)
@@ -334,22 +329,8 @@ class DriverMC:
             self.priortype = self.config.get('nested', 'priortype', fallback='u')
             #nsigma is the default value for sigma in gaussian priors
             self.nsigma = self.config.get('nested', 'sigma', fallback=2)
-
-            # Neural network settings
-            split      = self.config.getfloat('neural', 'split', fallback=0.8)
-            numNeurons = self.config.getint('neural', 'numNeurons', fallback=100)
-            epochs = self.config.getint('neural', 'epochs', fallback=100)
-            model  = self.config.get( 'model', 'model',   fallback=None)
-            savedmodelpath = self.config.get('neural', 'savedmodelpath', fallback=None)
-            it_to_start_net = self.config.getint('neural', 'it_to_start_net', fallback=None)
-            dlogz_start = self.config.getfloat('neural', 'dlogz_start', fallback=5)
-            updInt = self.config.getint('neural', 'updInt', fallback=nlivepoints)
-            proxy_tolerance = self.config.getfloat('neural', 'proxy_tolerance', fallback=0.3)
-            failure_tolerance = self.config.getfloat('neural', 'failure_tolerance', fallback=0.5)
-
         else:
             dynamic     = kwargs.pop('dynamic',    False)
-            neuralNetwork = kwargs.pop('neuralNetwork', False)
             nestedType  = kwargs.pop('nestedType', 'multi')
             nlivepoints = kwargs.pop('nlivepoints', 1024)
             accuracy    = kwargs.pop('accuracy',    0.01)
@@ -358,25 +339,12 @@ class DriverMC:
             self.priortype = kwargs.pop('priortype', 'u')
             self.nsigma = kwargs.pop('sigma', 2)
 
-            # For neural networks
-            split = kwargs.pop('split', 0.8)
-            numNeurons = kwargs.pop('numNeurons', 100)
-            epochs = kwargs.pop('epochs', 100)
-            model = kwargs.pop('model', None)
-            savedmodelpath = kwargs.pop('savedmodelpath', None)
-            it_to_start_net = kwargs.pop('it_to_start_net', 10000)
-            dlogz_start = kwargs.pop('dlogz_start', 5)
-            updInt = kwargs.pop('updInt', nlivepoints)
-            proxy_tolerance = kwargs.pop('proxy_tolerance', 0.3)
-            failure_tolerance = kwargs.pop('failure_tolerance', 0.5)
-
             if kwargs:
                 logger.critical('Unexpected **kwargs for nested sampler: {}'.format(kwargs))
                 logger.info('You can skip writing any option and SimpleMC will use the default value.\n'
                             'Nested executer options are:\n\tnlivepoints (int) Default: 1024\n\t'
                             'accuracy (float) Default: 0.01\n\tpriortype ({"u", "g"}) Default: "u"\n\t'
                             'nestedType {"multi", "single", "balls", "cubes"} Default: "multi"\n\t'
-                            'neuralNetwork (bool) Default: True\n\t'
                             'dynamic (bool) Default: False\n\t'
                             'addDerived (bool) Default: True')
                 sys.exit(1)
@@ -384,11 +352,8 @@ class DriverMC:
         #stored output files
         if self.analyzername is None: self.analyzername = 'nested'
         self.outputpath = '{}_{}_{}'.format(self.outputpath, self.analyzername, nestedType)
-        if neuralNetwork:
-            self.outputpath = "{}_ANN".format(self.outputpath)
         self.outputChecker()
 
-        self.neuralNetwork = neuralNetwork
         #paralel run
         pool, nprocess = self.mppool(nproc)
         logger.info("\n\tnlivepoints: {}\n"
@@ -396,24 +361,6 @@ class DriverMC:
                     "\tnested type: {}".format(nlivepoints, accuracy, nestedType))
 
         ti = time.time()
-        if neuralNetwork:
-            logger.info("\tUsing neural network.")
-            from simplemc.analyzers.pybambi.bambi import bambi
-            # self.logLike =
-            thumper = bambi(self.logLike, self.dims,
-                            split=split, numNeurons=numNeurons,
-                            epochs=epochs, model=model,
-                            savedmodelpath=savedmodelpath,
-                            it_to_start_net=it_to_start_net,
-                            updInt=updInt, dlogz_start=dlogz_start,
-                            proxy_tolerance=proxy_tolerance,
-                            failure_tolerance=failure_tolerance)
-
-            self.logLike = thumper.loglikelihood
-            dumper = thumper.dumper
-        else:
-            dumper = None
-
 
         if dynamic:
             logger.info("\nUsing dynamic nested sampling...")
@@ -432,7 +379,7 @@ class DriverMC:
                         bound=nestedType, sample = 'unif', nlive = nlivepoints,
                         pool = pool, queue_size=nprocess, use_pool={'loglikelihood': False})
             sampler.run_nested(dlogz=accuracy, outputname=self.outputpath,
-                               addDerived=self.addDerived, simpleLike=self.L, dumper=dumper)
+                               addDerived=self.addDerived, simpleLike=self.L)
             M = sampler.results
 
         try:
@@ -447,8 +394,7 @@ class DriverMC:
                'weights': np.exp(M.logwt - M.logz[-1])}
 
         self.dict_result = {'analyzer': 'nested',  'nested_algorithm': nestedType,
-                           'dynamic': dynamic, 'ANN': neuralNetwork,
-                           'result': res}
+                           'dynamic': dynamic, 'result': res}
         return True
 
 

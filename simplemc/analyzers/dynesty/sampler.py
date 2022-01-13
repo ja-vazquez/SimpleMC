@@ -84,8 +84,6 @@ class Sampler(object):
     def __init__(self, loglikelihood, prior_transform, npdim, live_points,
                  update_interval, first_update, rstate,
                  queue_size, pool, use_pool):
-        self.usedNeural = False
-        self.neural_counter = 0
         self.print_txt = "\rit: {} | ncall: {} | eff: {:.3f} | logz: {:.4f} | " \
                          "dlogz: {:.4f} | loglstar: {:.4f} | point {}"
 
@@ -838,22 +836,6 @@ class Sampler(object):
             # Increment total number of iterations.
             self.it += 1
 
-            # Using neural network to learn likelihood function
-            if self.bambi_dumper:
-                if self.pool is not None and self.queue_size > 1:
-                    bambiargs = []
-                    dumper_dict = {'live_v': self.live_v, 'live_logl': self.live_logl,
-                                   'it': self.it, 'dlogz': delta_logz}
-
-                    bambiargs.append(dumper_dict)
-                    r = self.pool.apply(self.bambi_dumper, bambiargs)
-
-                else:
-                    r = self.bambi_dumper(self.live_v, self.live_logl,
-                                          dlogz=delta_logz, it=self.it)
-                if r:
-                    self.neural_counter += 1
-
             # Return dead point and ancillary quantities.
             yield (worst, ustar, vstar, loglstar, logvol, logwt,
                    logz, logzvar, h, nc, worst_it, boundidx, bounditer,
@@ -865,7 +847,7 @@ class Sampler(object):
                    save_bounds=True,
                    addDerived=False,
                    outputname="outputDynesty",
-                   simpleLike=None, dumper=None, netError=0.01):
+                   simpleLike=None):
         """
         **A wrapper that executes the main nested sampling loop.**
         Iteratively replace the worst live point with a sample drawn
@@ -920,11 +902,6 @@ class Sampler(object):
             the live points internally. Default is *True*.
 
         """
-        # Parameters for the neural network use
-        self.bambi_dumper = dumper
-        self.netError = netError
-        if self.bambi_dumper:
-            self.print_txt += " | neural_counts: {}"
         # Set parameters for the simplemc output text file
         self.like = simpleLike
         self.outputname = outputname
@@ -974,7 +951,7 @@ class Sampler(object):
                 # Writing weights, likes and samples in a text file for simplemc output.
                 weights = np.exp(results[5])
                 vstarstr = str(results[2]).lstrip('[').rstrip(']')
-                sys.stdout.write(self.print_txt.format(it, ncall, eff, logz, delta_logz, loglstar, vstarstr, self.neural_counter))
+                sys.stdout.write(self.print_txt.format(it, ncall, eff, logz, delta_logz, loglstar, vstarstr))
                 sys.stdout.flush()
 
                 if addDerived:
@@ -1034,10 +1011,6 @@ class Sampler(object):
 
             f.close()
             self.it = it+1
-        if self.bambi_dumper:
-            fnetout = open(outputname+"_neural.txt", 'w+')
-            fnetout.write("{} {}".format(it, self.neural_counter))
-            fnetout.close()
 
     def add_final_live(self, print_progress=True):
         """
@@ -1070,7 +1043,7 @@ class Sampler(object):
             # Print progress.
             if print_progress:
                 sys.stdout.write(self.print_txt.format(self.it+i, ncall, eff, logz,
-                                                                       delta_logz, loglstar, vstar, self.neural_counter))
+                                                                       delta_logz, loglstar, vstar))
                 sys.stdout.flush()
 
 
