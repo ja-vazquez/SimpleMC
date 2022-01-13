@@ -5,9 +5,13 @@ from LCDMCosmology import *
 from scipy.integrate import quad
 from scipy.interpolate import interp1d
 from ParamDefs import *
-class eos_tanh(LCDMCosmology):
+class TanhCosmology(LCDMCosmology):
     def __init__(self):
 
+
+        Nbins_eos = 4
+        step_eos = -1
+        zbin_eos_par = [Parameter("zbin_eos%d"%i, step_eos, 0.2, (-3.5, 0), "zbin_eos%d"%i) for i in range(Nbins_eos)]
         self.parvals = zbin_eos_par
         self.zs = [i.value for i in self.parvals]
         names   = [i.name  for i in self.parvals]

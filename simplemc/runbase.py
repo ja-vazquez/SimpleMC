@@ -104,7 +104,7 @@ def ParseModel(model, **kwargs):
     elif model == "nuwCDM":
         T = wCDMCosmology()
         T.setVaryMnu()
-    elif model == "waCDM":
+    elif model == "wa2CDM":
         T = owa0CDMCosmology(varyOk=False)
     elif model == "owCDM":
         T = owa0CDMCosmology(varywa=False)
@@ -151,6 +151,8 @@ def ParseModel(model, **kwargs):
         T.setVaryMnu()
     elif model == "Binned":
         T = BinnedWCosmology()
+    elif model == "Tanh":
+        T = TanhCosmology()
     elif model == 'CPantheon':
         T = CompressPantheon()
     elif model == 'DGP':
