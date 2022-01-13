@@ -8,7 +8,7 @@ from .analyzers import DynamicNestedSampler, NestedSampler
 #from .analyzers import EnsembleSampler
 from .cosmo.Derivedparam import AllDerived
 from . import ParseDataset, ParseModel
-#from . import PostProcessing
+from simplemc.PostProcessing import PostProcessing
 from scipy.special import ndtri
 from simplemc import logger
 import numpy as np
