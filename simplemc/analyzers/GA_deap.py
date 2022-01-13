@@ -1,8 +1,11 @@
 
+#TODO make processes a variable
+
 
 import scipy as sp
 import numpy as np
 import matplotlib.pyplot as plt
+import multiprocessing
 
 from simplemc.plots.Plot_elipses import plot_elipses
 
@@ -75,6 +78,9 @@ class GA_deap:
 
     def main(self):
         toolbox = self.GA()
+        
+        pool = multiprocessing.Pool(processes=4)
+        toolbox.register("map", pool.map)
 
         # create initial population (generation 0):
         population = toolbox.populationCreator(n=self.POPULATION_SIZE)
