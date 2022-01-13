@@ -65,7 +65,7 @@ class PostProcessing:
             stdevs = np.sqrt(np.diag(cov_dy))
             param_fits = means
             print("\nCovariance matrix saved in .covmat file\n {} \n".format(cov_dy))
-            self.write_cov(cov_dy)
+            np.savetxt(self.filename + ".covmat", cov_dy, delimiter=',')
             try:
                 from getdist import mcsamples
                 getdistsamples = mcsamples.loadMCSamples(self.filename)
@@ -100,11 +100,6 @@ class PostProcessing:
         maxsamp = str(self.result['samples'][maxlogl_idx]).lstrip('[').rstrip(']')
         maxw = self.result['weights'][maxlogl_idx]
         file.write('{} {} {}'.format(maxw, self.maxlogl, maxsamp))
-        file.close()
-
-    def write_cov(self, cov):
-        file = open(self.filename + ".covmat", 'w')
-        file.write('{}'.format(cov))
         file.close()
 
     def mcevidence(self, k):
