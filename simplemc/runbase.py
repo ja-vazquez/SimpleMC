@@ -24,7 +24,7 @@ from .models import SplineLCDMCosmology
 from .models import StepCDMCosmology
 from .models import BinnedWCosmology
 from .models import CompressPantheon
-
+from .models import TanhCosmology
 
 #Generic model
 from .models.SimpleModel import SimpleModel, SimpleCosmoModel

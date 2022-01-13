@@ -1,10 +1,13 @@
 
 import math as N
 import numpy as np
-from LCDMCosmology import *
+from simplemc.models.LCDMCosmology import LCDMCosmology
 from scipy.integrate import quad
 from scipy.interpolate import interp1d
-from ParamDefs import *
+from simplemc.cosmo.Parameter import Parameter
+
+
+
 class TanhCosmology(LCDMCosmology):
     def __init__(self):
 
