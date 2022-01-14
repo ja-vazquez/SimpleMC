@@ -1,6 +1,6 @@
 
 #TODO make processes a variable
-
+#TODO check/change select, mate, mutate
 
 import scipy as sp
 import numpy as np
@@ -79,7 +79,7 @@ class GA_deap:
     def main(self):
         toolbox = self.GA()
         
-        pool = multiprocessing.Pool(processes=4)
+        pool = multiprocessing.Pool(processes = 3)
         toolbox.register("map", pool.map)
 
         # create initial population (generation 0):
@@ -188,11 +188,11 @@ class GA_deap:
         ## -----
 
         # genetic operators:
-        toolbox.register("select", tools.selTournament, tournsize=2)
+        toolbox.register("select", tools.selTournament, tournsize=10, k=2)
         toolbox.register("mate", tools.cxSimulatedBinaryBounded, low=self.BOUND_LOW, \
                          up=self.BOUND_UP, eta=self.CROWDING_FACTOR)
         toolbox.register("mutate", tools.mutPolynomialBounded, low=self.BOUND_LOW, \
-                         up=self.BOUND_UP, eta=self.CROWDING_FACTOR, indpb=1.0/self.DIMENSIONS)
+                         up=self.BOUND_UP, eta=self.CROWDING_FACTOR, indpb=0.2)#1.0/self.DIMENSIONS)
 
         return toolbox
 
