@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+
+#TODO when too many parameters, dont print all values.
+
 """
 The base `Sampler` class containing various helpful functions. All other
 samplers inherit this class either explicitly or implicitly.
