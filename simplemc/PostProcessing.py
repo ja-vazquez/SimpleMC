@@ -49,7 +49,7 @@ class PostProcessing:
                 file.write('{}: {}\n'.format(key, self.dict_result[key]))
 
         for key in self.result:
-            if key not in ['param_fit', 'samples', 'cov', 'logwt', 'logzerr', 'weights']:
+            if key not in ['param_fit', 'samples', 'cov', 'logwt', 'logzerr', 'weights', 'loglikes']:
                 if isinstance(self.result[key], float):
                     if key == 'logz':
                         file.write('{}: {:.4f} +/- {:.4f}\n'.format(key, self.result[key], self.result['logzerr']))
@@ -64,8 +64,8 @@ class PostProcessing:
             means, cov_dy = dyfunc.mean_and_cov(samples, weights)
             stdevs = np.sqrt(np.diag(cov_dy))
             param_fits = means
-            print("\ndy cov\n {} \n".format(cov_dy))
-            self.write_cov(cov_dy)
+            print("\nCovariance matrix saved in .covmat file\n {} \n".format(cov_dy))
+            np.savetxt(self.filename + ".covmat", cov_dy, delimiter=',')
             try:
                 from getdist import mcsamples
                 getdistsamples = mcsamples.loadMCSamples(self.filename)
@@ -100,11 +100,6 @@ class PostProcessing:
         maxsamp = str(self.result['samples'][maxlogl_idx]).lstrip('[').rstrip(']')
         maxw = self.result['weights'][maxlogl_idx]
         file.write('{} {} {}'.format(maxw, self.maxlogl, maxsamp))
-        file.close()
-
-    def write_cov(self, cov):
-        file = open(self.filename + ".covmat", 'w')
-        file.write('{}'.format(cov))
         file.close()
 
     def mcevidence(self, k):
