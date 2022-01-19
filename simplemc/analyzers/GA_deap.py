@@ -76,9 +76,18 @@ class GA_deap:
         self.DIMENSIONS = len(self.params)        # number of dimensions
         self.BOUND_LOW, self.BOUND_UP = 0.0, 1.0  # boundaries for all dimensions
 
+        self.sharing = False
+        if self.sharing:
+            # sharing constants:
+            DISTANCE_THRESHOLD = 0.1
+            SHARING_EXTENT = 5.0
+
+
+
     def main(self):
         toolbox = self.GA()
         
+        # using multiprocess
         pool = multiprocessing.Pool(processes = 3)
         toolbox.register("map", pool.map)
 
@@ -87,7 +96,11 @@ class GA_deap:
 
         # prepare the statistics object:
         stats = tools.Statistics(lambda ind: ind.fitness.values)
-        stats.register("min", np.min)
+        
+        if self.sharing:
+            stats.register("max", np.max)
+        else:
+            stats.register("min", np.min)
         stats.register("avg", np.mean)
 
         # define the hall-of-fame object:
@@ -164,15 +177,56 @@ class GA_deap:
     def randomFloat(self, low, up):
         return [random.uniform(l, u) for l, u in zip([low]*self.DIMENSIONS, [up]*self.DIMENSIONS)]
 
+
+    # wraps the tools.selTournament() with fitness sharing
+    # same signature as tools.selTournament()
+    def selTournamentWithSharing(self, individuals, k, tournsize, fit_attr="fitness"):
+
+        # get orig fitnesses:
+        origFitnesses = [ind.fitness.values[0] for ind in individuals]
+
+        # apply sharing to each individual:
+        for i in range(len(individuals)):
+            sharingSum = 1
+
+            # iterate over all other individuals
+            for j in range(len(individuals)):
+                if i != j:
+                    # calculate eucledean distance between individuals:
+                    distance = math.sqrt(
+                        ((individuals[i][0] - individuals[j][0]) ** 2) + ((individuals[i][1] - individuals[j][1]) ** 2))
+
+                    if distance < DISTANCE_THRESHOLD:
+                        sharingSum += (1 - distance / (SHARING_EXTENT * DISTANCE_THRESHOLD))
+
+            # reduce fitness accordingly:
+            individuals[i].fitness.values = origFitnesses[i] / sharingSum,
+
+        # apply original tools.selTournament() using modified fitness:
+        selected = tools.selTournament(individuals, k, tournsize, fit_attr)
+
+        # retrieve original fitness:
+        for i, ind in enumerate(individuals):
+            ind.fitness.values = origFitnesses[i],
+
+        return selected
+
+
+
+
     def GA(self):
         random.seed(self.RANDOM_SEED)
         toolbox = base.Toolbox()
 
-        # define a single objective, minimizing fitness strategy:
-        creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
+        if  self.sharing:
+            creator.create("FitnessMax", base.Fitness, weights=(1.0,))
+            creator.create("Individual", list, fitness=creator.FitnessMax)
+        else:
+            # define a single objective, minimizing fitness strategy:
+            creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
+            # create the Individual class based on list:
+            creator.create("Individual", list, fitness=creator.FitnessMin)
 
-        # create the Individual class based on list:
-        creator.create("Individual", list, fitness=creator.FitnessMin)
 
         # create an operator that randomly returns a float in the desired range and dimension:
         toolbox.register("attrFloat", self.randomFloat, self.BOUND_LOW, self.BOUND_UP)
@@ -188,7 +242,11 @@ class GA_deap:
         ## -----
 
         # genetic operators:
-        toolbox.register("select", tools.selTournament, tournsize=2)
+        if self.sharing:
+            toolbox.register("select", selTournamentWithSharing, tournsize=2)
+        else:
+            toolbox.register("select", tools.selTournament, tournsize=2)
+        
         toolbox.register("mate", tools.cxSimulatedBinaryBounded, low=self.BOUND_LOW, \
                          up=self.BOUND_UP, eta=self.CROWDING_FACTOR)
         toolbox.register("mutate", tools.mutPolynomialBounded, low=self.BOUND_LOW, \
@@ -223,6 +281,9 @@ class GA_deap:
         self.like.updateParams(self.params)
         loglike = self.like.loglike_wprior()
 
+        if self.sharing:
+            loglike = -loglike
+
         if sp.isnan(loglike):
             print('-1-'*10,loglike,'--'*10)
             return self.lastval+10
@@ -236,6 +297,9 @@ class GA_deap:
             pars.setValue(x[i])
         self.like.updateParams(self.params)
         loglike = self.like.loglike_wprior()
+
+        if self.sharing:
+            loglike = -loglike
 
         if sp.isnan(loglike):
             return self.lastval+10
