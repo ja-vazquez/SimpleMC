@@ -168,7 +168,7 @@ class GA_deap:
             plt.show()
 
         return {'population': len(population), 'no_generations': gens, 'param_fit': best_params,
-                'best_fitness': best.fitness.values[0], 'cov': self.cov}
+                'best_fitness': best.fitness.values[0], 'cov': self.cov, 'maxlike': best.fitness.values[0]}
 
 
 

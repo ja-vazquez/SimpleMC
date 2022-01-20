@@ -529,7 +529,7 @@ class DriverMC:
         res = A.result()
         res['weights'], res['samples'] = None, None
 
-        self.dict_result = {'analyzer': 'maxlike', 'result': res}
+        self.dict_result = {'analyzer': self.analyzername, 'result': res}
         return True
 
 

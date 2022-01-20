@@ -38,7 +38,10 @@ class PostProcessing:
         if addDerived:
             self.AD = AllDerived()
 
-        self.maxlogl = np.max(self.result['loglikes'])
+        if self.analyzername in ['mcmc', 'nested', 'emcee']:
+            self.maxlogl = np.max(self.result['loglikes'])
+        else:
+            self.maxlogl = self.result['maxlike']
 
     def writeSummary(self):
         file = open(self.filename + "_Summary" + ".txt", 'w')
@@ -58,9 +61,8 @@ class PostProcessing:
                 else:
                     file.write('{}: {}\n'.format(key, self.result[key]))
 
-        loglikes, samples, weights = self.result['loglikes'], self.result['samples'], self.result['weights']
-
         if self.analyzername in ['mcmc', 'nested', 'emcee']:
+            loglikes, samples, weights = self.result['loglikes'], self.result['samples'], self.result['weights']
             means, cov_dy = dyfunc.mean_and_cov(samples, weights)
             stdevs = np.sqrt(np.diag(cov_dy))
             param_fits = means
