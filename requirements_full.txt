@@ -1,4 +1,4 @@
-# Full requirements of Python3 for SimpleMC
+# Full requirements of Python3 for SimpleMC (includes libraries for plotting)
 # pip3 install -r requirements_full.txt
 numpy
 numdifftools
@@ -7,7 +7,5 @@ scipy
 sklearn
 deap
 mpi4py
-tensorflow
 corner
 getdist
-tqdm
