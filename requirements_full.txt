@@ -10,4 +10,5 @@ mpi4py
 tensorflow
 corner
 getdist
+fgivenx
 tqdm
