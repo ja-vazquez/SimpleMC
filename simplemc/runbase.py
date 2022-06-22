@@ -104,7 +104,7 @@ def ParseModel(model, **kwargs):
     elif model == "nuwCDM":
         T = wCDMCosmology()
         T.setVaryMnu()
-    elif model == "wa2CDM":
+    elif model == "waCDM":
         T = owa0CDMCosmology(varyOk=False)
     elif model == "owCDM":
         T = owa0CDMCosmology(varywa=False)
