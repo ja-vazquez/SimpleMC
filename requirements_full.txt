@@ -9,3 +9,5 @@ deap
 mpi4py
 corner
 getdist
+fgivenx
+tqdm
