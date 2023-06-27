@@ -9,7 +9,12 @@ import pandas as pd
 class PantheonPlusSNLikelihood(BaseLikelihood):
     def __init__(self, name, values_filename, cov_filename, ninterp=150):
         """
-        This module calculates likelihood for Pantheon datasets.
+        This module calculates likelihood for Pantheon plus dataset without SH0ES.
+
+        Likelihood based on:
+        Pantheon+_only_cosmosis_likelihood.py from the
+        https://github.com/PantheonPlusSH0ES repository.
+
         Parameters
         ----------
         name: str
@@ -80,6 +85,9 @@ class PantheonPlusSNLikelihood(BaseLikelihood):
 class PantheonPlus(PantheonPlusSNLikelihood):
     """
     Likelihood to full Pantheon+ SNIa compilation.
+
+    Data from the 4_DISTANCES_AND_COVAR folder on the
+    https://github.com/PantheonPlusSH0ES repo.
     """
     def __init__(self):
         PantheonPlusSNLikelihood.__init__(self, "PantheonPlus", cdir+"/data/Pantheon+SH0ES.dat",
