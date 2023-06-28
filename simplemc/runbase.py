@@ -38,11 +38,12 @@ from .likelihoods.LikelihoodMultiplier import LikelihoodMultiplier
 # Likelihood modules
 from .likelihoods.BAOLikelihoods import DR11LOWZ, DR11CMASS, DR14LyaAuto, DR14LyaCross, \
                                         SixdFGS, SDSSMGS, DR11LyaAuto, DR11LyaCross, eBOSS, \
-                                        DR12Consensus
+                                        DR12Consensus, DR16BAO
 from .likelihoods.SimpleCMBLikelihood import PlanckLikelihood, PlanckLikelihood_15, WMAP9Likelihood
 from .likelihoods.CompressedSNLikelihood import BetouleSN, UnionSN
 from .likelihoods.SNLikelihood import JLASN_Full
 from .likelihoods.PantheonSNLikelihood import PantheonSN, BinnedPantheon
+from .likelihoods.PantheonPlusSNLikelihood import PantheonPlus
 from .likelihoods.CompressedHDLikelihood import HubbleDiagram
 from .likelihoods.Compressedfs8Likelihood import fs8Diagram
 from .likelihoods.HubbleParameterLikelihood import RiessH0
@@ -104,7 +105,7 @@ def ParseModel(model, **kwargs):
     elif model == "nuwCDM":
         T = wCDMCosmology()
         T.setVaryMnu()
-    elif model == "wa2CDM":
+    elif model == "waCDM":
         T = owa0CDMCosmology(varyOk=False)
     elif model == "owCDM":
         T = owa0CDMCosmology(varywa=False)
@@ -181,7 +182,7 @@ def ParseModel(model, **kwargs):
 
 
 data_list = "BBAO, GBAO, GBAO_no6dF, CMASS, LBAO, LaBAO, LxBAO, MGS, Planck, WMAP, PlRd, WRd, PlDa, PlRdx10,"\
-    "CMBW, SN, SNx10, UnionSN, RiessH0, 6dFGS"
+    "CMBW, SN, SNx10, UnionSN, RiessH0, 6dFGS, PantheonPlus, DR16BAO"
 
 
 def ParseDataset(datasets, **kwargs):
@@ -267,6 +268,8 @@ def ParseDataset(datasets, **kwargs):
             L.addLikelihood(SixdFGS())
         elif name == 'eBOSS':
             L.addLikelihood(eBOSS())
+        elif name == 'DR16BAO':
+            L.addLikelihood(DR16BAO())
         elif name == 'Planck':
             L.addLikelihood(PlanckLikelihood())
         elif name == 'Planck_15':
@@ -288,6 +291,8 @@ def ParseDataset(datasets, **kwargs):
             L.addLikelihood(PantheonSN())
         elif name == 'BPantheon':
             L.addLikelihood(BinnedPantheon())
+        elif name == 'PantheonPlus':
+            L.addLikelihood(PantheonPlus())
         elif name == 'JLA':
             L.addLikelihood(JLASN_Full())
         elif name == 'SN':
