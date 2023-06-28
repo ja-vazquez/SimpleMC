@@ -39,9 +39,9 @@ class PantheonPlusSNLikelihood(BaseLikelihood):
         filename = cov_filename
         print("Loading covariance from {}".format(filename))
         f = open(filename)
-        # line = f.readline()
+        line = f.readline()
         n = int(len(self.zcmb))
-        C = np.zeros((n, n))
+        C = np.zeros((n,n))
         ii = -1
         jj = -1
         mine = 999
@@ -56,15 +56,15 @@ class PantheonPlusSNLikelihood(BaseLikelihood):
                 val = float(f.readline())
                 if self.ww[i]:
                     if self.ww[j]:
-                        C[ii, jj] = val
+                        C[ii,jj] = val
         f.close()
         print('Done')
         self.cov = C
-        self.xdiag = 1 / self.cov.diagonal()  # diagonal before marginalising constant
-        self.cov += 3 ** 2
+        self.xdiag = 1/self.cov.diagonal()  # diagonal before marginalising constant
+        self.cov += 3**2
         self.zmin = self.zcmb.min()
         self.zmax = self.zcmb.max()
-        self.zmaxi = 1.1  ## we interpolate to 1.1 beyond that exact calc
+        self.zmaxi = 1.1 ## we interpolate to 1.1 beyond that exact calc
         print("Pantheon SN: zmin=%f zmax=%f N=%i" % (self.zmin, self.zmax, self.N))
         self.zinter = np.linspace(1e-3, self.zmaxi, ninterp)
         self.icov = la.inv(self.cov)
@@ -77,10 +77,14 @@ class PantheonPlusSNLikelihood(BaseLikelihood):
         dist[who] = np.array([self.theory_.distance_modulus(z) for z in self.zcmb[who]])
         tvec = self.mag - dist
 
+        # tvec = self.mag-np.array([self.theory_.distance_modulus(z) for z in self.zcmb])
+        # print (tvec[:10])
         # first subtract a rought constant to stabilize marginaliztion of
         # intrinsic mag.
         tvec -= (tvec * self.xdiag).sum() / (self.xdiag.sum())
+        # print(tvec[:10])
         chi2 = np.einsum('i,ij,j', tvec, self.icov, tvec)
+        # print("chi2=",chi2)
         return -chi2 / 2
 class PantheonPlus(PantheonPlusSNLikelihood):
     """
