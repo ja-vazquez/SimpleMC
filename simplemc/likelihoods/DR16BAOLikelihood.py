@@ -12,8 +12,8 @@ class DR16BAOLikelihood(BaseLikelihood):
         This module calculates likelihood for the consensus BAODR16
         with some older BAOS. The new data in this compilation are
         eBoss (z~1.48) and Ly-alpha (z ~ 2.33).
-        BAO-only consensus results, Alam et al. 2016
-        https://arxiv.org/abs/1607.03155
+        BAO-only consensus results, Alam et al. 2021
+        https://journals.aps.org/prd/abstract/10.1103/PhysRevD.103.083533
         Parameters
         ----------
         name
@@ -44,7 +44,6 @@ class DR16BAOLikelihood(BaseLikelihood):
         print("Adding marginalising constant")
         cov += 3**2
         self.icov  = la.inv(cov)
-
 
     def loglike(self):
         tvec = []
