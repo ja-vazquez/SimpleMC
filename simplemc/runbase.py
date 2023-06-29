@@ -44,7 +44,7 @@ from .likelihoods.CompressedSNLikelihood import BetouleSN, UnionSN
 from .likelihoods.SNLikelihood import JLASN_Full
 from .likelihoods.PantheonSNLikelihood import PantheonSN, BinnedPantheon
 from .likelihoods.PantheonPlusSNLikelihood import PantheonPlus
-from .likelihoods.CompressedHDLikelihood import HubbleDiagram
+from .likelihoods.CompressedHDLikelihood import HubbleDiagram, HD23
 from .likelihoods.Compressedfs8Likelihood import fs8Diagram
 from .likelihoods.HubbleParameterLikelihood import RiessH0
 
@@ -182,7 +182,7 @@ def ParseModel(model, **kwargs):
 
 
 data_list = "BBAO, GBAO, GBAO_no6dF, CMASS, LBAO, LaBAO, LxBAO, MGS, Planck, WMAP, PlRd, WRd, PlDa, PlRdx10,"\
-    "CMBW, SN, SNx10, UnionSN, RiessH0, 6dFGS, PantheonPlus, DR16BAO"
+    "CMBW, SN, SNx10, UnionSN, RiessH0, 6dFGS, PantheonPlus, DR16BAO, HD23"
 
 
 def ParseDataset(datasets, **kwargs):
@@ -305,6 +305,8 @@ def ParseDataset(datasets, **kwargs):
             L.addLikelihood(RiessH0())
         elif name == 'HD':
             L.addLikelihood(HubbleDiagram())
+        elif name == 'HD23':
+            L.addLikelihood(HD23())
         elif name == 'fs8':
             L.addLikelihood(fs8Diagram())
         elif name == 'dline':
