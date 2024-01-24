@@ -150,6 +150,12 @@ class BaseCosmology:
         return 1./sp.sqrt(self.RHSquared_a(a))/a**2
 
 
+    def distance_ratio(self, zl, zs):
+        #integrating in a as below
+        r = intg.quad(self.DistIntegrand_a, 1./(1+zs), 1./(1+zl))
+        s = intg.quad(self.DistIntegrand_a, 1./(1+zs), 1)
+        return r[0]/s[0]
+
     # @autojit
     def Da_z(self, z):
         # r=intg.quad(self.Hinv_z,0,z)
