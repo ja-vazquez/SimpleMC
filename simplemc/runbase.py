@@ -48,6 +48,8 @@ from .likelihoods.CompressedHDLikelihood import HubbleDiagram, HD23
 from .likelihoods.Compressedfs8Likelihood import fs8Diagram
 from .likelihoods.HubbleParameterLikelihood import RiessH0
 
+from .likelihoods.StrongLensingLikelihood import StrongLensing
+
 from .likelihoods.SimpleLikelihood import GenericLikelihood
 from .likelihoods.SimpleLikelihood import StraightLine
 from .likelihoods.RotationCurvesLikelihood import RotationCurvesLike
@@ -315,6 +317,8 @@ def ParseDataset(datasets, **kwargs):
         #    L.addLikelihood(PantheonLikelihood())
         elif name == 'RC':
             L.addLikelihood(RotationCurvesLike())
+        elif name == "SL":
+            L.addLikelihood(StrongLensing())
         elif name == 'generic':
             L.addLikelihood(GenericLikelihood(path_to_data=path_to_data,
                                               path_to_cov=path_to_cov,
