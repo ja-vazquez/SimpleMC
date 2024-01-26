@@ -1,4 +1,4 @@
-from simplemc import logger
+from simplemc.setup_logger import logger
 from simplemc.models.LCDMCosmology import LCDMCosmology
 from simplemc.cosmo.Parameter import Parameter
 import math as N

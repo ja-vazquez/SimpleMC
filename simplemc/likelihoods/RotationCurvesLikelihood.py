@@ -3,7 +3,7 @@
 from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
 import scipy as sp
-from simplemc import cdir
+from simplemc.setup_logger import cdir
 
 
 #uncoment lines for use a covariance matrix

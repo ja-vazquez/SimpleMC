@@ -2,7 +2,7 @@ from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 import numpy as np
 import scipy.linalg as la
 from scipy.interpolate import interp1d
-from simplemc import cdir
+from simplemc.setup_logger import cdir
 import pandas as pd
 
 

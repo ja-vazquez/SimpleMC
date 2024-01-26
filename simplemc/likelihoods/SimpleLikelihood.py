@@ -2,10 +2,10 @@
 # This module calculates likelihood for a Generic DATA.
 #
 from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
-from simplemc import logger
+from simplemc.setup_logger import logger
 import scipy.linalg as la
 import scipy as sp
-from simplemc import cdir
+from simplemc.setup_logger import cdir
 
 
 # uncoment lines for use a covariance matrix

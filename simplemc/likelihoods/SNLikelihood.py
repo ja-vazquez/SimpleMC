@@ -2,7 +2,7 @@
 from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 from simplemc.likelihoods.JLA_SN import SN_likelihood
 import matplotlib.pyplot as plt
-from simplemc import cdir
+from simplemc.setup_logger import cdir
 
 
 class SNLikelihood(BaseLikelihood):
