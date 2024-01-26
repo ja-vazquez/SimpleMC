@@ -8,7 +8,7 @@ from simplemc.likelihoods.GaussBAODVLikelihood import GaussBAODVLikelihood
 from simplemc.likelihoods.ConsensusBAOLikelihood import ConsensusBAOLikelihood
 from simplemc.likelihoods.DR16BAOLikelihood import DR16BAOLikelihood
 from simplemc.models.LCDMCosmology import LCDMCosmology
-from simplemc import cdir
+from simplemc.setup_logger import cdir
 
 
 class DR11LOWZ(GaussBAODVLikelihood):

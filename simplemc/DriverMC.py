@@ -7,10 +7,10 @@ from .analyzers import MCMCAnalyzer
 from .analyzers import DynamicNestedSampler, NestedSampler
 #from .analyzers import EnsembleSampler
 from .cosmo.Derivedparam import AllDerived
-from . import ParseDataset, ParseModel
+from .setup_logger import logger
+from .runbase import ParseDataset, ParseModel
 from .PostProcessing import PostProcessing
 from scipy.special import ndtri
-from simplemc import logger
 import numpy as np
 import sys, os
 import time

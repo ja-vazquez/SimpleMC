@@ -1,6 +1,6 @@
 from simplemc.cosmo.Derivedparam import AllDerived
 from simplemc.analyzers.dynesty import utils as dyfunc
-from simplemc import logger
+from .setup_logger import logger
 import numpy as np
 import sys
 from .analyzers import MCEvidence
