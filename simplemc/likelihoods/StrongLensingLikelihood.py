@@ -28,7 +28,7 @@ class StrongLensingLikelihood(BaseLikelihood):
         self.zs = da[:, 1]
         self.theta_E = da[:,2]
         self.sigma = da[:,4]
-        
+
         print("Loading ", cov_filename)
         cov = sp.loadtxt(cov_filename, skiprows=1)
         assert(len(cov) == len(self.zs))
