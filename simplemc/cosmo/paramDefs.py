@@ -165,7 +165,10 @@ rs_par = Parameter("rs",  400., 10.0, (0.0, 600.0), "r_s")
 weff_par = Parameter("weff", -1.0, 0.02, (-1., 0.), "w_{eff}")
 wcpl_par = Parameter("wcpl", 0.0, 0.03, (0, 0.5), "w_{cpl}")
 
-
+#Brans Dicke
 LMBD_par = Parameter("LMBD", 0.65, 0.02, (0, 1), "w_{cpl}")
 
+#Chaplygin cosmology
+As_par = Parameter("as", 0.5, 0.1, (0.0, 1.0), "A_{s}")
+Calpha_par = Parameter("alpha", 0.3, 0.1, (0.0, 1.0), "\\alpha")
 

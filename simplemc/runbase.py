@@ -18,6 +18,7 @@ from .models import AnisotropicCosmology
 from .models import GraduatedCosmology
 from .models import QuintomCosmology
 from .models import RotationCurves
+from .models import ChaplyginCDMCosmology
 
 #Non-parametric functions
 from .models import SplineLCDMCosmology
@@ -172,6 +173,8 @@ def ParseModel(model, **kwargs):
         T = QuintomCosmology(vary_mquin=True, vary_mphan=True, vary_coupling=True)
     elif model == "Rotation":
         T = RotationCurves()
+    elif model == "Chaplygin":
+        T = ChaplyginCDMCosmology()
     elif model == 'simple':
         T = SimpleModel(custom_parameters, custom_function)
     elif model == 'simple_cosmo':
