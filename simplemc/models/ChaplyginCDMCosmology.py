@@ -18,7 +18,7 @@ class ChaplyginCDMCosmology(LCDMCosmology):
 
 
     """
-    def __init__(self, varyas=True, varyalpha=True, varyOk=False):
+    def __init__(self, varyas=True, varyalpha=True, varyOk=False, fixOm=True):
         self.varyas  = varyas
         self.varyalpha = varyalpha
         self.varyOk = varyOk
@@ -26,7 +26,7 @@ class ChaplyginCDMCosmology(LCDMCosmology):
         self.Ok = Ok_par.value
         self.As = As_par.value
         self.alpha = Calpha_par.value
-        LCDMCosmology.__init__(self)
+        LCDMCosmology.__init__(self, fixOm=fixOm)
 
 
     # my free parameters. We add Ok on top of LCDM ones (we inherit LCDM)
