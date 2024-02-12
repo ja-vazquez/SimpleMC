@@ -172,3 +172,4 @@ LMBD_par = Parameter("LMBD", 0.65, 0.02, (0, 1), "w_{cpl}")
 As_par = Parameter("as", 0.5, 0.1, (0.0, 1.0), "A_{s}")
 Calpha_par = Parameter("alpha", 0.3, 0.1, (0.0, 1.0), "\\alpha")
 
+

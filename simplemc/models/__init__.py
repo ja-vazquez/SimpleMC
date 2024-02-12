@@ -31,4 +31,5 @@ from .WeirdCDMCosmology import WeirdCDMCosmology
 from .wFourierCosmology import wFourierCosmology
 from .TanhCosmology import TanhCosmology 
 from .ChaplyginCDMCosmology import ChaplyginCDMCosmology
+from .HolographicCosmology import HolographicCosmology
 #from .ePhiCDMCosmology import ePhiCosmology
