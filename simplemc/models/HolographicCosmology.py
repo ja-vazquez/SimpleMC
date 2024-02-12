@@ -1,5 +1,6 @@
 from simplemc.models.LCDMCosmology import LCDMCosmology
-from simplemc.cosmo.Parameter import Parameter, Ok_par
+from simplemc.cosmo.Parameter import Parameter
+from simplemc.cosmo.paramDefs import Ok_par
 from scipy.interpolate import interp1d
 from scipy.integrate import odeint
 from scipy import optimize
