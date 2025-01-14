@@ -7,6 +7,7 @@ from simplemc.likelihoods.TabulatedBAODVLikelihood import TabulatedBAODVLikeliho
 from simplemc.likelihoods.GaussBAODVLikelihood import GaussBAODVLikelihood
 from simplemc.likelihoods.ConsensusBAOLikelihood import ConsensusBAOLikelihood
 from simplemc.likelihoods.DR16BAOLikelihood import DR16BAOLikelihood
+from simplemc.likelihoods.DESIBAOLikelihood import DESIBAOLikelihood
 from simplemc.models.LCDMCosmology import LCDMCosmology
 from simplemc.setup_logger import cdir
 
@@ -149,3 +150,16 @@ class DR16BAO(DR16BAOLikelihood):
         fidTheory = LCDMCosmology(obh2, Om, h, mnu)
         DR16BAOLikelihood.__init__(self, "DR16BAO", cdir+"/data/dr16_bao.dat",
                                    fidTheory)
+
+class DESIBAO(DESIBAOLikelihood):
+    """
+    Likelihood to full DESIBAO compilation.
+    """
+    def __init__(self):
+        obh2 = 0.022
+        Om   = 0.31
+        h    = 0.676
+        mnu  = 0.06
+        fidtheory = LCDMCosmology(obh2, Om, h, mnu)
+        DESIBAOLikelihood.__init__(self, "Desibao", cdir+"/data/desi_2024_gaussian_bao_ALL_GCcomb_mean.txt",
+                                      cdir+"/data/desi_2024_gaussian_bao_ALL_GCcomb_cov.txt",fidtheory)

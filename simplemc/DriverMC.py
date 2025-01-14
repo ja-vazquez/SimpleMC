@@ -803,6 +803,7 @@ class DriverMC:
         """
         import multiprocessing as mp
         from multiprocessing.pool import ThreadPool
+        #mp.set_start_method("fork")	
         if nproc <= 0:
             ncores = mp.cpu_count()
             nprocess = ncores//2
@@ -847,6 +848,7 @@ class DriverMC:
             nproc = kwargs.pop('nproc', 3)
         if nproc > 1:
             import multiprocessing as mp
+            #mp.set_start_method("fork")
             pool = mp.Pool(processes=nproc)
         else:
             pool = None
