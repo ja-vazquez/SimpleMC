@@ -161,5 +161,5 @@ class DESIBAO(DESIBAOLikelihood):
         h    = 0.676
         mnu  = 0.06
         fidtheory = LCDMCosmology(obh2, Om, h, mnu)
-        DESIBAOLikelihood.__init__(self, "Desibao", cdir+"/data/desi_2024_gaussian_bao_ALL_GCcomb_mean.txt",
-                                      cdir+"/data/desi_2024_gaussian_bao_ALL_GCcomb_cov.txt",fidtheory)
+        DESIBAOLikelihood.__init__(self, "DESIBAO", cdir+"/data/desi_2024_gaussian_bao_ALL_GCcomb_mean.txt",
+                                      cdir+"/data/desi_2024_gaussian_bao_ALL_GCcomb_cov.txt", fidtheory)

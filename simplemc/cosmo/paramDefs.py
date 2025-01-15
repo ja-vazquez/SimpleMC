@@ -24,7 +24,7 @@ Nnu_par = Parameter("Nnu", 3.046, 0.5, (3.0, 3.1), "N_{\\rm eff}")
 # Curvature and DE equation of state.
 Ok_par = Parameter("Ok", 0.0, 0.01, (-0.02, 0.02), "\Omega_k")
 w_par = Parameter("w", -1., 0.1, (-2.0, 0.0), "w_0")
-wa_par = Parameter("wa", 0.0, 0.1, (-2.0, 2.0), "w_a")
+wa_par = Parameter("wa", 0.0, 0.1, (-3.0, 2.0), "w_a")
 wb_par = Parameter("wb", 0.7, 0.2, (-2., 3.0), "w_b")
 wc_par = Parameter("wc", 0.7, 0.2, (-3., 5.0), "w_c")
 
