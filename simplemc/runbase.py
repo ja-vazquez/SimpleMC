@@ -40,12 +40,13 @@ from .likelihoods.LikelihoodMultiplier import LikelihoodMultiplier
 # Likelihood modules
 from .likelihoods.BAOLikelihoods import DR11LOWZ, DR11CMASS, DR14LyaAuto, DR14LyaCross, \
                                         SixdFGS, SDSSMGS, DR11LyaAuto, DR11LyaCross, eBOSS, \
-                                        DR12Consensus, DR16BAO
+                                        DR12Consensus, DR16BAO, DESIBAO
 from .likelihoods.SimpleCMBLikelihood import PlanckLikelihood, PlanckLikelihood_15, WMAP9Likelihood
 from .likelihoods.CompressedSNLikelihood import BetouleSN, UnionSN
 from .likelihoods.SNLikelihood import JLASN_Full
 from .likelihoods.PantheonSNLikelihood import PantheonSN, BinnedPantheon
 from .likelihoods.PantheonPlusSNLikelihood import PantheonPlus
+from .likelihoods.UNION3Likelihood import UNION3
 from .likelihoods.CompressedHDLikelihood import HubbleDiagram, HD23
 from .likelihoods.Compressedfs8Likelihood import fs8Diagram
 from .likelihoods.HubbleParameterLikelihood import RiessH0
@@ -190,7 +191,7 @@ def ParseModel(model, **kwargs):
 
 
 data_list = "BBAO, GBAO, GBAO_no6dF, CMASS, LBAO, LaBAO, LxBAO, MGS, Planck, WMAP, PlRd, WRd, PlDa, PlRdx10,"\
-    "CMBW, SN, SNx10, UnionSN, RiessH0, 6dFGS, PantheonPlus, DR16BAO, HD23"
+    "CMBW, SN, SNx10, UnionSN, RiessH0, 6dFGS, PantheonPlus, DR16BAO, HD23, DESIBAO"
 
 
 def ParseDataset(datasets, **kwargs):
@@ -278,6 +279,8 @@ def ParseDataset(datasets, **kwargs):
             L.addLikelihood(eBOSS())
         elif name == 'DR16BAO':
             L.addLikelihood(DR16BAO())
+        elif name == 'DESI':
+            L.addLikelihood(DESIBAO())
         elif name == 'Planck':
             L.addLikelihood(PlanckLikelihood())
         elif name == 'Planck_15':
@@ -303,6 +306,8 @@ def ParseDataset(datasets, **kwargs):
             L.addLikelihood(PantheonPlus())
         elif name == 'JLA':
             L.addLikelihood(JLASN_Full())
+        elif name == 'Union3':
+            L.addLikelihood(UNION3())
         elif name == 'SN':
             L.addLikelihood(BetouleSN())
         elif name == 'SNx10':
