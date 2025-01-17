@@ -3,9 +3,16 @@ from simplemc.DriverMC import DriverMC
 "read all setting from .ini file"
 inifile = "baseConfig.ini"
 
-analyzer = DriverMC(iniFile=inifile)
-analyzer.executer()
-#analyzer.postprocess()
+import multiprocessing as mp
+
+if __name__ == '__main__':
+    mp.freeze_support()
+    analyzer = DriverMC(iniFile=inifile)
+    analyzer.executer()
+
+#analyzer = DriverMC(iniFile=inifile)
+#analyzer.executer()
+##analyzer.postprocess()
 
 
 """ useful for short tests,
