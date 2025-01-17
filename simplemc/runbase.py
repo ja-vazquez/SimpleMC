@@ -47,6 +47,7 @@ from .likelihoods.SNLikelihood import JLASN_Full
 from .likelihoods.PantheonSNLikelihood import PantheonSN, BinnedPantheon
 from .likelihoods.PantheonPlusSNLikelihood import PantheonPlus
 from .likelihoods.UNION3Likelihood import UNION3
+from .likelihoods.DESY5Likelihood import DESY5
 from .likelihoods.CompressedHDLikelihood import HubbleDiagram, HD23
 from .likelihoods.Compressedfs8Likelihood import fs8Diagram
 from .likelihoods.HubbleParameterLikelihood import RiessH0
@@ -308,6 +309,8 @@ def ParseDataset(datasets, **kwargs):
             L.addLikelihood(JLASN_Full())
         elif name == 'Union3':
             L.addLikelihood(UNION3())
+        elif name == 'DESY5':
+            L.addLikelihood(DESY5())
         elif name == 'SN':
             L.addLikelihood(BetouleSN())
         elif name == 'SNx10':
