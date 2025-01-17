@@ -952,7 +952,10 @@ class Sampler(object):
             # Print progress.
             if print_progress:
                 # Writing weights, likes and samples in a text file for simplemc output.
-                weights = np.exp(results[5])
+                # hack for DESY5, but fix it later (jav)
+                tmp=800 if results[5]< -800 else 0
+                weights = np.exp(results[5]+tmp)
+
                 vstarstr = str(results[2]).lstrip('[').rstrip(']')
                 sys.stdout.write(self.print_txt.format(it, ncall, eff, logz, delta_logz, loglstar, vstarstr))
                 sys.stdout.flush()
