@@ -1,0 +1,15 @@
+https://arxiv.org/abs/2311.12098
+
+name = Union3
+data_file = Union3/lcparam_full.txt
+pecz = 0
+intrinsicdisp = 0
+twoscriptmfit = F
+scriptmcut = 10.0
+has_mag_covmat = T
+mag_covmat_file = Union3/mag_covmat.txt
+has_stretch_covmat = F
+has_colour_covmat = F
+has_mag_stretch_covmat = F
+has_mag_colour_covmat = F
+has_stretch_colour_covmat = F
