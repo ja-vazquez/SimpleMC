@@ -50,7 +50,7 @@ class SimpleCMBLikelihood(BaseLikelihood):
 
 
 
-class PlanckLikelihood(SimpleCMBLikelihood):
+class PLK(SimpleCMBLikelihood):
     def __init__(self, kill_Da= False, kill_rd= False):
         mean = sp.array([2.24519776e-02,   1.38572404e-01,   9.43303000e+01])
         cov  = sp.array([[1.28572727e-07,  -6.03323687e-07,   1.44305285e-05],
@@ -62,7 +62,7 @@ class PlanckLikelihood(SimpleCMBLikelihood):
 
 
                 #Calibrated with plikHM_TTTEEE_lowTEB
-class PlanckLikelihood_15(SimpleCMBLikelihood):
+class PLK15(SimpleCMBLikelihood):
     def __init__(self, kill_Da= False, kill_rd= False):
         mean = sp.array([2.24001583e-02,   1.40200580e-01,   9.44043640e+01 ])
         cov = sp.array([[3.02751758e-08,  -1.54495460e-07,   4.26868164e-06],
@@ -72,8 +72,18 @@ class PlanckLikelihood_15(SimpleCMBLikelihood):
         SimpleCMBLikelihood.__init__(self,name,mean,cov, kill_Da, kill_rd)
 
 
+#Calibrated with plikHM_TTTEEE_lowTEB
+class PLK18(SimpleCMBLikelihood):
+    def __init__(self, kill_Da= False, kill_rd= False):
+        mean = sp.array([2.23619584e-02,   1.425557737e-01,   9.43342292580e+01])
+        cov = sp.array([[ 2.2280476e-08,  -9.5339119e-08,  -1.5060900e-06],
+                 [ -9.5339119e-08,   1.6369370e-06,   1.1826342e-05],
+                 [ -1.5060900e-06,   1.1826342e-05,   7.9308203e-04 ]])
+        name = "SPlanck_18"
+        SimpleCMBLikelihood.__init__(self,name,mean,cov, kill_Da, kill_rd)
 
-class WMAP9Likelihood(SimpleCMBLikelihood):
+
+class WMAP9(SimpleCMBLikelihood):
     def __init__(self, kill_Da=False, kill_rd=False):
         mean = sp.array([2.25946978e-02,   1.35359318e-01,   9.45118918e+01])
         cov  = sp.array([[2.86459327e-07,  -4.80929954e-07,  -1.11081266e-05],

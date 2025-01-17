@@ -41,7 +41,7 @@ from .likelihoods.LikelihoodMultiplier import LikelihoodMultiplier
 from .likelihoods.BAOLikelihoods import DR11LOWZ, DR11CMASS, DR14LyaAuto, DR14LyaCross, \
                                         SixdFGS, SDSSMGS, DR11LyaAuto, DR11LyaCross, eBOSS, \
                                         DR12Consensus, DR16BAO, DESIBAO
-from .likelihoods.SimpleCMBLikelihood import PlanckLikelihood, PlanckLikelihood_15, WMAP9Likelihood
+from .likelihoods.SimpleCMBLikelihood import PLK, PLK15, PLK18, WMAP9
 from .likelihoods.CompressedSNLikelihood import BetouleSN, UnionSN
 from .likelihoods.SNLikelihood import JLASN_Full
 from .likelihoods.PantheonSNLikelihood import PantheonSN, BinnedPantheon
@@ -282,23 +282,25 @@ def ParseDataset(datasets, **kwargs):
             L.addLikelihood(DR16BAO())
         elif name == 'DESI':
             L.addLikelihood(DESIBAO())
-        elif name == 'Planck':
-            L.addLikelihood(PlanckLikelihood())
-        elif name == 'Planck_15':
-            L.addLikelihood(PlanckLikelihood_15())
-        elif name == 'WMAP':
-            L.addLikelihood(WMAP9Likelihood())
+        elif name == 'PLK':
+            L.addLikelihood(PLK())
+        elif name == 'PLK15':
+            L.addLikelihood(PLK15())
+        elif name == 'PLK18':
+            L.addLikelihood(PLK18())
+        elif name == 'WMAP9':
+            L.addLikelihood(WMAP9())
         elif name == 'PlRd':
-            L.addLikelihood(PlanckLikelihood(kill_Da=True))
+            L.addLikelihood(PLK(kill_Da=True))
         elif name == 'WRd':
-            L.addLikelihood(WMAP9Likelihood(kill_Da=True))
+            L.addLikelihood(WMAP9(kill_Da=True))
         elif name == 'PlDa':
-            L.addLikelihood(PlanckLikelihood(kill_rd=True))
+            L.addLikelihood(PLK(kill_rd=True))
         elif name == 'PlRdx10':
             L.addLikelihood(LikelihoodMultiplier(
-                PlanckLikelihood(kill_Da=True), 100.0))
+                PLK(kill_Da=True), 100.0))
         elif name == 'CMBW':
-            L.addLikelihood(WMAP9Likelihood())
+            L.addLikelihood(WMAP9())
         elif name == 'Pantheon':
             L.addLikelihood(PantheonSN())
         elif name == 'BPantheon':
