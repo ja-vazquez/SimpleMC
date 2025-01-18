@@ -953,9 +953,11 @@ class Sampler(object):
             if print_progress:
                 # Writing weights, likes and samples in a text file for simplemc output.
                 # hack when DESY5 is running, but fix it later (jav)
-                #0.01 added cause result is super small(negative) number
+                #a number is added cause result is super small(negative) number
 
-                weights = 5E-250+np.exp(results[5])
+                tmp = 1.0 if results[5]<-200 else 1
+                #print(' **', results[5]*tmp)
+                weights = np.exp(results[5]*tmp)
 
                 vstarstr = str(results[2]).lstrip('[').rstrip(']')
                 sys.stdout.write(self.print_txt.format(it, ncall, eff, logz, delta_logz, loglstar, vstarstr))
@@ -994,7 +996,9 @@ class Sampler(object):
                     logz = -np.inf
 
                 # Writing weights, likes and samples in a text file for simplemc output.
-                weights = np.exp(results[5])
+
+                tmp = 1.0 if results[5] < -200 else 1
+                weights = np.exp(results[5]*tmp)
                 vstarstr = str(results[2]).lstrip('[').rstrip(']')
 
                 if addDerived:
