@@ -18,6 +18,7 @@ class HolographicCosmology(LCDMCosmology):
     """
     def __init__(self, varyOk=False, varyc=True, varyD=False):
         # Holographic parameter
+        # Notation: capital C = 3c**2*M_p, here, we use little c
         self.c_par = Parameter("c", 0.7, 0.1, (0.5, 2.0), "c")
         self.D_par = Parameter("D", 0.0, 0.1, (0., 3.0), "D")
 
@@ -67,7 +68,7 @@ class HolographicCosmology(LCDMCosmology):
     def Q_term(self, z):
         D = self.D_hde
         term1 = 1./(D - 2)
-        Q = (2-D)*(self.c_hde)**(term1)*(100*self.h*np.sqrt(self.Om*(1 + z)**3))**(-D*term1)
+        Q = (2-D)*(self.c_hde)**(2*term1)*(100*self.h*np.sqrt(self.Om*(1 + z)**3))**(-D*term1)
         return Q
 
     def extra_term(self, z, Ode):
