@@ -3,7 +3,6 @@ from simplemc.cosmo.Parameter import Parameter
 from simplemc.cosmo.paramDefs import Ok_par
 from scipy.interpolate import interp1d
 from scipy.integrate import odeint
-from scipy import optimize
 import numpy as np
 
 
@@ -17,26 +16,24 @@ class HolographicCosmology(LCDMCosmology):
         :param varyc: variable w0 parameter
 
     """
-
-
-    def __init__(self, varyOk=False, varyc=True):
+    def __init__(self, varyOk=False, varyc=True, varyD=False):
         # Holographic parameter
-        self.c_par = Parameter("c", 0.7, 0.1, (0.5, 1.1), "c")
+        self.c_par = Parameter("c", 0.7, 0.1, (0.5, 2.0), "c")
+        self.D_par = Parameter("D", 0.0, 0.1, (0., 3.0), "D")
 
         self.varyOk = varyOk
         self.varyc  = varyc
+        self.varyD  = varyD
 
         self.Ok = Ok_par.value
-        self.c  = self.c_par.value
+        self.c_hde  = self.c_par.value
+        self.D_hde = self.D_par.value
 
         # This value is quite related to the initial z
         self.zini = 3
-        #self.scale = 10**(-2)
-        #self.avals = np.linspace(1./(1+self.zini), 1, 300)
-        self.zvals = np.linspace(0, self.zini, 50)
-        #self.zhde = np.linspace(0, 10, 500)
+        self.zvals = np.linspace(0, self.zini, 100)
 
-        LCDMCosmology.__init__(self)
+        LCDMCosmology.__init__(self, disable_radiation=True)
         self.updateParams([])
 
 
@@ -45,6 +42,7 @@ class HolographicCosmology(LCDMCosmology):
         l = LCDMCosmology.freeParameters(self)
         if (self.varyOk): l.append(Ok_par)
         if (self.varyc):  l.append(self.c_par)
+        if (self.varyD): l.append(self.D_par)
         return l
 
 
@@ -53,8 +51,10 @@ class HolographicCosmology(LCDMCosmology):
         if not ok:
             return False
         for p in pars:
-            if p.name   == "c":
-                self.c = p.value
+            if p.name  == "c":
+                self.c_hde = p.value
+            if p.name == "D":
+                self.D_hde = p.value
             elif p.name == "Ok":
                 self.Ok = p.value
                 self.setCurvature(self.Ok)
@@ -64,45 +64,36 @@ class HolographicCosmology(LCDMCosmology):
         self.initialize()
         return True
 
+    def Q_term(self, z):
+        D = self.D_hde
+        term1 = 1./(D - 2)
+        Q = (2-D)*(self.c_hde)**(term1)*(100*self.h*np.sqrt(self.Om*(1 + z)**3))**(-D*term1)
+        return Q
 
+    def extra_term(self, z, Ode):
+        D = self.D_hde
+        term1 = 1./(D - 2)
+        return (1- Ode)**(0.5*D*term1)*Ode**(-term1)
+
+
+    # Right hand side of the equations
     def RHS_hde(self, vals, z):
-        Omega = vals
-        fact = (1 + 2*np.sqrt(Omega)/self.c)
-        dOmega = -Omega*(1 - Omega)*fact/(1 + z) + 0
-        #dlogE = -0.5*Omega*(-3/Omega + fact)/(1 + z)
-        #dOmega = -Omega*(Omega - 1)*(1 + 2*np.sqrt(Omega)/self.c)/a + 0
+        Ode = vals
+        fact = self.D_hde + 1 + self.Q_term(z)*self.extra_term(z, Ode)
+        dOmega = -Ode*(1 - Ode)*fact/(1 + z) + 0
         return dOmega
-
-
-    #def compute_Ode(self, ini_vals):
-    #    solution = odeint(self.RHS_hde, ini_vals, self.zvals)
-        #Ode = Ode_ini*self.scale
-        #solution = odeint(self.RHS_a_hde, ini_vals, self.avals, h0=1E-5)
-    #    return solution
-
-    #For shooting
-    #def ini_sol(self, Ode_ini):
-    #    diference = self.compute_Ode(Ode_ini)[-1] - (1-self.Om-self.Ok)
-    #    return diference
 
 
     def initialize(self):
         """
-        Main method that searches the initial conditions for a given model.
+        Main method.
         """
-        #ini_val = optimize.newton(self.ini_sol, 1)
         Ode0 = (1 - self.Om - self.Ok)
-        #logE0 = 0
 
-        #ini_vals = Ode0
         result_E = odeint(self.RHS_hde, Ode0, self.zvals)
-        #Ode = np.exp(result_E[:, 0])
         self.Ode = interp1d(self.zvals, result_E[:, 0])
-        #self.Omega_hde = interp1d(self.avals, Ode[:, 0])
 
-        ## Add a flag in case the ini condition isn't found, i.e. c<0.4
         return True
-
 
 
 
@@ -117,3 +108,9 @@ class HolographicCosmology(LCDMCosmology):
             hubble = self.Om*(1+z)**3/(1-self.Ode(z))
 
         return hubble
+
+
+    def EoS(self, z):
+        Ode = self.Ode(z)
+        w = -(1+self.D_hde)/3. - (1./3)*self.Q_term(z)*self.extra_term(z, Ode)
+        return w
