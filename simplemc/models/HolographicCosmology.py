@@ -16,19 +16,22 @@ class HolographicCosmology(LCDMCosmology):
         :param varyc: variable w0 parameter
 
     """
-    def __init__(self, varyOk=False, varyc=True, varyD=False):
+    def __init__(self, varyOk=False, varychde=True, varyalpha=False, varybeta=False):
         # Holographic parameter
         # Notation: capital C = 3c**2*M_p, here, we use little c
         self.c_par = Parameter("c", 0.7, 0.1, (0.5, 2.0), "c")
-        self.D_par = Parameter("D", 0.0, 0.1, (0., 3.0), "D")
+        self.alpha_par = Parameter("alpha", 0.0, 0.1, (0., 3.0), "alpha")
+        self.beta_par = Parameter("beta", 0.0, 0.1, (0., 3.0), "beta")
 
         self.varyOk = varyOk
-        self.varyc  = varyc
-        self.varyD  = varyD
+        self.varychde  = varychde
+        self.varyalpha  = varyalpha
+        self.varybeta = varybeta
 
         self.Ok = Ok_par.value
         self.c_hde  = self.c_par.value
-        self.D_hde = self.D_par.value
+        self.alpha_hde = self.alpha_par.value
+        self.beta_hde = self.beta_par.value
 
         # This value is quite related to the initial z
         self.zini = 3
@@ -42,8 +45,9 @@ class HolographicCosmology(LCDMCosmology):
     def freeParameters(self):
         l = LCDMCosmology.freeParameters(self)
         if (self.varyOk): l.append(Ok_par)
-        if (self.varyc):  l.append(self.c_par)
-        if (self.varyD): l.append(self.D_par)
+        if (self.varychde):  l.append(self.c_par)
+        if (self.varyalpha): l.append(self.alpha_par)
+        if (self.varybeta): l.append(self.beta_par)
         return l
 
 
@@ -54,8 +58,10 @@ class HolographicCosmology(LCDMCosmology):
         for p in pars:
             if p.name  == "c":
                 self.c_hde = p.value
-            if p.name == "D":
-                self.D_hde = p.value
+            if p.name == "alpha":
+                self.alpha_hde = p.value
+            if p.name == "beta":
+                self.beta_hde = p.value
             elif p.name == "Ok":
                 self.Ok = p.value
                 self.setCurvature(self.Ok)
@@ -65,23 +71,42 @@ class HolographicCosmology(LCDMCosmology):
         self.initialize()
         return True
 
+
+    def delta_func(self, z):
+        return self.alpha_hde + self.beta_hde*z
+
+    def ddelta_func(self, z):
+        return self.beta_hde
+
+
     def Q_term(self, z):
-        D = self.D_hde
-        term1 = 1./(D - 2)
-        Q = (2-D)*(self.c_hde)**(2*term1)*(100*self.h*np.sqrt(self.Om*(1 + z)**3))**(-D*term1)
+        delta = self.delta_func(z)
+        term1 = 1./(delta - 2)
+        Q = (2-delta)*(self.c_hde)**(2*term1)*(100*self.h*np.sqrt(self.Om))**(-delta*term1)
         return Q
 
+
     def extra_term(self, z, Ode):
-        D = self.D_hde
-        term1 = 1./(D - 2)
-        return (1- Ode)**(0.5*D*term1)*Ode**(-term1)
+        delta = self.delta_func(z)
+        term1 = 1./(delta - 2)
+        return (1- Ode)**(0.5*delta*term1)*Ode**(-term1)
+
+
+    def term_func(self, z, Ode):
+        delta = self.delta_func(z)
+        qterm= self.c_hde**2*(1+z)**(-3)/(100*self.h)**2/self.Om
+        value= -(1+z)*self.ddelta_func(z)/(delta-2)*np.log(qterm*(1-Ode)/Ode)
+        return value
 
 
     # Right hand side of the equations
     def RHS_hde(self, vals, z):
         Ode = vals
-        fact = self.D_hde + 1 + self.Q_term(z)*self.extra_term(z, Ode)
-        dOmega = -Ode*(1 - Ode)*fact/(1 + z) + 0
+        delta = self.delta_func(z)
+
+        term_cte = 1 + delta + self.Q_term(z)*self.extra_term(z, Ode)*(1+z)**(-1.5*delta/(delta-2))
+        fact = term_cte + self.term_func(z, Ode)
+        dOmega = -Ode*(1 - Ode)*fact/(1 + z)
         return dOmega
 
 
@@ -113,5 +138,9 @@ class HolographicCosmology(LCDMCosmology):
 
     def EoS(self, z):
         Ode = self.Ode(z)
-        w = -(1+self.D_hde)/3. - (1./3)*self.Q_term(z)*self.extra_term(z, Ode)
-        return w
+        delta = self.delta_func(z)
+
+        tmp = (1+z)**(-1.5*delta/(2-delta))
+        w = -(1+delta) - self.Q_term(z)*self.extra_term(z, Ode)*tmp \
+            + self.term_func(z, Ode)
+        return w/3.
