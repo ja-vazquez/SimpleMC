@@ -88,7 +88,8 @@ class ChaplyginCosmology(LCDMCosmology):
         #in this case, we consider the pressure is given by
         # P=As*(\sigm(z)-1)\rho
         integ= lambda z: integrate.quad(self.integrand, 0, z)[0]
-        self.rhow = interp1d(self.zvals, list(map(integ, self.zvals)))
+        rho = np.exp( 3*np.array(list(map(integ, self.zvals))) )
+        self.rhow = interp1d(self.zvals, rho)
 
     def auxiliar(self, z):
         return self.as_chap + (1-self.as_chap)*(1+z)**( 3*(1+self.beta_chap)*(1+self.alpha_chap))
