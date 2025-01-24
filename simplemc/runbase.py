@@ -18,7 +18,7 @@ from .models import AnisotropicCosmology
 from .models import GraduatedCosmology
 from .models import QuintomCosmology
 from .models import RotationCurves
-from .models import ChaplyginCDMCosmology
+from .models import ChaplyginCosmology
 from .models import HolographicCosmology
 
 #Non-parametric functions
@@ -177,7 +177,7 @@ def ParseModel(model, **kwargs):
     elif model == "Rotation":
         T = RotationCurves()
     elif model == "Chaplygin":
-        T = ChaplyginCDMCosmology()
+        T = ChaplyginCosmology()
     elif model == "HDE":
         T = HolographicCosmology()
     elif model == 'simple':

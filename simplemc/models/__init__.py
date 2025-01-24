@@ -30,6 +30,6 @@ from .wCDMCosmology import wCDMCosmology
 from .WeirdCDMCosmology import WeirdCDMCosmology
 from .wFourierCosmology import wFourierCosmology
 from .TanhCosmology import TanhCosmology 
-from .ChaplyginCDMCosmology import ChaplyginCDMCosmology
+from .ChaplyginCosmology import ChaplyginCosmology
 from .HolographicCosmology import HolographicCosmology
 #from .ePhiCDMCosmology import ePhiCosmology
