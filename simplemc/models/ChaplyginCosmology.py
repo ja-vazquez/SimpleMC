@@ -3,6 +3,9 @@
 from simplemc.models.LCDMCosmology import LCDMCosmology
 from simplemc.cosmo.Parameter import Parameter
 from simplemc.cosmo.paramDefs import Ok_par
+from scipy.interpolate import interp1d
+from scipy import integrate
+import numpy as np
 
 
 
@@ -19,11 +22,12 @@ class ChaplyginCosmology(LCDMCosmology):
 
 
     """
-    def __init__(self, varyas=True, varyalpha=True, varybeta=True, varyOk=False, fixOm=True):
+    def __init__(self, varyas=True, varyalpha=True, varybeta=True,
+                 usesigmoid=False, varyOk=False, fixOm=True):
         # Chaplygin cosmology
-        self.as_par = Parameter("as", 0.5, 0.1, (0.0, 1.0), "A_{s}")
-        self.alpha_par = Parameter("alpha", 0.3, 0.1, (0.0, 1.0), "\\alpha")
-        self.beta_par = Parameter("beta", 0.3, 0.1, (0.0, 1.0), "\\beta")
+        self.as_par = Parameter("as", 1.0, 0.1, (0.8, 1.2), "A_{s}")
+        self.alpha_par = Parameter("alpha", 5, 0.1, (2.0, 20.0), "\\alpha")
+        self.beta_par = Parameter("beta", 1., 0.1, (-0.2, 2.5), "\\beta")
 
         self.varyOk = varyOk
         self.varyas  = varyas
@@ -34,7 +38,13 @@ class ChaplyginCosmology(LCDMCosmology):
         self.as_chap = self.as_par.value
         self.alpha_chap = self.alpha_par.value
         self.beta_chap = self.beta_par.value
+
+        self.use_sigmoid = usesigmoid
+        self.zvals = np.linspace(0, 3, 100)
+
         LCDMCosmology.__init__(self, fixOm=fixOm)
+        if self.use_sigmoid:
+            self.updateParams([])
 
 
     # my free parameters. We add Ok on top of LCDM ones (we inherit LCDM)
@@ -63,8 +73,22 @@ class ChaplyginCosmology(LCDMCosmology):
                 self.setCurvature(self.Ok)
                 if (abs(self.Ok) > 1.0):
                     return False
+        if self.use_sigmoid:
+            self.initialize()
         return True
 
+
+    def sigmoid(self, z):
+        return 1./(1 + np.exp( -self.alpha_chap*(z-self.beta_chap) ))
+
+    def integrand(self, z):
+        return ( 1+self.as_chap*(self.sigmoid(z)-1) )/(1+z)
+
+    def initialize(self):
+        #in this case, we consider the pressure is given by
+        # P=As*(\sigm(z)-1)\rho
+        integ= lambda z: integrate.quad(self.integrand, 0, z)[0]
+        self.rhow = interp1d(self.zvals, list(map(integ, self.zvals)))
 
     def auxiliar(self, z):
         return self.as_chap + (1-self.as_chap)*(1+z)**( 3*(1+self.beta_chap)*(1+self.alpha_chap))
@@ -79,8 +103,16 @@ class ChaplyginCosmology(LCDMCosmology):
         z= 1./a-1
         NuContrib = 0 #self.NuDensity.rho(a)/self.h**2
         standard = self.Obh2/self.h**2/a**3 + self.Ok/a**2+self.Omrad/a**4+NuContrib
-        return standard + (1.0-self.Obh2/self.h**2-self.Ok)*self.rho_chap(z)
+        if self.use_sigmoid:
+            rhow= self.rhow(z)
+        else:
+            rhow= self.rho_chap(z)
+        return standard + (1.0-self.Obh2/self.h**2-self.Ok)*rhow
 
 
     def eos(self, z):
-        return self.beta_chap - self.alpha_chap/self.auxiliar(z)
+        if self.use_sigmoid:
+            w = self.as_chap*( self.sigmoid(z)-1 )
+        else:
+            w = self.beta_chap - self.alpha_chap/self.auxiliar(z)
+        return w

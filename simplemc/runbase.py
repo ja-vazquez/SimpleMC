@@ -176,8 +176,8 @@ def ParseModel(model, **kwargs):
         T = QuintomCosmology(vary_mquin=True, vary_mphan=True, vary_coupling=True)
     elif model == "Rotation":
         T = RotationCurves()
-    elif model == "Chaplygin":
-        T = ChaplyginCosmology()
+    elif model == "Chaplygin_s":
+        T = ChaplyginCosmology(usesigmoid=True)
     elif model == "HDE":
         T = HolographicCosmology()
     elif model == 'simple':
