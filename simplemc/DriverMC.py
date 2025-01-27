@@ -3,6 +3,7 @@
 
 from .analyzers import MaxLikeAnalyzer
 from .analyzers import GA_deap
+from .analyzers import PSO_optimizer
 from .analyzers import MCMCAnalyzer
 from .analyzers import DynamicNestedSampler, NestedSampler
 #from .analyzers import EnsembleSampler
@@ -163,8 +164,11 @@ class DriverMC:
             self.maxLikeRunner(iniFile=self.iniFile, **kwargs)
         elif self.analyzername == 'ga_deap':
             self.geneticdeap(iniFile=self.iniFile, **kwargs)
+        elif self.analyzername == 'pso':
+            self.pso_optimizer(iniFile=self.iniFile, **kwargs)
         else:
             sys.exit("{}: Sampler/Analyzer name invalid".format(self.analyzername))
+
         self.postprocess()
         return self.dict_result
 
@@ -584,6 +588,24 @@ class DriverMC:
         res['weights'], res['samples'] = None, None
         self.dict_result = {'analyzer': 'ga_deap', 'max_generations': max_generation,
                             'mutation': mutation, 'crossover': crossover, 'result': res}
+        return True
+
+
+    def pso_optimizer(self, iniFile=None, **kwargs):
+        """"
+        Particle Swarm Optimization from PySwarm
+        """
+
+        if self.analyzername is None: self.analyzername = 'pso'
+        self.outputpath = '{}_{}'.format(self.outputpath, self.analyzername)
+        self.outputChecker()
+
+        ti = time.time()
+        P = PSO_optimizer(self.L, self.model)
+        res = P.main()
+
+        self.ttime = time.time() - ti
+        self.dict_result = {'analyzer': 'pso', 'result': res}
         return True
 
 ##---------------------- logLike and prior Transform function ----------------------
