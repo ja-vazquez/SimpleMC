@@ -28,3 +28,9 @@ class HubbleParameterLikelihood (BaseLikelihood):
 class RiessH0(HubbleParameterLikelihood):
     def __init__(self):
         HubbleParameterLikelihood.__init__(self, 0.738, 0.024)
+
+
+#Arxiv 2112.04510
+class RiessH0_21(HubbleParameterLikelihood):
+        def __init__(self):
+            HubbleParameterLikelihood.__init__(self, 0.733, 0.0104)

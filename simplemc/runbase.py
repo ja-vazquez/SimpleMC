@@ -50,7 +50,7 @@ from .likelihoods.UNION3Likelihood import UNION3
 from .likelihoods.DESY5Likelihood import DESY5
 from .likelihoods.CompressedHDLikelihood import HubbleDiagram, HD23
 from .likelihoods.Compressedfs8Likelihood import fs8Diagram
-from .likelihoods.HubbleParameterLikelihood import RiessH0
+from .likelihoods.HubbleParameterLikelihood import RiessH0, RiessH0_21
 
 from .likelihoods.StrongLensingLikelihood import StrongLensing
 
@@ -321,6 +321,8 @@ def ParseDataset(datasets, **kwargs):
             L.addLikelihood(UnionSN())
         elif name == 'RiessH0':
             L.addLikelihood(RiessH0())
+        elif name == 'RiessH0_21':
+            L.addLikelihood(RiessH0_21())
         elif name == 'HD':
             L.addLikelihood(HubbleDiagram())
         elif name == 'HD23':
