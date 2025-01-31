@@ -22,7 +22,7 @@ mnu_par = Parameter("mnu", 0.06, 0.1, (0, 1.0), "\Sigma m_{\\nu}")
 Nnu_par = Parameter("Nnu", 3.046, 0.5, (3.0, 3.1), "N_{\\rm eff}")
 
 # Curvature and DE equation of state.
-Ok_par = Parameter("Ok", 0.0, 0.01, (-0.02, 0.02), "\Omega_k")
+Ok_par = Parameter("Ok", 0.0, 0.01, (-0.3, 0.3), "\Omega_k")
 w_par = Parameter("w", -1., 0.1, (-3.0, 1.0), "w_0")
 wa_par = Parameter("wa", 0.0, 0.1, (-3.5, 2.0), "w_a")
 wb_par = Parameter("wb", 0.7, 0.2, (-2., 3.0), "w_b")
@@ -52,31 +52,6 @@ sig_par = Parameter("sig", 0.1, 0.2, (0, 3.0), "\sig")
 
 # Tired Light.
 beta_par = Parameter("beta", 1, 0.1, (-1, 1), "\\beta")
-
-# Spline reconstruction [arXiv: 1205.0847].
-Sp1_par = Parameter("Sp1", 1, 0.01, (-1.2, 1.2), "S1")
-Sp2_par = Parameter("Sp2", 1, 0.01, (-1.2, 1.2), "S2")
-Sp3_par = Parameter("Sp3", 1, 0.01, (-1.2, 1.2), "S3")
-Sp4_par = Parameter("Sp4", 1, 0.01, (-1.2, 1.2), "S4")
-
-
-# Step-wise dark energy density (edit: JG)
-# number of redshift boundaries (fixed).
-step_nz_par = Parameter("StepNZ", 3, 1, (0., 10.), "nz")
-# redshift of bin boundaries (fixed)
-step_z0_par = Parameter("StepZ0", 0.5, 0.01, (0., 10.), "z0")
-step_z1_par = Parameter("StepZ1", 1.0, 0.01, (0., 10.), "z1")
-step_z2_par = Parameter("StepZ2", 1.6, 0.01, (0., 10.), "z2")
-step_z3_par = None
-step_z4_par = None
-
-# rho_DE/rho_c in redshift bins (nz+1, free), 0.2 is working.
-step_rho0_par = Parameter("StepR0", 0.7, 0.5, (-20., 20.), "\\rho_0")
-step_rho1_par = Parameter("StepR1", 0.7, 0.5, (-20., 20.), "\\rho_1")
-step_rho2_par = Parameter("StepR2", 0.7, 0.5, (-20., 20.), "\\rho_2")
-step_rho3_par = Parameter("StepR3", 0.7, 0.5, (-20., 20.), "\\rho_3")
-step_rho4_par = None
-step_rho5_par = None
 
 # Decaying Dark Matter [arXiv: 1411.1074].
 lambda_par = Parameter("lambda", 1.0, 1.0, (0., 20.0), "\lambda")
@@ -168,8 +143,16 @@ wcpl_par = Parameter("wcpl", 0.0, 0.03, (0, 0.5), "w_{cpl}")
 #Brans Dicke
 LMBD_par = Parameter("LMBD", 0.65, 0.02, (0, 1), "w_{cpl}")
 
-#Chaplygin cosmology
-As_par = Parameter("as", 0.5, 0.1, (0.0, 1.0), "A_{s}")
-Calpha_par = Parameter("alpha", 0.3, 0.1, (0.0, 1.0), "\\alpha")
+
+#%%%%-------------------------------------------------%%%%
+#%%%%-------------------------------------------------%%%%
+
+# Spline reconstruction [arXiv: 1205.0847].
+Sp1_par = Parameter("Sp1", 1, 0.01, (-1.2, 1.2), "S1")
+Sp2_par = Parameter("Sp2", 1, 0.01, (-1.2, 1.2), "S2")
+Sp3_par = Parameter("Sp3", 1, 0.01, (-1.2, 1.2), "S3")
+Sp4_par = Parameter("Sp4", 1, 0.01, (-1.2, 1.2), "S4")
 
 
+#%%%%-------------------------------------------------%%%%
+#%%%%-------------------------------------------------%%%%

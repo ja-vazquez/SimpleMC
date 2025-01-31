@@ -24,7 +24,6 @@ from .models import HolographicCosmology
 #Non-parametric functions
 from .models import ReconstructedCosmology
 from .models import SplineLCDMCosmology
-from .models import StepCDMCosmology
 from .models import BinnedWCosmology
 from .models import CompressPantheon
 from .models import TanhCosmology
@@ -65,7 +64,7 @@ from .likelihoods.RotationCurvesLikelihood import RotationCurvesLike
 
 # String parser Aux routines
 model_list = "LCDOM, LCDMasslessnu, nuLCDM, NeffLCDM, noradLCDM, nuoLCDM, nuwLCDM, oLCDM, wCDM, waCDM, owCDM,"\
-    "owaCDM, JordiCDM, WeirdCDM, TLight, StepCDM, Spline, PolyCDM, fPolyCDM, Decay, Decay01, Decay05,"\
+    "owaCDM, JordiCDM, WeirdCDM, TLight, Spline, PolyCDM, fPolyCDM, Decay, Decay01, Decay05,"\
     "EarlyDE, EarlyDE_rd_DE, SlowRDE"
 
 
@@ -124,9 +123,7 @@ def ParseModel(model, **kwargs):
         T = WeirdCDMCosmology()
     elif model == "TLight":
         T = TiredLightDecorator(PolyCDMCosmology())
-    elif model == "StepCDM":
-        T = StepCDMCosmology()
-    elif model == "Recon":
+    elif model == "Recon_cub":
         T = ReconstructedCosmology()
     elif model == "Spline":
         T = SplineLCDMCosmology()

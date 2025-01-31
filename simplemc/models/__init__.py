@@ -24,7 +24,6 @@ from .RotationCurves import RotationCurves
 from .SimpleModel import SimpleModel
 from .SlowRDECosmology import SlowRDECosmology
 from .SplineLCDMCosmology import SplineLCDMCosmology
-from .StepCDMCosmology import StepCDMCosmology
 from .TiredLightDecorator import TiredLightDecorator
 from .wCDMCosmology import wCDMCosmology
 from .WeirdCDMCosmology import WeirdCDMCosmology
