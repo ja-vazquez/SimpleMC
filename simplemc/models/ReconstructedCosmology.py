@@ -8,24 +8,22 @@ from simplemc.cosmo.Parameter import Parameter
 import numpy as np
 
 class ReconstructedCosmology(LCDMCosmology):
-    def __init__(self, reconstuct='hub', kspline=1, nodes=7, fixOm=True):
+    def __init__(self, reconstuct='hubble', kspline=1, nodes=7, fixOm=True):
         """
-        This file implements serveral types of reconstruction techniques
-        for different functions, i.e. H(z), rho(z), w(z)
+        This file implements several types of reconstruction techniques
+        for different functions, i.e. H(z), rho(z), w(z), Q(z)
         """
 
         # select which function wants to reconstruct
-        self.select = 'hubble'
-
+        self.select = reconstuct
         self.kspline = kspline
-
         self.nnodes = nodes
+        
         self.zini = 0.0
         self.zend = 3.0
 
-        #this is useful when using MCMC
-        mean = 1
-        sigma = 0.2
+        #this is useful when using MCMC but not for nested
+        mean, sigma = 1, 0.2
         priors = (0.5, 15)
 
         self.pname = 'amp_'
