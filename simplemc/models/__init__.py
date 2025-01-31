@@ -32,4 +32,5 @@ from .wFourierCosmology import wFourierCosmology
 from .TanhCosmology import TanhCosmology 
 from .ChaplyginCosmology import ChaplyginCosmology
 from .HolographicCosmology import HolographicCosmology
+from .ReconstructedCosmology import ReconstructedCosmology
 #from .ePhiCDMCosmology import ePhiCosmology
