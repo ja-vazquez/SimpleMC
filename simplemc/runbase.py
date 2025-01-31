@@ -23,7 +23,6 @@ from .models import HolographicCosmology
 
 #Non-parametric functions
 from .models import ReconstructedCosmology
-from .models import SplineLCDMCosmology
 from .models import BinnedWCosmology
 from .models import CompressPantheon
 from .models import TanhCosmology
@@ -125,8 +124,6 @@ def ParseModel(model, **kwargs):
         T = TiredLightDecorator(PolyCDMCosmology())
     elif model == "Recon_cub":
         T = ReconstructedCosmology()
-    elif model == "Spline":
-        T = SplineLCDMCosmology()
     elif model == "DecayFrac":
         T = DecayLCDMCosmology()
     elif model == "Decay":
