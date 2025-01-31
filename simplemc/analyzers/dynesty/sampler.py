@@ -87,6 +87,10 @@ class Sampler(object):
     def __init__(self, loglikelihood, prior_transform, npdim, live_points,
                  update_interval, first_update, rstate,
                  queue_size, pool, use_pool):
+        #jav
+        #self.print_txt = "\rit: {} | ncall: {} | eff: {:.3f} | logz: {:.4f} | " \
+        #                 "dlogz: {:.4f} | loglstar: {:.4f} "
+
         self.print_txt = "\rit: {} | ncall: {} | eff: {:.3f} | logz: {:.4f} | " \
                          "dlogz: {:.4f} | loglstar: {:.4f} | point {}"
 
@@ -850,7 +854,8 @@ class Sampler(object):
                    save_bounds=True,
                    addDerived=False,
                    outputname="outputDynesty",
-                   simpleLike=None):
+                   simpleLike=None,
+                   print_params=True):
         """
         **A wrapper that executes the main nested sampling loop.**
         Iteratively replace the worst live point with a sample drawn
@@ -952,15 +957,20 @@ class Sampler(object):
             # Print progress.
             if print_progress:
                 # Writing weights, likes and samples in a text file for simplemc output.
+
                 # hack when DESY5 is running, but fix it later (jav)
                 #a number is added cause result is super small(negative) number
-
                 tmp = 1.0 if results[5]<-200 else 1
-                #print(' **', results[5]*tmp)
+
                 weights = np.exp(results[5]*tmp)
 
                 vstarstr = str(results[2]).lstrip('[').rstrip(']')
-                sys.stdout.write(self.print_txt.format(it, ncall, eff, logz, delta_logz, loglstar, vstarstr))
+
+                if print_params:
+                    sys.stdout.write(self.print_txt.format(it, ncall, eff, logz, delta_logz, loglstar, vstarstr))
+                else:
+                    sys.stdout.write(self.print_txt.format(it, ncall, eff, logz, delta_logz, loglstar, 0))
+
                 sys.stdout.flush()
 
                 if addDerived:
@@ -1053,6 +1063,8 @@ class Sampler(object):
 
             # Print progress.
             if print_progress:
+
+                #sys.stdout.write(self.print_txt.format(self.it + i, ncall, eff, logz, delta_logz, loglstar))
                 sys.stdout.write(self.print_txt.format(self.it+i, ncall, eff, logz,
                                                                        delta_logz, loglstar, vstar))
                 sys.stdout.flush()

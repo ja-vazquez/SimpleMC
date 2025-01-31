@@ -329,6 +329,7 @@ class DriverMC:
             nlivepoints = self.config.getint(       'nested', 'nlivepoints',  fallback=1024)
             accuracy    = self.config.getfloat(     'nested', 'accuracy',     fallback=0.01)
             nproc       = self.config.getint(       'nested', 'nproc',        fallback=1)
+            print_params= self.config.getboolean(   'nested', 'print_params', fallback=True)
 
             self.priortype = self.config.get('nested', 'priortype', fallback='u')
             #nsigma is the default value for sigma in gaussian priors
@@ -339,6 +340,7 @@ class DriverMC:
             nlivepoints = kwargs.pop('nlivepoints', 1024)
             accuracy    = kwargs.pop('accuracy',    0.01)
             nproc       = kwargs.pop('nproc', 1)
+            print_params= kwargs.pop('print_params', True)
 
             self.priortype = kwargs.pop('priortype', 'u')
             self.nsigma = kwargs.pop('sigma', 2)
@@ -383,7 +385,7 @@ class DriverMC:
                         bound=nestedType, sample = 'unif', nlive = nlivepoints,
                         pool = pool, queue_size=nprocess, use_pool={'loglikelihood': False})
             sampler.run_nested(dlogz=accuracy, outputname=self.outputpath,
-                               addDerived=self.addDerived, simpleLike=self.L)
+                               addDerived=self.addDerived, simpleLike=self.L, print_params=print_params)
             M = sampler.results
 
         try:
