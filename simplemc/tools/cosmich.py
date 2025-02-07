@@ -11,6 +11,7 @@ import numpy.fft as fft
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter1d
 from scipy.ndimage.filters import gaussian_filter
+import numpy as np
 
 
 # chains are col0: weight, col1:Likel, rest:params
@@ -31,7 +32,7 @@ def myloadtxt(fname, cols=None):
         else:
             bad.append(cline)
 
-    da = sp.array(da)
+    da = np.array(da)
     if (len(bad)):
         sys.exit("exit: BAD= format")
     return da
@@ -104,7 +105,7 @@ class cosmochain:
                 skip = 3
                 print("kirkby style ", end=' ')
                 cdata = open(fname).readlines()[skip:-1]
-                cdata = sp.array([[1, 0] + list(map(float, x.split()))
+                cdata = np.array([[1, 0] + list(map(float, x.split()))
                                for x in cdata])
             else:
                 da = myloadtxt(fname, cols=len(self.paramnames)+2)
@@ -130,7 +131,7 @@ class cosmochain:
                 cdata = da[skip:-1]
 
             data += list(cdata)
-        self.chain = sp.array(data)
+        self.chain = np.array(data)
 
         if weightfunc != None:
             print("Reweighting")
@@ -226,12 +227,12 @@ class cosmochain:
             if (tmp[ii] >= 0) and (tmp[ii] < nbins):
                 histo[tmp[ii]] += self.chain[ii, 0]
 
-        xval = sp.array([minval+(x+0.5)*step for x in range(nbins)])
+        xval = np.array([minval+(x+0.5)*step for x in range(nbins)])
         yval = histo/step
         #print(xval, minval, maxval, step)
 
         if smooth:
-            yvalpad = sp.array([0, 0, 0, 0]+list(yval)+[0, 0, 0, 0])
+            yvalpad = np.array([0, 0, 0, 0]+list(yval)+[0, 0, 0, 0])
             if smooth == 1:
                 yval = (yvalpad[3:nbins+3] + yvalpad[4:nbins+4] +
                         yvalpad[5:nbins+5])/3.0
@@ -309,7 +310,7 @@ class cosmochain:
         b = grid.flatten()
         b = b.tolist()
         b.sort(reverse=True)
-        b = sp.array(b)
+        b = np.array(b)
 
         c = b*1.0
         c = c.cumsum()
@@ -365,9 +366,9 @@ class cosmochain:
             lis = list(zip(self.chain[:, param], self.chain[:, 0]))
 
         lis.sort()
-        lis  = sp.array(lis)
-        pars = sp.array(lis[:, 0])
-        wei  = sp.array(lis[:, 1])
+        lis  = np.array(lis)
+        pars = np.array(lis[:, 0])
+        wei  = np.array(lis[:, 1])
         wei  = wei.cumsum()
         wei  = wei/wei[-1]
         lims = []
@@ -398,14 +399,14 @@ class cosmochain:
         sw  = 0.0
         for el in self.chain:  # [:100]:
             sw  += el[0]
-            vec  = sp.array([el[self.parcol[i]] for i in parlist])
+            vec  = np.array([el[self.parcol[i]] for i in parlist])
             mn  += vec*el[0]
-            cov += el[0]*sp.array([[v1*v2 for v1 in vec] for v2 in vec])
+            cov += el[0]*np.array([[v1*v2 for v1 in vec] for v2 in vec])
             # print cov[0,0], vec[0],sw
         mn  /= sw
         cov /= sw
 
-        cov -= sp.array([[v1*v2 for v1 in mn] for v2 in mn])
+        cov -= np.array([[v1*v2 for v1 in mn] for v2 in mn])
         return mn, cov
 
 
@@ -485,8 +486,8 @@ class cosmochain:
         sw = self.chain[:, 0].sum()
         lowl = [None]*len(lims)
         highl = [None]*len(lims)
-        lowtrig = 0.5- sp.array(lims)/2
-        hightrig = 0.5+ sp.array(lims)/2
+        lowtrig = 0.5- np.array(lims)/2
+        hightrig = 0.5+ np.array(lims)/2
 
         # print sw, hightrig
 
@@ -514,16 +515,16 @@ class cosmochain:
 
 def smline(x, y, mnmx):
     # first lets.pad
-    y = sp.log(y+1e-30)
+    y = np.log(y+1e-30)
     N = len(y)
-    y = sp.array([y[0]]*N+list(y)+[y[-1]]*N)
+    y = np.array([y[0]]*N+list(y)+[y[-1]]*N)
     rft = fft.rfft(y)
     Nx = len(rft)
     k = sp.linspace(0, 1, Nx)
-    rft *= sp.exp(-k*k/(2*0.2**2))
+    rft *= np.exp(-k*k/(2*0.2**2))
     y = fft.irfft(rft)
     y = y[N:2*N]
-    y = sp.exp(y)
+    y = np.exp(y)
     return x, y
 
 
@@ -531,7 +532,7 @@ def smline2(pic):
     Nx = len(pic[0])
     Ny = len(pic)
     picp = sp.zeros((3*Nx, 3*Ny))
-    picp[Nx:2*Nx, Ny:2*Ny] = sp.log(pic+1e-10)
+    picp[Nx:2*Nx, Ny:2*Ny] = np.log(pic+1e-10)
     rft = fft.rfft2(picp)
     Nxf = len(rft[0])
     Nyf = len(rft)
@@ -542,9 +543,9 @@ def smline2(pic):
         for j in range(Nyf):
             kx = i*1.0/(Nxf)
             ky = j*1.0/(Nyf)
-            k = sp.sqrt(kx*kx+ky*ky)
-            rft[j, i] *= sp.exp(-k*k/(0.1*3.0**2))
+            k = np.sqrt(kx*kx+ky*ky)
+            rft[j, i] *= np.exp(-k*k/(0.1*3.0**2))
     print(rft.sum())
     picp = fft.irfft2(rft)
-    pic = sp.exp(picp[Nx:2*Nx, Ny:2*Ny])
+    pic = np.exp(picp[Nx:2*Nx, Ny:2*Ny])
     return pic

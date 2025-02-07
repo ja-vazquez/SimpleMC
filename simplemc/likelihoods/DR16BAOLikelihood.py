@@ -29,7 +29,7 @@ class DR16BAOLikelihood(BaseLikelihood):
 
         self.rd = fidtheory.rd
         print("Loading ", values_filename)
-        da = sp.loadtxt(values_filename, usecols = (0,1,2,3))
+        da = np.loadtxt(values_filename, usecols = (0,1,2,3))
         self.zs    = da[:, 0]
         self.DM_DH = da[:, 1]
         self.sigma = da[:, 2]
@@ -39,7 +39,7 @@ class DR16BAOLikelihood(BaseLikelihood):
         cov = np.diag(np.square(self.sigma))
         assert(len(cov) == len(self.zs))
         vals, vecs = la.eig(cov)
-        vals = sorted(sp.real(vals))
+        vals = sorted(np.real(vals))
         print("Eigenvalues of cov matrix:", vals[0:3],'...',vals[-1])
         print("Adding marginalising constant")
         cov += 3**2
@@ -54,8 +54,8 @@ class DR16BAOLikelihood(BaseLikelihood):
                 tvec.append(self.theory_.HIOverrd(z))
             elif self.type[i]==3:
                 tvec.append(self.theory_.DVOverrd(z))
-        tvec = sp.array(tvec)
+        tvec = np.array(tvec)
         tvec += 0
         delta = tvec - self.DM_DH
-        return -sp.dot(delta, sp.dot(self.icov, delta))/2.0
+        return -np.dot(delta, np.dot(self.icov, delta))/2.0
 

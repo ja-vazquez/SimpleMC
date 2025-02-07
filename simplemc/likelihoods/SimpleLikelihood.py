@@ -6,6 +6,7 @@ from simplemc.setup_logger import logger
 import scipy.linalg as la
 import scipy as sp
 from simplemc.setup_logger import cdir
+import numpy as np
 
 
 # uncoment lines for use a covariance matrix
@@ -14,10 +15,10 @@ class SimpleLikelihood(BaseLikelihood):
         BaseLikelihood.__init__(self, name)
         # print("Loading ", values_filename)
         logger.info("Loading {}".format(values_filename))
-        data = sp.loadtxt(values_filename)
+        data = np.loadtxt(values_filename)
         self.xx  = data[:,0]
         self.yy  = data[:,1]
-        self.cov = sp.loadtxt(cov_filename,skiprows=0)
+        self.cov = np.loadtxt(cov_filename,skiprows=0)
         assert(len(self.cov) == len(self.xx))
         self.icov = la.inv(self.cov)
         self.fn = fn
@@ -25,16 +26,16 @@ class SimpleLikelihood(BaseLikelihood):
     def loglike(self):
         #delta is the difference between theory and data
         if self.fn == "generic":
-            tvec  = sp.array([self.theory_.genericModel(z) for z in self.xx])
+            tvec  = np.array([self.theory_.genericModel(z) for z in self.xx])
         elif self.fn == "h":
-            tvec = sp.array([100.0 * self.theory_.h * sp.sqrt(self.theory_.RHSquared_a(1.0 / (1 + z))) for z in self.xx])
+            tvec = np.array([100.0 * self.theory_.h * np.sqrt(self.theory_.RHSquared_a(1.0 / (1 + z))) for z in self.xx])
         elif self.fn == "fs8":
-            tvec = sp.array([self.theory_.fs8(z) for z in self.xx])
+            tvec = np.array([self.theory_.fs8(z) for z in self.xx])
         elif self.fn == "distance_mod":
-            tvec = sp.array([self.theory_.distance_modulus(z) for z in self.xx])
+            tvec = np.array([self.theory_.distance_modulus(z) for z in self.xx])
 
         delta = self.yy - tvec
-        return -0.5*sp.dot(delta, sp.dot(self.icov, delta))
+        return -0.5*np.dot(delta, np.dot(self.icov, delta))
 
 
 

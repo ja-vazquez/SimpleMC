@@ -6,6 +6,7 @@ from pyswarms.single.global_best import GlobalBestPSO
 #from pyswarms.utils.plotters import (plot_cost_history,plot_contour,plot_surface)
 
 import scipy as sp
+import numpy as np
 
 class PSO_optimizer():
     #explain some input params
@@ -21,7 +22,7 @@ class PSO_optimizer():
 
         self.params = like.freeParameters()
         self.vpars = [p.value for p in self.params]
-        self.sigma = sp.array([p.error for p in self.params])
+        self.sigma = np.array([p.error for p in self.params])
         self.bounds = [p.bounds for p in self.params]
         self.pso_bounds = list(zip(*self.bounds))
         print("Minimizing...", self.vpars, "with pso bounds", self.pso_bounds)

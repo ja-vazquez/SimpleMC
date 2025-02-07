@@ -4,10 +4,12 @@ numpy
 numdifftools
 matplotlib
 scipy
-sklearn
+scikit-learn
 deap
 mpi4py
 corner
 getdist
+pandas
+pyswarms
 fgivenx
 tqdm

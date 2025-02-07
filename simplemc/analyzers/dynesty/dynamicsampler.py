@@ -1842,7 +1842,7 @@ class AllDerived:
             sys.exit('Define derived parameter', parname)
 
     def compuAge(self, z):
-        return 1.0/((1+z)*100.0*self.like.theory_.h*sp.sqrt(self.like.theory_.RHSquared_a(1.0/(1+z))))
+        return 1.0/((1+z)*100.0*self.like.theory_.h*np.sqrt(self.like.theory_.RHSquared_a(1.0/(1+z))))
 
 class Derivedparam:
     def __init__(self, name, value, Ltxname=None):

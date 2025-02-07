@@ -3,6 +3,7 @@
 from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
 import scipy as sp
+import numpy as np
 from simplemc.setup_logger import cdir
 
 
@@ -23,10 +24,10 @@ class RotationCurvesLikelihood(BaseLikelihood):
         """
         BaseLikelihood.__init__(self,name)
         print("Loading ", values_filename)
-        data = sp.loadtxt(values_filename)
+        data = np.loadtxt(values_filename)
         self.xx  = data[:,0]
         self.yy  = data[:,1]
-        self.cov = sp.loadtxt(cov_filename,skiprows=0)
+        self.cov = np.loadtxt(cov_filename,skiprows=0)
         assert(len(self.cov) == len(self.xx))
         self.icov = la.inv(self.cov)
 
@@ -34,10 +35,10 @@ class RotationCurvesLikelihood(BaseLikelihood):
 
     def loglike(self):
         #delta is the difference between theory and data
-        tvec  = sp.array([self.theory_.rotation(r) for r in self.xx])
+        tvec  = np.array([self.theory_.rotation(r) for r in self.xx])
 
         delta = self.yy - tvec
-        return -0.5*sp.dot(delta, sp.dot(self.icov,delta))
+        return -0.5*np.dot(delta, np.dot(self.icov,delta))
 
 
 

@@ -40,7 +40,7 @@ class MaxLikeAnalyzer:
         self.outputname = outputname
         self.params = like.freeParameters()
         self.vpars = [p.value for p in self.params]
-        self.sigma = sp.array([p.error for p in self.params])
+        self.sigma = np.array([p.error for p in self.params])
         self.cov = None
         bounds = [p.bounds for p in self.params]
         print("Minimizing...", self.vpars, "with bounds", bounds)
@@ -74,7 +74,7 @@ class MaxLikeAnalyzer:
             print('Covariance matrix \n', self.cov)
             # set errors:
             for i, pars in enumerate(self.params):
-                pars.setError(sp.sqrt(self.cov[i, i]))
+                pars.setError(np.sqrt(self.cov[i, i]))
 
         # update with the final result
         self.opt_loglike = self.negloglike(self.res.x)

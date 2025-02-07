@@ -10,6 +10,7 @@
 import sys
 from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
+import numpy as np
 import scipy as sp
 
 print("DEPRECATED!")
@@ -19,12 +20,12 @@ sys.exit(1)
 class WangWangCMB (BaseLikelihood):
     def __init__(self, name, mean, err, cor):
         BaseLikelihood.__init__(self, name)
-        self.mean = sp.array(mean)
+        self.mean = np.array(mean)
         # wang and wang give correlation matrix
         # and errors and presumably we need to multipy
         # them back
-        err = sp.array(err)
-        cov = sp.array(cor)*sp.outer(err, err)
+        err = np.array(err)
+        cov = np.array(cor)*sp.outer(err, err)
         self.icov = la.inv(cov)
 
 
@@ -35,7 +36,7 @@ class WangWangCMB (BaseLikelihood):
 
     def loglike(self):
         delt = self.theory_.WangWangVec()-self.mean
-        return -sp.dot(delt, sp.dot(self.icov, delt))/2.0
+        return -np.dot(delt, np.dot(self.icov, delt))/2.0
 
 
 class PlanckLikelihood(WangWangCMB):

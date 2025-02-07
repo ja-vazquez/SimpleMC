@@ -23,12 +23,12 @@ class CompressedHDLikelihood(BaseLikelihood):
         """
         BaseLikelihood.__init__(self,name)
         print("Loading ",values_filename)
-        da = sp.loadtxt(values_filename)
+        da = np.loadtxt(values_filename)
         self.zs = da[:,0]
         self.Hs = da[:,1]
         self.errHz = da[:,2]
         print("Loading ", cov_filename)
-        cov = sp.loadtxt(cov_filename, skiprows=1)
+        cov = np.loadtxt(cov_filename, skiprows=1)
         assert(len(cov) == len(self.zs))
         if len(cov) == 15:
             filename = cdir+'/data/data_MM20.dat'
@@ -60,7 +60,7 @@ class CompressedHDLikelihood(BaseLikelihood):
             cov += 3 ** 2
 
         vals, vecs = la.eig(cov)
-        vals = sorted(sp.real(vals))
+        vals = sorted(np.real(vals))
         print("Eigenvalues of cov matrix:", vals[0:3],'...',vals[-1])
         print("Adding marginalising constant")
 
@@ -68,13 +68,13 @@ class CompressedHDLikelihood(BaseLikelihood):
 
 
     def loglike(self):
-        tvec = sp.array([100.0*self.theory_.h*sp.sqrt(self.theory_.RHSquared_a(1.0/(1+z))) for z in self.zs])
+        tvec = np.array([100.0*self.theory_.h*np.sqrt(self.theory_.RHSquared_a(1.0/(1+z))) for z in self.zs])
         #print tvec, self.Hs
         ## This is the factor that we need to correct
         ## note that in principle this shouldn't matter too much, we will marginalise over this
         tvec += 0
         delta = tvec - self.Hs
-        return -sp.dot(delta, sp.dot(self.icov, delta))/2.0
+        return -np.dot(delta, np.dot(self.icov, delta))/2.0
 
 
 class HubbleDiagram(CompressedHDLikelihood):

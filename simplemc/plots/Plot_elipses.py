@@ -29,8 +29,8 @@ def plot_elipses(best, cov, par1, par2, par1_Ltx='name_1', par2_Ltx='name_2', ax
             vec = vecs.T.copy()
 
             #plot vectors
-            vec[0]*=sp.sqrt(sig2*sp.real(vals[0]))
-            vec[1]*=sp.sqrt(sig2*sp.real(vals[1]))
+            vec[0]*=np.sqrt(sig2*np.real(vals[0]))
+            vec[1]*=np.sqrt(sig2*np.real(vals[1]))
 
             maxdot = '{}o'.format(contour_col)
             plt.plot(mn[par1], mn[par2],maxdot) #, label=self.model)
@@ -42,7 +42,7 @@ def plot_elipses(best, cov, par1, par2, par1_Ltx='name_1', par2_Ltx='name_2', ax
             theta = sp.degrees(np.arctan2(*vecs[:,0][::-1]))
 
             for i, sigs in enumerate(sigmas):
-                w, h = 2*sp.sqrt(vals)*sp.sqrt(sigs)
+                w, h = 2*np.sqrt(vals)*np.sqrt(sigs)
                 ell = Ellipse(xy=(mn[par1], mn[par2]),  width = w, height = h,\
                               angle=theta, color=contour_col,  lw=lw)
                 ell.set_facecolor('none')

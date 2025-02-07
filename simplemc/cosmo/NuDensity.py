@@ -7,6 +7,7 @@ from scipy import constants as ct
 from scipy.integrate import quad
 from scipy.special import zeta
 import scipy as sp
+import numpy as np
 #from numba import autojit
 
 
@@ -19,19 +20,19 @@ class NuIntegral:
     """
     def __init__(self):
         print("Initalizing nu density look up table...", end=' ')
-        rat  = 10**(sp.arange(-4, 5, 0.1))
+        rat  = 10**(np.arange(-4, 5, 0.1))
         intg = []
         for r in rat:
             # <in below is to supress the  overlow warning.
-            res = quad(lambda x: sp.sqrt(x**2 + r**2) /
-                       (sp.exp(min(x, 400)) + 1.0)*x**2, 0, 1000)
+            res = quad(lambda x: np.sqrt(x**2 + r**2) /
+                       (np.exp(min(x, 400)) + 1.0)*x**2, 0, 1000)
             intg.append(res[0]/(1+r))
-        intg = sp.array(intg)
+        intg = np.array(intg)
 
         # The right normalization.
         intg *= 7/8./intg[0]
 
-        self.interpolator = interp1d(sp.log(rat), intg)
+        self.interpolator = interp1d(np.log(rat), intg)
 
         # Type this into maple:
         # evalf(45*Zeta(3)/(2*Pi^4));  0.2776566337
@@ -65,7 +66,7 @@ class NuIntegral:
 
         # Return the integral for a given mass.
         else:
-            return self.interpolator(sp.log(mnuOT))*(1 + mnuOT)
+            return self.interpolator(np.log(mnuOT))*(1 + mnuOT)
 
 
 class ZeroNuDensity:
