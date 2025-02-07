@@ -3,6 +3,7 @@
 from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
 import scipy as sp
+import numpy as np
 from simplemc.setup_logger import cdir
 
 
@@ -23,14 +24,14 @@ class Compressedfs8Likelihood(BaseLikelihood):
         """
         BaseLikelihood.__init__(self,name)
         print("Loading ",values_filename)
-        da = sp.loadtxt(values_filename)
+        da = np.loadtxt(values_filename)
         self.zs  = da[:,0]
         self.fs8 = da[:,1]
         print("Loading ",cov_filename)
-        cov = sp.loadtxt(cov_filename,skiprows=1)
+        cov = np.loadtxt(cov_filename,skiprows=1)
         assert(len(cov) == len(self.zs))
         vals, vecs = la.eig(cov)
-        vals = sorted(sp.real(vals))
+        vals = sorted(np.real(vals))
         print("Eigenvalues of cov matrix:", vals[0:3],'...',vals[-1])
         print("Adding marginalising constant")
         cov += 3**2
@@ -38,9 +39,9 @@ class Compressedfs8Likelihood(BaseLikelihood):
 
 
     def loglike(self):
-        tvec = sp.array([self.theory_.fs8(z) for z in self.zs])
+        tvec = np.array([self.theory_.fs8(z) for z in self.zs])
         delta = tvec - self.fs8
-        return -sp.dot(delta, sp.dot(self.icov, delta))/2.0
+        return -np.dot(delta, np.dot(self.icov, delta))/2.0
 
 
 

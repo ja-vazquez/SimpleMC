@@ -34,7 +34,8 @@ import numpy as np
 import pandas as pd
 import sklearn as skl
 import statistics
-from sklearn.neighbors import NearestNeighbors, DistanceMetric
+from sklearn.neighbors import NearestNeighbors
+from sklearn.metrics import DistanceMetric
 import scipy.special as sp
 from numpy.linalg import inv
 from numpy.linalg import det

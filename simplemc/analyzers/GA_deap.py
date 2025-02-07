@@ -52,7 +52,7 @@ class GA_deap:
         self.outputname = outputname
         self.params = like.freeParameters()
         self.vpars = [p.value for p in self.params]
-        self.sigma = sp.array([p.error for p in self.params])
+        self.sigma = np.array([p.error for p in self.params])
         self.bounds = [p.bounds for p in self.params]
         print("Minimizing...", self.vpars, "with bounds", self.bounds)
         self.cov = None
@@ -147,7 +147,7 @@ class GA_deap:
 
             # set errors:
             #for i, pars in enumerate(self.params):
-            #    pars.setError(sp.sqrt(self.cov[i, i]))
+            #    pars.setError(np.sqrt(self.cov[i, i]))
         # update with the final result
         #self.result(self.negloglike(self.res.x))
 

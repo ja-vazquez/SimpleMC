@@ -2,7 +2,7 @@
 
 from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 import scipy as sp
-
+import numpy as np
 
 class CompositeLikelihood(BaseLikelihood):
     def __init__(self, llist=[]):
@@ -46,16 +46,16 @@ class CompositeLikelihood(BaseLikelihood):
 
 
     def compositeLogLikes(self):
-        return sp.array([like.loglike() for like in self.llist_])
+        return np.array([like.loglike() for like in self.llist_])
 
 
     def compositeLogLikes_wprior(self):
-        return sp.array([like.loglike() for like in self.llist_] + [self.theory_.prior_loglike()])
+        return np.array([like.loglike() for like in self.llist_] + [self.theory_.prior_loglike()])
 
 
     def loglike(self):
         likes = [like.loglike() for like in self.llist_]
-        return sp.array(likes).sum()
+        return np.array(likes).sum()
 
     # The base is good enough as
     # Everybody is holding the same reference

@@ -23,19 +23,19 @@ class StrongLensingLikelihood(BaseLikelihood):
         """
         BaseLikelihood.__init__(self,name)
         print("Loading ",values_filename)
-        da = sp.loadtxt(values_filename)
+        da = np.loadtxt(values_filename)
         self.zl = da[:,0]
         self.zs = da[:, 1]
         self.theta_E = da[:,2]
         self.sigma = da[:,4]
 
         print("Loading ", cov_filename)
-        cov = sp.loadtxt(cov_filename, skiprows=1)
+        cov = np.loadtxt(cov_filename, skiprows=1)
         assert(len(cov) == len(self.zs))
         cov += 3 ** 2
 
         vals, vecs = la.eig(cov)
-        vals = sorted(sp.real(vals))
+        vals = sorted(np.real(vals))
         print("Eigenvalues of cov matrix:", vals[0:3],'...',vals[-1])
         print("Adding marginalising constant")
 
@@ -45,12 +45,12 @@ class StrongLensingLikelihood(BaseLikelihood):
     def loglike(self):
         c = 3*10**5
         fact = (c**2)*(np.pi/(3600*180))/(4*np.pi)
-        tvec = sp.array([self.theory_.distance_ratio(zl0, zs0) for zl0, zs0 in zip(self.zl, self.zs)])
-        tobs = sp.array([fact*theta/sigma**2 for theta, sigma in zip(self.theta_E, self.sigma)])
+        tvec = np.array([self.theory_.distance_ratio(zl0, zs0) for zl0, zs0 in zip(self.zl, self.zs)])
+        tobs = np.array([fact*theta/sigma**2 for theta, sigma in zip(self.theta_E, self.sigma)])
 
         tvec += 0
         delta = tvec - tobs
-        loglike= -sp.dot(delta, sp.dot(self.icov, delta))/2.0
+        loglike= -np.dot(delta, np.dot(self.icov, delta))/2.0
         return loglike
 
 class StrongLensing(StrongLensingLikelihood):

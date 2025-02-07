@@ -4,6 +4,7 @@ from simplemc.cosmo import cosmoApprox as CA
 from simplemc.cosmo.BaseCosmology import BaseCosmology
 from simplemc.cosmo.RadiationAndNeutrinos import RadiationAndNeutrinos
 from simplemc.cosmo.paramDefs import Obh2_par, Om_par, h_par, mnu_par, Nnu_par
+import numpy as np
 
 
 
@@ -141,10 +142,10 @@ class LCDMCosmology(BaseCosmology, RadiationAndNeutrinos):
         omt    = Omh2/self.h**2
         zstar  = self.CA.z_lastscattering(Omh2, self.Obh2)
         Dastar = self.Da_z(zstar)*self.c_/(self.h*100)
-        R      = sp.sqrt(omt)*self.h*100*Dastar/self.c_
+        R      = np.sqrt(omt)*self.h*100*Dastar/self.c_
         la     = sp.pi*Dastar/self.CA.soundhorizon_star(Omh2, self.Obh2)
         # print la, R, self.Obh2
-        return sp.array([la, R, self.Obh2])
+        return np.array([la, R, self.Obh2])
 
 
     # this returns the "SimpleCMB" variables in a vec
@@ -152,4 +153,4 @@ class LCDMCosmology(BaseCosmology, RadiationAndNeutrinos):
         Ocbh2  = self.Ocb*self.h**2
         zstar  = 1090
         Dastar = self.Da_z(zstar)*self.c_/(self.h*100)
-        return sp.array([self.Obh2, Ocbh2, Dastar/self.rd])
+        return np.array([self.Obh2, Ocbh2, Dastar/self.rd])
