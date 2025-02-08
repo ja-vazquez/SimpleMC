@@ -7,10 +7,6 @@ import scipy as sp
 import numpy as np
 import sys
 
-try:
-    import numdifftools as nd
-except:
-    sys.exit('install numdifftools')
 
 class MaxLikeAnalyzer:
     """
@@ -40,13 +36,16 @@ class MaxLikeAnalyzer:
         self.outputname = outputname
         self.params = like.freeParameters()
         self.vpars = [p.value for p in self.params]
+        self.npars = [p.name for p in self.params]
         self.sigma = sp.array([p.error for p in self.params])
         self.cov = None
         bounds = [p.bounds for p in self.params]
-        print("Minimizing...", self.vpars, "with bounds", bounds)
+        print("Minimizing...", self.npars, "starting", self.vpars,  "with bounds", bounds)
 
         self.res = minimize(self.negloglike, self.vpars, bounds=bounds, method='L-BFGS-B')
-        print(self.res, 'with Errors =', compute_errors)
+        print(self.res)
+        with open('{}.maxlike'.format(self.outputname), 'w') as f:
+            np.savetxt(f, self.res.x, fmt='%.4e', delimiter=',')
 
         if compute_derived:
             for par, val in zip(self.params, self.res.x):
@@ -57,34 +56,35 @@ class MaxLikeAnalyzer:
             for der_par in AllDerived().listDerived(self.like):
                 print(der_par.name, ': ', der_par.value)
             print('--'*20)
-            # for errors, consider the df = J cov_x J^t
 
-        hess = nd.Hessian(self.negloglike, step=self.sigma*0.01)(self.res.x)
-        eigvl, eigvc = la.eig(hess)
-        print('Hessian', hess, eigvl, )
-        self.cov = la.inv(hess)
-            
-        with open('{}.maxlike'.format(self.outputname), 'w') as f:
-            np.savetxt(f, self.res.x, fmt='%.4e', delimiter=',')
+        # for errors, consider the df = J cov_x J^t
+        if compute_errors:
+            try:
+                import numdifftools as nd
+            except:
+                sys.exit("*'error': Install numdifftools to compute errors.")
 
-        with open('{}.cov'.format(self.outputname), 'w') as f:
-            np.savetxt(f, self.cov, fmt='%.4e', delimiter=',')
+            hess = nd.Hessian(self.negloglike, step=self.sigma*0.01)(self.res.x)
+            eigvl, eigvc = la.eig(hess)
+            print('Hessian', hess)
+            print('Eigen vals', eigvl)
+            print('Eigen vecs', eigvc)
 
-        if (compute_errors):
+            self.cov = la.inv(hess)
             print('Covariance matrix \n', self.cov)
             # set errors:
             for i, pars in enumerate(self.params):
                 pars.setError(sp.sqrt(self.cov[i, i]))
 
-        # update with the final result
-        self.opt_loglike = self.negloglike(self.res.x)
-        self.result()
+            with open('{}.cov'.format(self.outputname), 'w') as f:
+                np.savetxt(f, self.cov, fmt='%.4e', delimiter=',')
 
-        if show_contours and compute_errors:
-            param_names = [par.name for par in self.params]
-            if (plot_param1 in param_names) and (plot_param2 in param_names):
-                idx_param1 = param_names.index(plot_param1)
-                idx_param2 = param_names.index(plot_param2)
+
+        if compute_errors and show_contours:
+            pnames = [par.name for par in self.params]
+            if (plot_param1 in pnames) and (plot_param2 in pnames):
+                idx_param1 = pnames.index(plot_param1)
+                idx_param2 = pnames.index(plot_param2)
             else:
                 sys.exit('\n Not a base parameter, derived-errors still on construction')
 
@@ -92,6 +92,11 @@ class MaxLikeAnalyzer:
             ax = fig.add_subplot(111)
             plot_elipses(self.res.x, self.cov, idx_param1, idx_param2, ax=ax)
             plt.show()
+
+        # update with the final result
+        self.opt_loglike = self.negloglike(self.res.x)
+        self.result()
+
 
     def negloglike(self, x):
         for i, pars in enumerate(self.params):
@@ -104,6 +109,7 @@ class MaxLikeAnalyzer:
         else:
             self.lastval = -loglike
             return -loglike
+
 
     def result(self):
         print ("------")

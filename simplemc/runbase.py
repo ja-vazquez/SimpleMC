@@ -52,10 +52,8 @@ from .likelihoods.Compressedfs8Likelihood import fs8Diagram
 from .likelihoods.HubbleParameterLikelihood import RiessH0, RiessH0_21
 
 from .likelihoods.StrongLensingLikelihood import StrongLensing
-from .likelihoods.WangWangCMB import PlanckLikelihood
 
-from .likelihoods.SimpleLikelihood import GenericLikelihood
-from .likelihoods.SimpleLikelihood import StraightLine
+from .likelihoods.SimpleLikelihood import GenericLikelihood, StraightLine
 from .likelihoods.RotationCurvesLikelihood import RotationCurvesLike
 
 #Importance Sampling
@@ -287,6 +285,7 @@ def ParseDataset(datasets, **kwargs):
         elif name == 'PLK18':
             L.addLikelihood(PLK18())
         elif name == 'PLK_Wang':
+            from .likelihoods.WangWangCMB import PlanckLikelihood
             L.addLikelihood(PlanckLikelihood())
         elif name == 'WMAP9':
             L.addLikelihood(WMAP9())

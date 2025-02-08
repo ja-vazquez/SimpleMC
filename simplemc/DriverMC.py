@@ -1,12 +1,6 @@
 
 #TODO check: if self.analyzername is None
 
-from .analyzers import MaxLikeAnalyzer
-from .analyzers import GA_deap
-from .analyzers import PSO_optimizer
-from .analyzers import MCMCAnalyzer
-from .analyzers import DynamicNestedSampler, NestedSampler
-#from .analyzers import EnsembleSampler
 from .cosmo.Derivedparam import AllDerived
 from .setup_logger import logger
 from .runbase import ParseDataset, ParseModel
@@ -48,7 +42,7 @@ class DriverMC:
 
         analyzername : str
             The name of the analyzer. It can be a sampler: {mcmc, nested, emcee}
-            or a optimizer: {maxlike, ga_deap}
+            or an optimizer: {maxlike, ga_deap}
 
         compute_derived : bool
             True generates at the flight some derived parameters (such as
@@ -245,6 +239,9 @@ class DriverMC:
             estimates bayesian evidence throug MCEvidence (arXiv:1704.03472).
 
         """
+
+        from simplemc.analyzers.MCMCAnalyzer import MCMCAnalyzer
+
         if iniFile:
             nsamp    = self.config.getint(      'mcmc', 'nsamp',   fallback=50000)
             skip     = self.config.getint(      'mcmc', 'skip',    fallback=300)
@@ -369,6 +366,7 @@ class DriverMC:
         ti = time.time()
 
         if dynamic:
+            from simplemc.analyzers.dynesty import DynamicNestedSampler
             logger.info("\nUsing dynamic nested sampling...")
             sampler = DynamicNestedSampler(self.logLike, self.priorTransform,
                                            self.dims, bound=nestedType, pool=pool,
@@ -381,6 +379,7 @@ class DriverMC:
 
 
         else:
+            from simplemc.analyzers.dynesty import NestedSampler
             sampler = NestedSampler(self.logLike, self.priorTransform, self.dims,
                         bound=nestedType, sample = 'unif', nlive = nlivepoints,
                         pool = pool, queue_size=nprocess, use_pool={'loglikelihood': False})
@@ -425,6 +424,9 @@ class DriverMC:
             Number of processors in order to parallelise.
 
         """
+
+        from simplemc.analyzers.emcee import EnsembleSampler
+
         if iniFile:
             walkers = self.config.getint('emcee', 'walkers', fallback=self.dims*2+2)
             nsamp   = self.config.getint('emcee', 'nsamp', fallback=10000)
@@ -504,6 +506,9 @@ class DriverMC:
             Second parameter to plot.
 
         """
+
+        from simplemc.analyzers.MaxLikeAnalyzer import  MaxLikeAnalyzer
+
         if self.analyzername is None:
             self.analyzername = 'maxlike'
         self.outputpath = '{}_{}_optimization'.format(self.outputpath, self.analyzername)
@@ -546,6 +551,9 @@ class DriverMC:
         Genetic algorithms from Deap library.
 
         """
+
+        from simplemc.analyzers.GA_deap import GA_deap
+
         if self.analyzername is None: self.analyzername = 'ga_deap'
         self.outputpath = '{}_{}'.format(self.outputpath, self.analyzername)
         self.outputChecker()
@@ -597,6 +605,7 @@ class DriverMC:
         """"
         Particle Swarm Optimization from PySwarm
         """
+        from simplemc.analyzers.PSO_optimizer import PSO_optimizer
 
         if self.analyzername is None: self.analyzername = 'pso'
         self.outputpath = '{}_{}'.format(self.outputpath, self.analyzername)
