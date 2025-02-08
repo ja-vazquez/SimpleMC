@@ -52,6 +52,7 @@ from .likelihoods.Compressedfs8Likelihood import fs8Diagram
 from .likelihoods.HubbleParameterLikelihood import RiessH0, RiessH0_21
 
 from .likelihoods.StrongLensingLikelihood import StrongLensing
+from .likelihoods.WangWangCMB import PlanckLikelihood
 
 from .likelihoods.SimpleLikelihood import GenericLikelihood
 from .likelihoods.SimpleLikelihood import StraightLine
@@ -122,7 +123,7 @@ def ParseModel(model, **kwargs):
         T = WeirdCDMCosmology()
     elif model == "TLight":
         T = TiredLightDecorator(PolyCDMCosmology())
-    elif model == "Recon_cub":
+    elif model == "Recon":
         T = ReconstructedCosmology()
     elif model == "DecayFrac":
         T = DecayLCDMCosmology()
@@ -285,6 +286,8 @@ def ParseDataset(datasets, **kwargs):
             L.addLikelihood(PLK15())
         elif name == 'PLK18':
             L.addLikelihood(PLK18())
+        elif name == 'PLK_Wang':
+            L.addLikelihood(PlanckLikelihood())
         elif name == 'WMAP9':
             L.addLikelihood(WMAP9())
         elif name == 'PlRd':
@@ -296,8 +299,6 @@ def ParseDataset(datasets, **kwargs):
         elif name == 'PlRdx10':
             L.addLikelihood(LikelihoodMultiplier(
                 PLK(kill_Da=True), 100.0))
-        elif name == 'CMBW':
-            L.addLikelihood(WMAP9())
         elif name == 'Pantheon':
             L.addLikelihood(PantheonSN())
         elif name == 'BPantheon':

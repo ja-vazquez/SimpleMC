@@ -13,7 +13,7 @@ import scipy.linalg as la
 import scipy as sp
 
 print("DEPRECATED!")
-sys.exit(1)
+#sys.exit(1)
 
 
 class WangWangCMB (BaseLikelihood):
@@ -69,7 +69,7 @@ class PlanckLikelihood(WangWangCMB):
                    [-0.53470863, -0.71007217,  1.]]
 
         else:
-            print("Basd mtrices param")
+            print("Bad matrices param")
             sys.exit(1)
 
         WangWangCMB.__init__(self, "CMB_WW_"+matrices, mean, err, cov)

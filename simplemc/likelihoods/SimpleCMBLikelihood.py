@@ -49,6 +49,15 @@ class SimpleCMBLikelihood(BaseLikelihood):
         return -sp.dot(delt, sp.dot(self.icov, delt))/2.0
 
 
+class WMAP9(SimpleCMBLikelihood):
+    def __init__(self, kill_Da=False, kill_rd=False):
+        mean = sp.array([2.25946978e-02,   1.35359318e-01,   9.45118918e+01])
+        cov  = sp.array([[2.86459327e-07,  -4.80929954e-07,  -1.11081266e-05],
+                        [-4.80929954e-07,   1.90757225e-05,   7.49542945e-06],
+                        [-1.11081266e-05,   7.49542945e-06,   2.54207102e-02]])
+        name = "SWMAP"
+        SimpleCMBLikelihood.__init__(self, name, mean, cov, kill_Da, kill_rd)
+
 
 class PLK(SimpleCMBLikelihood):
     def __init__(self, kill_Da= False, kill_rd= False):
@@ -61,36 +70,27 @@ class PLK(SimpleCMBLikelihood):
 
 
 
-                #Calibrated with plikHM_TTTEEE_lowTEB
+#Calibrated with plikHM_TTTEEE_lowTEB
 class PLK15(SimpleCMBLikelihood):
     def __init__(self, kill_Da= False, kill_rd= False):
         mean = sp.array([2.24001583e-02,   1.40200580e-01,   9.44043640e+01 ])
         cov = sp.array([[3.02751758e-08,  -1.54495460e-07,   4.26868164e-06],
-                 [ -1.54495460e-07,   2.16079050e-06,  -1.49955437e-05 ],
-                 [ 4.26868164e-06,  -1.49955437e-05,   1.30349464e-03  ]])
+                        [-1.54495460e-07,   2.16079050e-06,  -1.49955437e-05],
+                        [4.26868164e-06,  -1.49955437e-05,   1.30349464e-03]])
         name = "SPlanck_15"
         SimpleCMBLikelihood.__init__(self,name,mean,cov, kill_Da, kill_rd)
 
 
-#Calibrated with plikHM_TTTEEE_lowTEB
+#Calibrated with
 class PLK18(SimpleCMBLikelihood):
     def __init__(self, kill_Da= False, kill_rd= False):
         mean = sp.array([2.23619584e-02,   1.425557737e-01,   9.43342292580e+01])
-        cov = sp.array([[ 2.2280476e-08,  -9.5339119e-08,  -1.5060900e-06],
-                 [ -9.5339119e-08,   1.6369370e-06,   1.1826342e-05],
-                 [ -1.5060900e-06,   1.1826342e-05,   7.9308203e-04 ]])
+        cov = sp.array([[2.2280476e-08,  -9.5339119e-08,  -1.5060900e-06],
+                        [-9.5339119e-08,   1.6369370e-06,   1.1826342e-05],
+                        [-1.5060900e-06,   1.1826342e-05,   7.9308203e-04]])
         name = "SPlanck_18"
         SimpleCMBLikelihood.__init__(self,name,mean,cov, kill_Da, kill_rd)
 
-
-class WMAP9(SimpleCMBLikelihood):
-    def __init__(self, kill_Da=False, kill_rd=False):
-        mean = sp.array([2.25946978e-02,   1.35359318e-01,   9.45118918e+01])
-        cov  = sp.array([[2.86459327e-07,  -4.80929954e-07,  -1.11081266e-05],
-                        [-4.80929954e-07,   1.90757225e-05,   7.49542945e-06],
-                        [-1.11081266e-05,   7.49542945e-06,   2.54207102e-02]])
-        name = "SWMAP"
-        SimpleCMBLikelihood.__init__(self, name, mean, cov, kill_Da, kill_rd)
 
 
 
