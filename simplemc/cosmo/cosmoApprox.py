@@ -11,7 +11,7 @@ import sys
 Tcmb = 2.7255
 
 
-def z_lastscattering(self, wm, wb):
+def z_lastscattering(wm, wb):
     """
     z_lastscattering(self,wm,wb):
     Returns z_LS from Hu & White, DampingTail paper.
@@ -33,19 +33,19 @@ def z_drag(self, wm, wb):
     return(zd)
 
 
-def soundhorizon_star(self, wm, wb):
+def soundhorizon_star(wm, wb):
     """
     soundhorizon_star(self,wm,wb):
     A fit to the sound horizon, in Mpc, from Eistenstein & Hu (1998;
     ApJ, 496, 605), Eqs. 2-6, except using z_lastscattering not zdrag.
     """
-    zeq = 2.50e4*wm*(self.Tcmb/2.7)**(-4)
-    keq = 7.46e-2*wm*(self.Tcmb/2.7)**(-2)      # In 1/Mpc.
+    zeq = 2.50e4*wm*(Tcmb/2.7)**(-4)
+    keq = 7.46e-2*wm*(Tcmb/2.7)**(-2)      # In 1/Mpc.
     b1 = 0.313*wm**(-0.419)*(1 + 0.607*wm**0.674)
     b2 = 0.238*wm**0.223
-    zd = self.z_lastscattering(wm, wb)
-    Rs = 31.5*wb*(self.Tcmb/2.7)**(-4)*(1e3/zd)
-    Req = 31.5*wb*(self.Tcmb/2.7)**(-4)*(1e3/zeq)
+    zd = z_lastscattering(wm, wb)
+    Rs = 31.5*wb*(Tcmb/2.7)**(-4)*(1e3/zd)
+    Req = 31.5*wb*(Tcmb/2.7)**(-4)*(1e3/zeq)
     s = 2./3./keq*(6./Req)**0.5 *\
         N.log((N.sqrt(1 + Rs) + N.sqrt(Rs+Req))/(1 + Req**0.5))
     return(s)
@@ -82,6 +82,8 @@ def rd_anderson_approx(obh2, ocbh2, onuh2, Nnu):
 
 
 def rd_cuesta_approx(obh2, ocbh2, onuh2, Nnu):
+    # Eqn (16) of arXiv:1411.1074v3
+    # Cosmological implications of baryon acoustic oscillation (BAO) measurements.
     if (abs(Nnu-3) > 0.1):
         print("ERROR, Tony Cuesta says: 'not in this cereal box.'")
         print("Nnu=", Nnu)
@@ -91,6 +93,9 @@ def rd_cuesta_approx(obh2, ocbh2, onuh2, Nnu):
 
 
 def rd_cuesta_Nnu_approx(obh2, ocbh2, onuh2, Nnu):
+    # Eqn (17) of arXiv:1411.1074v3
+    # Cosmological implications of baryon acoustic oscillation (BAO) measurements.
+    # 56.067*30.60
     return 1715.43/(ocbh2)**0.2436/obh2**0.128876/(Nnu-3.046+30.6)/N.exp(49.7*(onuh2+0.002)**2)
 
 
@@ -100,3 +105,9 @@ def rd_EH_approx(obh2, ocbh2, onuh2, Nnu):
         print("Nnu=", Nnu)
         sys.exit(1)
     return soundhorizon_eh(ocbh2, obh2, Nnu)
+
+
+def rd_Brieden_approx(obh2, ocbh2, onuh2, Nnu):
+    # arXiv:2212.04522v2
+    rd =147.05*(ocbh2/0.1432)**(-0.23)*(Nnu/3.04)**(-0.1)*(obh2/0.02236)**(-0.13)
+    return rd

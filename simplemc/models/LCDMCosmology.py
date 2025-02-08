@@ -34,15 +34,18 @@ class LCDMCosmology(BaseCosmology, RadiationAndNeutrinos):
 
     """
     # possible options: "Anderson", "Cuesta", "CuestaNeff", "EH"
-    rd_approx = "Cuesta"
+    #rd_approx = "Cuesta"
 
     def __init__(self, Obh2=Obh2_par.value, Om=Om_par.value, h=h_par.value, mnu=mnu_par.value,
-                 Nnu=Nnu_par.value, degenerate_nu=False, disable_radiation=False, fixOm=False):
+                        Nnu=Nnu_par.value, degenerate_nu=False, disable_radiation=False,
+                        fixOm=False, rd_approx='Cuesta'):
 
         # two parameters: Om and h
         self.Om    = Om
         self.Obh2  = Obh2
         self.fixOm = fixOm
+
+        self.rd_approx = rd_approx
 
         BaseCosmology.__init__(self, h)
         RadiationAndNeutrinos.__init__(
@@ -57,6 +60,8 @@ class LCDMCosmology(BaseCosmology, RadiationAndNeutrinos):
             self.rd_func_ = CA.rd_cuesta_Nnu_approx
         elif (self.rd_approx == "EH"):
             self.rd_func_ = CA.rd_EH_approx
+        elif (self.rd_approx == "Brieden"):
+            self.rd_func_ = CA.rd_Brieden_approx
         else:
             print("Bad rd Approx specified")
             sys.exit(1)
@@ -139,10 +144,10 @@ class LCDMCosmology(BaseCosmology, RadiationAndNeutrinos):
     def WangWangVec(self):
         Omh2   = self.Ocb*self.h**2+self.Omnuh2
         omt    = Omh2/self.h**2
-        zstar  = self.CA.z_lastscattering(Omh2, self.Obh2)
+        zstar  = CA.z_lastscattering(Omh2, self.Obh2)
         Dastar = self.Da_z(zstar)*self.c_/(self.h*100)
         R      = sp.sqrt(omt)*self.h*100*Dastar/self.c_
-        la     = sp.pi*Dastar/self.CA.soundhorizon_star(Omh2, self.Obh2)
+        la     = sp.pi*Dastar/CA.soundhorizon_star(Omh2, self.Obh2)
         # print la, R, self.Obh2
         return sp.array([la, R, self.Obh2])
 
