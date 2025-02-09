@@ -64,7 +64,7 @@ class MaxLikeAnalyzer:
             except:
                 sys.exit("*'error': Install numdifftools to compute errors.")
 
-            hess = nd.Hessian(self.negloglike, step=self.sigma*0.01)(self.res.x)
+            hess = nd.Hessian(self.negloglike, step=self.sigma*0.05)(self.res.x)
             eigvl, eigvc = la.eig(hess)
             print('Hessian', hess)
             print('Eigen vals', eigvl)
@@ -90,7 +90,12 @@ class MaxLikeAnalyzer:
 
             fig = plt.figure(figsize=(6, 6))
             ax = fig.add_subplot(111)
-            plot_elipses(self.res.x, self.cov, idx_param1, idx_param2, ax=ax)
+            plot_elipses(self.res.x, self.cov, idx_param1, idx_param2,
+                         self.params[idx_param1].name, self.params[idx_param2].name, ax=ax)
+            #ax.set_xlim([0.1, 0.5])
+            #ax.set_ylim([-0.3, 0.3])
+            #plt.axhline(y=0.0)
+            plt.savefig('plot_test.pdf')
             plt.show()
 
         # update with the final result

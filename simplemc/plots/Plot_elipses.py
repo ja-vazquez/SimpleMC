@@ -4,8 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_elipses(best, cov, par1, par2, par1_Ltx='name_1', par2_Ltx='name_2', ax=None, contour_col='g',
-                 axis_sty='-r', lw=4, label='Fisher', addtxt=None):
+def plot_elipses(best, cov, par1, par2, par1_Ltx='name_1', par2_Ltx='name_2',
+                 ax=None, contour_col='g', axis_sty='-r', lw=4, label='Fisher',
+                 addtxt=None):
             #fig = plt.figure(figsize=(6,6))
             #ax = fig.add_subplot(111) #, aspect='equal')
 
@@ -25,7 +26,7 @@ def plot_elipses(best, cov, par1, par2, par1_Ltx='name_1', par2_Ltx='name_2', ax
                 return vals[order], vecs[:,order]
 
             vals, vecs = eigsorted(covslice)
-            print('-- vals, vecs -- ', vals, vecs)
+            #print('-- vals, vecs -- ', vals, vecs)
             vec = vecs.T.copy()
 
             #plot vectors
@@ -58,6 +59,7 @@ def plot_elipses(best, cov, par1, par2, par1_Ltx='name_1', par2_Ltx='name_2', ax
             plt.grid()
             #ax.set_xlim([-1.2, -0.6])
             #ax.set_ylim([-1.5, 1.0])
+            #plt.axhline(y=0.0)
             #plt.savefig('GA_fisher.pdf')
             #plt.legend(loc='best')
             #plt.title('Fisher', fon    tsize=10)
