@@ -38,7 +38,7 @@ class LCDMCosmology(BaseCosmology, RadiationAndNeutrinos):
 
     def __init__(self, Obh2=Obh2_par.value, Om=Om_par.value, h=h_par.value, mnu=mnu_par.value,
                         Nnu=Nnu_par.value, degenerate_nu=False, disable_radiation=False,
-                        fixOm=False, rd_approx='Cuesta'):
+                        fixOm=False, rd_approx='Brieden'):
 
         # two parameters: Om and h
         self.Om    = Om
