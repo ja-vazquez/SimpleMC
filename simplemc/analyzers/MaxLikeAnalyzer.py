@@ -38,11 +38,11 @@ class MaxLikeAnalyzer:
         self.vpars = [p.value for p in self.params]
         self.npars = [p.name for p in self.params]
         self.sigma = sp.array([p.error for p in self.params])
+        self.bounds = [p.bounds for p in self.params]
         self.cov = None
-        bounds = [p.bounds for p in self.params]
-        print("Minimizing...", self.npars, "starting", self.vpars,  "with bounds", bounds)
 
-        self.res = minimize(self.negloglike, self.vpars, bounds=bounds, method='L-BFGS-B')
+        print("Minimizing...", self.npars, "starting", self.vpars,  "with bounds", self.bounds)
+        self.res = minimize(self.negloglike, self.vpars, bounds=self.bounds, method='L-BFGS-B')
         print(self.res)
         with open('{}.maxlike'.format(self.outputname), 'w') as f:
             np.savetxt(f, self.res.x, fmt='%.4e', delimiter=',')
@@ -95,7 +95,7 @@ class MaxLikeAnalyzer:
             #ax.set_xlim([0.1, 0.5])
             #ax.set_ylim([-0.3, 0.3])
             #plt.axhline(y=0.0)
-            plt.savefig('plot_test.pdf')
+            plt.savefig('ma_plot.pdf')
             plt.show()
 
         # update with the final result
