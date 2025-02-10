@@ -2,31 +2,30 @@
 #TODO make processes a variable
 #TODO check/change select, mate, mutate
 
-import scipy as sp
-import numpy as np
-import matplotlib.pyplot as plt
-import multiprocessing
 
 from simplemc.plots.Plot_elipses import plot_elipses
+import matplotlib.pyplot as plt
+import scipy.linalg as la
+import multiprocessing
+import scipy as sp
+import numpy as np
+import random
+import sys
 
 try:
     # Importamos libreria de algoritmos evolutivos
     from deap import base, creator, tools, algorithms
 except:
-    import warnings
-    warnings.warn("Please install DEAP library if you want to use ga_deap genetic algorithms.")
+    sys.exit("*error: Install DEAP library to use genetic algorithms (ga_deap).")
 
-# We import an independent module to implement elitism in the GA.
+# We import an independent module for elitism in the GA.
 from simplemc.analyzers import elitism
 
-import scipy.linalg as la
-
-import random
-import sys
 try:
     import numdifftools as nd
 except:
-    sys.exit('install numdifftools')
+    pass
+    #sys.exit('install numdifftools')
 
 class GA_deap:
     """
@@ -42,20 +41,22 @@ class GA_deap:
 
     """
     def __init__(self, like, model, outputname='deap_output',
-                 population=20, crossover=0.7,
-                 mutation=0.3, max_generation=20, hof_size=1,
-                 crowding_factor=1, plot_fitness=False,
+                 population=20, crossover=0.7, mutation=0.3, max_generation=20,
+                 hof_size=1, crowding_factor=1, plot_fitness=False,
                  compute_errors=False, show_contours=False,
-                 plot_param1=None, plot_param2=None):
+                 plot_param1=None, plot_param2=None, sharing=False):
+
         self.like = like
         self.model = model
         self.outputname = outputname
         self.params = like.freeParameters()
         self.vpars = [p.value for p in self.params]
+        self.npars = [p.name for p in self.params]
         self.sigma = sp.array([p.error for p in self.params])
         self.bounds = [p.bounds for p in self.params]
-        print("Minimizing...", self.vpars, "with bounds", self.bounds)
         self.cov = None
+
+        print("Minimizing...", self.npars, "starting", self.vpars,  "with bounds", self.bounds)
 
         self.plot_fitness = plot_fitness
         self.compute_errors = compute_errors
@@ -76,7 +77,7 @@ class GA_deap:
         self.DIMENSIONS = len(self.params)        # number of dimensions
         self.BOUND_LOW, self.BOUND_UP = 0.0, 1.0  # boundaries for all dimensions
 
-        self.sharing = False
+        self.sharing = sharing
         if self.sharing:
             # sharing constants:
             DISTANCE_THRESHOLD = 0.1
@@ -84,11 +85,10 @@ class GA_deap:
 
 
 
-    def main(self):
+    def main(self, pool):
         toolbox = self.GA()
         
         # using multiprocess
-        pool = multiprocessing.Pool(processes = 3)
         toolbox.register("map", pool.map)
 
         # create initial population (generation 0):
@@ -107,8 +107,8 @@ class GA_deap:
         hof = tools.HallOfFame(self.HALL_OF_FAME_SIZE)
 
         # perform the Genetic Algorithm flow with elitism:
-        population, logbook, gens = elitism.eaSimpleWithElitism(population, toolbox, cxpb=self.P_CROSSOVER,\
-                                                              mutpb=self.P_MUTATION, ngen=self.MAX_GENERATIONS,\
+        population, logbook, gens = elitism.eaSimpleWithElitism(population, toolbox, cxpb=self.P_CROSSOVER,
+                                                              mutpb=self.P_MUTATION, ngen=self.MAX_GENERATIONS,
                                                               stats=stats, halloffame=hof, verbose=True,
                                                               outputname=self.outputname, bounds=self.bounds)
 
@@ -117,41 +117,46 @@ class GA_deap:
         print("-- Best Fitness = ", best.fitness.values[0])
         print("- Best solutions are:")
         best_params = [self.change_prior(i, x) for i, x in enumerate(best)]
-        # res = [""]
+
         for i, x in enumerate(best_params):
             print("-- Best %s = "%self.params[i].name , x)
             # res.append("{}: {:.5f}".format(self.params[i].name, x))
         # res.append("Best Fitness: {:.5f}".format(best.fitness.values[0]))
 
-
         #for i in range(self.HALL_OF_FAME_SIZE):
         #    print(i, ": ", hof.items[i].fitness.values[0], " -> ", self.old_prior(i, hof.items[i]) )
-
-        if self.plot_fitness:
-            self.plotting(population, logbook, hof)
-
-        hess = nd.Hessian(self.negloglike2, step=self.sigma*0.01)(best_params)
-        eigvl, eigvc = la.eig(hess)
-        print('Hessian', hess, eigvl)
-        self.cov = la.inv(hess)
-        print('Covariance matrix \n', self.cov)
 
         with open('{}.maxlike'.format(self.outputname), 'w') as f:
             np.savetxt(f, best_params, fmt='%.4e', delimiter=',')
 
-        with open('{}.cov'.format(self.outputname), 'w') as f:
-            np.savetxt(f, self.cov, fmt='%.4e', delimiter=',')
+        if self.plot_fitness:
+            self.plotting(population, logbook, hof)
 
-        
-        # if self.compute_errors:
+        if self.compute_errors:
+            try:
+                import numdifftools as nd
+            except:
+                sys.exit("*'error': Install numdifftools to compute errors.")
 
+            hess = nd.Hessian(self.negloglike2, step=self.sigma*0.05)(best_params)
+            eigvl, eigvc = la.eig(hess)
+            print('Hessian', hess)
+            print('Eigen vals', eigvl)
+            print('Eigen vecs', eigvc)
+
+            self.cov = la.inv(hess)
+            print('Covariance matrix \n', self.cov)
             # set errors:
-            #for i, pars in enumerate(self.params):
-            #    pars.setError(sp.sqrt(self.cov[i, i]))
+            for i, pars in enumerate(self.params):
+                pars.setError(sp.sqrt(self.cov[i, i]))
+
+            with open('{}.cov'.format(self.outputname), 'w') as f:
+                np.savetxt(f, self.cov, fmt='%.4e', delimiter=',')
+
         # update with the final result
         #self.result(self.negloglike(self.res.x))
 
-        if self.show_contours and self.compute_errors:
+        if self.compute_errors and self.show_contours:
             param_names = [par.name for par in self.params]
             param_Ltx_names = [par.Ltxname for par in self.params]
             if (self.plot_param1 in param_names) and (self.plot_param2 in param_names):
@@ -165,10 +170,12 @@ class GA_deap:
             fig = plt.figure(figsize=(6, 6))
             ax = fig.add_subplot(111)
             plot_elipses(best_params, self.cov, idx_param1, idx_param2, param_Ltx1, param_Ltx2, ax=ax)
+            plt.savefig('ga_plot.pdf')
             plt.show()
 
         return {'population': len(population), 'no_generations': gens, 'param_fit': best_params,
                 'best_fitness': best.fitness.values[0], 'cov': self.cov, 'maxlike': best.fitness.values[0]}
+
 
 
 
@@ -257,12 +264,10 @@ class GA_deap:
 
 
     def plotting(self, pop, log, hof):
-
         # extract statistics
         gen, avg, min_, max_ = log.select("gen", "avg", "min", "max")
-
+        #print(pop)
         plt.figure(figsize=(6, 6))
-
         plt.plot(gen, min_, label="minimum")
 
         plt.title("Fitness Evolution")
@@ -270,7 +275,7 @@ class GA_deap:
         plt.ylabel("Fitness", fontsize=20)
         plt.legend(loc="upper right")
         #plt.savefig('GA_fitness.pdf')
-        #plt.show()
+        plt.show()
 
 
 
@@ -293,6 +298,7 @@ class GA_deap:
 
 
     def negloglike2(self, x):
+        #original likelihood, standard prior
         for i, pars in enumerate(self.params):
             pars.setValue(x[i])
         self.like.updateParams(self.params)
@@ -310,6 +316,7 @@ class GA_deap:
 
 
     def change_prior(self, i, x):
+        # Intput priors are on the range [0, 1]
         new_par = self.bounds[i][0] + (self.bounds[i][1] - self.bounds[i][0])*x
         return new_par
 
@@ -322,7 +329,7 @@ class GA_deap:
         print ("------")
         print("Done.")
         print("Optimal loglike : ", loglike)
-
+        return {'maxlike': loglike, 'param_fit': self.res.x, 'cov': self.cov}
 
 if  __name__ == '__main__' :
     g= GA_deap()

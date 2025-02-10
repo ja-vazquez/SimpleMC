@@ -537,9 +537,9 @@ class DriverMC:
                             plot_param1=plot_param1, plot_param2=plot_param2, outputname=self.outputpath)
         self.T.printParameters(A.params)
         self.ttime = time.time() - ti
+
         res = A.result()
         res['weights'], res['samples'] = None, None
-
         self.dict_result = {'analyzer': self.analyzername, 'result': res}
         return True
 
@@ -555,34 +555,37 @@ class DriverMC:
         from simplemc.analyzers.GA_deap import GA_deap
 
         if self.analyzername is None: self.analyzername = 'ga_deap'
-        self.outputpath = '{}_{}'.format(self.outputpath, self.analyzername)
+        self.outputpath = '{}_{}_optimization'.format(self.outputpath, self.analyzername)
         self.outputChecker()
         if iniFile:
-            plot_fitness = self.config.getboolean('ga_deap', 'plot_fitness', fallback=False)
-            compute_errors = self.config.getboolean('ga_deap', 'compute_errors', fallback=False)
-            show_contours = self.config.getboolean('ga_deap', 'show_contours', fallback=False)
-            plot_param1 = self.config.get('ga_deap', 'plot_param1', fallback=None)
-            plot_param2 = self.config.get('ga_deap', 'plot_param2', fallback=None)
-
             population = self.config.getint('ga_deap','population', fallback=20)
             crossover = self.config.getfloat('ga_deap', 'crossover', fallback=0.7)
             mutation = self.config.getfloat('ga_deap', 'mutation', fallback=0.3)
             max_generation = self.config.getint('ga_deap', 'max_generation', fallback=100)
             hof_size = self.config.getint('ga_deap','hof_size', fallback=1)
             crowding_factor = self.config.getfloat('ga_deap', 'crowding_factor',fallback=1)
-        else:
-            plot_fitness = kwargs.pop('plot_fitness', False)
-            compute_errors = kwargs.pop('compute_errors', False)
-            show_contours = kwargs.pop('show_contours', False)
-            plot_param1 = kwargs.pop('plot_param1', None)
-            plot_param2 = kwargs.pop('plot_param2', None)
+            nproc = self.config.getint('ga_deap', 'nproc', fallback=1)
 
+            plot_fitness = self.config.getboolean('ga_deap', 'plot_fitness', fallback=False)
+            compute_errors = self.config.getboolean('ga_deap', 'compute_errors', fallback=False)
+            show_contours = self.config.getboolean('ga_deap', 'show_contours', fallback=False)
+            plot_param1 = self.config.get('ga_deap', 'plot_param1', fallback=None)
+            plot_param2 = self.config.get('ga_deap', 'plot_param2', fallback=None)
+        else:
             population = kwargs.pop('population', 20)
             crossover = kwargs.pop('crossover', 0.7)
             mutation = kwargs.pop('mutation', 0.3)
             max_generation = kwargs.pop('max_generation', 100)
             hof_size = kwargs.pop('hof_size', 1)
             crowding_factor = kwargs.pop('crowding_factor', 1)
+            nproc = kwargs.pop('nproc', 1)
+
+            plot_fitness = kwargs.pop('plot_fitness', False)
+            compute_errors = kwargs.pop('compute_errors', False)
+            show_contours = kwargs.pop('show_contours', False)
+            plot_param1 = kwargs.pop('plot_param1', None)
+            plot_param2 = kwargs.pop('plot_param2', None)
+
 
         ti = time.time()
         M = GA_deap(self.L, self.model, outputname=self.outputpath,
@@ -592,9 +595,12 @@ class DriverMC:
                     plot_fitness=plot_fitness, compute_errors=compute_errors,
                     show_contours=show_contours, plot_param1=plot_param1,
                     plot_param2=plot_param2)
-        res = M.main()
+
+        # paralel run
+        pool, _ = self.mppool(nproc)
+        res = M.main(pool)
         self.ttime = time.time() - ti
-        #M.plotting()
+
         res['weights'], res['samples'] = None, None
         self.dict_result = {'analyzer': 'ga_deap', 'max_generations': max_generation,
                             'mutation': mutation, 'crossover': crossover, 'result': res}
@@ -854,6 +860,7 @@ class DriverMC:
                 pool = mp.Pool(processes=nprocess)
 
         return pool, nprocess
+
 
     def neuralLike(self, iniFile=None, **kwargs):
         """

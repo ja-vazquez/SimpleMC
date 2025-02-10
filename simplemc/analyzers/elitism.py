@@ -1,20 +1,19 @@
+
+
+
+
 try:
     from deap import tools
     from deap import algorithms
 except:
-    import warnings
-    warnings.warn("Please install DEAP library if you want to use ga_deap genetic algorithms.")
-    try:
-        import sys
-        sys.exit("Exit.")
-    except:
-        pass
+    import sys
+    sys.exit("Install DEAP library to use ga_deap genetic algorithms.")
 
 import re
 
-
-def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
-             halloffame=None, outputname='deap_output', verbose=__debug__, bounds=None):
+def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen,
+                        stats=None, halloffame=None, outputname='deap_output',
+                        verbose=__debug__, bounds=None):
     """This algorithm is similar to DEAP eaSimple() algorithm, with the modification that
     halloffame is used to implement an elitism mechanism. The individuals contained in the
     halloffame are directly injected into the next generation and are not subject to the
