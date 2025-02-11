@@ -214,8 +214,8 @@ class DriverMC:
 ##======== ======== ======== Samplers ======== ======== ========
 
 
-##---------------------- MCMC ----------------------
 
+##---------------------- MCMC ----------------------
     def mcmcRunner(self, iniFile=None, **kwargs):
         """
         This method calls MCMCAnalyzer.
@@ -289,7 +289,6 @@ class DriverMC:
 
 
 ##---------------------- Nested ----------------------
-
     def nestedRunner(self, iniFile=None, **kwargs):
         """
         This method calls Dynesty nested samplers.
@@ -404,7 +403,6 @@ class DriverMC:
 
 
 ##---------------------- EMCEE ----------------------
-
     def emceeRunner(self, iniFile=None, **kwargs):
         """
         This method calls the emcee library to use ensamble sampler.
@@ -489,7 +487,6 @@ class DriverMC:
 
 
 ##---------------------- MaxLikeAnalizer ----------------------
-
     def maxLikeRunner(self, iniFile=None, **kwargs):
         """
         It calls MaxLikeAnalyzer class.
@@ -506,7 +503,6 @@ class DriverMC:
             Second parameter to plot.
 
         """
-
         from simplemc.analyzers.MaxLikeAnalyzer import  MaxLikeAnalyzer
 
         if self.analyzername is None:
@@ -544,14 +540,12 @@ class DriverMC:
         return True
 
 
-##---------------------- Genetic Algorithms ----------------------
 
+##---------------------- Genetic Algorithms ----------------------
     def geneticdeap(self, iniFile=None, **kwargs):
         """
-        Genetic algorithms from Deap library.
-
+        Genetic algorithms using Deap library.
         """
-
         from simplemc.analyzers.GA_deap import GA_deap
 
         if self.analyzername is None: self.analyzername = 'ga_deap'
@@ -607,21 +601,63 @@ class DriverMC:
         return True
 
 
+##---------------------- Particle Swarm Optimization ----------------------
     def pso_optimizer(self, iniFile=None, **kwargs):
         """"
-        Particle Swarm Optimization from PySwarm
+         PSO using PySwarm Library
         """
         from simplemc.analyzers.PSO_optimizer import PSO_optimizer
 
         if self.analyzername is None: self.analyzername = 'pso'
-        self.outputpath = '{}_{}'.format(self.outputpath, self.analyzername)
+        self.outputpath = '{}_{}_optimization'.format(self.outputpath, self.analyzername)
         self.outputChecker()
 
-        ti = time.time()
-        P = PSO_optimizer(self.L, self.model)
-        res = P.main()
+        if iniFile:
+            nparticles = self.config.getint('pso', 'nparticles', fallback=30)
+            iterations = self.config.getint('pso', 'iterations', fallback=80)
+            opt_c1 = self.config.getfloat('pso', 'opt_c1', fallback=0.5)
+            opt_c2 = self.config.getfloat('pso', 'opt_c2', fallback=0.5)
+            opt_w = self.config.getfloat('pso', 'opt_w', fallback=0.9)
 
+            nproc = self.config.getint('pso', 'nproc', fallback=1)
+            early_stop = self.config.getboolean('pso', 'early_stop', fallback=False)
+            ftol = self.config.getfloat('pso', 'ftol', fallback=0.001)
+            ftol_iter = self.config.getint('pso', 'ftol_iter', fallback=20)
+
+            plot_fitness = self.config.getboolean('pso', 'plot_fitness', fallback=False)
+            compute_errors = self.config.getboolean('pso', 'compute_errors', fallback=False)
+            show_contours = self.config.getboolean('pso', 'show_contours', fallback=False)
+            plot_param1 = self.config.get('pso', 'plot_param1', fallback=None)
+            plot_param2 = self.config.get('pso', 'plot_param2', fallback=None)
+        else:
+            nparticles = kwargs.pop('nparticles', 30)
+            iterations = kwargs.pop('iterations', 80)
+            opt_c1 = kwargs.pop('opt_c1', 0.5)
+            opt_c2 = kwargs.pop('opt_c2', 0.5)
+            opt_w = kwargs.pop('opt_w', 0.9)
+
+            nproc = kwargs.pop('nproc', 1)
+            early_stop = kwargs.pop('early_stop', False)
+            ftol = kwargs.pop('ftol', 0.001)
+            ftol_iter = kwargs.pop('ftol_iter', 20)
+
+            plot_fitness = kwargs.pop('plot_fitness', False)
+            compute_errors = kwargs.pop('compute_errors', False)
+            show_contours = kwargs.pop('show_contours', False)
+            plot_param1 = kwargs.pop('plot_param1', None)
+            plot_param2 = kwargs.pop('plot_param2', None)
+
+        ti = time.time()
+        P = PSO_optimizer(self.L, self.model, outputname=self.outputpath,
+                          nparticles=nparticles, iterations=iterations,
+                          opt_c1=opt_c1, opt_c2=opt_c2, opt_w=opt_w, nproc=nproc,
+                          early_stop=early_stop, ftol=ftol, ftol_iter=ftol_iter,
+                          plot_fitness=plot_fitness, compute_errors=compute_errors,
+                          show_contours=show_contours, plot_param1=plot_param1,
+                          plot_param2=plot_param2)
+        res = P.main()
         self.ttime = time.time() - ti
+
         self.dict_result = {'analyzer': 'pso', 'result': res}
         return True
 
