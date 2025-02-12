@@ -284,7 +284,7 @@ def ParseDataset(datasets, **kwargs):
             L.addLikelihood(PLK15())
         elif name == 'PLK18':
             L.addLikelihood(PLK18())
-        elif name == 'PLK_Wang':
+        elif name == 'PLKw':
             from .likelihoods.WangWangCMB import PlanckLikelihood
             L.addLikelihood(PlanckLikelihood())
         elif name == 'WMAP9':

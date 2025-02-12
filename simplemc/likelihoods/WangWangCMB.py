@@ -12,7 +12,7 @@ from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
 import scipy as sp
 
-print("DEPRECATED!")
+print("Wang Wang DEPRECATED!")
 #sys.exit(1)
 
 
@@ -39,7 +39,7 @@ class WangWangCMB (BaseLikelihood):
 
 
 class PlanckLikelihood(WangWangCMB):
-    def __init__(self, matrices="PLA3"):
+    def __init__(self, matrices="PLK18"):
         if matrices == "WW":
             mean = [301.57, 1.7407, 0.02228]
             err = [0.18, 0.0094, 0.00030]
@@ -67,6 +67,22 @@ class PlanckLikelihood(WangWangCMB):
             cov = [[1.,  0.62040041, -0.53470863],
                    [0.62040041,  1., -0.71007217],
                    [-0.53470863, -0.71007217,  1.]]
+
+        elif matrices == 'PLK18':
+            # LCDM
+            mean = [3.01471e+02, 1.7502, 2.236e-02]
+            err = [0.089, 0.0046, 0.00015]
+            cov = [[1., 0.46, -0.33],
+                   [0.46, 1., -0.66],
+                   [-0.33, -0.66, 1.0]]
+
+        elif matrices == 'PLK18_w':
+            # wCDM
+            mean = [3.01462e+02, 1.7493, 2.239e-02 ]
+            err = [0.089, 0.0046, 0.00015]
+            cov = [[1., 0.54, -0.42],
+                   [0.54, 1., -0.75],
+                   [-0.42, -0.75, 1.0]]
 
         else:
             print("Bad matrices param")
