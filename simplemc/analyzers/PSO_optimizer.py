@@ -26,7 +26,9 @@ class PSO_optimizer():
                  opt_c1=0.5, opt_c2=0.5, opt_w= 0.9, nproc=1,
                  early_stop=False, ftol=-np.inf, ftol_iter=1,
                  plot_fitness=False, compute_errors=False, show_contours=False,
-                 plot_param1=None, plot_param2=None, more_params=True):
+                 plot_param1=None, plot_param2=None, save_like=False, more_params=True):
+
+        print('-- output --', outputname)
 
         self.like = like
         self.model = model
@@ -49,6 +51,8 @@ class PSO_optimizer():
         self.plot_param1 = plot_param1
         self.plot_param2 = plot_param2
 
+        self.save_like = save_like
+
         #PSO Algorithm hyperparams
         self.dimensions = len(self.params)
         self.nparticles = nparticles
@@ -64,7 +68,7 @@ class PSO_optimizer():
         self.opt_w = opt_w
 
 
-    def main(self):
+    def main(self, fout=None):
         # limits in the format requested by the code:
         min_bound = self.pso_bounds[0]
         max_bound = self.pso_bounds[1]
@@ -82,6 +86,17 @@ class PSO_optimizer():
         cost, pos = optimizer.optimize(self.negloglike, iters=self.iterations,
                                        n_processes=self.nprocesses)
 
+        # Printing -only for testing purposes as it doubles the time
+        self.formstr = '%g ' + '%g ' * len(self.vpars) + '\n'
+
+        for i, j in enumerate(optimizer.pos_history[1::]):
+            for k in j:
+                if self.save_like:
+                    s = np.concatenate((self.negloglike2(k), k), axis=None)
+                else:
+                    s=np.concatenate((i,k), axis=None)
+                fout.write(self.formstr%tuple(s))
+
 
         if self.plot_fitness:
             self.plotting(optimizer)
@@ -94,8 +109,8 @@ class PSO_optimizer():
                 sys.exit("*'error': Install numdifftools to compute errors.")
 
             #hess = nd.Hessian(self.negloglike2, step=self.sigma*0.1)(pos)
-            hess = nd.approx_hess3(pos, self.negloglike2)
-            eigvl, eigvc = la.eig(hess)
+            hess = nd.approx_hess3(pos, self.negloglike2, epsilon=self.sigma*0.1)
+            #eigvl, eigvc = la.eig(hess)
             #print('Hessian', hess)
             #print('Eigen vals', eigvl)
             #print('Eigen vecs', eigvc)
@@ -108,6 +123,7 @@ class PSO_optimizer():
 
             with open('{}.cov'.format(self.outputname), 'w') as f:
                 np.savetxt(f, self.cov, fmt='%.4e', delimiter=',')
+
 
         if self.compute_errors and self.show_contours:
             param_names = [par.name for par in self.params]
@@ -126,27 +142,25 @@ class PSO_optimizer():
 
             # Adding history
             import matplotlib as mpl
-            
-            nlines = 5
+
+            niters = 5
             lh = len(optimizer.pos_history)
 
-            c = np.arange(1, nlines + 1)
-            d = c*int(lh/nlines)
+            c = np.arange(1, niters + 1)
+            d = c*int(lh/niters)
             norm = mpl.colors.Normalize(vmin=c.min(), vmax=c.max())
             cmap = mpl.cm.ScalarMappable(norm=norm, cmap=mpl.cm.cool) #jet, cool
             cmap.set_array([])
 
             #fig, ax = plt.subplots(dpi=100)
-            for i, yi in enumerate(optimizer.pos_history[1::int(lh/nlines)]):
-            #for i, yi in enumerate(optimizer.pos_history):
-                ax.plot(list(zip(*yi))[idx_param1], list(zip(*yi))[idx_param2], 'o', c=cmap.to_rgba(i ))
+            for i, yi in enumerate(optimizer.pos_history[1::int(lh/niters)]):
+                ax.plot(list(zip(*yi))[idx_param1], list(zip(*yi))[idx_param2], 'o', c=cmap.to_rgba(i))
             cbar = fig.colorbar(cmap, ticks=c, ax=ax)
             cbar.ax.set_yticklabels(d)
             cbar.set_label('Iterations', rotation=270)
 
             plt.savefig('pso_plot.pdf')
             plt.show()
-
 
 
         return {'population': self.nparticles, 'no_generations': self.iterations, 'param_fit':pos,
@@ -169,16 +183,12 @@ class PSO_optimizer():
 
     def negloglike(self, xvals):
         nloglike = []
-        #print('1',xvals)
         for x in xvals:
             for i, pars in enumerate(self.params):
                 pars.setValue(x[i])
-            #for i, j in enumerate(x):
-            #    self.params[i].setValue(j)
             self.like.updateParams(self.params)
             loglike = self.like.loglike_wprior()
             nloglike.append(-loglike)
-        #print('*-' * 5, xvals, nloglike)
         return nloglike
 
 

@@ -629,6 +629,8 @@ class DriverMC:
             show_contours = self.config.getboolean('pso', 'show_contours', fallback=False)
             plot_param1 = self.config.get('pso', 'plot_param1', fallback=None)
             plot_param2 = self.config.get('pso', 'plot_param2', fallback=None)
+
+            save_like = self.config.getboolean('pso', 'save_like', fallback=False)
         else:
             nparticles = kwargs.pop('nparticles', 30)
             iterations = kwargs.pop('iterations', 80)
@@ -647,6 +649,9 @@ class DriverMC:
             plot_param1 = kwargs.pop('plot_param1', None)
             plot_param2 = kwargs.pop('plot_param2', None)
 
+            save_like = kwargs.pop('save_like', False)
+
+
         ti = time.time()
         P = PSO_optimizer(self.L, self.model, outputname=self.outputpath,
                           nparticles=nparticles, iterations=iterations,
@@ -654,8 +659,11 @@ class DriverMC:
                           early_stop=early_stop, ftol=ftol, ftol_iter=ftol_iter,
                           plot_fitness=plot_fitness, compute_errors=compute_errors,
                           show_contours=show_contours, plot_param1=plot_param1,
-                          plot_param2=plot_param2)
-        res = P.main()
+                          plot_param2=plot_param2, save_like=save_like)
+
+        fout = open(self.outputpath + "_1.txt", 'w')
+        res = P.main(fout)
+        fout.close()
         self.ttime = time.time() - ti
 
         self.dict_result = {'analyzer': 'pso', 'result': res}
