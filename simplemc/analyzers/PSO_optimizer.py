@@ -21,12 +21,38 @@ class PSO_optimizer():
     explain some input params
     """
 
-    def __init__(self, like, model, outputname='pso_output',
-                 nparticles=30, iterations= 80,
-                 opt_c1=0.5, opt_c2=0.5, opt_w= 0.9, nproc=1,
-                 early_stop=False, ftol=-np.inf, ftol_iter=1,
-                 plot_fitness=False, compute_errors=False, show_contours=False,
-                 plot_param1=None, plot_param2=None, save_like=False, more_params=True):
+    def __init__(self,
+                 like,
+                 model,
+                 outputname='pso_output',
+                 technique=None,
+                 nparticles=30,
+                 iterations=80,
+                 opt_c1=0.5,
+                 opt_c2=0.5,
+                 opt_w=0.9,
+                 opt_k=3,
+                 opt_p=1,
+                 nproc=1,
+                 use_oh_strategy=False,
+                 early_stop=False,
+                 ftol=-np.inf,
+                 ftol_iter=1,
+                 plot_fitness=False,
+                 compute_errors=False,
+                 show_contours=False,
+                 plot_param1=None,
+                 plot_param2=None,
+                 save_like=False,
+                 more_params=True):
+
+        """Initialize the PSO Optimizer
+
+        Attributes
+        ----------
+        n_particles : int
+        number of particles in the swarm.
+        """
 
         print('-- output --', outputname)
 
@@ -45,18 +71,13 @@ class PSO_optimizer():
         print("with bounds", self.bounds)
         print("#particles=", nparticles, "#iterations=", iterations, "\n")
 
-        self.plot_fitness = plot_fitness
-        self.compute_errors = compute_errors
-        self.show_contours = show_contours
-        self.plot_param1 = plot_param1
-        self.plot_param2 = plot_param2
-
-        self.save_like = save_like
-
         #PSO Algorithm hyperparams
         self.dimensions = len(self.params)
         self.nparticles = nparticles
         self.iterations = iterations
+        self.technique = technique
+        if use_oh_strategy:
+            self.oh_strategy = {"w": 'exp_decay', 'c1': 'lin_variation'}
 
         self.nprocesses = nproc
         self.early_stop = early_stop
@@ -66,19 +87,64 @@ class PSO_optimizer():
         self.opt_c1 = opt_c1
         self.opt_c2 = opt_c2
         self.opt_w = opt_w
+        self.opt_k = opt_k
+        self.opt_p = opt_p
+
+        self.plot_fitness = plot_fitness
+        self.compute_errors = compute_errors
+        self.show_contours = show_contours
+        self.plot_param1 = plot_param1
+        self.plot_param2 = plot_param2
+
+        self.save_like = save_like
 
 
     def main(self, fout=None):
+        """Optimize with the swarm
+
+        Performs the optimization of the likelihood
+        function :code:`f` for a number of iterations :code:`iter.`
+
+        Parameters
+        ----------
+        objective_func : callable
+            objective function to be evaluated
+        iters : int
+            number of iterations
+        n_processes : int
+            number of processes to use for parallel particle evaluation (default: None = no parallelization)
+        kwargs : dict
+            arguments for the objective function
+
+        Returns
+        -------
+        dictionary
+
+        """
+
         # limits in the format requested by the code:
         min_bound = self.pso_bounds[0]
         max_bound = self.pso_bounds[1]
         bounds = (min_bound, max_bound)
 
-        options = {'c1': self.opt_c1, 'c2': self.opt_c2, 'w': self.opt_w}
-
-        optimizer = ps.single.GlobalBestPSO(n_particles=self.nparticles,
+        if self.technique == 'Global':
+            options = {'c1':self.opt_c1, 'c2':self.opt_c2, 'w':self.opt_w}
+            optimizer = ps.single.GlobalBestPSO(n_particles=self.nparticles,
                                             dimensions=self.dimensions, ftol=self.ftol,
-                                            options=options, bounds=bounds, center= self.vpars)
+                                            options=options, bounds=bounds, center= self.vpars,
+                                            oh_strategy=self.oh_strategy)
+
+        elif self.technique == 'Local':
+            options = {'c1':self.opt_c1, 'c2':self.opt_c2, 'w':self.opt_w,
+                       'k':self.opt_k, 'p':self.opt_p}
+            optimizer = ps.single.LocalBestPSO(n_particles=self.nparticles,
+                                                dimensions=self.dimensions, ftol=self.ftol,
+                                                options=options, bounds=bounds, center=self.vpars,
+                                                oh_strategy=self.oh_strategy)
+
+        else:
+            sys.exit('no correct strategy')
+
 
         if self.early_stop:
             optimizer.ftol_iter = self.ftol_iter

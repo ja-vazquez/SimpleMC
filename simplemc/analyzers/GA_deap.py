@@ -21,11 +21,6 @@ except:
 # We import an independent module for elitism in the GA.
 from simplemc.analyzers import elitism
 
-try:
-    import numdifftools as nd
-except:
-    pass
-    #sys.exit('install numdifftools')
 
 class GA_deap:
     """
@@ -78,8 +73,8 @@ class GA_deap:
         self.BOUND_LOW, self.BOUND_UP = 0.0, 1.0  # boundaries for all dimensions
 
         self.sharing = sharing
+        # sharing constants:
         if self.sharing:
-            # sharing constants:
             DISTANCE_THRESHOLD = 0.1
             SHARING_EXTENT = 5.0
 
@@ -139,10 +134,10 @@ class GA_deap:
                 sys.exit("*'error': Install numdifftools to compute errors.")
 
             hess = nd.Hessian(self.negloglike2, step=self.sigma*0.05)(best_params)
-            eigvl, eigvc = la.eig(hess)
-            print('Hessian', hess)
-            print('Eigen vals', eigvl)
-            print('Eigen vecs', eigvc)
+            #eigvl, eigvc = la.eig(hess)
+            #print('Hessian', hess)
+            #print('Eigen vals', eigvl)
+            #print('Eigen vecs', eigvc)
 
             self.cov = la.inv(hess)
             print('Covariance matrix \n', self.cov)
