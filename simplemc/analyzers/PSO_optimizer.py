@@ -25,7 +25,7 @@ class PSO_optimizer():
                  like,
                  model,
                  outputname='pso_output',
-                 technique=None,
+                 method=None,
                  nparticles=30,
                  iterations=80,
                  opt_c1=0.5,
@@ -63,9 +63,14 @@ class PSO_optimizer():
         self.vpars = [p.value for p in self.params]
         self.npars = [p.name for p in self.params]
         self.sigma = sp.array([p.error for p in self.params])
-        self.bounds = [p.bounds for p in self.params]
-        self.pso_bounds = list(zip(*self.bounds))
         self.cov = None
+
+        bounds = [p.bounds for p in self.params]
+        pso_bounds = list(zip(*bounds))
+        # limits in the format requested by the code:
+        min_bound = pso_bounds[0]
+        max_bound = pso_bounds[1]
+        self.bounds = (min_bound, max_bound)
 
         print("Minimizing...", self.npars, "starting", self.vpars)
         print("with bounds", self.bounds)
@@ -75,7 +80,9 @@ class PSO_optimizer():
         self.dimensions = len(self.params)
         self.nparticles = nparticles
         self.iterations = iterations
-        self.technique = technique
+        self.method = method
+
+        self.oh_strategy = None
         if use_oh_strategy:
             self.oh_strategy = {"w": 'exp_decay', 'c1': 'lin_variation'}
 
@@ -99,7 +106,7 @@ class PSO_optimizer():
         self.save_like = save_like
 
 
-    def main(self, fout=None):
+    def main(self, fout=None, show_animation=True):
         """Optimize with the swarm
 
         Performs the optimization of the likelihood
@@ -122,28 +129,23 @@ class PSO_optimizer():
 
         """
 
-        # limits in the format requested by the code:
-        min_bound = self.pso_bounds[0]
-        max_bound = self.pso_bounds[1]
-        bounds = (min_bound, max_bound)
-
-        if self.technique == 'Global':
+        if self.method == 'global':
             options = {'c1':self.opt_c1, 'c2':self.opt_c2, 'w':self.opt_w}
             optimizer = ps.single.GlobalBestPSO(n_particles=self.nparticles,
                                             dimensions=self.dimensions, ftol=self.ftol,
-                                            options=options, bounds=bounds, center= self.vpars,
-                                            oh_strategy=self.oh_strategy)
+                                            options=options, bounds=self.bounds,
+                                            center= self.vpars, oh_strategy=self.oh_strategy)
 
-        elif self.technique == 'Local':
+        elif self.method == 'local':
             options = {'c1':self.opt_c1, 'c2':self.opt_c2, 'w':self.opt_w,
                        'k':self.opt_k, 'p':self.opt_p}
             optimizer = ps.single.LocalBestPSO(n_particles=self.nparticles,
                                                 dimensions=self.dimensions, ftol=self.ftol,
-                                                options=options, bounds=bounds, center=self.vpars,
-                                                oh_strategy=self.oh_strategy)
+                                                options=options, bounds=self.bounds,
+                                                center=self.vpars, oh_strategy=self.oh_strategy)
 
         else:
-            sys.exit('no correct strategy')
+            sys.exit('no correct method of PSO')
 
 
         if self.early_stop:
@@ -152,12 +154,13 @@ class PSO_optimizer():
         cost, pos = optimizer.optimize(self.negloglike, iters=self.iterations,
                                        n_processes=self.nprocesses)
 
-        # Printing -only for testing purposes as it doubles the time
         self.formstr = '%g ' + '%g ' * len(self.vpars) + '\n'
 
-        for i, j in enumerate(optimizer.pos_history[1::]):
+        phistory = optimizer.pos_history
+        for i, j in enumerate(phistory[1::]):
             for k in j:
                 if self.save_like:
+                    # Printing -only for testing purposes as it doubles the time
                     s = np.concatenate((self.negloglike2(k), k), axis=None)
                 else:
                     s=np.concatenate((i,k), axis=None)
@@ -165,7 +168,7 @@ class PSO_optimizer():
 
 
         if self.plot_fitness:
-            self.plotting(optimizer)
+            self.plotting_fitness(optimizer)
 
         if self.compute_errors:
             try:
@@ -176,13 +179,13 @@ class PSO_optimizer():
 
             #hess = nd.Hessian(self.negloglike2, step=self.sigma*0.1)(pos)
             hess = nd.approx_hess3(pos, self.negloglike2, epsilon=self.sigma*0.1)
+            # print('Hessian', hess)
             #eigvl, eigvc = la.eig(hess)
-            #print('Hessian', hess)
-            #print('Eigen vals', eigvl)
-            #print('Eigen vecs', eigvc)
+            #print('Eigen vals & vecs', eigvl, eigvc)
 
             self.cov = la.inv(hess)
             print('Covariance matrix \n', self.cov)
+
             # set errors:
             for i, pars in enumerate(self.params):
                 pars.setError(sp.sqrt(self.cov[i, i]))
@@ -192,48 +195,99 @@ class PSO_optimizer():
 
 
         if self.compute_errors and self.show_contours:
-            param_names = [par.name for par in self.params]
-            param_Ltx_names = [par.Ltxname for par in self.params]
-            if (self.plot_param1 in param_names) and (self.plot_param2 in param_names):
-                idx_param1 = param_names.index(self.plot_param1)
-                idx_param2 = param_names.index(self.plot_param2)
-                param_Ltx1 = param_Ltx_names[idx_param1]
-                param_Ltx2 = param_Ltx_names[idx_param2]
-            else:
-                sys.exit('\n Not a base parameter, derived-errors still on construction')
+            self.plotting_contours(phistory, pos)
 
-            fig = plt.figure(figsize=(6, 6))
-            ax = fig.add_subplot(111)
-            plot_elipses(pos, self.cov, idx_param1, idx_param2, param_Ltx1, param_Ltx2, ax=ax)
-
-            # Adding history
-            import matplotlib as mpl
-
-            niters = 5
-            lh = len(optimizer.pos_history)
-
-            c = np.arange(1, niters + 1)
-            d = c*int(lh/niters)
-            norm = mpl.colors.Normalize(vmin=c.min(), vmax=c.max())
-            cmap = mpl.cm.ScalarMappable(norm=norm, cmap=mpl.cm.cool) #jet, cool
-            cmap.set_array([])
-
-            #fig, ax = plt.subplots(dpi=100)
-            for i, yi in enumerate(optimizer.pos_history[1::int(lh/niters)]):
-                ax.plot(list(zip(*yi))[idx_param1], list(zip(*yi))[idx_param2], 'o', c=cmap.to_rgba(i))
-            cbar = fig.colorbar(cmap, ticks=c, ax=ax)
-            cbar.ax.set_yticklabels(d)
-            cbar.set_label('Iterations', rotation=270)
-
-            plt.savefig('pso_plot.pdf')
-            plt.show()
-
+        if show_animation:
+            self.show_animation(phistory, pos)
 
         return {'population': self.nparticles, 'no_generations': self.iterations, 'param_fit':pos,
             'best_params': pos, 'cov': self.cov, 'maxlike': cost}
 
 
-    def plotting(self, optimizer):
+
+    def plotting_contours(self, phistory, pos):
+        param_names = [par.name for par in self.params]
+        param_Ltx_names = [par.Ltxname for par in self.params]
+        if (self.plot_param1 in param_names) and (self.plot_param2 in param_names):
+            idx_param1 = param_names.index(self.plot_param1)
+            idx_param2 = param_names.index(self.plot_param2)
+            param_Ltx1 = param_Ltx_names[idx_param1]
+            param_Ltx2 = param_Ltx_names[idx_param2]
+        else:
+            sys.exit('\n Not a base parameter, derived-errors still on construction')
+
+        fig = plt.figure(figsize=(6, 6))
+        ax = fig.add_subplot(111)
+        plot_elipses(pos, self.cov, idx_param1, idx_param2, param_Ltx1, param_Ltx2, ax=ax)
+
+        # Adding history
+        import matplotlib as mpl
+
+        niters = 5
+        lh = len(phistory)
+
+        c = np.arange(1, niters + 1)
+        d = c * int(lh / niters)
+        norm = mpl.colors.Normalize(vmin=c.min(), vmax=c.max())
+        cmap = mpl.cm.ScalarMappable(norm=norm, cmap=mpl.cm.cool)  # jet, cool
+        cmap.set_array([])
+
+        # fig, ax = plt.subplots(dpi=100)
+        for i, yi in enumerate(phistory[1::int(lh / niters)]):
+            ax.plot(list(zip(*yi))[idx_param1], list(zip(*yi))[idx_param2], 'o', c=cmap.to_rgba(i))
+        cbar = fig.colorbar(cmap, ticks=c, ax=ax)
+        cbar.ax.set_yticklabels(d)
+        cbar.set_label('Iterations', rotation=270)
+
+        plt.savefig('pso_plot.pdf')
+        plt.show()
+
+
+
+    def show_animation(self, phistory, pos):
+        param_names = [par.name for par in self.params]
+        param_Ltx_names = [par.Ltxname for par in self.params]
+        if (self.plot_param1 in param_names) and (self.plot_param2 in param_names):
+            idx_param1 = param_names.index(self.plot_param1)
+            idx_param2 = param_names.index(self.plot_param2)
+            param_Ltx1 = param_Ltx_names[idx_param1]
+            param_Ltx2 = param_Ltx_names[idx_param2]
+        else:
+            sys.exit('\n Not a base parameter, derived-errors still on construction')
+
+        figure, ax = plt.subplots()
+
+        iters = len(phistory)
+        cmap = plt.cm.cool  # hsv
+        norm = plt.Normalize(vmin=0, vmax=iters)
+
+        import matplotlib.animation as animation
+        from IPython.display import HTML
+        from matplotlib.animation import FuncAnimation
+
+        def animation_function(i):
+            ax.clear()
+            ax.set_xlim(0.6, 0.8)
+            ax.set_ylim(0.2, 0.4)
+            plot_elipses(pos, self.cov, idx_param1, idx_param2, param_Ltx1, param_Ltx2, ax=ax)
+            plt.plot(phistory[i][:, idx_param1], phistory[i][:, idx_param2], 'o', color=cmap(norm(i)), label='iter=%d' % i)
+            plt.legend(loc='upper right')
+            plt.grid()
+            #ax.set_title('$20 + 2*x**2 + y**2 $')
+
+        ani = FuncAnimation(figure, func=animation_function,
+                            frames=np.arange(0, iters, 1),
+                            interval=200, repeat=False)
+        ani.save('pso_LCDM.gif', writer='pillow')
+        plt.show()
+
+        #HTML(ani.to_jshtml())
+
+
+
+
+
+    def plotting_fitness(self, optimizer):
         plt.figure(figsize=(6, 6))
 
         plt.plot(np.arange(len(optimizer.cost_history[1::])), optimizer.cost_history[1::])

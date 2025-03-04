@@ -615,11 +615,15 @@ class DriverMC:
         if iniFile:
             nparticles = self.config.getint('pso', 'nparticles', fallback=30)
             iterations = self.config.getint('pso', 'iterations', fallback=80)
+            method = self.config.get('pso', 'method', fallback=None)
             opt_c1 = self.config.getfloat('pso', 'opt_c1', fallback=0.5)
             opt_c2 = self.config.getfloat('pso', 'opt_c2', fallback=0.5)
             opt_w = self.config.getfloat('pso', 'opt_w', fallback=0.9)
+            opt_k = self.config.getint('pso', 'opt_k', fallback=2)
+            opt_p = self.config.getint('pso', 'opt_p', fallback=1)
 
             nproc = self.config.getint('pso', 'nproc', fallback=1)
+            use_oh_strategy = self.config.getboolean('pso', 'use_oh_strategy', fallback=False)
             early_stop = self.config.getboolean('pso', 'early_stop', fallback=False)
             ftol = self.config.getfloat('pso', 'ftol', fallback=0.001)
             ftol_iter = self.config.getint('pso', 'ftol_iter', fallback=20)
@@ -634,11 +638,15 @@ class DriverMC:
         else:
             nparticles = kwargs.pop('nparticles', 30)
             iterations = kwargs.pop('iterations', 80)
+            method = kwargs.pop('method', None)
             opt_c1 = kwargs.pop('opt_c1', 0.5)
             opt_c2 = kwargs.pop('opt_c2', 0.5)
             opt_w = kwargs.pop('opt_w', 0.9)
+            opt_k = kwargs.pop('opt_k', 2)
+            opt_p = kwargs.pop('opt_p', 2)
 
             nproc = kwargs.pop('nproc', 1)
+            use_oh_strategy = kwargs.pop('use_oh_strategy', False)
             early_stop = kwargs.pop('early_stop', False)
             ftol = kwargs.pop('ftol', 0.001)
             ftol_iter = kwargs.pop('ftol_iter', 20)
@@ -655,7 +663,8 @@ class DriverMC:
         ti = time.time()
         P = PSO_optimizer(self.L, self.model, outputname=self.outputpath,
                           nparticles=nparticles, iterations=iterations,
-                          opt_c1=opt_c1, opt_c2=opt_c2, opt_w=opt_w, nproc=nproc,
+                          method=method, opt_c1=opt_c1, opt_c2=opt_c2, opt_w=opt_w,
+                          opt_k=opt_k, opt_p=opt_p, nproc=nproc, use_oh_strategy=use_oh_strategy,
                           early_stop=early_stop, ftol=ftol, ftol_iter=ftol_iter,
                           plot_fitness=plot_fitness, compute_errors=compute_errors,
                           show_contours=show_contours, plot_param1=plot_param1,
