@@ -1,3 +1,4 @@
+from scipy.interpolate import InterpolatedUnivariateSpline
 from simplemc.models.LCDMCosmology import LCDMCosmology
 from simplemc.cosmo.Parameter import Parameter
 from simplemc.cosmo.paramDefs import Ok_par
@@ -16,26 +17,38 @@ class HolographicCosmology(LCDMCosmology):
         :param varyc: variable w0 parameter
 
     """
-    def __init__(self, varyOk=False, varychde=True, varyalpha=False, varybeta=False):
+    def __init__(self, varyOk=False, varychde=True,
+                 nodes=3  # numer of nodes used in the interpolation
+                 ):
         # Holographic parameter
         # Notation: capital C = 3c**2*M_p, here, we use little c
-        self.c_par = Parameter("c", 0.7, 0.1, (0.5, 2.0), "c")
-        self.alpha_par = Parameter("alpha", 0.0, 0.1, (0., 3.0), "alpha")
-        self.beta_par = Parameter("beta", 0.0, 0.1, (0., 3.0), "beta")
+
+        self.nnodes = nodes
 
         self.varyOk = varyOk
-        self.varychde  = varychde
-        self.varyalpha  = varyalpha
-        self.varybeta = varybeta
+        self.varychde = varychde
+
+        self.c_par = Parameter("c", 0.7, 0.1, (0.5, 2.0), "c")
 
         self.Ok = Ok_par.value
-        self.c_hde  = self.c_par.value
-        self.alpha_hde = self.alpha_par.value
-        self.beta_hde = self.beta_par.value
+        self.c_hde = self.c_par.value
 
-        # This value is quite related to the initial z
-        self.zini = 3
-        self.zvals = np.linspace(0, self.zini, 100)
+        # zend is the last point in linear-interpolation
+        # however is the first point of the last step in the binning/tanh version
+        self.zini = 0.0
+        self.zend = 3.0
+
+        # range to perform the interpolation
+        self.zvals = np.linspace(self.zini, self.zend, 100)
+
+
+        mean = -2
+        priors = (-1, 3)
+        sigma = 0.2
+
+        self.pname = 'amp_'
+        self.params = [Parameter(self.pname+str(i), mean, sigma, priors, self.pname+str(i)) for i in range(nodes)]
+        self.pvals = [i.value for i in self.params]
 
         LCDMCosmology.__init__(self, disable_radiation=True)
         self.updateParams([])
@@ -44,10 +57,9 @@ class HolographicCosmology(LCDMCosmology):
     # my free parameters. We add Ok on top of LCDM ones (we inherit LCDM)
     def freeParameters(self):
         l = LCDMCosmology.freeParameters(self)
-        if (self.varyOk): l.append(Ok_par)
+        l += self.params
         if (self.varychde):  l.append(self.c_par)
-        if (self.varyalpha): l.append(self.alpha_par)
-        if (self.varybeta): l.append(self.beta_par)
+        if (self.varyOk): l.append(Ok_par)
         return l
 
 
@@ -55,31 +67,57 @@ class HolographicCosmology(LCDMCosmology):
         ok = LCDMCosmology.updateParams(self, pars)
         if not ok:
             return False
-        for p in pars:
-            if p.name  == "c":
+
+        for i, p in enumerate(pars):
+            if p.name == (self.pname+str(i)):
+                self.pvals[i] = p.value
+            if p.name == "c":
                 self.c_hde = p.value
-            if p.name == "alpha":
-                self.alpha_hde = p.value
-            if p.name == "beta":
-                self.beta_hde = p.value
             elif p.name == "Ok":
                 self.Ok = p.value
                 self.setCurvature(self.Ok)
                 if (abs(self.Ok) > 1.0):
                     return False
 
+        if self.nnodes > 1:
+            self.ini_function()
         self.initialize()
         return True
+
+
+
+
+    def ini_function(self):
+        self.y = self.pvals
+        self.mnodes = self.nnodes-1
+
+        delta = (self.zend - self.zini)/(self.mnodes)
+        self.x = [self.zini + delta*i for i in range(self.mnodes+1)]
+
+        self.spline = InterpolatedUnivariateSpline(self.x, self.y, k=1)
+
+        return True
+
 
 
     def ffunc(self, z):
         # = 0 for CC, = 2 for Barrow
         # f = \Delta-2
-        return self.alpha_hde + self.beta_hde*z
+        # function = self.alpha_hde + self.beta_hde*z
+        if self.nnodes==1:
+            funct = self.pvals[0]
+        else:
+            funct = self.spline(z)
+        return funct
 
 
     def dffunc(self, z):
-        return self.beta_hde
+        # dfunction = self.beta_hde
+        if self.nnodes==1:
+            dfunc = 0
+        else:
+            dfucn = x
+        return dfunc
 
 
     def Q_term(self, z):
