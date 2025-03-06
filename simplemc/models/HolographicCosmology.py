@@ -72,40 +72,48 @@ class HolographicCosmology(LCDMCosmology):
         return True
 
 
-    def delta_func(self, z):
+    def ffunc(self, z):
+        # = 0 for CC, = 2 for Barrow
+        # f = \Delta-2
         return self.alpha_hde + self.beta_hde*z
 
-    def ddelta_func(self, z):
+
+    def dffunc(self, z):
         return self.beta_hde
 
 
     def Q_term(self, z):
-        delta = self.delta_func(z)
+        delta = self.ffunc(z) + 2
         term1 = 1./(delta - 2)
+
         Q = (2-delta)*(self.c_hde)**(2*term1)*(100*self.h*np.sqrt(self.Om))**(-delta*term1)
         return Q
 
 
     def extra_term(self, z, Ode):
-        delta = self.delta_func(z)
+        delta = self.ffunc(z) + 2
         term1 = 1./(delta - 2)
-        return (1- Ode)**(0.5*delta*term1)*Ode**(-term1)
+
+        return (1 - Ode)**(0.5*delta*term1)*Ode**(-term1)
 
 
-    def term_func(self, z, Ode):
-        delta = self.delta_func(z)
+    def deriv_func(self, z, Ode):
+        delta = self.ffunc(z) + 2
+        term1 = 1. / (delta - 2)
+
         qterm= self.c_hde**2*(1+z)**(-3)/(100*self.h)**2/self.Om
-        value= -(1+z)*self.ddelta_func(z)/(delta-2)*np.log(qterm*(1-Ode)/Ode)
+        # this is where the sign changes compared to previous works
+        value= (1 + z)*self.dffunc(z)*term1*np.log(qterm*(1 - Ode)/Ode)
         return value
 
 
     # Right hand side of the equations
-    def RHS_hde(self, vals, z):
-        Ode = vals
-        delta = self.delta_func(z)
+    def RHS_hde(self, Ode, z):
+        delta = self.ffunc(z) + 2
+        term1 = 1./(delta - 2)
 
-        term_cte = 1 + delta + self.Q_term(z)*self.extra_term(z, Ode)*(1+z)**(-1.5*delta/(delta-2))
-        fact = term_cte + self.term_func(z, Ode)
+        term_cte = 1 + delta + self.Q_term(z)*self.extra_term(z, Ode)*(1 + z)**(-1.5*delta*term1)
+        fact = term_cte + self.deriv_func(z, Ode)
         dOmega = -Ode*(1 - Ode)*fact/(1 + z)
         return dOmega
 
@@ -138,9 +146,9 @@ class HolographicCosmology(LCDMCosmology):
 
     def EoS(self, z):
         Ode = self.Ode(z)
-        delta = self.delta_func(z)
+        delta = self.ffunc(z)
 
         tmp = (1+z)**(-1.5*delta/(2-delta))
         w = -(1+delta) - self.Q_term(z)*self.extra_term(z, Ode)*tmp \
-            + self.term_func(z, Ode)
+            + self.deriv_func(z, Ode)
         return w/3.
