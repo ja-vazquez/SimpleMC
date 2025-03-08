@@ -109,9 +109,6 @@ class HolographicCosmology(LCDMCosmology):
         self.dffunc = self.ffunc.derivative(n=1)
         return True
 
-    #def dffunc(self, z):
-
-
 
     def Q_term(self, z):
         delta = self.ffunc(z) + 2
@@ -134,7 +131,8 @@ class HolographicCosmology(LCDMCosmology):
         delta = self.ffunc(z) + 2
         term1 = 1./self.ffunc(z)
 
-        qterm= self.c_hde**2*(1+z)**(-3)/(100*self.h)**2/self.Om
+        h0_c = 100*self.h
+        qterm= self.c_hde**2*(1+z)**(-3)/(h0_c)**2/self.Om
         # below is where the sign changes compared to previous works
         value= (1 + z)*self.dffunc(z)*term1*np.log(qterm*(1 - Ode)/Ode)
         return value
@@ -145,7 +143,7 @@ class HolographicCosmology(LCDMCosmology):
         delta = self.ffunc(z) + 2
         term1 = 1./self.ffunc(z)
 
-        if np.abs(self.ffunc(z)) <= 0.005 : #np.allclose(self.ffunc(z), 0):
+        if np.abs(self.ffunc(z)) <= 0.005 :
             fact = 1 + delta
         else:
             term_cte = 1 + delta + self.Q_term(z)*self.extra_term(z, Ode)*(1 + z)**(-1.5*delta*term1)
