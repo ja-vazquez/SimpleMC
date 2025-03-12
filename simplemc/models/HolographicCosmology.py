@@ -63,7 +63,7 @@ class HolographicCosmology(LCDMCosmology):
     # my free parameters. We add Ok on top of LCDM ones (we inherit LCDM)
     def freeParameters(self):
         l = LCDMCosmology.freeParameters(self)
-        if (self.varychde):  l.append(self.c_par)
+        if (self.varychde): l.append(self.c_par)
         if (self.varyOk): l.append(Ok_par)
         if self.nnodes > 0:
             l += self.params
@@ -95,7 +95,7 @@ class HolographicCosmology(LCDMCosmology):
 
 
     def ini_function(self):
-        if self.nnodes <=1:
+        if self.nnodes <= 1:
             amp = 1
             y = self.pvals[0]*np.ones(2)
         else:
@@ -115,7 +115,7 @@ class HolographicCosmology(LCDMCosmology):
         term1 = 1./self.ffunc(z)
 
         h0_c= 100*self.h/(constants.c/1000.)
-        Q = (2-delta)*(self.c_hde)**(2*term1)*(h0_c*np.sqrt(self.Om))**(-delta*term1)
+        Q = (2 - delta)*(self.c_hde)**(2*term1)*(h0_c*np.sqrt(self.Om))**(-delta*term1)
 
         return Q
 
@@ -128,11 +128,10 @@ class HolographicCosmology(LCDMCosmology):
 
 
     def deriv_func(self, z, Ode):
-        delta = self.ffunc(z) + 2
         term1 = 1./self.ffunc(z)
 
-        h0_c = 100*self.h
-        qterm= self.c_hde**2*(1+z)**(-3)/(h0_c)**2/self.Om
+        h0_c = 100*self.h/(constants.c/1000.)
+        qterm= self.c_hde**2*(1 + z)**(-3)/(h0_c)**2/self.Om
         # below is where the sign changes compared to previous works
         value= (1 + z)*self.dffunc(z)*term1*np.log(qterm*(1 - Ode)/Ode)
         return value
@@ -170,10 +169,10 @@ class HolographicCosmology(LCDMCosmology):
     def RHSquared_a(self, a):
         z = 1./a-1
         if z>self.zend:
-            Ode =  (1-self.Om-self.Ok)
+            Ode =  (1 - self.Om - self.Ok)
             hubble = self.Omrad/a**4 + self.Ocb/a**3 + self.Ok/a**2 + Ode
         else:
-            hubble = self.Om*(1+z)**3/(1-self.Ode(z))
+            hubble = self.Om*(1+z)**3/(1 - self.Ode(z))
 
         return hubble
 
@@ -186,6 +185,6 @@ class HolographicCosmology(LCDMCosmology):
             fact = -(1 + delta)
         else:
             tmp = (1+z)**(-1.5*delta/(2-delta))
-            fact = -(1+delta) - self.Q_term(z)*self.extra_term(z, Ode)*tmp \
+            fact = -(1 + delta) - self.Q_term(z)*self.extra_term(z, Ode)*tmp \
             + self.deriv_func(z, Ode)
         return fact/3.
