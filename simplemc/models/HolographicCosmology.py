@@ -18,7 +18,7 @@ class HolographicCosmology(LCDMCosmology):
         :param varyc: variable w0 parameter
 
     """
-    def __init__(self, varyOk=False, varychde=True, mean=-1,
+    def __init__(self, varyOk=False, varychde=True, mean=-2,
                  nodes=3,   # numer of nodes used in the interpolation
                  interp= 'lineal'
                  ):
@@ -98,15 +98,16 @@ class HolographicCosmology(LCDMCosmology):
         if self.nnodes <= 1:
             amp = 1
             y = self.pvals[0]*np.ones(2)
+            self.ffunc = lambda x: self.pvals[0]
+            self.dffunc = lambda x: 0
         else:
             amp = self.nnodes-1
             y = self.pvals
+            delta = (self.zend - self.zini)/amp
+            x = [self.zini + delta*i for i in range(amp+1)]
 
-        delta = (self.zend - self.zini)/amp
-        x = [self.zini + delta*i for i in range(amp+1)]
-
-        self.ffunc = InterpolatedUnivariateSpline(x, y, k=self.interp)
-        self.dffunc = self.ffunc.derivative(n=1)
+            self.ffunc = InterpolatedUnivariateSpline(x, y, k=self.interp)
+            self.dffunc = self.ffunc.derivative(n=1)
         return True
 
 
