@@ -96,15 +96,13 @@ class HolographicCosmology(LCDMCosmology):
 
     def ini_function(self):
         if self.nnodes <= 1:
-            amp = 1
+            x = [self.zini, self.zend]
             y = self.pvals[0]*np.ones(2)
-            self.ffunc = lambda x: self.pvals[0]
-            self.dffunc = lambda x: 0
+            self.ffunc = InterpolatedUnivariateSpline(x, y, k=self.interp)
         else:
-            amp = self.nnodes-1
             y = self.pvals
-            delta = (self.zend - self.zini)/amp
-            x = [self.zini + delta*i for i in range(amp+1)]
+            delta = (self.zend - self.zini)/(self.nnodes-1)
+            x = [self.zini + delta*i for i in range(self.nnodes)]
 
             self.ffunc = InterpolatedUnivariateSpline(x, y, k=self.interp)
             self.dffunc = self.ffunc.derivative(n=1)
@@ -146,8 +144,9 @@ class HolographicCosmology(LCDMCosmology):
         if np.abs(self.ffunc(z)) <= 0.005 :
             fact = 1 + delta
         else:
-            term_cte = 1 + delta + self.Q_term(z)*self.extra_term(z, Ode)*(1 + z)**(-1.5*delta*term1)
-            fact = term_cte + self.deriv_func(z, Ode)
+            fact = 1 + delta + self.Q_term(z)*self.extra_term(z, Ode)*(1 + z)**(-1.5*delta*term1)
+            if self.nnodes > 1:
+                fact += self.deriv_func(z, Ode)
         dOmega = -Ode*(1 - Ode)*fact/(1 + z)
         return dOmega
 
@@ -182,10 +181,11 @@ class HolographicCosmology(LCDMCosmology):
         Ode = self.Ode(z)
         delta = self.ffunc(z) + 2
 
-        if np.abs(self.ffunc(z)) <= 0.005: #np.allclose(self.ffunc(z), 0):
+        if np.abs(self.ffunc(z)) <= 0.005:
             fact = -(1 + delta)
         else:
             tmp = (1+z)**(-1.5*delta/(2-delta))
-            fact = -(1 + delta) - self.Q_term(z)*self.extra_term(z, Ode)*tmp \
-            + self.deriv_func(z, Ode)
+            fact = -(1 + delta) - self.Q_term(z)*self.extra_term(z, Ode)*tmp
+            if self.nnodes > 1:
+                fact += self.deriv_func(z, Ode)
         return fact/3.
