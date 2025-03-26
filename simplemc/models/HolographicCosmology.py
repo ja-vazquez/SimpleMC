@@ -33,7 +33,7 @@ class HolographicCosmology(LCDMCosmology):
         self.varyOk = varyOk
         self.varychde = varychde
 
-        self.c_par = Parameter("c", 2.1, 0.1, (0.5, 2.0), "c")
+        self.c_par = Parameter("c", 1.0, 0.1, (0.5, 2.0), "c")
 
         self.Ok = Ok_par.value
         self.c_hde = self.c_par.value
@@ -166,8 +166,8 @@ class HolographicCosmology(LCDMCosmology):
 
         if np.abs(self.ffunc(z)) > 0.005:
             ex_term = self.extra_term(z, Ode)
-            fact += func*np.sqrt(Ode)/self.c_hde*ex_term**(0.5*(func+2)/func)
+            fact += -1*func*np.sqrt(Ode)/self.c_hde*ex_term**(0.5*(func+2)/func)
 
             if self.nnodes > 1:
-                fact += (1 + z) / func * self.dffunc(z) * np.log(ex_term)
+                fact += (1+z)/func*self.dffunc(z)*np.log(ex_term)
         return -fact/3.
