@@ -98,7 +98,7 @@ class HolographicCosmology(LCDMCosmology):
         if self.nnodes <= 1:
             x = [self.zini, self.zend]
             y = self.pvals[0]*np.ones(2)
-            self.ffunc = InterpolatedUnivariateSpline(x, y, k=self.interp)
+            self.ffunc = InterpolatedUnivariateSpline(x, y, k=1)
         else:
             y = self.pvals
             delta = (self.zend - self.zini)/(self.nnodes-1)
@@ -109,44 +109,27 @@ class HolographicCosmology(LCDMCosmology):
         return True
 
 
-    def Q_term(self, z):
-        delta = self.ffunc(z) + 2
-        term1 = 1./self.ffunc(z)
-
-        h0_c= 100*self.h/(constants.c/1000.)
-        Q = (2 - delta)*(self.c_hde)**(2*term1)*(h0_c*np.sqrt(self.Om))**(-delta*term1)
-
-        return Q
-
 
     def extra_term(self, z, Ode):
-        delta = self.ffunc(z) + 2
-        term1 = 1./self.ffunc(z)
+        # Bear in mind that f=D-2
+        q_term = self.c_hde**2/(self.Om*(1 + z)**3)
+        return q_term*(1 - Ode)/Ode
 
-        return (1 - Ode)**(0.5*delta*term1)*Ode**(-term1)
-
-
-    def deriv_func(self, z, Ode):
-        term1 = 1./self.ffunc(z)
-
-        h0_c = 100*self.h/(constants.c/1000.)
-        qterm= self.c_hde**2*(1 + z)**(-3)/(h0_c)**2/self.Om
-        # below is where the sign changes compared to previous works
-        value= (1 + z)*self.dffunc(z)*term1*np.log(qterm*(1 - Ode)/Ode)
-        return value
 
 
     # Right hand side of the equations
     def RHS_hde(self, Ode, z):
-        delta = self.ffunc(z) + 2
-        term1 = 1./self.ffunc(z)
+        func = self.ffunc(z)
 
-        if np.abs(self.ffunc(z)) <= 0.005 :
-            fact = 1 + delta
-        else:
-            fact = 1 + delta + self.Q_term(z)*self.extra_term(z, Ode)*(1 + z)**(-1.5*delta*term1)
+        fact = 3 + func
+
+        if np.abs(func) > 0.005:
+            ex_term = self.extra_term(z, Ode)
+            fact += -1*func*np.sqrt(Ode)/self.c_hde*ex_term**(0.5*(func+2)/func)
+
+            # derivative term
             if self.nnodes > 1:
-                fact += self.deriv_func(z, Ode)
+                fact += (1+z)/func*self.dffunc(z)*np.log(ex_term)
         dOmega = -Ode*(1 - Ode)*fact/(1 + z)
         return dOmega
 
