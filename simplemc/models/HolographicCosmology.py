@@ -33,7 +33,7 @@ class HolographicCosmology(LCDMCosmology):
         self.varyOk = varyOk
         self.varychde = varychde
 
-        self.c_par = Parameter("c", 0.7, 0.1, (0.5, 2.0), "c")
+        self.c_par = Parameter("c", 1.0, 0.1, (0.5, 2.0), "c")
 
         self.Ok = Ok_par.value
         self.c_hde = self.c_par.value
@@ -120,7 +120,6 @@ class HolographicCosmology(LCDMCosmology):
     # Right hand side of the equations
     def RHS_hde(self, Ode, z):
         func = self.ffunc(z)
-
         fact = 3 + func
 
         if np.abs(func) > 0.005:
@@ -152,7 +151,7 @@ class HolographicCosmology(LCDMCosmology):
     def RHSquared_a(self, a):
         z = 1./a-1
         if z>self.zend:
-            Ode =  (1 - self.Om - self.Ok)
+            Ode = (1 - self.Om - self.Ok)
             hubble = self.Omrad/a**4 + self.Ocb/a**3 + self.Ok/a**2 + Ode
         else:
             hubble = self.Om*(1+z)**3/(1 - self.Ode(z))
@@ -162,13 +161,13 @@ class HolographicCosmology(LCDMCosmology):
 
     def EoS(self, z):
         Ode = self.Ode(z)
-        delta = self.ffunc(z) + 2
+        func = self.ffunc(z)
+        fact = 3 + func
 
-        if np.abs(self.ffunc(z)) <= 0.005:
-            fact = -(1 + delta)
-        else:
-            tmp = (1+z)**(-1.5*delta/(2-delta))
-            fact = -(1 + delta) - self.Q_term(z)*self.extra_term(z, Ode)*tmp
+        if np.abs(self.ffunc(z)) > 0.005:
+            ex_term = self.extra_term(z, Ode)
+            fact += func*np.sqrt(Ode)/self.c_hde*ex_term**(0.5*(func+2)/func)
+
             if self.nnodes > 1:
-                fact += self.deriv_func(z, Ode)
+                fact += (1 + z) / func * self.dffunc(z) * np.log(ex_term)
         return fact/3.
