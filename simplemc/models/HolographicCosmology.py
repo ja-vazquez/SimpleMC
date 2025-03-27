@@ -20,15 +20,15 @@ class HolographicCosmology(LCDMCosmology):
     """
     def __init__(self, varyOk=False, varychde=True, mean=-2,
                  nodes=3,   # numer of nodes used in the interpolation
-                 interp= 'lineal'
+                 interp='lineal'
                  ):
         # Holographic parameter
         # Notation: capital C = 3c**2*M_p, here, we use little c
         # Nodes: =0 delta constant, = 1 varying delta, = 2 two nodes, etc.
 
         self.nnodes = nodes
-        # =1 lineal, 3 = cubic
-        self.interp = 1 if interp == 'lineal' else 3
+        # Degree of the smoothing spline, =1 lineal, =3 cubic
+        self.interp = 1 if interp == 'lineal' else 2
 
         self.varyOk = varyOk
         self.varychde = varychde
@@ -42,6 +42,9 @@ class HolographicCosmology(LCDMCosmology):
         # however is the first point of the last step in the binning/tanh version
         self.zini = 0.0
         self.zend = 2.5
+
+        # whenever it is considered as LCDM
+        self.tol = 1E-5
 
         # range to perform the interpolation
         self.zvals = np.linspace(self.zini, self.zend, 100)
@@ -122,7 +125,7 @@ class HolographicCosmology(LCDMCosmology):
         func = self.ffunc(z)
         fact = 3 + func
 
-        if np.abs(func) > 0.005:
+        if np.abs(func) > self.tol:
             ex_term = self.extra_term(z, Ode)
             fact += -1*func*np.sqrt(Ode)/self.c_hde*ex_term**(0.5*(func+2)/func)
 
@@ -164,7 +167,7 @@ class HolographicCosmology(LCDMCosmology):
         func = self.ffunc(z)
         fact = 3 + func
 
-        if np.abs(self.ffunc(z)) > 0.005:
+        if np.abs(self.ffunc(z)) > self.tol:
             ex_term = self.extra_term(z, Ode)
             fact += -1*func*np.sqrt(Ode)/self.c_hde*ex_term**(0.5*(func+2)/func)
 
