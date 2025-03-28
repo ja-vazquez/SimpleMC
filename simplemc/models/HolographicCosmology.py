@@ -33,7 +33,7 @@ class HolographicCosmology(LCDMCosmology):
         self.varyOk = varyOk
         self.varychde = varychde
 
-        self.c_par = Parameter("c", 1.0, 0.1, (0.5, 2.0), "c")
+        self.c_par = Parameter("c", 1.0, 0.1, (0.0, 2.0), "c")
 
         self.Ok = Ok_par.value
         self.c_hde = self.c_par.value
@@ -51,8 +51,8 @@ class HolographicCosmology(LCDMCosmology):
 
         # = 0 for CC, = -2 for Barrow
         mean = mean
-        priors = (-3, 1)
-        sigma = 0.2
+        priors = (-3.0 , 0.0)
+        sigma = 0.1
 
         self.pname = 'amp_'
         amps = 1 if nodes <= 1 else nodes
@@ -115,7 +115,8 @@ class HolographicCosmology(LCDMCosmology):
 
     def extra_term(self, z, Ode):
         # Bear in mind that f=D-2
-        q_term = self.c_hde**2/(self.Om*(1 + z)**3)
+        h0_c = 100*self.h/(constants.c/1000.)
+        q_term = self.c_hde**2/(h0_c**2*self.Om*(1 + z)**3)
         return q_term*(1 - Ode)/Ode
 
 
@@ -127,7 +128,7 @@ class HolographicCosmology(LCDMCosmology):
 
         if np.abs(func) > self.tol:
             ex_term = self.extra_term(z, Ode)
-            fact += -1*func*np.sqrt(Ode)/self.c_hde*ex_term**(0.5*(func+2)/func)
+            fact += -1*func*np.sqrt(Ode)/self.c_hde*ex_term**(0.5 + 1./func)
 
             # derivative term
             if self.nnodes > 1:
@@ -169,7 +170,7 @@ class HolographicCosmology(LCDMCosmology):
 
         if np.abs(self.ffunc(z)) > self.tol:
             ex_term = self.extra_term(z, Ode)
-            fact += -1*func*np.sqrt(Ode)/self.c_hde*ex_term**(0.5*(func+2)/func)
+            fact += -1*func*np.sqrt(Ode)/self.c_hde*ex_term**(0.5 + 1./func)
 
             if self.nnodes > 1:
                 fact += (1+z)/func*self.dffunc(z)*np.log(ex_term)
