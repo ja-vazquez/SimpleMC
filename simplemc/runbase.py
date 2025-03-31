@@ -50,6 +50,7 @@ from .likelihoods.DESY5Likelihood import DESY5
 from .likelihoods.CompressedHDLikelihood import HubbleDiagram, HD23
 from .likelihoods.Compressedfs8Likelihood import fs8Diagram
 from .likelihoods.HubbleParameterLikelihood import RiessH0, RiessH0_21
+from .likelihoods.BBNLikelihood import BBN
 
 from .likelihoods.StrongLensingLikelihood import StrongLensing
 
@@ -174,8 +175,8 @@ def ParseModel(model, **kwargs):
         T = RotationCurves()
     elif model == "Chaplygin_s":
         T = ChaplyginCosmology(usesigmoid=True)
-    elif model == "HDE":
-        T = HolographicCosmology()
+    elif model == "HDE_node1":
+        T = HolographicCosmology(nodes=1)
     elif model == 'simple':
         T = SimpleModel(custom_parameters, custom_function)
     elif model == 'simple_cosmo':
@@ -284,7 +285,7 @@ def ParseDataset(datasets, **kwargs):
             L.addLikelihood(PLK15())
         elif name == 'PLK18':
             L.addLikelihood(PLK18())
-        elif name == 'PLKw':
+        elif name == 'PLKW':
             from .likelihoods.WangWangCMB import PlanckLikelihood
             L.addLikelihood(PlanckLikelihood())
         elif name == 'WMAP9':
@@ -324,6 +325,8 @@ def ParseDataset(datasets, **kwargs):
             L.addLikelihood(HubbleDiagram())
         elif name == 'HD23':
             L.addLikelihood(HD23())
+        elif name == 'BBN':
+            L.addLikelihood(BBN())
         elif name == 'fs8':
             L.addLikelihood(fs8Diagram())
         elif name == 'dline':

@@ -51,7 +51,7 @@ class HolographicCosmology(LCDMCosmology):
 
         # = 0 for CC, = -2 for Barrow
         mean = mean
-        priors = (-3.0 , 0.0)
+        priors = (-3.5 , -0.01)
         sigma = 0.1
 
         self.pname = 'amp_'
