@@ -51,11 +51,10 @@ from .likelihoods.CompressedHDLikelihood import HubbleDiagram, HD23
 from .likelihoods.Compressedfs8Likelihood import fs8Diagram
 from .likelihoods.HubbleParameterLikelihood import RiessH0, RiessH0_21
 from .likelihoods.BBNLikelihood import BBN
-
 from .likelihoods.StrongLensingLikelihood import StrongLensing
-
 from .likelihoods.SimpleLikelihood import GenericLikelihood, StraightLine
 from .likelihoods.RotationCurvesLikelihood import RotationCurvesLike
+from .likelihoods.DESIDR2BAOLikelihood import DESIDR2BAO
 
 #Importance Sampling
 #from .CosmoMCImportanceSampler import *
@@ -189,7 +188,7 @@ def ParseModel(model, **kwargs):
 
 
 data_list = "BBAO, GBAO, GBAO_no6dF, CMASS, LBAO, LaBAO, LxBAO, MGS, Planck, WMAP, PlRd, WRd, PlDa, PlRdx10,"\
-    "CMBW, SN, SNx10, UnionSN, RiessH0, 6dFGS, PantheonPlus, DR16BAO, HD23, DESIBAO"
+    "CMBW, SN, SNx10, UnionSN, RiessH0, 6dFGS, PantheonPlus, DR16BAO, HD23, DESIBAO, DESIDR2BAO"
 
 
 def ParseDataset(datasets, **kwargs):
@@ -279,6 +278,8 @@ def ParseDataset(datasets, **kwargs):
             L.addLikelihood(DR16BAO())
         elif name == 'DESI':
             L.addLikelihood(DESIBAO())
+        elif name == 'DESIDR2':
+            L.addLikelihood(DESIDR2BAO())  
         elif name == 'PLK':
             L.addLikelihood(PLK())
         elif name == 'PLK15':
