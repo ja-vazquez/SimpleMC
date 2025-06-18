@@ -2,7 +2,7 @@ import numpy as np
 from simplemc.likelihoods.BaseLikelihood import BaseLikelihood
 import scipy.linalg as la
 import numpy as sp
-
+from simplemc.setup_logger import cdir
 
 
 class DESIDR2BAOLikelihood(BaseLikelihood):
@@ -48,3 +48,12 @@ class DESIDR2BAOLikelihood(BaseLikelihood):
         tvec += 0
         delta = tvec - self.DM_DH
         return -sp.dot(delta, sp.dot(self.icov, delta))/2.0
+
+class DESIDR2BAO(DESIDR2BAOLikelihood):
+    """
+    Likelihood to full DESIDR2BAO compilation.
+    """
+    def __init__(self):
+        DESIDR2BAOLikelihood.__init__(self, "DESIDR2BAO", cdir+"/data/desi_gaussian_bao_ALL_GCcomb_mean.txt",
+                                          cdir+"/data/desi_gaussian_bao_ALL_GCcomb_cov.txt")
+
