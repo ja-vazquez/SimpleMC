@@ -143,3 +143,8 @@ wcpl_par = Parameter("wcpl", 0.0, 0.03, (0, 0.5), "w_{cpl}")
 #Brans Dicke
 LMBD_par = Parameter("LMBD", 0.65, 0.02, (0, 1), "w_{cpl}")
 
+#BEC Model
+Ochi0_par = Parameter("Ochi0", 0.335, 0.012, (0.0, 1.0), "\Omega_{\chi0}")  
+r_chi_par = Parameter("r_chi", 3.43, 0.20, (2.0, 4.0), "r_{\chi}")  
+sigma_par = Parameter("sigma", 0.00156, 0.00049, (0.0, 0.01), "\sigma")  
+zcr_par = Parameter("zcr", 0.740, 0.012, (0.0, 1.0), "z_{cr}")
