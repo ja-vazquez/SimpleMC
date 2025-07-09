@@ -39,7 +39,7 @@ from .likelihoods.LikelihoodMultiplier import LikelihoodMultiplier
 # Likelihood modules
 from .likelihoods.BAOLikelihoods import DR11LOWZ, DR11CMASS, DR14LyaAuto, DR14LyaCross, \
                                         SixdFGS, SDSSMGS, DR11LyaAuto, DR11LyaCross, eBOSS, \
-                                        DR12Consensus, DR16BAO, DESIBAO
+                                        DR12Consensus, DR16BAO, DESIBAO, DESIDR2BAO
 from .likelihoods.SimpleCMBLikelihood import PLK, PLK15, PLK18, WMAP9
 from .likelihoods.CompressedSNLikelihood import BetouleSN, UnionSN
 from .likelihoods.SNLikelihood import JLASN_Full
@@ -54,7 +54,6 @@ from .likelihoods.BBNLikelihood import BBN
 from .likelihoods.StrongLensingLikelihood import StrongLensing
 from .likelihoods.SimpleLikelihood import GenericLikelihood, StraightLine
 from .likelihoods.RotationCurvesLikelihood import RotationCurvesLike
-from .likelihoods.DESIDR2BAOLikelihood import DESIDR2BAO
 
 #Importance Sampling
 #from .CosmoMCImportanceSampler import *
