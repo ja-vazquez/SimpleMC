@@ -31,4 +31,5 @@ from .TanhCosmology import TanhCosmology
 from .ChaplyginCosmology import ChaplyginCosmology
 from .HolographicCosmology import HolographicCosmology
 from .ReconstructedCosmology import ReconstructedCosmology
+from .BECCosmology import BECCosmology
 #from .ePhiCDMCosmology import ePhiCosmology
