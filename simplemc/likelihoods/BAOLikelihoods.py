@@ -8,6 +8,7 @@ from simplemc.likelihoods.GaussBAODVLikelihood import GaussBAODVLikelihood
 from simplemc.likelihoods.ConsensusBAOLikelihood import ConsensusBAOLikelihood
 from simplemc.likelihoods.DR16BAOLikelihood import DR16BAOLikelihood
 from simplemc.likelihoods.DESIBAOLikelihood import DESIBAOLikelihood
+from simplemc.likelihoods.DESIDR2BAOLikelihood import DESIDR2BAOLikelihood
 from simplemc.models.LCDMCosmology import LCDMCosmology
 from simplemc.setup_logger import cdir
 
