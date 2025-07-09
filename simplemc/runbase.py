@@ -20,6 +20,7 @@ from .models import QuintomCosmology
 from .models import RotationCurves
 from .models import ChaplyginCosmology
 from .models import HolographicCosmology
+from .models import BECCosmology
 
 #Non-parametric functions
 from .models import ReconstructedCosmology
@@ -64,7 +65,7 @@ from .likelihoods.RotationCurvesLikelihood import RotationCurvesLike
 # String parser Aux routines
 model_list = "LCDOM, LCDMasslessnu, nuLCDM, NeffLCDM, noradLCDM, nuoLCDM, nuwLCDM, oLCDM, wCDM, waCDM, owCDM,"\
     "owaCDM, JordiCDM, WeirdCDM, TLight, Spline, PolyCDM, fPolyCDM, Decay, Decay01, Decay05,"\
-    "EarlyDE, EarlyDE_rd_DE, SlowRDE"
+    "EarlyDE, EarlyDE_rd_DE, SlowRDE, BECModel"
 
 
 def ParseModel(model, **kwargs):
@@ -107,6 +108,8 @@ def ParseModel(model, **kwargs):
         T.setVaryMnu()
     elif model == "wCDM":
         T = wCDMCosmology()
+    elif model == "BEC":
+        T = BECCosmology()
     elif model == "nuwCDM":
         T = wCDMCosmology()
         T.setVaryMnu()
@@ -189,7 +192,7 @@ def ParseModel(model, **kwargs):
 
 
 data_list = "BBAO, GBAO, GBAO_no6dF, CMASS, LBAO, LaBAO, LxBAO, MGS, Planck, WMAP, PlRd, WRd, PlDa, PlRdx10,"\
-    "CMBW, SN, SNx10, UnionSN, RiessH0, 6dFGS, PantheonPlus, DR16BAO, HD23, DESIBAO"
+    "CMBW, SN, SNx10, UnionSN, RiessH0, 6dFGS, PantheonPlus, DR16BAO, HD23, DESIBAO, DESIDR2BAO"
 
 
 def ParseDataset(datasets, **kwargs):
