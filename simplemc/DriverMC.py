@@ -128,6 +128,7 @@ class DriverMC:
         self.pars_info  = self.L.freeParameters()
         self.bounds     = [p.bounds for p in self.pars_info]
         self.means      = [p.value  for p in self.pars_info]
+        self.errors     = [p.error  for p in self.pars_info]
         self.paramsList = [p.name   for p in self.pars_info]
         self.dims       = len(self.paramsList)
 
@@ -723,12 +724,18 @@ class DriverMC:
         """
         priors = []
         n = self.nsigma
-
+        # if the prior is gaussian
         if self.priortype == 'g':
-            for c, bound in enumerate(self.bounds):
+            for c in range(len(theta)):
                 mu = self.means[c]
-                sigma = (bound[1]-bound[0])/n
-                priors.append(mu+sigma*(ndtri(theta[c])))
+                sigma = self.errors[c]
+                if sigma == 0:
+                    raise ValueError(f"Standard deviation (err) is zero for parameter {c}. "
+                                     "Cannot define a Gaussian prior with err = 0.")
+                bound = self.bounds[c]
+                prior_val = mu + sigma * ndtri(theta[c])
+                priors.append(prior_val)
+        # if the prior is uniform        
         else:
             for c, bound in enumerate(self.bounds):
                # When theta 0-> append bound[0], if theta 1-> append bound[1]
